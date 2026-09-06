@@ -45,6 +45,7 @@
     ballMaxSpeed: 720,
     maxBounceAngle: Math.PI / 3,  // 60 degrees off the horizontal
     serveDelay: 0.9,        // seconds the ball waits at the centre
+    titleBlink: 0.62,       // seconds the 'press any key' line stays on, then off
     maxSubstep: 6           // never move the ball further than this in one go
   };
 
@@ -83,6 +84,10 @@
       rules: rules,
       rng: opts.rng || Math.random,
       era: 0,                 // era zero: the 1972 machine
+      // Where a fresh machine sits. In 'title' the field exists but NOTHING
+      // moves: the ball holds still and no point can be scored until
+      // startGame() is called. 'playing' is the game proper.
+      phase: opts.phase === 'playing' ? 'playing' : 'title',
       time: 0,                // seconds of simulated play
       rally: 0,               // paddle hits since the last serve
       serveDelay: 0,
@@ -117,6 +122,24 @@
     state.serveDelay = r.serveDelay;
     state.lastEvent = 'serve';
     rerollCpuAim(state);
+  }
+
+  /**
+   * Leave the title screen and start a real game: paddles home, score back to
+   * nothing, a fresh serve, and the clock restarted. Calling it while already
+   * playing does nothing, so a fistful of keypresses cannot restart a rally.
+   * Returns true only if it actually started something.
+   */
+  function startGame(state) {
+    if (state.phase !== 'title') return false;
+    state.phase = 'playing';
+    state.time = 0;
+    state.score.left = 0;
+    state.score.right = 0;
+    state.left.y = (state.height - state.left.h) / 2;
+    state.right.y = (state.height - state.right.h) / 2;
+    serve(state, 1);
+    return true;
   }
 
   function rerollCpuAim(state) {
@@ -248,6 +271,11 @@
     state.time += dt;
     state.lastEvent = null;
 
+    // The title screen is a real state, not a paused game. The clock above
+    // keeps running -- the blinking prompt reads it -- and nothing else
+    // happens at all until startGame() is called.
+    if (state.phase === 'title') return state;
+
     stepPlayer(state, dt, intent);
     stepCpu(state, dt);
 
@@ -269,6 +297,7 @@
     FIELD: FIELD,
     RULES: RULES,
     createGame: createGame,
+    startGame: startGame,
     step: step,
     serve: serve,
     ballSpeed: ballSpeed,
