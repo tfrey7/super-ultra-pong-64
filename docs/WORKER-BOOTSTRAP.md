@@ -15,7 +15,9 @@ self-playing demo rally behind it, drawn from the score's own block font. It is 
 `package.json`, no build step, no framework, no dependencies of any kind** — and that is a
 deliberate property to preserve, not an accident of it being early. The layout exists so later
 eras are *additions*: `src/game.js` is the rules, `src/render.js` the look, `src/input.js` the
-hands, `src/main.js` the loop that ties them together. Read the `README.md` for the full tour.
+hands, `src/main.js` the loop that ties them together. In the README's own words: adding an era
+should mean adding fields to the state and rules to `step()`, plus a branch in the renderer —
+not touching the other two modules. Read the `README.md` for the full tour.
 
 ## 2. Cut your own worktree
 
@@ -62,7 +64,7 @@ done. The repo itself binds nothing.
 node --test
 ```
 
-From the repo root, Node 18+. **30 tests, well under a second** (0.7 s measured). It is the headless suite over the pure rules
+From the repo root, Node 18+. **45 tests, well under a second** (0.16 s measured). It is the headless suite over the pure rules
 in `src/game.js` — paddle bounces and their angles, wall bounces, scoring on each side, the serve
 reset, and frame-rate independence. There is no faster subset worth naming; the whole thing is one
 file (`test/game.test.js`) and already instant. This is the command you run once, immediately
