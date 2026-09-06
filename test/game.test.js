@@ -457,6 +457,98 @@ test('the game a start hands you is a clean one', () => {
   assert.strictEqual(g.ball.x, (g.width - g.ball.size) / 2, 'and the ball centres');
 });
 
+// ----------------------------------------------------- the turn to colour
+// Evolution step one: the machine boots black and white and turns colour the
+// moment the first point of the session lands.
+
+test('the machine boots in black and white', () => {
+  const g = newGame();
+  assert.strictEqual(g.colour, false);
+});
+
+test('the first point of the session turns the machine colour', () => {
+  const g = newGame();
+  endServeDelay(g);
+  placeBall(g, 1, g.height / 2, -400, 0);
+  centrePaddle(g.left, 60);
+  assert.strictEqual(g.colour, false, 'still monochrome at match point zero');
+  Pong.step(g, 0.05, {});
+  assert.strictEqual(g.score.right, 1);
+  assert.strictEqual(g.colour, true, 'and colour the instant the point lands');
+});
+
+test('the colours belong to the session, not to the point', () => {
+  const g = Pong.createGame({ rng: Math.random, phase: 'playing' });
+  const score = () => {
+    endServeDelay(g);
+    placeBall(g, 1, g.height / 2, -400, 0);
+    centrePaddle(g.left, 60);
+    Pong.step(g, 0.05, {});
+  };
+  score();
+  const first = Object.assign({}, g.paddleColour);
+  for (let i = 0; i < 6; i++) score();
+  assert.strictEqual(g.score.right, 7);
+  assert.deepStrictEqual(g.paddleColour, first,
+    'the colours a session earns are its own for the rest of the run');
+});
+
+test('the two paddles never wear the same colour', () => {
+  for (let i = 0; i < 300; i++) {
+    const g = Pong.createGame({ rng: Math.random, phase: 'playing' });
+    Pong.flipToColour(g);
+    assert.notStrictEqual(g.paddleColour.left, g.paddleColour.right,
+      'a session where both paddles came out the same colour');
+    for (const side of ['left', 'right']) {
+      const i2 = g.paddleColour[side];
+      assert.ok(Number.isInteger(i2) && i2 >= 0 && i2 < g.rules.paletteSize,
+        `${side} picked ${i2}, which is not a palette slot`);
+    }
+  }
+});
+
+test('a pinned rng still cannot give both paddles one colour', () => {
+  const g = newGame(0.5);            // every draw comes out the same slot
+  Pong.flipToColour(g);
+  assert.notStrictEqual(g.paddleColour.left, g.paddleColour.right);
+});
+
+test('a new session starts over in black and white', () => {
+  const g = Pong.createGame({ rng: Math.random });
+  Pong.startGame(g);
+  Pong.flipToColour(g);
+  assert.strictEqual(g.colour, true);
+  g.phase = 'title';
+  Pong.startGame(g);
+  assert.strictEqual(g.colour, false, 'a fresh session earns its own colours');
+});
+
+// ------------------------------------------------------- the palette itself
+// The rules pick a slot; src/render.js is the only place that knows what a
+// colour looks like. These two checks pin the join between them.
+test('the renderer offers exactly the palette the rules pick from', () => {
+  require('../src/render.js');
+  const inks = globalThis.PongRender.PADDLE_COLOURS;
+  assert.strictEqual(inks.length, Pong.RULES.paletteSize);
+  for (const ink of inks) {
+    assert.match(ink, /^#[0-9a-f]{6}$/, `${ink} is not a plain hex colour`);
+    assert.ok(globalThis.PongRender.isLegible(ink),
+      `${ink} would vanish into the black field`);
+  }
+});
+
+test('the paddles are white until the machine turns colour', () => {
+  require('../src/render.js');
+  const R = globalThis.PongRender;
+  const g = newGame();
+  assert.strictEqual(R.paddleInk(g, 'left'), '#ffffff');
+  assert.strictEqual(R.paddleInk(g, 'right'), '#ffffff');
+  Pong.flipToColour(g);
+  assert.ok(R.PADDLE_COLOURS.includes(R.paddleInk(g, 'left')));
+  assert.ok(R.PADDLE_COLOURS.includes(R.paddleInk(g, 'right')));
+  assert.notStrictEqual(R.paddleInk(g, 'left'), R.paddleInk(g, 'right'));
+});
+
 // ------------------------------------------------------------------- purity
 test('the rules module touches no browser globals', () => {
   const src = require('node:fs')
