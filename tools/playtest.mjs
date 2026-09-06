@@ -166,6 +166,12 @@ async function main() {
         t1.score.left === 0 && t1.score.right === 0,
       `ball at ${t1.ball.x.toFixed(1)},${t1.ball.y.toFixed(1)} after 0.7s, ` +
       `score ${t1.score.left}-${t1.score.right}`);
+    // Catch the invitation lit rather than mid-blink: a title shot without it
+    // shows the reader a screen that never says how to start.
+    for (let i = 0; i < 40; i++) {
+      if (await s.eval('window.PongRender.promptLit(window.__pong)')) break;
+      await sleep(60);
+    }
     const titleShot = await s.shot('title');
 
     // 2. A click starts it -- then reload and prove a key does too.
@@ -182,6 +188,9 @@ async function main() {
     await sleep(150);
     check('and any key starts it too', (await state(s)).phase === 'playing',
       'pressed the space bar on the title screen');
+    // Far enough past the serve pause that the ball is on its way: a shot
+    // taken on the very first frame is an empty field, which proves nothing.
+    await sleep(1200);
     const firstFrameShot = await s.shot('first-frame');
 
     // 3. The loop is running at all.

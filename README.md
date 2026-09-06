@@ -15,6 +15,12 @@ Open **`index.html`** in a browser. That is the whole install: no `npm install`,
 no build step, no dev server. Double-clicking the file off disk works, because
 everything is a plain script and there is nothing to compile.
 
+It opens on the **title screen**, with a demo rally playing itself behind the
+name the way an idle cabinet did. Nothing counts there: the ball is held still
+and no point can be scored until you press any key or click. All of it is drawn
+on the canvas out of the score's own block font — there is no HTML text on the
+page at all.
+
 - **Your paddle is on the left.** Move the mouse over the field to place it, or
   use the **arrow keys** / **W** and **S**. Whichever you touched last is the one
   in charge, so you can swap mid-rally.

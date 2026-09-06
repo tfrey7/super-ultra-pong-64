@@ -189,16 +189,25 @@
 
     for (i = 0; i < TITLE.how.length; i++) drawLine(ctx, TITLE.how[i], mid);
 
-    // The invitation blinks, the way an idle cabinet did. A blink period of 0
-    // (or a state without the rule) simply leaves it lit.
+    if (promptLit(state)) drawLine(ctx, TITLE.prompt, mid);
+  }
+
+  /**
+   * Whether the invitation is showing this instant. The blink is the
+   * renderer's business, so anything that needs to know -- the playtest
+   * harness catching a screenshot with the prompt lit, say -- asks here rather
+   * than re-deriving it. A blink period of 0, or a state without the rule at
+   * all, simply leaves it lit.
+   */
+  function promptLit(state) {
     var period = (state.rules && state.rules.titleBlink) || 0;
-    var lit = !period || Math.floor(state.time / period) % 2 === 0;
-    if (lit) drawLine(ctx, TITLE.prompt, mid);
+    return !period || Math.floor(state.time / period) % 2 === 0;
   }
 
   root.PongRender = {
     draw: draw,
     drawTitle: drawTitle,
+    promptLit: promptLit,
     DIGITS: DIGITS,
     LETTERS: LETTERS,
     TITLE: TITLE
