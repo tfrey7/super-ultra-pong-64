@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Super Ultra Pong 64: Remastered</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* The cursor is the paddle; nothing else needs to be pointed at. */
+    cursor: none;
+  }
+  canvas {
+    display: block;
+    /* Fit the window while keeping the field's 4:3 shape, and keep the blocks
+       hard-edged rather than smoothed when the browser scales it. */
+    width: auto;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 75vw;
+    aspect-ratio: 4 / 3;
+    background: #000;
+    image-rendering: pixelated;
+  }
+</style>
+</head>
+<body>
+  <canvas id="field" width="800" height="600"
+          aria-label="Pong: your paddle on the left, the computer on the right"></canvas>
+
+  <!-- Plain scripts, in dependency order, so this page opens straight off disk:
+       ES modules are blocked over file:// and would need a dev server. -->
+  <script src="src/game.js"></script>
+  <script src="src/render.js"></script>
+  <script src="src/input.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>
