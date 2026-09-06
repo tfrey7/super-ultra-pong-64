@@ -1,0 +1,45 @@
+{
+  "measuredAt": "2026-09-06T16:49:51.894Z",
+  "runs": [
+    {
+      "label": "this checkout",
+      "aim": "track",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-titlescreen\\src\\game.js",
+      "trials": 300,
+      "windowSeconds": 22,
+      "sessionsThatScored": 133,
+      "passRate": 0.44333333333333336,
+      "pointsPerMinute": 1.436363636363636
+    },
+    {
+      "label": "comparison",
+      "aim": "track",
+      "module": "G:\\claude-tmp\\pong-master-control\\src\\game.js",
+      "trials": 300,
+      "windowSeconds": 22,
+      "sessionsThatScored": 133,
+      "passRate": 0.44333333333333336,
+      "pointsPerMinute": 1.436363636363636
+    },
+    {
+      "label": "this checkout",
+      "aim": "corner",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-titlescreen\\src\\game.js",
+      "trials": 300,
+      "windowSeconds": 22,
+      "sessionsThatScored": 237,
+      "passRate": 0.79,
+      "pointsPerMinute": 2.5636363636363635
+    },
+    {
+      "label": "comparison",
+      "aim": "corner",
+      "module": "G:\\claude-tmp\\pong-master-control\\src\\game.js",
+      "trials": 300,
+      "windowSeconds": 22,
+      "sessionsThatScored": 237,
+      "passRate": 0.79,
+      "pointsPerMinute": 2.5636363636363635
+    }
+  ]
+}
