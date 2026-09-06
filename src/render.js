@@ -16,6 +16,47 @@
   var INK = '#ffffff';
   var FIELD_INK = '#000000';
 
+  // Era one, the first evolution step: the machine turns colour on the first
+  // point. A dozen colours picked by eye to sit in the range a 2600 could
+  // show -- warm and slightly muddy, no pure #ff channels anywhere. This is
+  // NOT the real 128-entry NTSC palette and does not pretend to be; when an
+  // era genuinely needs that, that era can go and look it up.
+  //
+  // Every entry is deliberately bright, because the field is black and a
+  // paddle that vanishes into it is a broken game. isLegible() below is the
+  // check that keeps a future addition honest.
+  var PADDLE_INKS = [
+    '#c85c14',   // burnt orange
+    '#d8a038',   // gold
+    '#c8cc30',   // olive yellow
+    '#68bc40',   // grass
+    '#40b898',   // teal
+    '#4890d8',   // sky blue
+    '#7068d4',   // indigo
+    '#a858c8',   // violet
+    '#d0589c',   // magenta
+    '#cc4444',   // red
+    '#d88860',   // salmon
+    '#8cc8e8'    // pale blue
+  ];
+
+  /** Bright enough to read against the black field. No contrast maths. */
+  function isLegible(hex) {
+    var r = parseInt(hex.slice(1, 3), 16);
+    var g = parseInt(hex.slice(3, 5), 16);
+    var b = parseInt(hex.slice(5, 7), 16);
+    return (r * 0.30 + g * 0.59 + b * 0.11) > 70;
+  }
+
+  var PADDLE_COLOURS = PADDLE_INKS.filter(isLegible);
+
+  /** What the two paddles are wearing this session, or white before the flip. */
+  function paddleInk(state, side) {
+    if (!state.colour) return INK;
+    var i = (state.paddleColour && state.paddleColour[side]) || 0;
+    return PADDLE_COLOURS[i % PADDLE_COLOURS.length];
+  }
+
   // A 3x5 block font -- the same shape the original score was built from.
   // Each row is three cells; a 1 is a lit block.
   var DIGITS = {
@@ -136,13 +177,23 @@
     ctx.fillStyle = FIELD_INK;
     ctx.fillRect(0, 0, state.width, state.height);
 
-    ctx.fillStyle = (opts && opts.ink) || INK;
+    var ink = (opts && opts.ink) || INK;
+    var dim = !!(opts && opts.ink);   // the attract rally behind the title
+    ctx.fillStyle = ink;
     drawCentreLine(ctx, state);
-    drawNumber(ctx, state.score.left, state.width / 2 - SCORE_OFFSET, SCORE_TOP, SCORE_CELL);
-    drawNumber(ctx, state.score.right, state.width / 2 + SCORE_OFFSET, SCORE_TOP, SCORE_CELL);
 
+    // Once the machine has turned colour each score wears its own paddle's
+    // colour, so the flip reads across the whole screen and not just at the
+    // edges. Dimmed (attract) frames stay monochrome whatever the state says.
+    ctx.fillStyle = dim ? ink : paddleInk(state, 'left');
+    drawNumber(ctx, state.score.left, state.width / 2 - SCORE_OFFSET, SCORE_TOP, SCORE_CELL);
     ctx.fillRect(state.left.x, state.left.y, state.left.w, state.left.h);
+
+    ctx.fillStyle = dim ? ink : paddleInk(state, 'right');
+    drawNumber(ctx, state.score.right, state.width / 2 + SCORE_OFFSET, SCORE_TOP, SCORE_CELL);
     ctx.fillRect(state.right.x, state.right.y, state.right.w, state.right.h);
+
+    ctx.fillStyle = ink;
 
     // The ball blinks out while the serve waits, the way a reset reads.
     if (state.serveDelay <= 0) {
@@ -208,6 +259,9 @@
     draw: draw,
     drawTitle: drawTitle,
     promptLit: promptLit,
+    PADDLE_COLOURS: PADDLE_COLOURS,
+    paddleInk: paddleInk,
+    isLegible: isLegible,
     DIGITS: DIGITS,
     LETTERS: LETTERS,
     TITLE: TITLE
