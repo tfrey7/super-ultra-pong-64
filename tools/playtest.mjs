@@ -17,6 +17,7 @@ import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import os from 'node:os';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -115,7 +116,9 @@ const geometry = (s) => s.eval(`(() => {
 async function main() {
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
   const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/');
-  const profile = path.join(process.env.TEMP || process.env.TMP || '.', 'pong-playtest-profile');
+  // Never '.' as the fallback: that puts a Chrome profile in the repo root and dirties
+  // the worktree. os.tmpdir() always answers, and honours TEMP/TMP when they are set.
+  const profile = path.join(os.tmpdir(), 'pong-playtest-profile');
 
   const chrome = spawn(CHROME, [
     '--headless=new', '--disable-gpu', '--hide-scrollbars',

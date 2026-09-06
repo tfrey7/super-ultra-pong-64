@@ -86,21 +86,36 @@ change confined to the rules.
 py -3.10 "G:/Claude Stuff/fleet-console/scripts/shot.py" "file:///G:/Claude Stuff/super-ultra-pong-64-<name>/index.html" out.png
 ```
 
-## 5. What never to commit
+## 5. How the fleet lands it
+
+A branch here is landed by the fleet's integrator, not by you, and it does not guess how this
+repo works — the repo root's **`fleet.json`** tells it:
+
+```json
+{ "repo": "super-ultra-pong-64", "suite": "node --test",
+  "build": null, "protect": [], "restart": null }
+```
+
+The suite is `node --test`; there is **nothing to build**, **nothing protected** and **nothing
+to restart** after a merge. Those nulls are a description rather than an unfinished file — a
+game you open off disk has no build output and no service to bounce, and since the playtest
+screenshots became ignored output there is no path a merge has to tread carefully around. If
+you ever add one of those things, this is the file that has to say so.
+
+## 6. What never to commit
 
 - **`node_modules/`** — nothing should ever create one here, and its appearance means something
   pulled in a dependency this repo does not want. If you genuinely need one, that is a
   conversation, not a commit.
-- **`docs/shots/` output you did not mean to keep.** The playtest harness writes into
-  `docs/shots/playtest/` every time it runs, so a `git add -A` after a playtest sweeps up
-  regenerated PNGs. The screenshots already on master are deliberate; overwriting them with your
-  run's is noise in the diff. Check `git status --short` before every commit and restore any shot
-  you did not set out to change (`git checkout -- docs/shots/`). This is convention, not a
-  gitignore rule — nothing here is ignored for you.
+- **Playtest screenshots.** The harness rewrites `docs/shots/playtest/` on every run, so that
+  directory is gitignored and a playtest leaves `git status --short` empty — there is nothing to
+  check afterwards and nothing to restore. The one screenshot that *is* tracked is
+  `docs/shots/bootstrap/era-zero.png`, the reference frame a reader opens; if you deliberately
+  change how era zero looks, update that file on purpose, in its own commit.
 - Chrome's throwaway profile directories and any temp files from a playtest run — keep them on
   `G:/claude-tmp`, outside the worktree.
 
-## 6. Ports this repo owns
+## 7. Ports this repo owns
 
 **None.** The game is a file you open; nothing in `src/` listens on anything.
 
@@ -109,7 +124,7 @@ Two ports are borrowed rather than owned. `tools/playtest.mjs` opens Chrome's de
 **above 8930** that you release when you finish. **8790 is Tim's live fleet console and 27183 is
 his emulator — never touch either.**
 
-## 7. Traps
+## 8. Traps
 
 - **`src/game.js` must stay free of canvas, DOM, timers and input devices.** It is the rules and
   nothing else, and the headless suite exists only because that is true. Reach for

@@ -13,6 +13,14 @@ desktop.ini
 Desktop.ini
 .DS_Store
 
+# The playtest harness rewrites these on every run, so they are output, not
+# source. The reference frame a reader opens lives in docs/shots/bootstrap/.
+docs/shots/playtest/
+
+# The fleet's worker launcher reserves a port by writing .state/portlocks/
+# into this checkout. It is a runtime claim that expires by itself, not source.
+.state/
+
 # Scratch
 tmp/
 *.tmp
