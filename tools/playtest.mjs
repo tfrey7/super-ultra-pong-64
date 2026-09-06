@@ -1,8 +1,10 @@
 /*
  * Playtest harness -- proves the game is actually PLAYABLE, in a real browser,
  * opened straight off disk. `node --test` proves the rules; this proves the
- * page: that the mouse moves the paddle, that the keys move the paddle, that
- * rallies happen, that a miss scores, and that the serve comes back to centre.
+ * page: that it opens on a title screen with the ball held still, that a click
+ * and a keypress each start it, that the mouse moves the paddle, that the keys
+ * move the paddle, that rallies happen, that a miss scores, and that the serve
+ * comes back to centre.
  *
  * No dependencies: it launches Chrome with a debugging port and drives it over
  * the DevTools protocol using Node's built-in WebSocket client (Node 22+).
@@ -67,6 +69,15 @@ class Session {
   mouseTo(x, y) {
     return this.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y, button: 'none' });
   }
+  async click(x, y) {
+    const at = { x, y, button: 'left', clickCount: 1 };
+    await this.send('Input.dispatchMouseEvent', { type: 'mousePressed', ...at });
+    await this.send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...at });
+  }
+  async reload() {
+    await this.send('Page.reload', { ignoreCache: true });
+    await sleep(700);
+  }
   async key(type, code, key, vk) {
     await this.send('Input.dispatchKeyEvent', {
       type, code, key, windowsVirtualKeyCode: vk, nativeVirtualKeyCode: vk
@@ -101,7 +112,7 @@ function check(name, ok, detail) {
 }
 
 const state = (s) => s.eval(`(() => { const g = window.__pong; return {
-  time: g.time, serveDelay: g.serveDelay, rally: g.rally,
+  phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally,
   score: { left: g.score.left, right: g.score.right },
   ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy },
   leftY: g.left.y, rightY: g.right.y, h: g.left.h, height: g.height, width: g.width
@@ -144,13 +155,42 @@ async function main() {
     const toClientY = (fieldY) => geo.top + (fieldY / g0.height) * geo.height;
     const midX = geo.left + geo.width / 2;
 
-    // 1. The loop is running at all.
+    // 1. The machine opens on its title screen, and stays there.
+    const t0 = await state(s);
+    await sleep(700);
+    const t1 = await state(s);
+    check('the game opens on the title screen', t1.phase === 'title',
+      `phase is "${t1.phase}"`);
+    check('and the ball holds still until someone starts it',
+      t0.ball.x === t1.ball.x && t0.ball.y === t1.ball.y &&
+        t1.score.left === 0 && t1.score.right === 0,
+      `ball at ${t1.ball.x.toFixed(1)},${t1.ball.y.toFixed(1)} after 0.7s, ` +
+      `score ${t1.score.left}-${t1.score.right}`);
+    const titleShot = await s.shot('title');
+
+    // 2. A click starts it -- then reload and prove a key does too.
+    await s.click(midX, geo.top + geo.height / 2);
+    await sleep(150);
+    check('a click starts the game', (await state(s)).phase === 'playing',
+      'clicked the field on the title screen');
+
+    await s.reload();
+    check('a reload comes back to the title screen',
+      (await state(s)).phase === 'title', 'the machine resets to its attract state');
+    await s.key('keyDown', 'Space', ' ', 32);
+    await s.key('keyUp', 'Space', ' ', 32);
+    await sleep(150);
+    check('and any key starts it too', (await state(s)).phase === 'playing',
+      'pressed the space bar on the title screen');
+    const firstFrameShot = await s.shot('first-frame');
+
+    // 3. The loop is running at all.
     await sleep(600);
     const g1 = await state(s);
     check('the game loop advances in real time', g1.time > 0.3,
       `${g1.time.toFixed(2)}s of play elapsed`);
 
-    // 2. The mouse places the player paddle.
+    // 4. The mouse places the player paddle.
     await s.mouseTo(midX, toClientY(120));
     await sleep(120);
     const gm = await state(s);
@@ -158,7 +198,7 @@ async function main() {
     check('the mouse moves the player paddle', Math.abs(centre - 120) < 12,
       `paddle centre landed at ${centre.toFixed(0)}, aimed at 120`);
 
-    // 3. The keys move the player paddle, both ways.
+    // 5. The keys move the player paddle, both ways.
     const before = (await state(s)).leftY;
     await s.key('keyDown', 'ArrowUp', 'ArrowUp', 38);
     await sleep(350);
@@ -174,7 +214,7 @@ async function main() {
     check('the S key moves the paddle down', afterDown > afterUp + 20,
       `moved from ${afterUp.toFixed(0)} to ${afterDown.toFixed(0)}`);
 
-    // 4. Play properly for a while: track the ball with the mouse and rally.
+    // 6. Play properly for a while: track the ball with the mouse and rally.
     let shotTaken = false;
     const deadline = Date.now() + 22000;
     while (Date.now() < deadline) {
@@ -192,7 +232,7 @@ async function main() {
     check('the player can score against the computer', gp.score.left > 0,
       `score after ~22s of tracking play: player ${gp.score.left}, computer ${gp.score.right}`);
 
-    // 5. Miss on purpose: park the paddle in a corner and let one through.
+    // 7. Miss on purpose: park the paddle in a corner and let one through.
     const missDeadline = Date.now() + 15000;
     const conceded = gp.score.right;
     let sawCentreServe = false;
@@ -217,6 +257,8 @@ async function main() {
     await sleep(500);
     const scoreShot = await s.shot('scoreboard');
     console.log('\nscreenshots:');
+    console.log('  ' + titleShot);
+    console.log('  ' + firstFrameShot);
     if (shotTaken) console.log('  ' + path.join(SHOTS, 'rally.png'));
     console.log('  ' + scoreShot);
 
