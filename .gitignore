@@ -1,0 +1,19 @@
+# This project has no build step and no dependencies on purpose.
+# Nothing here should ever appear; the entries are guards, not needs.
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+Desktop.ini
+.DS_Store
+
+# Scratch
+tmp/
+*.tmp
+*.log
