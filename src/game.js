@@ -33,10 +33,13 @@
     paddleHeight: 84,
     paddleInset: 32,        // gap between the wall and the paddle's outer edge
     playerKeySpeed: 480,    // field units per second, keyboard control
-    cpuSpeed: 330,          // the CPU is deliberately slower than a hard shot
+    cpuSpeed: 300,          // the CPU is deliberately slower than a hard shot
     cpuHomeSpeed: 0.55,     // fraction of cpuSpeed used when drifting home
     cpuDeadZone: 9,         // it will not chase an error smaller than this
-    cpuMaxAimError: 34,     // re-rolled each rally: the beatable part
+    cpuMaxAimError: 52,     // re-rolled each rally: the beatable part.
+                            // Measured over 8 x 2 minutes of tracking play: a
+                            // point roughly every 32s, or every 20s once the
+                            // player starts aiming for the corners.
     ballStartSpeed: 340,
     ballSpeedStep: 22,      // added on every paddle hit
     ballMaxSpeed: 720,

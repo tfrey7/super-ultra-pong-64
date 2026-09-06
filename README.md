@@ -40,6 +40,21 @@ angles, wall bounces, scoring on each side, the serve reset, and the fact that
 the same second of play produces the same result whether it arrives as one long
 frame or sixty short ones.
 
+There is also a **playtest** that proves the page itself is playable, by opening
+the real `index.html` off disk in a real browser and playing it:
+
+```bash
+node tools/playtest.mjs
+```
+
+It launches Chrome with a debugging port and drives it over the DevTools
+protocol — still no dependencies, using Node's built-in WebSocket client (Node
+22 or newer) — then checks that the loop runs in real time, that the mouse and
+the keys move the paddle, that rallies happen, that a miss scores, and that the
+next serve starts from the centre. It leaves screenshots in
+`docs/shots/playtest/`. Pass `--chrome "<path to chrome.exe>"` if it cannot find
+a browser on its own.
+
 ## How it is laid out
 
 The point of the layout is that later eras are additions, not rewrites.
