@@ -60,7 +60,7 @@ done. The repo itself binds nothing.
 node --test
 ```
 
-From the repo root, Node 18+, **about two seconds**. It is the headless suite over the pure rules
+From the repo root, Node 18+. **30 tests, well under a second** (0.7 s measured). It is the headless suite over the pure rules
 in `src/game.js` — paddle bounces and their angles, wall bounces, scoring on each side, the serve
 reset, and frame-rate independence. There is no faster subset worth naming; the whole thing is one
 file (`test/game.test.js`) and already instant. This is the command you run once, immediately
