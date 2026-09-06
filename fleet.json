@@ -1,0 +1,9 @@
+{
+  "repo": "super-ultra-pong-64",
+  "suite": "node --test",
+  "build": null,
+  "protect": [
+    "docs/shots/playtest/"
+  ],
+  "restart": null
+}
