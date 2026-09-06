@@ -55,6 +55,12 @@ next serve starts from the centre. It leaves screenshots in
 `docs/shots/playtest/`. Pass `--chrome "<path to chrome.exe>"` if it cannot find
 a browser on its own.
 
+## Working on it as a fleet agent
+
+If a background worker was sent here, read **`docs/WORKER-BOOTSTRAP.md`** first: it is the
+two-minute on-ramp covering the worktree, the commands above, what never to commit, and the
+traps this repo has already cost someone time over.
+
 ## How it is laid out
 
 The point of the layout is that later eras are additions, not rewrites.
