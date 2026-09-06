@@ -15,7 +15,9 @@ self-playing demo rally behind it, drawn from the score's own block font. It is 
 `package.json`, no build step, no framework, no dependencies of any kind** — and that is a
 deliberate property to preserve, not an accident of it being early. The layout exists so later
 eras are *additions*: `src/game.js` is the rules, `src/render.js` the look, `src/input.js` the
-hands, `src/main.js` the loop that ties them together. Read the `README.md` for the full tour.
+hands, `src/main.js` the loop that ties them together. In the README's own words: adding an era
+should mean adding fields to the state and rules to `step()`, plus a branch in the renderer —
+not touching the other two modules. Read the `README.md` for the full tour.
 
 ## 2. Cut your own worktree
 

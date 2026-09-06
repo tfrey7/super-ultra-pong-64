@@ -57,9 +57,16 @@ It launches Chrome with a debugging port and drives it over the DevTools
 protocol — still no dependencies, using Node's built-in WebSocket client (Node
 22 or newer) — then checks that the loop runs in real time, that the mouse and
 the keys move the paddle, that rallies happen, that a miss scores, and that the
-next serve starts from the centre. It leaves screenshots in
-`docs/shots/playtest/`. Pass `--chrome "<path to chrome.exe>"` if it cannot find
-a browser on its own.
+next serve starts from the centre. Pass `--chrome "<path to chrome.exe>"` if it
+cannot find a browser on its own.
+
+Every run rewrites the screenshots it drops in `docs/shots/playtest/`. Those are
+ignored output, not source: the directory is gitignored, nobody needs to check
+them afterwards and there is nothing to restore, so a playtest leaves `git
+status` empty. The one tracked reference frame is
+`docs/shots/bootstrap/era-zero.png` — the picture of era zero a reader opens. If
+you deliberately change how era zero looks, update that file on purpose, in its
+own commit.
 
 ## Working on it as a fleet agent
 
