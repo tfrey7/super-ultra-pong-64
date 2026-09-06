@@ -45,6 +45,10 @@
     ballMaxSpeed: 720,
     maxBounceAngle: Math.PI / 3,  // 60 degrees off the horizontal
     serveDelay: 0.9,        // seconds the ball waits at the centre
+    paletteSize: 12,        // how many paddle colours the renderer offers.
+                            // The rules pick an INDEX; the hex lives in
+                            // src/render.js, which is the only place that
+                            // knows what a colour looks like.
     titleBlink: 0.62,       // seconds the 'press any key' line stays on, then off
     maxSubstep: 6           // never move the ball further than this in one go
   };
@@ -89,6 +93,12 @@
       // startGame() is called. 'playing' is the game proper.
       phase: opts.phase === 'playing' ? 'playing' : 'title',
       time: 0,                // seconds of simulated play
+      // Evolution step one: the machine boots in black and white and turns
+      // colour the instant the first point of the session lands. `colour` is
+      // plain readable state, so the headless suite can ask "has it turned
+      // yet?" without a canvas anywhere near it.
+      colour: false,
+      paddleColour: { left: 0, right: 0 },
       rally: 0,               // paddle hits since the last serve
       serveDelay: 0,
       score: { left: 0, right: 0 },
@@ -138,7 +148,30 @@
     state.score.right = 0;
     state.left.y = (state.height - state.left.h) / 2;
     state.right.y = (state.height - state.right.h) / 2;
+    // A fresh session starts monochrome again, and earns its own colours.
+    state.colour = false;
+    state.paddleColour = { left: 0, right: 0 };
     serve(state, 1);
+    return true;
+  }
+
+  /**
+   * The first point of the session turns the machine colour, and it stays
+   * colour until a new session starts. Each paddle draws a palette index;
+   * the two are re-picked until they differ, so the paddles never share a
+   * colour. (Nothing can vanish into the black field: every entry the
+   * renderer offers is a bright one.)
+   */
+  function flipToColour(state) {
+    if (state.colour) return false;
+    var n = state.rules.paletteSize;
+    var pick = function () { return Math.min(n - 1, Math.floor(state.rng() * n)); };
+    var left = pick();
+    var right = pick();
+    for (var tries = 0; right === left && tries < 16; tries++) right = pick();
+    if (right === left) right = (left + 1) % n;   // a pinned rng, say
+    state.colour = true;
+    state.paddleColour = { left: left, right: right };
     return true;
   }
 
@@ -247,12 +280,14 @@
     if (b.x + b.size < 0) {
       state.score.right += 1;
       state.lastEvent = 'score';
+      flipToColour(state);
       serve(state, 1);
       return true;
     }
     if (b.x > state.width) {
       state.score.left += 1;
       state.lastEvent = 'score';
+      flipToColour(state);
       serve(state, -1);
       return true;
     }
@@ -298,6 +333,7 @@
     RULES: RULES,
     createGame: createGame,
     startGame: startGame,
+    flipToColour: flipToColour,
     step: step,
     serve: serve,
     ballSpeed: ballSpeed,
