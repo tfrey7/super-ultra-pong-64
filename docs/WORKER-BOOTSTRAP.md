@@ -9,7 +9,9 @@ project's `CLAUDE.md` and none of ours. This is the two-minute on-ramp. Read it,
 1972 arcade machine (black screen, two white bars, a square ball, a dashed centre line) and the
 game is meant to grow up through the eras around it as the session goes on. Evoland, but for Pong.
 Today the repo holds **era zero only**: the original machine, you against the computer, playable
-and honest, with nothing evolving yet. It is plain HTML and plain JavaScript — **no npm, no
+and honest, with nothing evolving yet. It opens on a **title screen** -- a real `phase` in
+`src/game.js`, where `step()` moves nothing at all until `startGame()` is called -- with a
+self-playing demo rally behind it, drawn from the score's own block font. It is plain HTML and plain JavaScript — **no npm, no
 `package.json`, no build step, no framework, no dependencies of any kind** — and that is a
 deliberate property to preserve, not an accident of it being early. The layout exists so later
 eras are *additions*: `src/game.js` is the rules, `src/render.js` the look, `src/input.js` the
@@ -73,7 +75,8 @@ node tools/playtest.mjs
 ```
 
 Node 22+. It launches Chrome with a debugging port and drives the real `index.html` off disk over
-the DevTools protocol (no dependencies — Node's built-in WebSocket client), checking that the loop
+the DevTools protocol (no dependencies — Node's built-in WebSocket client), checking that it opens on the
+title screen with the ball held still, that a click and a keypress each start it, that the loop
 runs in real time, that the mouse and keys move the paddle, that rallies happen, that a miss
 scores, and that the next serve starts from the centre. Pass `--chrome "<path to chrome.exe>"` if
 it cannot find a browser, and `--port <n>` if 9333 is busy. Use it for any change to
@@ -140,6 +143,11 @@ his emulator — never touch either.**
   the browser (`window.Pong`) and `node --test` (CommonJS). `tools/playtest.mjs` is `.mjs` because
   Node runs it, not the page.
 - **Run `node --test` from the repo root.** The suite reaches `src/game.js` by relative path.
+- **One playtest check is a coin flip and always has been.** "The player can score against the
+  computer" allows 22 seconds of ball-tracking play and asks for a point;
+  `node tools/beatability-sample.mjs` measures that at 44% over 300 sessions, identically on
+  master. Do not read a single failure of that one line as a regression you caused -- run the
+  sampler before you believe it.
 - **The computer paddle is deliberately beatable** — it only chases once the ball heads its way,
   aims slightly off centre, and cannot match a really steep shot. If a change makes it perfect,
   that is a regression in the game even when every test passes.

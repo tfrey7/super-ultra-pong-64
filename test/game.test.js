@@ -11,10 +11,14 @@ const test = require('node:test');
 const assert = require('node:assert');
 const Pong = require('../src/game.js');
 
-/** A game with the randomness pinned, so every run is the same run. */
+/**
+ * A game with the randomness pinned, so every run is the same run -- and past
+ * the title screen, because every test below is about play. The title phase
+ * has its own section at the foot of this file.
+ */
 function newGame(rngValue) {
   const v = rngValue === undefined ? 0.5 : rngValue;
-  return Pong.createGame({ rng: () => v });
+  return Pong.createGame({ rng: () => v, phase: 'playing' });
 }
 
 /** Skip past the serve pause without moving anything else. */
@@ -61,7 +65,7 @@ test('the ball holds still during the serve pause, then moves', () => {
 
 test('the opening serve is never a flat horizontal shot', () => {
   for (const r of [0, 0.25, 0.5, 0.75, 1]) {
-    const g = Pong.createGame({ rng: () => r });
+    const g = Pong.createGame({ rng: () => r, phase: 'playing' });
     assert.ok(Math.abs(g.ball.vx) > 0, 'the ball must travel sideways');
     const angle = Math.abs(Math.atan2(g.ball.vy, Math.abs(g.ball.vx)));
     assert.ok(angle <= g.rules.maxBounceAngle, 'and not steeper than the limit');
@@ -339,7 +343,7 @@ test('the computer paddle cannot leave the field either', () => {
 test('the computer is beatable: a corner shot gets past it', () => {
   // It aims a little off and moves slower than a steep shot, so a ball fired
   // at the far corner from close range should beat it.
-  const g = Pong.createGame({ rng: () => 0.9 });
+  const g = Pong.createGame({ rng: () => 0.9, phase: 'playing' });
   endServeDelay(g);
   centrePaddle(g.right, g.height / 2);
   placeBall(g, g.right.x - 220, g.height / 2, 620, -600);
@@ -382,6 +386,75 @@ test('a huge stalled frame is clamped instead of teleporting the ball', () => {
   Pong.step(g, 12, {});   // the tab was in the background for 12 seconds
   assert.ok(g.ball.x < g.width, 'the ball is still on the field');
   assert.strictEqual(g.score.left, 0, 'and nobody was handed a point for it');
+});
+
+// -------------------------------------------------------- the title screen
+test('a fresh game sits on the title screen', () => {
+  const g = Pong.createGame({ rng: () => 0.5 });
+  assert.strictEqual(g.phase, 'title');
+});
+
+test('the ball holds still for as long as the title lasts', () => {
+  const g = Pong.createGame({ rng: () => 0.5 });
+  const where = { x: g.ball.x, y: g.ball.y };
+  // Ten seconds of frames, with a hand on the mouse the whole time.
+  for (let i = 0; i < 600; i++) Pong.step(g, 1 / 60, { pointerY: 40 });
+  assert.strictEqual(g.ball.x, where.x, 'the ball must not drift sideways');
+  assert.strictEqual(g.ball.y, where.y, 'nor up or down');
+  assert.strictEqual(g.phase, 'title', 'and nothing should have started it');
+});
+
+test('no point can be scored while the title is up', () => {
+  const g = Pong.createGame({ rng: () => 0.5 });
+  // Park the ball off the end of the field, which in play is a point.
+  placeBall(g, g.width + 200, g.height / 2, 500, 0);
+  endServeDelay(g);
+  for (let i = 0; i < 300; i++) Pong.step(g, 1 / 60, {});
+  assert.strictEqual(g.score.left, 0);
+  assert.strictEqual(g.score.right, 0);
+});
+
+test('the clock still runs on the title screen, so the prompt can blink', () => {
+  const g = Pong.createGame({ rng: () => 0.5 });
+  for (let i = 0; i < 60; i++) Pong.step(g, 1 / 60, {});
+  assert.ok(g.time > 0.9 && g.time < 1.1, `a second should have passed, got ${g.time}`);
+});
+
+test('starting the game leaves the title state behind', () => {
+  const g = Pong.createGame({ rng: () => 0.5 });
+  assert.strictEqual(Pong.startGame(g), true, 'it should report that it started');
+  assert.strictEqual(g.phase, 'playing');
+  assert.ok(g.serveDelay > 0, 'and open with the usual serve pause');
+
+  const startX = g.ball.x;
+  for (let i = 0; i < 200; i++) Pong.step(g, 1 / 60, {});
+  assert.notStrictEqual(g.ball.x, startX, 'now the ball is under way');
+});
+
+test('starting an already-running game changes nothing', () => {
+  const g = Pong.createGame({ rng: () => 0.5 });
+  Pong.startGame(g);
+  g.score.left = 3;
+  for (let i = 0; i < 120; i++) Pong.step(g, 1 / 60, {});
+  const mid = { x: g.ball.x, y: g.ball.y, score: g.score.left };
+
+  assert.strictEqual(Pong.startGame(g), false, 'a second press must be ignored');
+  assert.strictEqual(g.ball.x, mid.x, 'the rally must not be re-served');
+  assert.strictEqual(g.ball.y, mid.y);
+  assert.strictEqual(g.score.left, mid.score, 'nor the score wiped');
+});
+
+test('the game a start hands you is a clean one', () => {
+  const g = Pong.createGame({ rng: () => 0.5 });
+  g.score.left = 7;
+  g.score.right = 4;
+  g.left.y = 0;
+  Pong.startGame(g);
+  assert.strictEqual(g.score.left, 0);
+  assert.strictEqual(g.score.right, 0);
+  assert.strictEqual(g.time, 0, 'the clock restarts with the game');
+  assert.strictEqual(g.left.y, (g.height - g.left.h) / 2, 'paddles come home');
+  assert.strictEqual(g.ball.x, (g.width - g.ball.size) / 2, 'and the ball centres');
 });
 
 // ------------------------------------------------------------------- purity
