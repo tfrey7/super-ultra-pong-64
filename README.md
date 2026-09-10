@@ -84,11 +84,36 @@ The point of the layout is that later eras are additions, not rewrites.
 | `src/render.js` | **The look.** Draws a state onto a canvas. Reads the state; never changes it. |
 | `src/input.js` | **The hands.** Turns mouse and keyboard into a plain intent object (`pointerY`, `up`, `down`). Knows nothing about the rules. |
 | `src/main.js` | The loop that ties the three together and hands `step` the real elapsed time. |
-| `test/game.test.js` | The headless suite over `src/game.js`. |
+| `src/eras/` | **One file per era**, each registering that era's look with the renderer. |
+| `test/game.test.js` | The headless suite over `src/game.js`, plus the era-look checks. |
+| `tools/eralooks.js` | Draws fixed scenes on a recording canvas; `eralooks-today.json` beside it is what eras 0 and 1 drew before the ladder. |
 
 `step` takes a **delta time in seconds** and never assumes 60fps; long frames are
 cut into substeps so a fast ball cannot pass through a paddle. Randomness goes
 through `state.rng`, so a test can pin it down.
 
-Adding an era should mean adding fields to the state and rules to `step`, plus a
-branch in the renderer — not touching the other two modules.
+## The era ladder
+
+Every point either side scores moves the machine up one era, and it stops at
+the top:
+
+| Era | Machine | Look today |
+| --- | --- | --- |
+| 0 | 1972 arcade Pong | black and white |
+| 1 | 1977 Atari 2600 | the turn to colour: each paddle and its score in its own colour |
+| 2 | 1985 NES | placeholder, draws era 1 |
+| 3 | 1989 Sega Genesis | placeholder, draws era 1 |
+| 4 | 1991 Super Nintendo | placeholder, draws era 1 |
+
+The rules (`Pong.ERAS` in `src/game.js`) carry only the number: `state.era`,
+and `state.eraChangedAt`, the game time it last moved, for a transition to read.
+What each number looks like is its own plain script in `src/eras/`, loaded by
+`index.html` after `src/render.js`, making one `PongRender.registerEra({...})`
+call. **An era card edits its own file and nobody else's**: to build the NES,
+replace `src/eras/era2-nes.js`. A look gives `paddleInk(state, side)`, and may
+give `draw(ctx, state, opts, PongRender)` to take over the whole frame
+(`PongRender.drawBase` is the stock frame to paint over). A brand-new rung is one
+new file, one `<script>` line in `index.html`, and one entry in `Pong.ERAS`.
+
+**Open the page at any era** with a query: `index.html?era=3`. The playtest
+takes `--era 3` for the same thing.

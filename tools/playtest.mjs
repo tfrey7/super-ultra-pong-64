@@ -37,6 +37,9 @@ function arg(name, fallback) {
 }
 
 const PORT = Number(arg('port', 9333));
+// --era 3 opens the page at that rung of the ladder (index.html?era=3); every
+// check below is about play, and holds at any era.
+const ERA = arg('era', '');
 const CHROME = arg('chrome', CHROMES.find((p) => existsSync(p)));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -126,7 +129,8 @@ const geometry = (s) => s.eval(`(() => {
 
 async function main() {
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
-  const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/');
+  const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') +
+    (ERA ? '?era=' + encodeURIComponent(ERA) : '');
   // Never '.' as the fallback: that puts a Chrome profile in the repo root and dirties
   // the worktree. os.tmpdir() always answers, and honours TEMP/TMP when they are set.
   const profile = path.join(os.tmpdir(), 'pong-playtest-profile');
