@@ -40,6 +40,9 @@ const PORT = Number(arg('port', 9333));
 // --era 3 opens the page at that rung of the ladder (index.html?era=3); every
 // check below is about play, and holds at any era.
 const ERA = arg('era', '');
+// --no-audio takes AudioContext away from the page before it loads, the way a
+// browser with no audio device would, and checks the game still plays silently.
+const NO_AUDIO = process.argv.includes('--no-audio');
 const CHROME = arg('chrome', CHROMES.find((p) => existsSync(p)));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -121,6 +124,13 @@ const state = (s) => s.eval(`(() => { const g = window.__pong; return {
   leftY: g.left.y, rightY: g.right.y, h: g.left.h, height: g.height, width: g.width
 }; })()`);
 
+/** What the page's sound player has done so far. It never changes the game. */
+const sound = (s) => s.eval(`(() => { const p = window.__pongSound; return p ? {
+  exists: true, unlocked: p.unlocked, available: p.available, played: p.played,
+  errors: p.errors, last: p.last, audio: p.audioState(),
+  hasAudioContext: typeof (window.AudioContext || window.webkitAudioContext) === 'function'
+} : { exists: false }; })()`);
+
 /** Where the canvas sits on screen, so we can aim the mouse at the field. */
 const geometry = (s) => s.eval(`(() => {
   const b = document.getElementById('field').getBoundingClientRect();
@@ -133,10 +143,13 @@ async function main() {
     (ERA ? '?era=' + encodeURIComponent(ERA) : '');
   // Never '.' as the fallback: that puts a Chrome profile in the repo root and dirties
   // the worktree. os.tmpdir() always answers, and honours TEMP/TMP when they are set.
-  const profile = path.join(os.tmpdir(), 'pong-playtest-profile');
+  // One profile per debugging port, so two playtests on two ports can run at once.
+  const profile = path.join(os.tmpdir(), 'pong-playtest-profile-' + PORT);
 
   const chrome = spawn(CHROME, [
-    '--headless=new', '--disable-gpu', '--hide-scrollbars',
+    // --mute-audio: the audio graph still runs and is still checked, but a
+    // playtest never beeps through the speakers of the machine it runs on.
+    '--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
     '--user-data-dir=' + profile, '--no-first-run', '--no-default-browser-check',
     url
@@ -152,6 +165,12 @@ async function main() {
     const s = new Session(ws);
     await s.send('Page.enable');
     await s.send('Runtime.enable');
+    if (NO_AUDIO) {
+      await s.send('Page.addScriptToEvaluateOnNewDocument', {
+        source: 'delete window.AudioContext; delete window.webkitAudioContext;'
+      });
+      await s.reload();
+    }
     await sleep(400);
 
     const geo = await geometry(s);
@@ -178,11 +197,23 @@ async function main() {
     }
     const titleShot = await s.shot('title');
 
+    const q = await sound(s);
+    check('the title screen is silent: no audio is opened before a click or key',
+      q.exists && !q.unlocked && q.played === 0 && q.audio === 'none',
+      `sound player ${q.exists ? 'loaded' : 'MISSING'}, unlocked ${q.unlocked}, ` +
+      `${q.played} sounds, audio ${q.audio}` + (NO_AUDIO ? ', AudioContext removed' : ''));
+
     // 2. A click starts it -- then reload and prove a key does too.
     await s.click(midX, geo.top + geo.height / 2);
     await sleep(150);
     check('a click starts the game', (await state(s)).phase === 'playing',
       'clicked the field on the title screen');
+    const qc = await sound(s);
+    check(NO_AUDIO ? 'with no audio device the click opens nothing and throws nothing'
+                   : 'and that click switches the sound on',
+      NO_AUDIO ? (qc.unlocked && !qc.available && qc.errors === 0 && !qc.hasAudioContext)
+               : (qc.unlocked && qc.available && qc.audio === 'running'),
+      `unlocked ${qc.unlocked}, audio ${qc.audio}, errors ${qc.errors}`);
 
     await s.reload();
     check('a reload comes back to the title screen',
@@ -244,6 +275,26 @@ async function main() {
       `${gp.rally} hits in the current rally, score ${gp.score.left}-${gp.score.right}`);
     check('the player can score against the computer', gp.score.left > 0,
       `score after ~22s of tracking play: player ${gp.score.left}, computer ${gp.score.right}`);
+
+    // 6b. The rally was heard (the key press after the reload unlocked it), and
+    // every era's voice schedules on the real Web Audio API.
+    const qr = await sound(s);
+    check(NO_AUDIO ? 'with no audio device the rally plays silently, with no errors'
+                   : 'hits and bounces make sound, in the era the machine is on',
+      NO_AUDIO ? (qr.played === 0 && qr.errors === 0) : (qr.played > 0 && qr.errors === 0),
+      `${qr.played} sounds, errors ${qr.errors}` +
+        (qr.last ? `, last: ${qr.last.type} on era ${qr.last.era} (${qr.last.waves.join('+')}` +
+          `${qr.last.echo ? ' + echo' : ''})` : ''));
+    const voices = await s.eval(`(() => { const p = window.__pongSound; const out = [];
+      for (let era = 0; era <= 4; era++) {
+        const ok = p.play({ type: 'paddle', era: era });
+        out.push({ era: era, ok: ok, last: ok ? p.last : null });
+      }
+      return { out: out, errors: p.errors }; })()`);
+    check(NO_AUDIO ? 'and no era tries to sound' : 'every era\'s voice schedules in the browser',
+      voices.errors === 0 && voices.out.every((v) => v.ok === !NO_AUDIO),
+      voices.out.map((v) => `era ${v.era}: ` +
+        (v.last ? v.last.waves.join('+') + (v.last.echo ? '+echo' : '') : 'silent')).join('; '));
 
     // 7. Miss on purpose: park the paddle in a corner and let one through.
     const missDeadline = Date.now() + 15000;
