@@ -27,6 +27,19 @@
     height: 600
   };
 
+  // The era ladder. Every point either side scores moves the machine up one
+  // rung, and it stops at the top. This list is the single agreement every era
+  // card works to: the rules only ever carry the NUMBER, and src/eras/ holds
+  // one file per rung saying what that number looks like.
+  var ERAS = [
+    { era: 0, year: 1972, machine: 'arcade Pong' },       // black and white
+    { era: 1, year: 1977, machine: 'Atari 2600' },        // the turn to colour
+    { era: 2, year: 1985, machine: 'NES' },
+    { era: 3, year: 1989, machine: 'Sega Genesis' },
+    { era: 4, year: 1991, machine: 'Super Nintendo' }
+  ];
+  var TOP_ERA = ERAS.length - 1;
+
   var RULES = {
     ballSize: 12,
     paddleWidth: 14,
@@ -76,18 +89,46 @@
    * Build a fresh game state.
    * opts.rng lets tests pin the randomness down; it defaults to Math.random.
    */
+  /**
+   * A rung number made safe: whole, not below 0, not above the top of the
+   * ladder. Anything that is not a number at all is era 0.
+   */
+  function clampEra(n) {
+    n = Math.floor(Number(n));
+    if (!(n >= 0)) return 0;
+    return n > TOP_ERA ? TOP_ERA : n;
+  }
+
+  /**
+   * Read a starting era out of a page's query string, e.g. '?era=3'. Takes the
+   * STRING and nothing else, so the rules still never touch the page: the loop
+   * hands it location.search. No era asked for (or a nonsense one) is era 0.
+   */
+  function eraFromQuery(search) {
+    var m = /[?&]era=([^&#]*)/.exec(String(search || ''));
+    return m ? clampEra(decodeURIComponent(m[1])) : 0;
+  }
+
   function createGame(opts) {
     opts = opts || {};
     var rules = Object.assign({}, RULES, opts.rules || {});
     var width = opts.width || FIELD.width;
     var height = opts.height || FIELD.height;
+    var startEra = clampEra(opts.era || 0);
 
     var state = {
       width: width,
       height: height,
       rules: rules,
       rng: opts.rng || Math.random,
-      era: 0,                 // era zero: the 1972 machine
+      // Which rung of ERAS the machine is on. 0 is the 1972 machine; every
+      // point moves it up one, capped at TOP_ERA. `eraChangedAt` is the game
+      // time (state.time) of the last move, so a transition can be timed off
+      // it. `startEra` is where a session begins -- 0 unless the page was
+      // opened at a later era for a screenshot or a playtest.
+      era: startEra,
+      eraChangedAt: 0,
+      startEra: startEra,
       // Where a fresh machine sits. In 'title' the field exists but NOTHING
       // moves: the ball holds still and no point can be scored until
       // startGame() is called. 'playing' is the game proper.
@@ -112,6 +153,8 @@
     };
 
     serve(state, 1);
+    // A machine opened past era 0 has already earned its colours.
+    if (startEra >= 1) flipToColour(state);
     return state;
   }
 
@@ -148,10 +191,28 @@
     state.score.right = 0;
     state.left.y = (state.height - state.left.h) / 2;
     state.right.y = (state.height - state.right.h) / 2;
-    // A fresh session starts monochrome again, and earns its own colours.
+    // A fresh session starts monochrome again, and earns its own colours --
+    // back at the era it was opened at, which is era 0 unless asked otherwise.
     state.colour = false;
     state.paddleColour = { left: 0, right: 0 };
+    state.era = clampEra(state.startEra || 0);
+    state.eraChangedAt = 0;
     serve(state, 1);
+    if (state.era >= 1) flipToColour(state);
+    return true;
+  }
+
+  /**
+   * One point scored: the machine moves up one era, unless it is already at
+   * the top of the ladder. Reaching era 1 is the turn to colour. Returns true
+   * only if the era actually moved.
+   */
+  function advanceEra(state) {
+    var next = clampEra((state.era || 0) + 1);
+    if (next === state.era) return false;
+    state.era = next;
+    state.eraChangedAt = state.time;
+    if (next >= 1) flipToColour(state);
     return true;
   }
 
@@ -280,14 +341,14 @@
     if (b.x + b.size < 0) {
       state.score.right += 1;
       state.lastEvent = 'score';
-      flipToColour(state);
+      advanceEra(state);
       serve(state, 1);
       return true;
     }
     if (b.x > state.width) {
       state.score.left += 1;
       state.lastEvent = 'score';
-      flipToColour(state);
+      advanceEra(state);
       serve(state, -1);
       return true;
     }
@@ -331,9 +392,14 @@
   return {
     FIELD: FIELD,
     RULES: RULES,
+    ERAS: ERAS,
+    TOP_ERA: TOP_ERA,
     createGame: createGame,
     startGame: startGame,
     flipToColour: flipToColour,
+    advanceEra: advanceEra,
+    clampEra: clampEra,
+    eraFromQuery: eraFromQuery,
     step: step,
     serve: serve,
     ballSpeed: ballSpeed,
