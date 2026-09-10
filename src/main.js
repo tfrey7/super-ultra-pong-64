@@ -28,7 +28,11 @@
   function start() {
     var canvas = document.getElementById('field');
     var ctx = canvas.getContext('2d');
-    var game = Pong.createGame();
+    // ?era=3 opens the machine at that rung of the ladder -- for screenshots
+    // and the playtest. No query is era 0, the 1972 machine.
+    var game = Pong.createGame({
+      era: Pong.eraFromQuery(root.location && root.location.search)
+    });
 
     // The canvas is a fixed field of logical units, scaled to fit by CSS, so
     // one canvas pixel is one field unit and nothing has to be converted here.

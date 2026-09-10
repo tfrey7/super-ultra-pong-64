@@ -1,9 +1,11 @@
 /*
- * Super Ultra Pong 64: Remastered -- the look of era zero.
+ * Super Ultra Pong 64: Remastered -- the look, era by era.
  *
  * Draws a game state onto a canvas and nothing else: it READS the state and
- * never changes it, and it knows none of the rules. A later era should be able
- * to add its own draw pass here without the rules or the input noticing.
+ * never changes it, and it knows none of the rules. It holds the table of era
+ * looks (see "the era table" below); each era's own look is one file in
+ * src/eras/, so a later era adds its own draw pass there without the rules,
+ * the input, or any other era noticing.
  *
  * Era zero is the 1972 machine: black field, white shapes, a dashed line down
  * the middle, a square ball, and chunky block digits across the top. The
@@ -16,30 +18,6 @@
   var INK = '#ffffff';
   var FIELD_INK = '#000000';
 
-  // Era one, the first evolution step: the machine turns colour on the first
-  // point. A dozen colours picked by eye to sit in the range a 2600 could
-  // show -- warm and slightly muddy, no pure #ff channels anywhere. This is
-  // NOT the real 128-entry NTSC palette and does not pretend to be; when an
-  // era genuinely needs that, that era can go and look it up.
-  //
-  // Every entry is deliberately bright, because the field is black and a
-  // paddle that vanishes into it is a broken game. isLegible() below is the
-  // check that keeps a future addition honest.
-  var PADDLE_INKS = [
-    '#c85c14',   // burnt orange
-    '#d8a038',   // gold
-    '#c8cc30',   // olive yellow
-    '#68bc40',   // grass
-    '#40b898',   // teal
-    '#4890d8',   // sky blue
-    '#7068d4',   // indigo
-    '#a858c8',   // violet
-    '#d0589c',   // magenta
-    '#cc4444',   // red
-    '#d88860',   // salmon
-    '#8cc8e8'    // pale blue
-  ];
-
   /** Bright enough to read against the black field. No contrast maths. */
   function isLegible(hex) {
     var r = parseInt(hex.slice(1, 3), 16);
@@ -48,13 +26,61 @@
     return (r * 0.30 + g * 0.59 + b * 0.11) > 70;
   }
 
-  var PADDLE_COLOURS = PADDLE_INKS.filter(isLegible);
+  // ------------------------------------------------------------ the era table
+  // The rules carry an era NUMBER (state.era); what each number looks like
+  // lives in its own plain-script file under src/eras/, loaded by index.html
+  // after this one, and each file makes exactly one registerEra() call. An era
+  // card edits its own file and nobody else's.
+  //
+  // A look is an object:
+  //   era        its rung on the ladder (Pong.ERAS in src/game.js)
+  //   name       what it is, for a reader
+  //   paddleInk  function (state, side) -> the colour a paddle and its score wear
+  //   like       optional: another era whose fields fill in anything this one
+  //              leaves out -- how a placeholder draws an earlier era's look
+  //   draw       optional: function (ctx, state, opts, PongRender) that takes
+  //              over the whole frame; PongRender.drawBase is the stock frame
+  //              an era can paint over.
+  var LOOKS = [];
+  var RESOLVED = [];
 
-  /** What the two paddles are wearing this session, or white before the flip. */
+  // What draws when no era file has been loaded at all: the plain machine.
+  var BARE_LOOK = { era: -1, name: 'no era loaded', paddleInk: function () { return INK; } };
+
+  function registerEra(look) {
+    if (!look || !(look.era >= 0) || Math.floor(look.era) !== look.era) {
+      throw new Error('registerEra needs a look with a whole era number');
+    }
+    LOOKS[look.era] = look;
+    RESOLVED = [];
+    return look;
+  }
+
+  /**
+   * The look for an era number: its own entry, with anything it leaves out
+   * borrowed from the era it is `like`. A rung with no file at all falls back
+   * to the nearest registered one below it, so a missing file draws an older
+   * machine rather than nothing.
+   */
+  function eraLook(era) {
+    var e = Math.floor(era) || 0;
+    if (RESOLVED[e]) return RESOLVED[e];
+    var found = BARE_LOOK;
+    for (var i = e; i >= 0; i--) {
+      if (!LOOKS[i]) continue;
+      found = LOOKS[i];
+      if (found.like !== undefined && found.like < i) {
+        found = Object.assign({}, eraLook(found.like), found);
+      }
+      break;
+    }
+    if (e >= 0) RESOLVED[e] = found;
+    return found;
+  }
+
+  /** What a paddle (and its score) is wearing, in whatever era the state is in. */
   function paddleInk(state, side) {
-    if (!state.colour) return INK;
-    var i = (state.paddleColour && state.paddleColour[side]) || 0;
-    return PADDLE_COLOURS[i % PADDLE_COLOURS.length];
+    return eraLook(state.era).paddleInk(state, side);
   }
 
   // A 3x5 block font -- the same shape the original score was built from.
@@ -169,11 +195,23 @@
   }
 
   /**
-   * Draw one frame of the given state.
+   * Draw one frame of the given state, in the look of the era it is in. An era
+   * whose look brings its own draw takes the whole frame; every other era gets
+   * the stock frame below, wearing its own paddle inks.
+   */
+  function draw(ctx, state, opts) {
+    var look = eraLook(state.era);
+    if (typeof look.draw === 'function') return look.draw(ctx, state, opts, api);
+    drawBase(ctx, state, opts);
+  }
+
+  /**
+   * The stock frame: the 1972 machine's field, centre line, block scores,
+   * paddles and ball, with each paddle and score in its era's ink.
    * opts.ink dims the whole field, which is how the attract rally sits behind
    * the title without competing with it.
    */
-  function draw(ctx, state, opts) {
+  function drawBase(ctx, state, opts) {
     ctx.fillStyle = FIELD_INK;
     ctx.fillRect(0, 0, state.width, state.height);
 
@@ -255,11 +293,16 @@
     return !period || Math.floor(state.time / period) % 2 === 0;
   }
 
-  root.PongRender = {
+  var api = root.PongRender = {
+    INK: INK,
+    FIELD_INK: FIELD_INK,
+    registerEra: registerEra,
+    eraLook: eraLook,
     draw: draw,
+    drawBase: drawBase,
     drawTitle: drawTitle,
+    drawText: drawText,
     promptLit: promptLit,
-    PADDLE_COLOURS: PADDLE_COLOURS,
     paddleInk: paddleInk,
     isLegible: isLegible,
     DIGITS: DIGITS,

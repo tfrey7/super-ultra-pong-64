@@ -40,6 +40,14 @@
        ES modules are blocked over file:// and would need a dev server. -->
   <script src="src/game.js"></script>
   <script src="src/render.js"></script>
+  <!-- One file per era, in ladder order, each registering its look with the
+       renderer. An era card replaces its own file and touches no other; a new
+       rung is one new file and one line here. -->
+  <script src="src/eras/era0-arcade.js"></script>
+  <script src="src/eras/era1-atari2600.js"></script>
+  <script src="src/eras/era2-nes.js"></script>
+  <script src="src/eras/era3-genesis.js"></script>
+  <script src="src/eras/era4-snes.js"></script>
   <script src="src/input.js"></script>
   <script src="src/main.js"></script>
 </body>
