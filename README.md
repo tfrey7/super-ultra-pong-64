@@ -118,3 +118,15 @@ new file, one `<script>` line in `index.html`, and one entry in `Pong.ERAS`.
 
 **Open the page at any era** with a query: `index.html?era=3`. The playtest
 takes `--era 3` for the same thing.
+
+**The change is a moment.** When a point moves the machine up a rung the field
+flashes, a band of the new machine's colours wipes across it, and a name card
+comes up -- `ERA 2`, then `1985 · NES`, year and machine read from `Pong.ERAS` --
+in that machine's own style: the Atari's paddle colours, the NES's double-framed
+black dialog box, the Genesis's blue window, the Super Nintendo's purple window
+with its four buttons. It is drawn by `src/erachange.js` over the finished
+frame and lives entirely inside the serve pause the point already started
+(`rules.serveDelay`, 0.9 s), so it is gone the frame the ball launches and the
+serve is never held back. A game opened at a later era, or a point at the top of
+the ladder, shows nothing. An era file can restyle its own card by giving its
+look a `card` object with the same fields as `STYLES` in that file.
