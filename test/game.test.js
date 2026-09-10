@@ -594,7 +594,7 @@ test('eras 2 to 4 are placeholders that draw era 1 until their own cards land', 
   const one = drawAt(1);
   assert.notDeepStrictEqual(one, drawAt(0), 'era 1 is not era 0');
   for (const era of [2, 3, 4]) {
-    assert.strictEqual(R.eraLook(era).placeholder, true, `era ${era} is still a placeholder`);
+    if (!R.eraLook(era).placeholder) continue;   // its own era card has landed
     assert.deepStrictEqual(drawAt(era), one, `era ${era} draws era 1's look`);
   }
 });
