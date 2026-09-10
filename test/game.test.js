@@ -524,29 +524,199 @@ test('a new session starts over in black and white', () => {
 });
 
 // ------------------------------------------------------- the palette itself
-// The rules pick a slot; src/render.js is the only place that knows what a
-// colour looks like. These two checks pin the join between them.
+// The rules pick a slot; era 1's file (src/eras/era1-atari2600.js) is the only
+// place that knows what a colour looks like. These two checks pin the join.
+const path = require('node:path');
+const fs = require('node:fs');
+const eralooks = require('../tools/eralooks.js');
+const ROOT = path.join(__dirname, '..');
+/** The renderer and every era file, loaded in the order index.html loads them. */
+const page = () => eralooks.loadRenderer(ROOT);
+
 test('the renderer offers exactly the palette the rules pick from', () => {
-  require('../src/render.js');
-  const inks = globalThis.PongRender.PADDLE_COLOURS;
+  const { R } = page();
+  const inks = R.eraLook(1).palette;
   assert.strictEqual(inks.length, Pong.RULES.paletteSize);
   for (const ink of inks) {
     assert.match(ink, /^#[0-9a-f]{6}$/, `${ink} is not a plain hex colour`);
-    assert.ok(globalThis.PongRender.isLegible(ink),
-      `${ink} would vanish into the black field`);
+    assert.ok(R.isLegible(ink), `${ink} would vanish into the black field`);
   }
 });
 
 test('the paddles are white until the machine turns colour', () => {
-  require('../src/render.js');
-  const R = globalThis.PongRender;
+  const { R } = page();
   const g = newGame();
   assert.strictEqual(R.paddleInk(g, 'left'), '#ffffff');
   assert.strictEqual(R.paddleInk(g, 'right'), '#ffffff');
-  Pong.flipToColour(g);
-  assert.ok(R.PADDLE_COLOURS.includes(R.paddleInk(g, 'left')));
-  assert.ok(R.PADDLE_COLOURS.includes(R.paddleInk(g, 'right')));
+  Pong.advanceEra(g);
+  const palette = R.eraLook(1).palette;
+  assert.ok(palette.includes(R.paddleInk(g, 'left')));
+  assert.ok(palette.includes(R.paddleInk(g, 'right')));
   assert.notStrictEqual(R.paddleInk(g, 'left'), R.paddleInk(g, 'right'));
+});
+
+// ------------------------------------------------------ the era look table
+test('the page loads one era file per rung, in ladder order, between the renderer and the loop', () => {
+  const { html, eraScripts, R } = page();
+  assert.strictEqual(eraScripts.length, Pong.ERAS.length, 'one file per era');
+  eraScripts.forEach((src, i) => {
+    assert.match(src, new RegExp(`^src/eras/era${i}-[a-z0-9]+\\.js$`), `rung ${i} is ${src}`);
+    assert.strictEqual(R.eraLook(i).era, i, `${src} registers era ${i}`);
+  });
+  const at = (s) => html.indexOf(`src="${s}"`);
+  assert.ok(at('src/render.js') < at(eraScripts[0]), 'era files come after the renderer');
+  assert.ok(at(eraScripts[eraScripts.length - 1]) < at('src/main.js'), 'and before the loop');
+  assert.ok(at('src/game.js') < at('src/render.js'));
+});
+
+test('eras 0 and 1 draw exactly what the machine drew before the ladder', () => {
+  const { Pong: P, R } = page();
+  const want = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools', 'eralooks-today.json'), 'utf8'));
+  const got = eralooks.scenes(P, R);
+  assert.deepStrictEqual(Object.keys(got), Object.keys(want.scenes));
+  for (const name of Object.keys(want.scenes)) {
+    assert.ok(want.scenes[name].length > 20, `${name} recorded a real frame`);
+    assert.deepStrictEqual(got[name], want.scenes[name], `${name} changed`);
+  }
+});
+
+test('eras 2 to 4 are placeholders that draw era 1 until their own cards land', () => {
+  const { R } = page();
+  const drawAt = (era) => {
+    const g = Pong.createGame({ rng: () => 0.1, phase: 'playing' });
+    Pong.advanceEra(g);                 // era 1, colours picked
+    g.era = era;
+    g.serveDelay = 0;
+    const rec = eralooks.recorder();
+    R.draw(rec.ctx, g);
+    return rec.calls;
+  };
+  const one = drawAt(1);
+  assert.notDeepStrictEqual(one, drawAt(0), 'era 1 is not era 0');
+  for (const era of [2, 3, 4]) {
+    assert.strictEqual(R.eraLook(era).placeholder, true, `era ${era} is still a placeholder`);
+    assert.deepStrictEqual(drawAt(era), one, `era ${era} draws era 1's look`);
+  }
+});
+
+test('every rung of the ladder has a look, and a missing rung falls back to the one below', () => {
+  const { R } = page();
+  for (const e of Pong.ERAS) {
+    assert.strictEqual(typeof R.eraLook(e.era).paddleInk, 'function', `era ${e.era}`);
+  }
+  assert.strictEqual(R.eraLook(Pong.TOP_ERA + 3).era, Pong.TOP_ERA);
+  assert.throws(() => R.registerEra({ name: 'no number' }));
+});
+
+// ---------------------------------------------------------- the era ladder
+// Every point either side scores moves the machine up one era, capped at the
+// top rung. Era 1 IS the turn to colour above.
+
+/** Score one point for the computer, the quick way. */
+function concede(g) {
+  endServeDelay(g);
+  placeBall(g, 1, g.height / 2, -400, 0);
+  centrePaddle(g.left, 60);
+  Pong.step(g, 0.05, {});
+}
+
+test('the ladder is named, in order, from the 1972 machine to the Super Nintendo', () => {
+  assert.deepStrictEqual(Pong.ERAS.map((e) => [e.era, e.year, e.machine]), [
+    [0, 1972, 'arcade Pong'],
+    [1, 1977, 'Atari 2600'],
+    [2, 1985, 'NES'],
+    [3, 1989, 'Sega Genesis'],
+    [4, 1991, 'Super Nintendo']
+  ]);
+  assert.strictEqual(Pong.TOP_ERA, 4);
+});
+
+test('a machine starts at era 0, and has never changed era', () => {
+  const g = newGame();
+  assert.strictEqual(g.era, 0);
+  assert.strictEqual(g.eraChangedAt, 0);
+});
+
+test('a point by EITHER side moves the machine up exactly one era', () => {
+  const g = newGame();
+  concede(g);                                      // the computer scores
+  assert.strictEqual(g.era, 1);
+  assert.strictEqual(g.colour, true, 'era 1 is the turn to colour');
+
+  endServeDelay(g);
+  placeBall(g, g.width - 2, g.height / 2, 400, 0); // the player scores
+  centrePaddle(g.right, 60);
+  Pong.step(g, 0.05, {});
+  assert.strictEqual(g.score.left, 1);
+  assert.strictEqual(g.era, 2);
+});
+
+test('the era records the game time it last changed at', () => {
+  const g = newGame();
+  for (let i = 0; i < 30; i++) Pong.step(g, 1 / 60, {});
+  const before = g.time;
+  concede(g);
+  assert.ok(g.eraChangedAt > before, 'stamped at the moment of the point');
+  assert.strictEqual(g.eraChangedAt, g.time);
+  const stamp = g.eraChangedAt;
+  for (let i = 0; i < 30; i++) Pong.step(g, 1 / 60, {});
+  assert.strictEqual(g.eraChangedAt, stamp, 'play without a point leaves it alone');
+});
+
+test('the ladder stops at the top: more points never pass the last era', () => {
+  const g = newGame();
+  for (let i = 0; i < Pong.TOP_ERA; i++) concede(g);
+  assert.strictEqual(g.era, Pong.TOP_ERA);
+  const stamp = g.eraChangedAt;
+  for (let i = 0; i < 6; i++) concede(g);
+  assert.strictEqual(g.score.right, Pong.TOP_ERA + 6);
+  assert.strictEqual(g.era, Pong.TOP_ERA, 'capped');
+  assert.strictEqual(g.eraChangedAt, stamp, 'a capped point is not an era change');
+  assert.strictEqual(Pong.advanceEra(g), false);
+});
+
+test('a game can be opened at any era, clamped to the ladder', () => {
+  const g = Pong.createGame({ rng: () => 0.5, phase: 'playing', era: 3 });
+  assert.strictEqual(g.era, 3);
+  assert.strictEqual(g.colour, true, 'past era 0 it already wears colours');
+  assert.notStrictEqual(g.paddleColour.left, g.paddleColour.right);
+  assert.strictEqual(Pong.createGame({ era: 99 }).era, Pong.TOP_ERA);
+  assert.strictEqual(Pong.createGame({ era: -2 }).era, 0);
+  assert.strictEqual(Pong.createGame({ era: 'banana' }).era, 0);
+});
+
+test('opening at era 0 draws the rng exactly as before, so the serve is unchanged', () => {
+  let n = 0;
+  Pong.createGame({ rng: () => { n++; return 0.5; } });
+  assert.strictEqual(n, 2, 'one draw for the serve angle, one for the CPU aim');
+});
+
+test('a new session starts back at the era it was opened at', () => {
+  const g = Pong.createGame({ rng: Math.random, era: 2 });
+  Pong.startGame(g);
+  concede(g);
+  concede(g);
+  assert.strictEqual(g.era, 4);
+  g.phase = 'title';
+  Pong.startGame(g);
+  assert.strictEqual(g.era, 2);
+  assert.strictEqual(g.eraChangedAt, 0);
+
+  const plain = newGame();
+  concede(plain);
+  plain.phase = 'title';
+  Pong.startGame(plain);
+  assert.strictEqual(plain.era, 0, 'an ordinary session starts at the 1972 machine');
+});
+
+test('the page query picks the starting era, and nonsense is era 0', () => {
+  assert.strictEqual(Pong.eraFromQuery('?era=3'), 3);
+  assert.strictEqual(Pong.eraFromQuery('?x=1&era=1'), 1);
+  assert.strictEqual(Pong.eraFromQuery('?era=9'), Pong.TOP_ERA);
+  assert.strictEqual(Pong.eraFromQuery('?era=-1'), 0);
+  assert.strictEqual(Pong.eraFromQuery('?era=nes'), 0);
+  assert.strictEqual(Pong.eraFromQuery(''), 0);
+  assert.strictEqual(Pong.eraFromQuery(undefined), 0);
 });
 
 // ------------------------------------------------------------------- purity

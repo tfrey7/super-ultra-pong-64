@@ -8,16 +8,19 @@ project's `CLAUDE.md` and none of ours. This is the two-minute on-ramp. Read it,
 **Super Ultra Pong 64: Remastered** is a Pong that evolves while you play it — you start at the
 1972 arcade machine (black screen, two white bars, a square ball, a dashed centre line) and the
 game is meant to grow up through the eras around it as the session goes on. Evoland, but for Pong.
-Today the repo holds **era zero only**: the original machine, you against the computer, playable
-and honest, with nothing evolving yet. It opens on a **title screen** -- a real `phase` in
+Every point either side scores moves the machine **up one era** -- 0 the 1972 arcade machine,
+1 the 1977 Atari 2600 (the turn to colour), 2 the NES, 3 the Genesis, 4 the Super Nintendo, where
+it stops -- and eras 2 to 4 are placeholders drawing era 1 until their own cards land (the README's
+*The era ladder* is the recipe). It opens on a **title screen** -- a real `phase` in
 `src/game.js`, where `step()` moves nothing at all until `startGame()` is called -- with a
 self-playing demo rally behind it, drawn from the score's own block font. It is plain HTML and plain JavaScript — **no npm, no
 `package.json`, no build step, no framework, no dependencies of any kind** — and that is a
 deliberate property to preserve, not an accident of it being early. The layout exists so later
 eras are *additions*: `src/game.js` is the rules, `src/render.js` the look, `src/input.js` the
-hands, `src/main.js` the loop that ties them together. In the README's own words: adding an era
-should mean adding fields to the state and rules to `step()`, plus a branch in the renderer —
-not touching the other two modules. Read the `README.md` for the full tour.
+hands, `src/main.js` the loop that ties them together, and `src/eras/` one file per era's look.
+**An era card replaces its own `src/eras/eraN-*.js` and edits nobody else's**; the rules only
+carry `state.era` and `state.eraChangedAt`. Open the page at any era with `index.html?era=3`
+(`node tools/playtest.mjs --era 3` likewise). Read the `README.md` for the full tour.
 
 ## 2. Cut your own worktree
 
@@ -64,9 +67,10 @@ done. The repo itself binds nothing.
 node --test
 ```
 
-From the repo root, Node 18+. **45 tests, well under a second** (0.16 s measured). It is the headless suite over the pure rules
+From the repo root, Node 18+. **58 tests, well under a second** (0.09 s measured). It is the headless suite over the pure rules
 in `src/game.js` — paddle bounces and their angles, wall bounces, scoring on each side, the serve
-reset, and frame-rate independence. There is no faster subset worth naming; the whole thing is one
+reset, frame-rate independence and the era ladder — plus the era-look checks, which draw on a
+recording canvas and need no browser. There is no faster subset worth naming; the whole thing is one
 file (`test/game.test.js`) and already instant. This is the command you run once, immediately
 before writing your report.
 
@@ -150,6 +154,12 @@ his emulator — never touch either.**
   `node tools/beatability-sample.mjs` measures that at 44% over 300 sessions, identically on
   master. Do not read a single failure of that one line as a regression you caused -- run the
   sampler before you believe it.
+- **Eras 0 and 1 are pinned to the pixel.** `tools/eralooks-today.json` holds every draw call
+  those two eras made before the ladder existed, and a test compares the live renderer against
+  it. A deliberate change to either look re-records it: `node tools/eralooks.js`, committed with
+  the change and said so in the report. An era 2+ card never needs to.
+- **Nothing under `test/` may be a helper.** `node --test` runs every `.js` file under `test/`,
+  which is why the era-look loader and scenes live in `tools/eralooks.js`.
 - **The computer paddle is deliberately beatable** — it only chases once the ball heads its way,
   aims slightly off centre, and cannot match a really steep shot. If a change makes it perfect,
   that is a regression in the game even when every test passes.

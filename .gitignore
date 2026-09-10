@@ -21,6 +21,10 @@ docs/shots/playtest/
 # into this checkout. It is a runtime claim that expires by itself, not source.
 .state/
 
+# The fleet's CI runner writes its run log and verdict into the worktree it
+# was asked to test. Output, not source.
+.ci/
+
 # Scratch
 tmp/
 *.tmp
