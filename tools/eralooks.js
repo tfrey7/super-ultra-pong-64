@@ -112,7 +112,14 @@ if (require.main === module) {
     scenes: scenes(Pong, R)
   };
   const dest = path.join(__dirname, 'eralooks-today.json');
-  fs.writeFileSync(dest, JSON.stringify(out, null, 1) + '\n');
+  // One draw call per line, so the file diffs as frames rather than as a
+  // wall of single numbers.
+  const sceneText = Object.entries(out.scenes).map(([name, calls]) =>
+    `  ${JSON.stringify(name)}: [\n` +
+    calls.map((c) => `   ${JSON.stringify(c)}`).join(',\n') + '\n  ]').join(',\n');
+  const head = JSON.stringify({ what: out.what, renderSha256: out.renderSha256, eraScripts: out.eraScripts }, null, 1)
+    .replace(/\n}$/, '');
+  fs.writeFileSync(dest, `${head},\n "scenes": {\n${sceneText}\n }\n}\n`);
   const counts = Object.entries(out.scenes).map(([k, v]) => `${k}: ${v.length}`);
   console.log(`wrote ${dest}\n  ${counts.join('\n  ')}`);
 }
