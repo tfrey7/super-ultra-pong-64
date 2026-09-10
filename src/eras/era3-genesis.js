@@ -1,16 +1,246 @@
 /*
- * Era 3 -- 1989 Sega Genesis.
+ * Era 3 -- 1989 Sega Genesis: sixteen bits.
  *
- * PLACEHOLDER: until the Genesis card lands this rung draws era 1's look,
- * which is what `like: 1` means. That card replaces this file and touches no
- * other.
+ * The same game in the look of a Genesis cartridge, a clear step up from the
+ * NES before it:
+ *
+ *  - Every colour is on the Genesis palette: 3 bits a channel, 512 colours.
+ *    The paddles keep the colours the rules picked (era 1's pick), snapped to
+ *    that palette, and are shaded by moving whole palette steps lighter and
+ *    darker -- the stepped gradient a 1989 sprite artist painted by hand.
+ *  - Two parallax planes behind the field, the way the Genesis video chip's
+ *    two scroll planes were used: a far plane (stars and a distant range)
+ *    that barely drifts, and a near plane of hills three times faster.
+ *    They scroll with game time, so they are part of the frame, not the play.
+ *  - A shaded ball with a motion trail. The trail is placed back along the
+ *    ball's own velocity, never remembered from earlier frames, so this file
+ *    still only READS the state -- the rules do not know it exists and the
+ *    game plays exactly as it did in the eras below.
+ *  - A bolder block score with a drop shadow.
+ *
+ * It paints with fillStyle and fillRect only, like the stock frame, so the
+ * recording canvas in tools/eralooks.js can check it headless. A dimmed frame
+ * (the attract rally behind the title) is the stock frame, as in every era.
  */
 (function (root) {
   'use strict';
-  root.PongRender.registerEra({
+  var R = root.PongRender;
+
+  // ------------------------------------------------------------ the palette
+  // The Genesis video chip: 3 bits per channel, so 8 levels of each.
+  var LEVELS = [0x00, 0x24, 0x49, 0x6d, 0x92, 0xb6, 0xdb, 0xff];
+
+  function hex2(n) { return (n < 16 ? '0' : '') + n.toString(16); }
+
+  /**
+   * A '#rrggbb' colour moved to the nearest Genesis colour, then `steps`
+   * palette levels lighter (+) or darker (-) on every channel.
+   */
+  function onPalette(hex, steps) {
+    var s = steps || 0;
+    var out = '#';
+    for (var c = 0; c < 3; c++) {
+      var v = parseInt(hex.slice(1 + 2 * c, 3 + 2 * c), 16);
+      var i = Math.round(v * 7 / 255) + s;
+      out += hex2(LEVELS[Math.max(0, Math.min(7, i))]);
+    }
+    return out;
+  }
+
+  var SHADOW = 'rgba(0,0,0,0.5)';
+
+  // Dusk sky, in horizontal bands of palette colours -- a smooth gradient was
+  // not something the chip could draw, a raster of bands was.
+  var SKY = ['#000024', '#000024', '#240024', '#240049', '#242449',
+             '#24246d', '#49246d', '#49496d', '#6d4992', '#6d6db6'];
+  var DITHER = 3;        // scanlines of the next band laid over the end of this one
+
+  // ------------------------------------------------------- the two planes
+  var FAR_SPEED = 6;     // field units per second of game time: barely moving
+  var NEAR_SPEED = 18;   // three times the far plane -- that gap IS the parallax
+  var COLUMN = 8;        // silhouettes are drawn in 8-unit columns, a tile's width
+
+  /** How far each plane has scrolled at a game time, in field units. */
+  function planes(time) {
+    var t = time || 0;
+    return { far: t * FAR_SPEED, near: t * NEAR_SPEED };
+  }
+
+  // A fixed scatter of stars on the far plane, from a hash rather than
+  // Math.random(), so every frame of every run agrees on where they are.
+  var STARS = [];
+  (function () {
+    for (var j = 0; j < 56; j++) {
+      var a = Math.sin(j * 12.9898) * 43758.5453;
+      var b = Math.sin(j * 78.233) * 12345.6789;
+      STARS.push({ x: (a - Math.floor(a)) * 800, y: 8 + (b - Math.floor(b)) * 320, lit: j % 3 === 0 });
+    }
+  })();
+
+  function drawSky(ctx, state) {
+    var band = state.height / SKY.length;
+    var i, d;
+    for (i = 0; i < SKY.length; i++) {
+      ctx.fillStyle = SKY[i];
+      ctx.fillRect(0, Math.floor(i * band), state.width, Math.ceil(band) + 1);
+    }
+    // Soften each hard edge the way a 16-bit artist did: the next band's
+    // colour on every other scanline, just above where it takes over.
+    for (i = 1; i < SKY.length; i++) {
+      ctx.fillStyle = SKY[i];
+      var edge = Math.floor(i * band);
+      for (d = 1; d <= DITHER; d++) ctx.fillRect(0, edge - d * 4, state.width, 2);
+    }
+  }
+
+  function drawStars(ctx, state, scroll) {
+    var w = state.width;
+    for (var i = 0; i < STARS.length; i++) {
+      var s = STARS[i];
+      ctx.fillStyle = s.lit ? '#dbdbff' : '#6d6db6';
+      ctx.fillRect(Math.floor((((s.x - scroll) % w) + w) % w), Math.floor(s.y), 2, 2);
+    }
+  }
+
+  /**
+   * One plane's skyline: stepped columns along the bottom of the field, whose
+   * heights come from the column's place in the WORLD, so scrolling slides the
+   * same hills along rather than growing new ones.
+   */
+  function drawRidge(ctx, state, scroll, base, rise, seed, body, edge) {
+    var first = Math.floor(scroll / COLUMN);
+    var shift = scroll - first * COLUMN;
+    var cols = Math.ceil(state.width / COLUMN) + 1;
+    for (var i = 0; i < cols; i++) {
+      var k = first + i;
+      var h = base + rise * (0.55 * Math.sin(k * 0.13 + seed) +
+                             0.30 * Math.sin(k * 0.047 + seed * 2.1) +
+                             0.15 * Math.sin(k * 0.61 + seed * 0.7));
+      h = Math.round(h / 4) * 4;
+      var x = i * COLUMN - shift;
+      var top = state.height - h;
+      ctx.fillStyle = body;
+      ctx.fillRect(x, top, COLUMN, h);
+      ctx.fillStyle = edge;
+      ctx.fillRect(x, top, COLUMN, 4);
+    }
+  }
+
+  // ------------------------------------------------------------- the play
+  function drawCentreLine(ctx, state) {
+    var dash = 20;
+    var gap = 16;
+    var w = 8;
+    var x = (state.width - w) / 2;
+    for (var y = 6; y < state.height; y += dash + gap) {
+      var h = Math.min(dash, state.height - y);
+      ctx.fillStyle = '#6d6db6';
+      ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = '#b6b6ff';
+      ctx.fillRect(x, y, w / 2, h);
+    }
+  }
+
+  /** What a paddle and its score wear: era 1's pick, snapped to the palette. */
+  function paddleInk(state, side) {
+    return onPalette(R.eraLook(1).paddleInk(state, side));
+  }
+
+  // Across the bar, left to right: lit edge to shadowed edge.
+  var BAR_STEPS = [2, 1, 0, 0, -1, -2];
+
+  function drawShadedBar(ctx, p, ink) {
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(p.x + 5, p.y + 5, p.w, p.h);
+    var n = BAR_STEPS.length;
+    for (var i = 0; i < n; i++) {
+      var x0 = p.x + Math.round(i * p.w / n);
+      var x1 = p.x + Math.round((i + 1) * p.w / n);
+      ctx.fillStyle = onPalette(ink, BAR_STEPS[i]);
+      ctx.fillRect(x0, p.y, x1 - x0, p.h);
+    }
+    ctx.fillStyle = onPalette(ink, 3);          // the top catches the light
+    ctx.fillRect(p.x, p.y, p.w, 3);
+    ctx.fillStyle = onPalette(ink, -3);         // the bottom falls away
+    ctx.fillRect(p.x, p.y + p.h - 3, p.w, 3);
+  }
+
+  var TRAIL = 6;          // ghosts behind the ball
+  var TRAIL_DT = 0.016;   // seconds of flight between one ghost and the next
+  var TRAIL_INK = '146,182,255';
+
+  function drawBall(ctx, state) {
+    var b = state.ball;
+    var s = b.size;
+    for (var i = TRAIL; i >= 1; i--) {
+      var gs = Math.max(2, Math.round(s * (1 - i / (TRAIL + 2))));
+      var cx = b.x + s / 2 - b.vx * TRAIL_DT * i;
+      var cy = Math.max(0, Math.min(state.height, b.y + s / 2 - b.vy * TRAIL_DT * i));
+      ctx.fillStyle = 'rgba(' + TRAIL_INK + ',' + (0.55 * (1 - i / (TRAIL + 1))).toFixed(2) + ')';
+      ctx.fillRect(cx - gs / 2, cy - gs / 2, gs, gs);
+    }
+    var q = Math.max(1, Math.round(s / 4));
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(b.x + 4, b.y + 4, s, s);
+    ctx.fillStyle = '#b6b6db';
+    ctx.fillRect(b.x, b.y, s, s);
+    ctx.fillStyle = '#6d6d92';                  // shade on the far side
+    ctx.fillRect(b.x + s - q, b.y, q, s);
+    ctx.fillRect(b.x, b.y + s - q, s, q);
+    ctx.fillStyle = '#ffffff';                  // the glint
+    ctx.fillRect(b.x + q, b.y + q, q, q);
+  }
+
+  // Bigger blocks than the stock 14, bevelled: a lit edge along the top of
+  // every stroke, and a SOLID drop shadow in the ink's own deep shade -- a
+  // translucent black one vanishes into the night sky.
+  var SCORE = { cell: 16, gap: 12, top: 36, offset: 110, shadow: 6, bevel: 3 };
+
+  function drawScore(ctx, state, side, centreX) {
+    var text = String(state.score[side]);
+    var ink = paddleInk(state, side);
+    var cell = SCORE.cell;
+    var gap = SCORE.gap;
+    var top = SCORE.top;
+    ctx.fillStyle = onPalette(ink, -3);
+    R.drawText(ctx, text, centreX + SCORE.shadow, top + SCORE.shadow, cell, gap);
+    ctx.fillStyle = onPalette(ink, 3);
+    R.drawText(ctx, text, centreX, top, cell, gap);
+    ctx.fillStyle = ink;
+    R.drawText(ctx, text, centreX, top + SCORE.bevel, cell, gap);
+  }
+
+  function draw(ctx, state, opts) {
+    if (opts && opts.ink) return R.drawBase(ctx, state, opts);
+    var p = planes(state.time);
+
+    drawSky(ctx, state);
+    drawStars(ctx, state, p.far);
+    drawRidge(ctx, state, p.far, 150, 70, 0.4, '#242449', '#49496d');
+    drawRidge(ctx, state, p.near, 70, 40, 2.7, '#000024', '#242449');
+
+    drawCentreLine(ctx, state);
+    drawScore(ctx, state, 'left', state.width / 2 - SCORE.offset);
+    drawScore(ctx, state, 'right', state.width / 2 + SCORE.offset);
+
+    drawShadedBar(ctx, state.left, paddleInk(state, 'left'));
+    drawShadedBar(ctx, state.right, paddleInk(state, 'right'));
+
+    // The ball blinks out while the serve waits, as in every era.
+    if (state.serveDelay <= 0) drawBall(ctx, state);
+  }
+
+  R.registerEra({
     era: 3,
     name: '1989 Sega Genesis',
-    placeholder: true,
-    like: 1
+    paddleInk: paddleInk,
+    draw: draw,
+    planes: planes,
+    onPalette: onPalette,
+    LEVELS: LEVELS,
+    SCORE: SCORE,
+    TRAIL: TRAIL,
+    TRAIL_INK: TRAIL_INK,
+    SHADOW: SHADOW
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
