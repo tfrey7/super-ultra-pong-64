@@ -17,7 +17,8 @@ self-playing demo rally behind it, drawn from the score's own block font. It is 
 `package.json`, no build step, no framework, no dependencies of any kind** — and that is a
 deliberate property to preserve, not an accident of it being early. The layout exists so later
 eras are *additions*: `src/game.js` is the rules, `src/render.js` the look, `src/input.js` the
-hands, `src/main.js` the loop that ties them together, and `src/eras/` one file per era's look.
+hands, `src/sound.js` the voice (each era's notes, synthesised on the page), `src/main.js` the loop
+that ties them together, and `src/eras/` one file per era's look.
 **An era card replaces its own `src/eras/eraN-*.js` and edits nobody else's**; the rules only
 carry `state.era` and `state.eraChangedAt`. Open the page at any era with `index.html?era=3`
 (`node tools/playtest.mjs --era 3` likewise). Read the `README.md` for the full tour.
@@ -67,11 +68,12 @@ done. The repo itself binds nothing.
 node --test
 ```
 
-From the repo root, Node 18+. **58 tests, well under a second** (0.09 s measured). It is the headless suite over the pure rules
+From the repo root, Node 18+. **75 tests, well under a second** (0.15 s measured). It is the headless suite over the pure rules
 in `src/game.js` — paddle bounces and their angles, wall bounces, scoring on each side, the serve
 reset, frame-rate independence and the era ladder — plus the era-look checks, which draw on a
-recording canvas and need no browser. There is no faster subset worth naming; the whole thing is one
-file (`test/game.test.js`) and already instant. This is the command you run once, immediately
+recording canvas and need no browser, and the sound checks (`test/sound.test.js`), which drive the
+player through a recording stand-in for Web Audio and need no audio device. There is no faster
+subset worth naming; the whole thing is two files and already instant. This is the command you run once, immediately
 before writing your report.
 
 The page itself — not the rules — is proved by the **playtest harness**:
@@ -84,8 +86,13 @@ Node 22+. It launches Chrome with a debugging port and drives the real `index.ht
 the DevTools protocol (no dependencies — Node's built-in WebSocket client), checking that it opens on the
 title screen with the ball held still, that a click and a keypress each start it, that the loop
 runs in real time, that the mouse and keys move the paddle, that rallies happen, that a miss
-scores, and that the next serve starts from the centre. Pass `--chrome "<path to chrome.exe>"` if
-it cannot find a browser, and `--port <n>` if 9333 is busy. Use it for any change to
+scores, and that the next serve starts from the centre -- and that the title screen opens no audio,
+the first click switches sound on, the rally is heard, and every era's voice schedules on the real
+Web Audio API (17 checks). Chrome runs `--mute-audio`, so a playtest never beeps through the
+machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
+plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
+it cannot find a browser, and `--port <n>` if 9333 is busy; each port gets its own Chrome profile,
+so two playtests on two ports can run at once. Use it for any change to
 `src/render.js`, `src/input.js`, `src/main.js` or `index.html`; `node --test` alone is enough for a
 change confined to the rules.
 
@@ -158,6 +165,12 @@ his emulator — never touch either.**
   those two eras made before the ladder existed, and a test compares the live renderer against
   it. A deliberate change to either look re-records it: `node tools/eralooks.js`, committed with
   the change and said so in the report. An era 2+ card never needs to.
+- **Sound listens to `state.events`, never to `lastEvent`.** The rules append every paddle hit, wall
+  bounce and point to `state.events` (emptied at the start of each `step`); `lastEvent` keeps only
+  the final one, so a hit and a bounce in one frame would lose a note. `src/sound.js` reads the list
+  and writes nothing, plays the real game only (never the attract rally), and opens no audio until
+  `begin()` in `src/main.js` unlocks it from a click or key -- browsers refuse sound before that.
+  An era's voice is its row in `VOICES` in `src/sound.js`.
 - **Nothing under `test/` may be a helper.** `node --test` runs every `.js` file under `test/`,
   which is why the era-look loader and scenes live in `tools/eralooks.js`.
 - **The computer paddle is deliberately beatable** — it only chases once the ball heads its way,

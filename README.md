@@ -33,7 +33,13 @@ page at all.
 - A point scores when the ball leaves either side, and the next serve starts from
   the centre after a short pause. The score is drawn across the top.
 
-No sound yet.
+**The sound grows up with the machine.** Paddle hits, wall bounces and points
+each play a note made on the page itself, with no audio files: a bare
+square-wave blip on the arcade machine and the Atari, square and triangle
+chiptune on the NES, a bright FM bell on the Genesis, and full layered chords
+with a short echo on the Super Nintendo. The game is silent until your first key
+or click, because browsers do not let a page make sound before that, and it
+plays on silently in a browser with no audio at all.
 
 ## Run the tests
 
@@ -42,10 +48,11 @@ node --test
 ```
 
 Node's own test runner, no dependencies, nothing to install (Node 18 or newer).
-The suite is headless and covers the pure rules only — paddle bounces and their
+The suite is headless — paddle bounces and their
 angles, wall bounces, scoring on each side, the serve reset, and the fact that
 the same second of play produces the same result whether it arrives as one long
-frame or sixty short ones.
+frame or sixty short ones — plus each era's look, and each era's sound, played
+through a recording stand-in for the browser's audio so no audio device is needed.
 
 There is also a **playtest** that proves the page itself is playable, by opening
 the real `index.html` off disk in a real browser and playing it:
@@ -58,8 +65,12 @@ It launches Chrome with a debugging port and drives it over the DevTools
 protocol — still no dependencies, using Node's built-in WebSocket client (Node
 22 or newer) — then checks that the loop runs in real time, that the mouse and
 the keys move the paddle, that rallies happen, that a miss scores, and that the
-next serve starts from the centre. Pass `--chrome "<path to chrome.exe>"` if it
-cannot find a browser on its own.
+next serve starts from the centre. It also checks the sound: nothing is opened on
+the title screen, the first click switches it on, the rally is heard, and every
+era's voice plays in the real browser. Chrome runs muted, so the checks never
+beep through your speakers. `--no-audio` runs the same checks with the browser's
+audio taken away, to prove the game still plays silently. Pass
+`--chrome "<path to chrome.exe>"` if it cannot find a browser on its own.
 
 Every run rewrites the screenshots it drops in `docs/shots/playtest/`. Those are
 ignored output, not source: the directory is gitignored, nobody needs to check
@@ -84,9 +95,11 @@ The point of the layout is that later eras are additions, not rewrites.
 | `src/game.js` | **The rules.** Pure state plus one `step(state, dt, intent)`. No canvas, no DOM, no timers, no input devices — which is why the tests can run headless. |
 | `src/render.js` | **The look.** Draws a state onto a canvas. Reads the state; never changes it. |
 | `src/input.js` | **The hands.** Turns mouse and keyboard into a plain intent object (`pointerY`, `up`, `down`). Knows nothing about the rules. |
-| `src/main.js` | The loop that ties the three together and hands `step` the real elapsed time. |
+| `src/sound.js` | **The voice.** Each era's notes (`VOICES`), and a player that plays the step's `state.events` through Web Audio. Reads the state; never changes it. Silent until the first click or key. |
+| `src/main.js` | The loop that ties them together and hands `step` the real elapsed time. |
 | `src/eras/` | **One file per era**, each registering that era's look with the renderer. |
 | `test/game.test.js` | The headless suite over `src/game.js`, plus the era-look checks. |
+| `test/sound.test.js` | The rules' event list, each era's voice, and the player through a recording stand-in for Web Audio. |
 | `tools/eralooks.js` | Draws fixed scenes on a recording canvas; `eralooks-today.json` beside it is what eras 0 and 1 drew before the ladder. |
 
 `step` takes a **delta time in seconds** and never assumes 60fps; long frames are

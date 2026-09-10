@@ -144,6 +144,13 @@
       serveDelay: 0,
       score: { left: 0, right: 0 },
       lastEvent: null,        // 'wall' | 'paddle' | 'score' | 'serve' | null
+      // Everything that happened during the LAST step(), in order, emptied at
+      // the start of every step. lastEvent keeps only the final one; a sound
+      // (or anything else that reacts) wants every hit and bounce, so it reads
+      // this. Each entry is plain data: { type: 'paddle' | 'wall' | 'score',
+      // side, era, time } -- era is the rung it happened on, and for a point
+      // it is the rung that point moved the machine up TO.
+      events: [],
       ball: {
         x: 0, y: 0, vx: 0, vy: 0,
         size: rules.ballSize
@@ -236,6 +243,12 @@
     return true;
   }
 
+  /** Note something that happened this step on state.events (see createGame). */
+  function emit(state, type, side) {
+    if (!state.events) state.events = [];
+    state.events.push({ type: type, side: side || null, era: state.era || 0, time: state.time });
+  }
+
   function rerollCpuAim(state) {
     var r = state.rules;
     state.right.aimError = (state.rng() * 2 - 1) * r.cpuMaxAimError;
@@ -311,6 +324,7 @@
 
     state.rally += 1;
     state.lastEvent = 'paddle';
+    emit(state, 'paddle', dirX > 0 ? 'left' : 'right');
     rerollCpuAim(state);
   }
 
@@ -320,10 +334,12 @@
       b.y = -b.y;
       b.vy = Math.abs(b.vy);
       state.lastEvent = 'wall';
+      emit(state, 'wall', 'top');
     } else if (b.y + b.size > state.height) {
       b.y = 2 * (state.height - b.size) - b.y;
       b.vy = -Math.abs(b.vy);
       state.lastEvent = 'wall';
+      emit(state, 'wall', 'bottom');
     }
   }
 
@@ -342,6 +358,7 @@
       state.score.right += 1;
       state.lastEvent = 'score';
       advanceEra(state);
+      emit(state, 'score', 'right');
       serve(state, 1);
       return true;
     }
@@ -349,6 +366,7 @@
       state.score.left += 1;
       state.lastEvent = 'score';
       advanceEra(state);
+      emit(state, 'score', 'left');
       serve(state, -1);
       return true;
     }
@@ -366,6 +384,7 @@
     dt = Math.min(dt, 0.05);     // a tab that was in the background, say
     state.time += dt;
     state.lastEvent = null;
+    state.events = [];
 
     // The title screen is a real state, not a paused game. The clock above
     // keeps running -- the blinking prompt reads it -- and nothing else

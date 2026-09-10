@@ -50,6 +50,9 @@
     }
 
     var input = PongInput.attach(canvas, game.height);
+    // The voice plays the REAL game's events only -- never the attract rally --
+    // and stays silent until begin() unlocks it from a click or key.
+    var sound = root.PongSound ? root.PongSound.createPlayer() : null;
     var last = 0;
 
     function drawFrame() {
@@ -70,6 +73,7 @@
 
       // In the title phase this only advances the clock the blink reads.
       Pong.step(game, dt, input.read());
+      if (sound) sound.handle(game);
       if (game.phase === 'title') Pong.step(attract, dt, attractIntent(dt));
 
       drawFrame();
@@ -78,6 +82,8 @@
 
     /** Any key, any click, any tap. Does nothing once the game is under way. */
     function begin() {
+      // Browsers only let a page make sound from inside a gesture like this one.
+      if (sound) sound.unlock();
       Pong.startGame(game);
     }
 
@@ -92,6 +98,7 @@
     // and to leave the title screen without a keyboard.
     root.__pong = game;
     root.__pongStart = begin;
+    root.__pongSound = sound;
   }
 
   if (document.readyState === 'loading') {
