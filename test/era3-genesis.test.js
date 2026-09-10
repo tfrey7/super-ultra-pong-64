@@ -95,12 +95,13 @@ test('the score is bolder than the stock frame and drops a shadow', () => {
   const cell = look.SCORE.cell;
   assert.ok(cell > 14, 'bigger blocks than the 14-unit stock score');
   const ink = look.paddleInk(g, 'left');
+  const { shadow, bevel } = look.SCORE;
   const blocks = calls.filter(([c, x, y, w]) => c === ink && w === cell && y < 150);
   assert.ok(blocks.length >= 7, `the left score's blocks (${blocks.length})`);
+  const has = (colour, x, y) => calls.some(([c, bx, by, bw]) => c === colour && bx === x && by === y && bw === cell);
   for (const [, x, y] of blocks) {
-    const s = look.SCORE.shadow;
-    assert.ok(calls.some(([c, sx, sy, sw]) => c === look.SHADOW && sx === x + s && sy === y + s && sw === cell),
-      `a shadow under the block at ${x},${y}`);
+    assert.ok(has(look.onPalette(ink, -3), x + shadow, y - bevel + shadow), `a solid shadow under the block at ${x},${y}`);
+    assert.ok(has(look.onPalette(ink, 3), x, y - bevel), `a lit edge above the block at ${x},${y}`);
   }
 });
 

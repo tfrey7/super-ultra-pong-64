@@ -51,8 +51,9 @@
 
   // Dusk sky, in horizontal bands of palette colours -- a smooth gradient was
   // not something the chip could draw, a raster of bands was.
-  var SKY = ['#000000', '#000024', '#000024', '#240024', '#240049',
-             '#242449', '#24246d', '#49246d', '#49496d', '#6d4992'];
+  var SKY = ['#000024', '#000024', '#240024', '#240049', '#242449',
+             '#24246d', '#49246d', '#49496d', '#6d4992', '#6d6db6'];
+  var DITHER = 3;        // scanlines of the next band laid over the end of this one
 
   // ------------------------------------------------------- the two planes
   var FAR_SPEED = 6;     // field units per second of game time: barely moving
@@ -78,9 +79,17 @@
 
   function drawSky(ctx, state) {
     var band = state.height / SKY.length;
-    for (var i = 0; i < SKY.length; i++) {
+    var i, d;
+    for (i = 0; i < SKY.length; i++) {
       ctx.fillStyle = SKY[i];
       ctx.fillRect(0, Math.floor(i * band), state.width, Math.ceil(band) + 1);
+    }
+    // Soften each hard edge the way a 16-bit artist did: the next band's
+    // colour on every other scanline, just above where it takes over.
+    for (i = 1; i < SKY.length; i++) {
+      ctx.fillStyle = SKY[i];
+      var edge = Math.floor(i * band);
+      for (d = 1; d <= DITHER; d++) ctx.fillRect(0, edge - d * 4, state.width, 2);
     }
   }
 
@@ -182,14 +191,23 @@
     ctx.fillRect(b.x + q, b.y + q, q, q);
   }
 
-  var SCORE = { cell: 16, gap: 12, top: 36, offset: 110, shadow: 4 };
+  // Bigger blocks than the stock 14, bevelled: a lit edge along the top of
+  // every stroke, and a SOLID drop shadow in the ink's own deep shade -- a
+  // translucent black one vanishes into the night sky.
+  var SCORE = { cell: 16, gap: 12, top: 36, offset: 110, shadow: 6, bevel: 3 };
 
   function drawScore(ctx, state, side, centreX) {
     var text = String(state.score[side]);
-    ctx.fillStyle = SHADOW;
-    R.drawText(ctx, text, centreX + SCORE.shadow, SCORE.top + SCORE.shadow, SCORE.cell, SCORE.gap);
-    ctx.fillStyle = paddleInk(state, side);
-    R.drawText(ctx, text, centreX, SCORE.top, SCORE.cell, SCORE.gap);
+    var ink = paddleInk(state, side);
+    var cell = SCORE.cell;
+    var gap = SCORE.gap;
+    var top = SCORE.top;
+    ctx.fillStyle = onPalette(ink, -3);
+    R.drawText(ctx, text, centreX + SCORE.shadow, top + SCORE.shadow, cell, gap);
+    ctx.fillStyle = onPalette(ink, 3);
+    R.drawText(ctx, text, centreX, top, cell, gap);
+    ctx.fillStyle = ink;
+    R.drawText(ctx, text, centreX, top + SCORE.bevel, cell, gap);
   }
 
   function draw(ctx, state, opts) {
