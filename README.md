@@ -5,9 +5,10 @@ black screen, two white bars, a square ball, a dashed line down the middle — a
 as the session goes on the game grows up through the eras around it: colour,
 sound, sprites, physics, whatever each later era brings. Evoland, but for Pong.
 
-Right now the repo holds **era zero only**: the original machine, you against the
-computer. Nothing evolves yet. That is deliberate — era zero is the thing every
-later era has to grow out of, so it was built first and built honestly.
+**Every point either side scores moves the machine up one era**, from the 1972
+arcade machine to the Super Nintendo (see *The era ladder* below). Today eras 0
+and 1 are built — black and white, then the Atari turn to colour — and eras 2 to
+4 are placeholders that draw era 1 until their own cards land.
 
 ## Play it
 
