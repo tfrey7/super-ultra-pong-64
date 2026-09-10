@@ -61,6 +61,9 @@
         PongRender.drawTitle(ctx, game);
       } else {
         PongRender.draw(ctx, game);
+        // A point that moved the machine up an era: the flash, the wipe and
+        // the name card, over the frame, for as long as the serve pause lasts.
+        if (PongRender.drawEraChange) PongRender.drawEraChange(ctx, game);
       }
     }
 
