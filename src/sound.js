@@ -150,8 +150,14 @@
       last: null,         // { era, type, waves } of the latest event played
       unlock: unlock,
       handle: handle,
-      play: play
+      play: play,
+      audioState: audioState
     };
+
+    /** 'none' before unlock or with no audio; else the context's own state. */
+    function audioState() {
+      return ctx ? String(ctx.state) : 'none';
+    }
 
     /** Call from inside a click or keypress. Safe to call any number of times. */
     function unlock() {
