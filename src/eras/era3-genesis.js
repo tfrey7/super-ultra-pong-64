@@ -226,24 +226,105 @@
     R.drawText(ctx, text, centreX, top + SCORE.bevel, cell, gap);
   }
 
+  // ------------------------------------------------------- the pixel art
+  // Three pieces generated with tools/pixellab.mjs and snapped offline to the
+  // palette above by tools/palette-snap.mjs (assets/pixellab/manifest.json
+  // holds the request and the snap for each). Every piece is drawImage calls
+  // only -- nothing here reads or loops over pixels. Until an image has
+  // decoded, and always under node --test (there is no Image in Node), the
+  // hand-drawn piece is drawn in its place, so the look never has a hole.
+  var ART = { court: 'genesis-court', paddle: 'genesis-paddle', ball: 'genesis-ball' };
+
+  /** The sprite loader, when this page can decode images at all. */
+  function art() {
+    var S = root.PongSprites;
+    return S && typeof root.Image === 'function' ? S : null;
+  }
+
+  /**
+   * The far plane as the generated court: its 320x240 picture -- the
+   * Genesis's own 320-wide screen -- scaled to the field and scrolled with the
+   * far plane, every other copy flipped so the join is seamless. The near
+   * plane's hills still pass in front of it. False while it has not decoded.
+   */
+  function drawCourt(ctx, state, S, scroll) {
+    if (!S.ready(ART.court)) { S.load(ART.court); return false; }
+    var w = state.width;
+    var h = state.height;
+    var span = 2 * w;
+    var off = ((scroll % span) + span) % span;
+    for (var k = 0; k < 3; k++) {
+      var x = Math.floor(k * w - off);
+      if (x >= w || x + w <= 0) continue;
+      if (k % 2 === 0) {
+        S.draw(ctx, ART.court, x, 0, w, h);
+      } else {
+        ctx.save();
+        ctx.translate(x + w, 0);
+        ctx.scale(-1, 1);
+        S.draw(ctx, ART.court, 0, 0, w, h);
+        ctx.restore();
+      }
+    }
+    return true;
+  }
+
+  // One tinted copy of the paddle art per ink, made once: the grey chrome
+  // multiplied by the side's colour, then cut back to the sprite's own shape.
+  var tints = {};
+
+  function paddleArt(S, ink) {
+    if (!S.ready(ART.paddle)) { S.load(ART.paddle); return null; }
+    if (tints[ink]) return tints[ink];
+    if (typeof document === 'undefined' || !document.createElement) return null;
+    var img = S.load(ART.paddle);
+    var c = document.createElement('canvas');
+    c.width = img.naturalWidth || img.width;
+    c.height = img.naturalHeight || img.height;
+    var o = c.getContext('2d');
+    o.drawImage(img, 0, 0);
+    o.globalCompositeOperation = 'multiply';
+    o.fillStyle = onPalette(ink, 1);
+    o.fillRect(0, 0, c.width, c.height);
+    o.globalCompositeOperation = 'destination-in';
+    o.drawImage(img, 0, 0);
+    o.globalCompositeOperation = 'source-over';
+    tints[ink] = c;
+    return c;
+  }
+
+  function drawPaddle(ctx, p, ink, S) {
+    var tint = S ? paddleArt(S, ink) : null;
+    if (!tint) { drawShadedBar(ctx, p, ink); return; }
+    ctx.fillStyle = SHADOW;
+    ctx.fillRect(p.x + 5, p.y + 5, p.w, p.h);
+    var smooth = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(tint, p.x, p.y, p.w, p.h);
+    ctx.imageSmoothingEnabled = smooth;
+  }
+
   function draw(ctx, state, opts) {
     if (opts && opts.ink) return R.drawBase(ctx, state, opts);
     var p = planes(state.time);
+    var S = art();
 
-    drawSky(ctx, state);
-    drawStars(ctx, state, p.far);
-    drawRidge(ctx, state, p.far, 150, 70, 0.4, '#242449', '#49496d');
+    if (!(S && drawCourt(ctx, state, S, p.far))) {
+      drawSky(ctx, state);
+      drawStars(ctx, state, p.far);
+      drawRidge(ctx, state, p.far, 150, 70, 0.4, '#242449', '#49496d');
+    }
     drawRidge(ctx, state, p.near, 70, 40, 2.7, '#000024', '#242449');
 
     drawCentreLine(ctx, state);
     drawScore(ctx, state, 'left', state.width / 2 - SCORE.offset);
     drawScore(ctx, state, 'right', state.width / 2 + SCORE.offset);
 
-    drawShadedBar(ctx, state.left, paddleInk(state, 'left'));
-    drawShadedBar(ctx, state.right, paddleInk(state, 'right'));
+    drawPaddle(ctx, state.left, paddleInk(state, 'left'), S);
+    drawPaddle(ctx, state.right, paddleInk(state, 'right'), S);
 
     // The ball blinks out while the serve waits, as in every era.
-    if (state.serveDelay <= 0) drawBall(ctx, state);
+    if (state.serveDelay <= 0) drawBall(ctx, state, S);
   }
 
   // ------------------------------------------------ the arrival: the shatter

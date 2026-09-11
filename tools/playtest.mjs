@@ -370,7 +370,12 @@ async function main() {
   const chrome = spawn(CHROME, [
     // --mute-audio: the audio graph still runs and is still checked, but a
     // playtest never beeps through the speakers of the machine it runs on.
+    // --allow-file-access-from-files: the page is opened off disk, where Chrome
+    // counts every image as another origin, so one drawImage of the pixel art
+    // in assets/pixellab/ taints the canvas and the ladder walk's getImageData
+    // throws. With it, a file:// page may read back its own files (item 1179).
     '--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
+    '--allow-file-access-from-files',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
     '--user-data-dir=' + profile, '--no-first-run', '--no-default-browser-check',
     url
