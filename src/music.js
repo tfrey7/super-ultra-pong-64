@@ -166,6 +166,23 @@
   var RALLY_STEP = 0.012;      // each paddle hit in a rally: +1.2% tempo...
   var RALLY_MAX = 0.18;        // ...up to +18%
 
+  // The master limiter (item 1241): a fast, hard compressor, then a ceiling no
+  // sample can pass, so the climax can stack every layer and never clip.
+  var LIMIT = { threshold: -6, knee: 0, ratio: 20, attack: 0.002, release: 0.12 };
+  var CEILING = 0.89;          // about -1 dBFS: the loudest sample the page can send
+  var CEILING_KNEE = 0.6;      // straight through below this, bent softly above it
+
+  // The intensity (item 1241): 0 at the first serve, climbing with the rally
+  // and the score, 0.9 and up at match point, 1 through the finale. A part (or
+  // one of the engine's lift layers) with `from: f` joins once it reaches f.
+  var INTENSITY = {
+    rallyFull: 12,             // a rally this long gives the rally's whole share
+    rallyShare: 0.4,           // how much of the build a long rally is worth...
+    scoreShare: 0.5,           // ...and how much the points played so far are
+    beforeMatchPoint: 0.89,    // the ordinary game never reaches the match-point layers
+    matchPoint: 0.9            // match point starts here and the rally takes it to 1
+  };
+
   var NOTE_INDEX = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
   var PLAYS = { melody: 1, bass: 1, chords: 1, echo: 1, drum: 1 };
   var RULES = {
@@ -540,6 +557,50 @@
     return (60 / (theme.bpm * speed)) * 4 / theme.steps;
   }
 
+  /**
+   * How big the music is right now, 0..1, read off the game and never written
+   * to it. The build ADDS layers (parts with `from`), it never swaps the loop:
+   *   title screen             0
+   *   a rally                  up to rallyShare, at rallyFull hits
+   *   the points played        up to scoreShare, at the point before match point
+   *   match point (item 1211)  matchPoint, plus the rally's share of what is left
+   *   the finale and rewind    1: the whole orchestra, all the way down the ladder
+   * A game that never ends (matchPoints 0) counts its points against ten.
+   */
+  function intensityOf(game) {
+    if (!game || game.phase === 'title') return 0;
+    if (game.phase === 'over') return 1;
+    var I = INTENSITY;
+    var rallyPart = Math.min(1, Math.max(0, game.rally || 0) / I.rallyFull);
+    var score = game.score || {};
+    var played = (score.left || 0) + (score.right || 0);
+    var mp = game.rules && game.rules.matchPoints > 0 ? game.rules.matchPoints : 0;
+    if (mp > 0 && played >= mp - 1) {
+      return I.matchPoint + (1 - I.matchPoint) * rallyPart;
+    }
+    var scorePart = Math.min(1, played / Math.max(1, mp > 0 ? mp - 1 : 10));
+    var i = I.scoreShare * scorePart + I.rallyShare * rallyPart;
+    return Math.round(Math.min(I.beforeMatchPoint, i) * 1000) / 1000;
+  }
+
+  /**
+   * The limiter's ceiling as a transfer curve: straight through up to
+   * CEILING_KNEE, then bent so it approaches CEILING and never passes it --
+   * inputs past full scale are held at the curve's end, under CEILING too.
+   */
+  var ceilingCache = null;
+  function ceilingCurve() {
+    if (ceilingCache) return ceilingCache;
+    var n = 2048, c = new Float32Array(n), room = CEILING - CEILING_KNEE;
+    for (var i = 0; i < n; i++) {
+      var x = i * 2 / (n - 1) - 1, ax = Math.abs(x);
+      var y = ax <= CEILING_KNEE ? ax : CEILING_KNEE + room * Math.tanh((ax - CEILING_KNEE) / room);
+      c[i] = x < 0 ? -y : y;
+    }
+    ceilingCache = c;
+    return c;
+  }
+
   /** ?music=off (or =0, =no, =false) keeps the soundtrack silent. */
   function offFromQuery(search) {
     var m = /[?&]music=([^&#]*)/.exec(String(search || ''));
@@ -737,9 +798,8 @@
     var halls = [];
     function hallImpulse(spec) {
       for (var i = 0; i < halls.length; i++) if (halls[i].spec === spec) return halls[i].buffer;
-      var ir = ctx.createBuffer(2, 1, ctx.sampleRate);
       var sr = ctx.sampleRate, len = Math.max(1, Math.floor(sr * (spec.gate || spec.seconds)));
-      ir = ctx.createBuffer(2, len, sr);
+      var ir = ctx.createBuffer(2, len, sr);
       var seed = 11;
       for (var ch = 0; ch < 2; ch++) {
         var d = ir.getChannelData(ch);
@@ -1276,6 +1336,14 @@
     arrangementProblems: arrangementProblems,
     arrangementFor: arrangementFor,
     stepSeconds: stepSeconds,
+    intensityOf: intensityOf,
+    INTENSITY: INTENSITY,
+    LIMIT: LIMIT,
+    CEILING: CEILING,
+    ceilingCurve: ceilingCurve,
+    peakVoices: peakVoices,
+    drumVoices: drumVoices,
+    LIFT: LIFT,
     offFromQuery: offFromQuery,
     createMusic: createMusic,
     attachToPage: attachToPage
