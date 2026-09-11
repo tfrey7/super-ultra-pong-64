@@ -42,6 +42,130 @@
         "detail": "low detail",
         "no_background": true
       }
+    },
+    {
+      "name": "genesis-court",
+      "file": "genesis-court.png",
+      "prompt": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
+      "size": {
+        "width": 320,
+        "height": 240
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 530743640,
+      "date": "2026-09-11T01:16:13.015Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 22.4,
+      "pixels": {
+        "width": 320,
+        "height": 240
+      },
+      "bytes": 8475,
+      "sha256": "4ad286a89080049decc3f353de7a4464de1ed516d53e325ffff0122f863d9dda",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
+        "image_size": {
+          "width": 320,
+          "height": 240
+        },
+        "seed": 530743640,
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "genesis-ball",
+      "file": "genesis-ball.png",
+      "prompt": "shiny white chrome ball sprite, 16-bit Sega Genesis style, bright white core with a hard white highlight and pale blue shading at the edge",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 1527937682,
+      "date": "2026-09-11T01:16:30.804Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 17.1,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 730,
+      "sha256": "5f77f8760a3b897a8bd5c6d868c2c60bee9dc1d9ebe7c8195358559985749143",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "shiny white chrome ball sprite, 16-bit Sega Genesis style, bright white core with a hard white highlight and pale blue shading at the edge",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1527937682,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      }
+    },
+    {
+      "name": "genesis-paddle",
+      "file": "genesis-paddle.png",
+      "prompt": "vertical bat paddle sprite for a 16-bit Sega Genesis sports game, tall narrow light grey chrome bar with bevelled rounded ends, bright highlight down the left edge, darker shading on the right",
+      "size": {
+        "width": 16,
+        "height": 96
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 393692841,
+      "date": "2026-09-11T01:17:07.054Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 18.1,
+      "pixels": {
+        "width": 16,
+        "height": 96
+      },
+      "bytes": 808,
+      "sha256": "912836468946d9c60f936e5b30fc894bcc3d626b56a09da6bcc92561ca12778b",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "vertical bat paddle sprite for a 16-bit Sega Genesis sports game, tall narrow light grey chrome bar with bevelled rounded ends, bright highlight down the left edge, darker shading on the right",
+        "image_size": {
+          "width": 16,
+          "height": 96
+        },
+        "seed": 393692841,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      }
     }
   ]
 }
