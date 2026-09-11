@@ -134,31 +134,31 @@ const B = {
 
 // ---- the knight's own parts; arms and legs are the barbarian's in plate -------
 const plate = (rows, map) => rows.map((r) => r.replace(/[a-z]/g, (c) => map[c] || c));
-const ARMOUR = { a: 'l', b: 'n', c: 'o' };             // skin -> steel
+const ARMOUR = { a: 'l', b: 'o', c: 'p' };             // skin -> steel
 const GREAVES = { a: 'l', b: 'o', f: 'n', g: 'p' };    // legs and boots -> greaves and sabatons
 const K = {
   head: [                 // 14 x 10: a crested great helm, the plume swept back
     '...kkkk.......',
-    '.kksssrk......',
-    'kssrrrrdk.....',
-    'krrdkkkkkkk...',
-    '.kdklllllmmk..',
-    '..knlllllllmk.',
-    '..knkkkkkkkkk.',
-    '..knlllkllllk.',
-    '..knolllllllk.',
-    '...kooonnnnk..'
+    '.kkssrrk......',
+    'ksrrrrrdk.....',
+    'krrddkkkkkk...',
+    '.kdkponnllmk..',
+    '..kponnnlllmk.',
+    '..kpkkkkkkkkk.',
+    '..kponnkllllk.',
+    '..kpoonnnlllk.',
+    '...kpoooonnk..'
   ],
   torso: [                // 10 x 9: breastplate, gold belt, mail skirt
-    'kolllllmmk',
-    'konlllllmk',
-    'kpollllllk',
-    'kponlllllk',
-    'kppoonnnnk',
+    'kponnllmmk',
+    'kponnnllmk',
+    'kpoonnnllk',
+    'kpoonnnnlk',
+    'kppooonnnk',
     '.kyyyyyyk.',
-    '.kpooonok.',
-    '.kponopok.',
-    '.kpoopook.'
+    '.kponnnok.',
+    '.kpononok.',
+    '.kponnopk.'
   ],
   shield: [               // 6 x 8: a heater shield in the crest's red
     'kkkkkk',
