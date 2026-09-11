@@ -43,9 +43,13 @@ function concede(g, y) {
 function spy() {
   const log = [];
   const o = { lineWidth: 1, globalCompositeOperation: 'source-over', fillStyle: '#000000', shadowBlur: 0 };
+  const stack = [];
   const ctx = new Proxy(o, {
     get(t, k) {
       if (k in t) return t[k];
+      // save/restore put the state back, as a real canvas does.
+      if (k === 'save') return () => { stack.push(Object.assign({}, t)); log.push(['save']); };
+      if (k === 'restore') return () => { if (stack.length) Object.assign(t, stack.pop()); log.push(['restore']); };
       if (k === 'createRadialGradient' || k === 'createLinearGradient') {
         return (...a) => { log.push([k, ...a]); return { addColorStop() {} }; };
       }

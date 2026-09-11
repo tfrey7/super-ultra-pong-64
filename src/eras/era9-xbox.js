@@ -716,7 +716,10 @@
     },
     // The pure pieces, for the era's own test.
     xbox: { lightAt: lightAt, castPoint: castPoint, paddleShadow: paddleShadow, shieldView: shieldView,
-            SHADOW_ALPHA: SHADOW_ALPHA, TAGS: TAGS, PADDLE_Z: PADDLE_Z },
+            SHADOW_ALPHA: SHADOW_ALPHA, TAGS: TAGS, PADDLE_Z: PADDLE_Z,
+            ARRIVAL: ARRIVAL, orbRadius: orbRadius, arrivalLight: arrivalLight, tagFade: tagFade },
+    // The arrival: the green sphere (docs/ERAS.md chapter 10), over the engine's ring.
+    flourish: greenSphere,
     draw: draw
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
