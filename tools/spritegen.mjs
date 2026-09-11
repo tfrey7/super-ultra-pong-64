@@ -73,8 +73,21 @@ function nesTable() {
  * held; `perRow` is the 2600's one-colour-a-line rule; `tile` the NES's three
  * colours in any 8 x 8.
  */
+/** Era 1's twelve paddle inks, read out of its own file (item 1278). */
+function atariInks() {
+  const src = fs.readFileSync(path.join(ROOT, 'src/eras/era1-atari2600.js'), 'utf8');
+  const m = /var PADDLE_INKS = \[([\s\S]*?)\];/.exec(src);
+  return m ? m[1].match(/#[0-9a-f]{6}/g) : [];
+}
+
 export const ERAS = {
-  1: { name: 'Atari 2600', colours: 8, perRow: 1, snap: (c) => c },
+  // The 2600 (item 1278): a player object is one 8-bit graphics register -- 8
+  // pixels a line, never wider -- in one colour register a line (a kernel can
+  // rewrite COLUP0 between lines, never within one), and its colours are era
+  // 1's own inks, the twelve the game gives the machine.
+  1: { name: 'Atari 2600', colours: 8, perRow: 1, register: 8, table: null,
+       snap(c) { this.table = this.table || atariInks(); const t = rgbOf(c); let b = this.table[0];
+         for (const e of this.table) if (dist2(rgbOf(e), t) < dist2(rgbOf(b), t)) b = e; return b; } },
   2: { name: 'NES', colours: 12, tile: 3, table: null,
        snap(c) { this.table = this.table || nesTable(); const t = rgbOf(c); let b = this.table[0];
          for (const e of this.table) if (dist2(rgbOf(e), t) < dist2(rgbOf(b), t)) b = e; return b; } },
@@ -186,6 +199,10 @@ export function lint(doc) {
         if (c !== 'k' && nb.every((v) => v !== undefined && v !== '.' && v !== c)) detail++;
       });
       if (era && era.perRow && rowCols.size > era.perRow) faults.push(`frame ${n} row ${y} has ${rowCols.size} colours; the ${era.name} draws one a line`);
+      if (era && era.register) {
+        const lit = row.map((c, x) => (c === '.' ? -1 : x)).filter((x) => x >= 0);
+        if (lit.length && lit[lit.length - 1] - lit[0] + 1 > era.register) faults.push(`frame ${n} row ${y} spans ${lit[lit.length - 1] - lit[0] + 1} pixels; one ${era.name} player register is ${era.register} wide`);
+      }
     });
     if (era && era.tile) {
       for (let ty = 0; ty < g.length; ty += 8) for (let tx = 0; tx < g[0].length; tx += 8) {
