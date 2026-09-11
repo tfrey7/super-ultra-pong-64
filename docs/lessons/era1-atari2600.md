@@ -154,3 +154,22 @@ art bible's era 1 page, [docs/ART.md](../ART.md)). A rally at this era:
    the ball with the mouse, and times two seconds of it (16.7 ms a frame, mean and p95).
 
 - **The opponent's name is not drawn in this era (item 1261)**: the HUD is two digits in the paddles' own colours, and the 3x5 caption under the right one read as a smudge at the 2600's resolution; a 2600 cart named nobody anyway.
+
+**Redrawn the EarthBound way (item 1278)**
+
+- **LESSON: at 6 x 28 the movement has to come from the body moving around a hand that stays put.**
+  The first draft pushed the arm up for "move up" and down for "move down", and era 1's own test
+  failed it: the paddle is drawn at the hand, so an arm that leaves row 13-14 is a hand that leaves
+  the paddle. Moving the whole body instead reads better anyway: up is a stretched runner in two
+  strides (head at the top of the frame), down is a crouch with the knees swapping (head three rows
+  lower), and the arm meets the paddle at the same pixel in every idle, up and down frame. Every beat
+  now moves at least 12 of the frame's 168 pixels away from standing, and the test holds it there.
+- The figures are now two text grids, [era1-left.json](../../assets/spritegen/era1-left.json) (the
+  player, a ponytail and an eye cut out of the head) and
+  [era1-right.json](../../assets/spritegen/era1-right.json) (the computer, a billed cap, the head
+  straight on its shoulders one row lower), checked by `tools/spritegen.mjs`, which knows the 2600
+  now: **8 pixels a line** (one player graphics register), **one colour a line**, and **era 1's
+  twelve inks** as the colours. `era1-sheets.mjs` only lays each grid out once per ink. Before and
+  after: [contact.png](../shots/item-1278/contact.png) (grey bar the old frames, ink bar the new;
+  the player then the computer; game scale 5 above, 4x below). A rally with them:
+  [rally-era1.png](../shots/item-1278/rally-era1.png).

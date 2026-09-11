@@ -4,7 +4,8 @@
  *
  * The arena (src/eras/era1-atari2600.js) is recorded headless as
  * [fillStyle, x, y, w, h] calls; the players are the rig's (src/characters.js),
- * wearing sheets painted by assets/pixellab/era1-sheets.mjs.
+ * wearing sheets laid out by assets/pixellab/era1-sheets.mjs from the text grids
+ * assets/spritegen/era1-left.json and era1-right.json (item 1278).
  */
 const { test } = require('node:test');
 const assert = require('node:assert');
@@ -188,6 +189,39 @@ test('the painted poses: all five beats, the hand on the paddle, the two players
     for (let i = 0; i < 2; i++) assert.strictEqual(S.pose('left', beat, i)[13][5], 1, beat + ' holds the paddle at its middle');
   }
   assert.notDeepStrictEqual(S.pose('left', 'idle', 0), S.pose('right', 'idle', 0), 'the right player is its own sheet');
-  assert.notDeepStrictEqual(S.pose('left', 'win', 0)[0], S.pose('left', 'idle', 0)[0], 'the win raises the arms');
+  assert.notDeepStrictEqual(S.pose('left', 'win', 1)[0], S.pose('left', 'idle', 0)[0], 'the win raises the arms');
   assert.notDeepStrictEqual(S.pose('left', 'swing', 1), S.pose('left', 'idle', 0), 'the swing moves the arm');
+});
+
+test('item 1278: every era 1 sheet on disk is its text grid in that ink, the grids pass the 2600 checker, and the beats really move', async () => {
+  const SG = await import('../tools/spritegen.mjs');
+  const { decode } = await import('../tools/palette-snap.mjs');
+  const S = await import('../assets/pixellab/era1-sheets.mjs');
+  const inks = S.paddleInks();
+  for (const side of ['left', 'right']) {
+    const doc = SG.load(path.join(ROOT, 'assets', 'spritegen', 'era1-' + side + '.json'));
+    const res = SG.lint(doc);
+    assert.deepStrictEqual(res.faults, [], side + ' passes the 2600 rules');
+    assert.strictEqual(res.nums.unique, res.nums.frames, side + ': no two frames the same pose');
+    for (let i = 0; i < inks.length; i++) {
+      const want = S.sheet(side, inks[i]);
+      const got = decode(fs.readFileSync(path.join(ASSETS, 'era1-' + side + '-' + i + '.png')));
+      assert.ok(Buffer.compare(Buffer.from(got.rgba), want.rgba) === 0, side + ' ink ' + i + ' is its grid (re-run node assets/pixellab/era1-sheets.mjs)');
+    }
+    // real movement: each beat differs from idle0 in a good share of its pixels
+    const idle = S.pose(side, 'idle', 0).flat();
+    for (const [beat, i] of [['up', 0], ['down', 0], ['swing', 0], ['swing', 2], ['miss', 0], ['win', 0]]) {
+      const f = S.pose(side, beat, i).flat();
+      const moved = f.reduce((n, v, k) => n + (v !== idle[k] ? 1 : 0), 0);
+      assert.ok(moved >= 12, side + ' ' + beat + i + ' moves ' + moved + ' pixels from idle0');
+    }
+  }
+  // the ERAS rule itself: one colour a line and an 8-pixel register
+  const wide = { format: 'pgrid-v1', id: 't', era: 1, frame: { w: 10, h: 1 }, beats: { idle: 1 }, palette: { a: inks[0], b: inks[1] },
+    frames: { idle0: ['a........a'] } };
+  assert.ok(SG.lint(wide).faults.some((f) => /register is 8 wide/.test(f)));
+  wide.frames.idle0 = ['ab........'];
+  assert.ok(SG.lint(wide).faults.some((f) => /one a line/.test(f)));
+  wide.palette.a = '#123456';
+  assert.ok(SG.lint(wide).faults.some((f) => /off the Atari 2600's colours/.test(f)));
 });

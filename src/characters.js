@@ -107,7 +107,10 @@
 
   // One block per rung. Era 0 has none: the 1972 machine stays bars and a dot.
   var ERAS = {
-    // Atari 2600 (item 1224): two one-colour 6 x 28 sprites painted in code by
+    // Atari 2600 (item 1224; redrawn by item 1278): two one-colour 6 x 28
+    // sprites drawn as text grids (assets/spritegen/era1-left.json, the player
+    // with a ponytail, and era1-right.json, the computer in a billed cap),
+    // checked by tools/spritegen.mjs against the 2600's limits and laid out by
     // assets/pixellab/era1-sheets.mjs, one sheet per paddle ink and side; era
     // 1's look names the pair this frame wears (playerSheets), so each figure
     // is always in its own paddle's colour, as a 2600 player and its missile
