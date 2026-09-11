@@ -931,6 +931,302 @@
         "shading": "medium shading",
         "detail": "low detail"
       }
+    },
+    {
+      "name": "era4-players-left-sheet",
+      "file": "era4-players-left-sheet.png",
+      "prompt": "16-bit Super Nintendo sprite sheet, 3 columns by 6 rows of the same small hover-racing pilot facing right, side view: red and white racing suit, round red helmet with dark visor band, standing on a small grey hover pad with a blue jet flame under it. row 1 idle, row 2 leaning up, row 3 leaning down, row 4 spinning, row 5 slumped, row 6 both arms raised in victory",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "seed": 4101,
+      "date": "2026-09-11T03:22:24.000Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 17.8,
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 2747,
+      "sha256": "11a177fa2e5e2e5b62fd059bda8e50deae747b1bdd90eee1f465b66aa68a9b7c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite sheet, 3 columns by 6 rows of the same small hover-racing pilot facing right, side view: red and white racing suit, round red helmet with dark visor band, standing on a small grey hover pad with a blue jet flame under it. row 1 idle, row 2 leaning up, row 3 leaning down, row 4 spinning, row 5 slumped, row 6 both arms raised in victory",
+        "image_size": {
+          "width": 30,
+          "height": 264
+        },
+        "seed": 4101,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-left",
+      "file": "era4-pilot-left.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4102,
+      "date": "2026-09-11T03:22:43.007Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 18.4,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 3368,
+      "sha256": "b540f00eb7cd8f9abd2ada1318f982156b973f440a9215ed5b50065d461e4d2d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4102,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-right",
+      "file": "era4-pilot-right.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4103,
+      "date": "2026-09-11T03:23:02.185Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 18.5,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 2428,
+      "sha256": "76629ee98a492715a310632ea1e277f1176d4b2433bba5d85b5d216a0fc248e6",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4103,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-balloon",
+      "file": "era4-balloon.png",
+      "prompt": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "seed": 4104,
+      "date": "2026-09-11T03:23:43.204Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 27.7,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 879,
+      "sha256": "e03bd501ee9d5e36537acb2883c2f54565d4115eab2e74bcc85f4b491fd770ec",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4104,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pylon",
+      "file": "era4-pylon.png",
+      "prompt": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 4105,
+      "date": "2026-09-11T03:23:59.604Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 15.1,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 330,
+      "sha256": "cd0834af21a86f6707e68ec4bc316f2e1d2201217b57add600a72028a87de47e",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4105,
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-left-win",
+      "file": "era4-pilot-left-win.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: red and white racing suit, round red helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4106,
+      "date": "2026-09-11T03:37:50.097Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 16.5,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 1129,
+      "sha256": "d6885607f33de30237b31793b16d4cf3c4d5600db23786562de6f5701c353ad0",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: red and white racing suit, round red helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4106,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-right-win",
+      "file": "era4-pilot-right-win.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4107,
+      "date": "2026-09-11T03:38:19.463Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 24.8,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 1035,
+      "sha256": "246b8cbd1d85587efbf51000d48ca4e4d4ba383511b2dfb7c6f3c25801c91c17",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4107,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
     }
   ]
 }
