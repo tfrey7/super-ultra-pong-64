@@ -143,9 +143,9 @@ Super Mario World's sprites) that happens to be Pong. Picture:
 
 - `assets/pixellab/era4-players-build.mjs`: one generated pose in, a six-beat sheet out, snapped
   to 15-bit colour and capped under the ball's brightness. Point it at any side-view character.
-- The rig block in `src/characters.js` (`ERAS[4]`): `sheets: { left, right }`, frame 32 x 101,
-  hand on the frame's right edge (32, 41), scale 1.2, fps 12, and **two** miss frames, so the
-  conceding pad blinks without any extra code.
+- The rig block in `src/characters.js` (`ERAS[4]`): `sheets: { left, right }`, frame 12 x 42
+  since item 1281 (32 x 101 before), hand on the frame's right edge (12, 17), scale 3.125, fps
+  12, and **two** miss frames, so the conceding pad blinks without any extra code.
 - `drawPanel`, `drawBalloons` and `drawPylons` in `src/eras/era4-snes.js`: the F-Zero HUD, the
   drifting set dressing and the blinking lights, each a handful of `fillRect` and `drawImage`
   calls with no pixel loop.
@@ -170,3 +170,31 @@ Super Mario World's sprites) that happens to be Pong. Picture:
   them to the waist up.
 - The bats are rung 3's (earned-ink rubber, wood line, black rubber, handle), drawn as filled quads
   through the tilt. The dyed capsule sprite (`tintedPaddle`) is no longer drawn in play.
+
+### The pilots redrawn as text grids (item 1281)
+
+Tim: *"some of these sprites are pretty jacked"*, and he ruled "Redraw all of them". Proof, old
+beside new: [contact.png](../shots/item-1281/contact.png); in play:
+[rally-era4.png](../shots/item-1281/rally-era4.png).
+
+- **LESSON: draw at the machine's pixel, not finer.** The pixellab pilots were 32 x 101 sheet pixels
+  at 1.2 field units each, and the display then sampled them down to about 12 x 39 Super Nintendo
+  pixels, so most of their shading never reached the screen. The new grids are 12 x 42 at 3.125
+  field units (800 / 256), one sheet pixel to one SNES pixel, so every pixel drawn is a pixel shown.
+  `assets/spritegen/era4-pilot-red.json` is the drawing; its prompt line says who he is.
+- **LESSON: player two is a second palette, not a second drawing.** The blue pilot is the red
+  grid in another 15-colour OBJ palette (`assets/spritegen/era4-pilots-compose.mjs`), the way
+  F-Zero and Street Fighter II made their second players. It is one character on each side in
+  every frame by construction. The pixellab pair was a visored racer and a kid with a bare face.
+- **LESSON: make the beats move the torso as well as the pad**, so a crop to the waist still shows
+  them (card 1282 crops these to the waist up). Up rises 2 pixels on an 8-pixel flame, down sinks
+  2 on a short one, the swing is a real spin (front, back, follow-through), and the miss slumps 3
+  pixels with the visor bowed and the pad going dark. The arm is redrawn in each of those frames,
+  so the glove stays on the handle row (17). Every beat moves at least 20 pixels from idle, and
+  `test/era4-players.test.js` pins that.
+- **The checker's Super Nintendo rules**: 5 bits a channel, 15 colours and clear in one OBJ palette,
+  and 12 of the machine's 34 OBJ tiles a scanline for one figure (`lineTiles`). Two figures, the
+  orb, its shadow and the scenery share the 34. The pilots light at most 2 tiles on any line.
+- **Drawing time, by the clock:** the red pilot's 13 frames took about 6 minutes of writing, the
+  blue one a script. The first `lint` named 11 colours off the 5-bit grid, each with its nearest
+  legal value, which was pasted straight back in.
