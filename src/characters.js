@@ -91,12 +91,12 @@
     2:  { skin: '#fcbcb0', body: '#0000bc', scale: 2.5 },                    // NES
     3:  { skin: '#eeaa88', body: '#222266', scale: 2.5, res: 2 },            // Genesis
     4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
-    5:  { skin: '#d8a888', body: '#303848', scale: 2.6, res: 2, round: true }, // PlayStation
-    6:  { skin: '#e8b890', body: '#283080', scale: 2.6, res: 3, round: true }, // Nintendo 64
-    7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 2.6, res: 3, round: true }, // Dreamcast
-    8:  { skin: '#dcae8c', body: '#20242c', scale: 2.6, res: 4, round: true }, // PlayStation 2
-    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 2.6, res: 4, round: true }, // Xbox
-    10: { skin: '#e2b294', body: '#2a2e36', scale: 2.6, res: 4, round: true }  // Xbox 360
+    5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
+    6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
+    7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
+    8:  { skin: '#dcae8c', body: '#20242c', scale: 3.2, res: 4, round: true }, // PlayStation 2
+    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
+    10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
   };
 
   var FIRST_3D = 5;
