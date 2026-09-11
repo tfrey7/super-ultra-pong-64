@@ -88,6 +88,67 @@
     return SPEED_LINES.offsets.map(function () { return 30 + 40 * rnd(); });
   })();
 
+  // ------------------------------------------------ the rooftop (item 1231)
+  // docs/ART.md, era 7 SCENE: a rooftop skate spot above a city at sunset. Three
+  // poster billboards stand on the skyline, a water tower behind it, twelve
+  // window lights switch on and off on their own and a blimp crosses the sky.
+  // All of it drawn in code, in flat poster colour and ink -- no gradients.
+  var SCENE = {
+    poster: { w: 60, h: 30, legs: 3 },
+    posters: [
+      { x: 20, z: 34, bg: PALETTE.magenta, fg: PALETTE.yellow, art: 'disc' },
+      { x: 370, z: 26, bg: PALETTE.cyan, fg: PALETTE.ink, art: 'bolt' },
+      { x: 720, z: 40, bg: PALETTE.yellow, fg: PALETTE.orange, art: 'stripes' }
+    ],
+    tower: { x: 700, y: -80, w: 40, legs: 40, top: 100, leg: 4, tank: PALETTE.orange, band: PALETTE.yellow },
+    windows: { count: 12, size: 7, min: 0.5, max: 2 },
+    blimp: { w: 80, h: 24, speed: 12, y: 9, flash: 1, body: PALETTE.blue, panel: PALETTE.yellow }
+  };
+
+  // Twelve window lights on the skyline, each on its own seeded period.
+  var WINDOWS = (function () {
+    var rnd = lcg(1127);
+    var out = [];
+    for (var i = 0; i < SCENE.windows.count; i++) {
+      var b = SKYLINE[Math.floor(rnd() * SKYLINE.length)];
+      var s = SCENE.windows.size;
+      var period = SCENE.windows.min + (SCENE.windows.max - SCENE.windows.min) * rnd();
+      out.push({
+        x: b.x0 + 8 + (b.x1 - b.x0 - 16 - s) * rnd(),
+        z: 8 + Math.max(0, b.h - 16 - s) * rnd(),
+        period: period, phase: period * 2 * rnd()
+      });
+    }
+    return out;
+  })();
+
+  /** Whether window i is lit at time t: each toggles every `period` seconds. Pure. */
+  function windowLit(i, t) {
+    var w = WINDOWS[i];
+    return Math.floor((Math.max(0, t) + w.phase) / w.period) % 2 === 0;
+  }
+
+  /**
+   * The blimp's left edge at time t, in field units: 12 a second, left to right,
+   * round again once it is wholly off the right edge -- every 73 s, not the
+   * bible's 70, because at 12 a second a 70 s lap would pop it back into view. Pure.
+   */
+  function blimpX(t) {
+    var B = SCENE.blimp;
+    return -B.w + (Math.max(0, t) * B.speed) % (800 + B.w);
+  }
+
+  /** Whether the match is on its match point, by the rules' own test. */
+  function matchPoint(state) {
+    var G = root.Pong;
+    try { return !!(G && typeof G.isMatchPoint === 'function' && G.isMatchPoint(state)); } catch (e) { return false; }
+  }
+
+  /** The sky bands, top to bottom: swapped (magenta on top) at match point. Pure. */
+  function skyOrder(isMatch) {
+    return isMatch ? PALETTE.sky.slice().reverse() : PALETTE.sky.slice();
+  }
+
   var cached = { spec: null, cam: null };
   function cameraFor(T, spec) {
     if (cached.spec !== spec) {
@@ -101,13 +162,154 @@
   function crisp(v) { return Math.round(v) + 0.5; }
 
   // ------------------------------------------------------------ 1. backdrop
-  function backdrop(ctx, T, cam, state) {
+  /** A flat poster shape: (u, v) points on the billboard's face, filled and inked. */
+  function posterShape(ctx, T, cam, p, uv, fill) {
+    var pts = uv.map(function (q) { return [p.x + q[0], SKYLINE_Y + 1, p.z + q[1]]; });
+    T.path(ctx, cam, pts);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = PALETTE.ink;
+    ctx.stroke();
+  }
+
+  /** Each billboard's own original graphic (no real logo): a disc, a bolt or stripes. */
+  function posterArt(p) {
+    var W = SCENE.poster.w, H = SCENE.poster.h;
+    if (p.art === 'disc') {
+      var out = [];
+      for (var k = 0; k < 12; k++) {                      // 12 sides: never the starburst's 16
+        var a = k * Math.PI / 6;
+        out.push([W / 2 + 11 * Math.cos(a), H / 2 + 11 * Math.sin(a)]);
+      }
+      return [out];
+    }
+    if (p.art === 'bolt') return [[[34, 27], [22, 14], [30, 14], [24, 3], [38, 17], [30, 17]]];
+    return [0, 1, 2].map(function (i) {
+      var x = 6 + i * 18;
+      return [[x, 3], [x + 8, 3], [x + 16, H - 3], [x + 8, H - 3]];
+    });
+  }
+
+  function drawPosters(ctx, T, cam) {
+    var S = SCENE.poster;
+    for (var i = 0; i < SCENE.posters.length; i++) {
+      var p = SCENE.posters[i];
+      // Two ink legs down to the roof, then the board, then its graphic.
+      [10, S.w - 10 - S.legs].forEach(function (u) {
+        T.quad(ctx, cam, [[p.x + u, SKYLINE_Y + 1, 0], [p.x + u + S.legs, SKYLINE_Y + 1, 0],
+          [p.x + u + S.legs, SKYLINE_Y + 1, p.z], [p.x + u, SKYLINE_Y + 1, p.z]], { fill: PALETTE.ink, outline: false });
+      });
+      T.quad(ctx, cam, [[p.x, SKYLINE_Y + 1, p.z], [p.x + S.w, SKYLINE_Y + 1, p.z],
+        [p.x + S.w, SKYLINE_Y + 1, p.z + S.h], [p.x, SKYLINE_Y + 1, p.z + S.h]], { fill: p.bg });
+      var art = posterArt(p);
+      for (var k = 0; k < art.length; k++) posterShape(ctx, T, cam, p, art[k], p.fg);
+    }
+  }
+
+  function drawTower(ctx, T, cam) {
+    var W = SCENE.tower;
+    var legs = [[0, 0], [W.w - W.leg, 0], [0, W.w - W.leg], [W.w - W.leg, W.w - W.leg]];
+    for (var i = 0; i < legs.length; i++) {
+      T.box(ctx, cam, { x: W.x + legs[i][0], y: W.y + legs[i][1], w: W.leg, h: W.leg }, 0, W.legs, { fill: PALETTE.ink });
+    }
+    var faces = { top: W.band, near: W.tank, side: T.shade(W.tank, -0.35) };
+    T.box(ctx, cam, { x: W.x, y: W.y, w: W.w, h: W.w }, W.legs, W.top,
+      { fill: function (face) { return faces[face] || W.tank; } });
+  }
+
+  function drawWindows(ctx, T, cam, t) {
+    var s = SCENE.windows.size;
+    for (var i = 0; i < WINDOWS.length; i++) {
+      if (!windowLit(i, t)) continue;
+      var w = WINDOWS[i];
+      T.quad(ctx, cam, [[w.x, SKYLINE_Y + 0.5, w.z], [w.x + s, SKYLINE_Y + 0.5, w.z],
+        [w.x + s, SKYLINE_Y + 0.5, w.z + s], [w.x, SKYLINE_Y + 0.5, w.z + s]], { fill: PALETTE.yellow, outline: false });
+    }
+  }
+
+  /** The blimp: a flat blue envelope in ink, fins, a gondola, and a side panel that flashes the score. */
+  function drawBlimp(ctx, P, state, flash) {
+    var B = SCENE.blimp;
+    var x = blimpX(state.time || 0), y = B.y;
+    var cx = x + B.w / 2, cy = y + B.h / 2;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = PALETTE.ink;
+    ctx.lineJoin = 'round';
+    ctx.fillStyle = PALETTE.orange;                                   // the tail fins
+    ctx.beginPath();
+    ctx.moveTo(x + 8, cy); ctx.lineTo(x - 4, y - 3); ctx.lineTo(x + 14, y + 4); ctx.closePath();
+    ctx.moveTo(x + 8, cy); ctx.lineTo(x - 4, y + B.h + 3); ctx.lineTo(x + 14, y + B.h - 4); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = PALETTE.ink;                                      // the gondola
+    ctx.fillRect(cx - 7, y + B.h - 1, 14, 5);
+    ovalPath(ctx, cx, cy, B.w / 2, B.h / 2, 0, Math.PI * 2);          // the envelope
+    ctx.fillStyle = B.body;
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = T_shadeSafe(B.body);                              // its one cel band, the lower third
+    ovalPath(ctx, cx, cy + B.h * 0.22, B.w / 2 - 6, B.h * 0.2, 0, Math.PI);
+    ctx.fill();
+    var pw = 36, ph = 12, px = cx - pw / 2, py = cy - ph / 2;          // the side panel
+    ctx.fillStyle = flash ? PALETTE.ink : B.panel;
+    ctx.fillRect(px, py, pw, ph);
+    ctx.lineWidth = 1.5;
+    rectPath(ctx, px, py, pw, ph);
+    ctx.stroke();
+    if (flash) blockText(ctx, P, flash, cx, py + 1, 2, PALETTE.yellow);
+    else {
+      ctx.fillStyle = PALETTE.magenta;
+      for (var i = 0; i < 3; i++) ctx.fillRect(px + 5 + i * 10, py + 3, 6, ph - 6);
+    }
+  }
+
+  /** A rectangle as a path (no strokeRect: not every recorder the tests use has it). */
+  function rectPath(ctx, x, y, w, h) {
+    ctx.beginPath();
+    ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + h); ctx.lineTo(x, y + h);
+    ctx.closePath();
+  }
+
+  /** An oval (or part of one) as a 24-sided path: every context has lineTo. */
+  function ovalPath(ctx, cx, cy, rx, ry, a0, a1) {
+    ctx.beginPath();
+    for (var k = 0; k <= 24; k++) {
+      var a = a0 + (a1 - a0) * k / 24;
+      if (k) ctx.lineTo(cx + rx * Math.cos(a), cy + ry * Math.sin(a));
+      else ctx.moveTo(cx + rx * Math.cos(a), cy + ry * Math.sin(a));
+    }
+    ctx.closePath();
+  }
+
+  function T_shadeSafe(hex) {
+    var T = R && R.table3d;
+    return T && T.shade ? T.shade(hex, -0.3) : hex;
+  }
+
+  /** Text in the score's block font, centred on cx, `cell` units a cell. */
+  function blockText(ctx, P, text, cx, top, cell, fill) {
+    var glyphs = String(text).split('').map(function (ch) { return P.DIGITS[ch] || P.LETTERS[ch] || null; });
+    var width = 0;
+    glyphs.forEach(function (g, i) { width += (i ? cell : 0) + (g ? g[0].length : 2) * cell; });
+    var left = cx - width / 2;
+    ctx.fillStyle = fill;
+    glyphs.forEach(function (g) {
+      if (g) {
+        for (var r = 0; r < g.length; r++) {
+          for (var c = 0; c < g[r].length; c++) if (g[r][c] === '1') ctx.fillRect(left + c * cell, top + r * cell, cell, cell);
+        }
+      }
+      left += (g ? g[0].length : 2) * cell + cell;
+    });
+  }
+
+  function backdrop(ctx, T, cam, state, P, flash) {
     var horizon = T.project(cam, 400, SKYLINE_Y, 0).y;
     ctx.fillStyle = PALETTE.blue;                       // the floor around the table
     ctx.fillRect(0, 0, state.width, state.height);
-    var band = horizon / PALETTE.sky.length;
-    for (var i = 0; i < PALETTE.sky.length; i++) {
-      ctx.fillStyle = PALETTE.sky[i];
+    var sky = skyOrder(matchPoint(state));
+    var band = horizon / sky.length;
+    for (var i = 0; i < sky.length; i++) {
+      ctx.fillStyle = sky[i];
       ctx.fillRect(0, Math.round(i * band), state.width, Math.round((i + 1) * band) - Math.round(i * band));
     }
     ctx.lineWidth = 1;
@@ -119,11 +321,15 @@
       ctx.lineTo(state.width, y);
       ctx.stroke();
     }
+    drawBlimp(ctx, P, state, flash);                    // in the sky, behind the city
+    drawTower(ctx, T, cam);                             // behind the skyline
     for (var k = 0; k < SKYLINE.length; k++) {
       var b = SKYLINE[k];
       T.quad(ctx, cam, [[b.x0, SKYLINE_Y, 0], [b.x1, SKYLINE_Y, 0], [b.x1, SKYLINE_Y, b.h], [b.x0, SKYLINE_Y, b.h]],
         { fill: PALETTE.skyline });
     }
+    drawWindows(ctx, T, cam, state.time || 0);
+    drawPosters(ctx, T, cam);
   }
 
   // The pixellab tiles (item 1187), laid over the era's own flat bands through
@@ -377,6 +583,155 @@
     return low;
   }
 
+  // ------------------------------------------- tags, cans and the splat (item 1231)
+  // docs/ART.md, era 7 SCOREBOARD and MOMENTS. Beside each number, on the inside
+  // (not under it: under would cross R8's line at y 76), a spray tag -- P1 and CPU in the block
+  // font at cell 4, the number's skew, poster cyan and ink -- over a row of three
+  // spray cans, one filled per three rally hits. A point stamps a magenta paint
+  // splat behind the scorer's number, fading over 1.2 s, and the blimp's panel
+  // shows the new score for 1 s. At match point both tags blink 4 times a second.
+  var HUD = { tagCell: 4, tagTop: 20, tagGap: 12, tagOutline: 3,
+    can: { w: 10, h: 18, gap: 4, top: 50, per: 3, count: 3, empty: '#6a4a8a' /* (new) an empty can, skyline lifted */ },
+    splat: { w: 90, h: 60, life: 1.2, points: 14, drops: 5 }, blink: 4 };
+
+  /** How many of the three cans are full for a rally count. Pure. */
+  function cansFilled(rally) {
+    return Math.max(0, Math.min(HUD.can.count, Math.floor((rally || 0) / HUD.can.per)));
+  }
+
+  /** The splat's opacity `age` seconds after the point: 1 fading to 0 over 1.2 s. Pure. */
+  function splatAlpha(age) {
+    return age >= 0 && age < HUD.splat.life ? 1 - age / HUD.splat.life : 0;
+  }
+
+  /** Whether the tags show this frame: always, but at match point 4 blinks a second. Pure. */
+  function tagsShown(isMatch, t) {
+    return !isMatch || Math.floor(t * HUD.blink * 2) % 2 === 0;
+  }
+
+  // The points' memory: the score last seen and the last splat.
+  var points = { time: null, left: 0, right: 0, splat: null };
+
+  /**
+   * Fold the score into the memory: a side whose score went up gets a splat
+   * now. On arrival (the first frame this era sees, within 0.8 s of the change)
+   * the point that brought it here is splatted too, from the rules' last event.
+   */
+  function notePoints(state) {
+    var sc = state.score || { left: 0, right: 0 };
+    var t = state.time || 0;
+    if (points.time === null || t < points.time) {
+      points.splat = null;
+      var since = t - (state.eraChangedAt || 0);
+      var ev = state.lastEvent;
+      if (state.eraChangedAt > 0 && since >= 0 && since < 0.8 && ev && ev.type === 'score' &&
+          (ev.side === 'left' || ev.side === 'right')) {
+        points.splat = { side: ev.side, at: state.eraChangedAt };
+      }
+    } else if (sc.left > points.left) points.splat = { side: 'left', at: t };
+    else if (sc.right > points.right) points.splat = { side: 'right', at: t };
+    points.left = sc.left;
+    points.right = sc.right;
+    points.time = t;
+    return points.splat;
+  }
+
+  /** The splat's outline round (cx, cy): 14 seeded lobes, 90 x 60 at most. Pure. */
+  function splatShape(cx, cy, seed) {
+    var rnd = lcg(seed);
+    var S = HUD.splat;
+    var pts = [];
+    for (var k = 0; k < S.points; k++) {
+      var a = k * 2 * Math.PI / S.points;
+      var f = k % 2 ? 0.55 + 0.2 * rnd() : 0.8 + 0.2 * rnd();
+      pts.push({ x: cx + Math.cos(a) * S.w / 2 * f, y: cy + Math.sin(a) * S.h / 2 * f });
+    }
+    return pts;
+  }
+
+  function drawSplat(ctx, cx, cy, alpha, seed) {
+    if (!(alpha > 0)) return;
+    var prev = ctx.globalAlpha;
+    ctx.globalAlpha = prev * alpha;
+    polyline(ctx, splatShape(cx, cy, seed), true);
+    ctx.fillStyle = PALETTE.magenta;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = PALETTE.ink;
+    ctx.stroke();
+    var rnd = lcg(seed + 7);
+    for (var d = 0; d < HUD.splat.drops; d++) {                   // a few flung drops
+      var a = rnd() * Math.PI * 2, r = HUD.splat.w * (0.5 + 0.1 * rnd());
+      ctx.beginPath();
+      ctx.arc(cx + Math.cos(a) * r * 0.7, cy + Math.sin(a) * r * 0.45, 3 + 2 * rnd(), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = prev;
+  }
+
+  /** A spray tag's cells: the text in the block font at cell 4, centred on cx. Pure. */
+  function tagCells(P, text, cx) {
+    var cell = HUD.tagCell;
+    var glyphs = String(text).split('').map(function (ch) { return P.DIGITS[ch] || P.LETTERS[ch]; });
+    var width = 0;
+    glyphs.forEach(function (rows, i) { width += (i ? cell : 0) + rows[0].length * cell; });
+    var left = cx - width / 2;
+    var cells = [];
+    glyphs.forEach(function (rows) {
+      for (var r = 0; r < rows.length; r++) {
+        for (var c = 0; c < rows[r].length; c++) {
+          if (rows[r][c] === '1') cells.push({ x: left + c * cell, y: HUD.tagTop + r * cell, w: cell, h: cell });
+        }
+      }
+      left += rows[0].length * cell + cell;
+    });
+    return { cells: cells, drips: [], cx: cx, cy: HUD.tagTop + 2.5 * cell, width: width };
+  }
+
+  /**
+   * Where a side's tag goes: beside its number, on the inside, toward the
+   * middle -- the outside of the right number is where the opponent's name
+   * plate sits. Pure.
+   */
+  function tagCentre(P, number, side) {
+    var text = side === 'left' ? 'P1' : 'CPU';
+    var probe = tagCells(P, text, 0);
+    var dir = side === 'left' ? 1 : -1;
+    return { text: text, cx: number.cx + dir * (number.width / 2 + HUD.tagGap + probe.width / 2) };
+  }
+
+  function drawTag(ctx, tag) {
+    ctx.strokeStyle = PALETTE.ink;
+    ctx.lineJoin = 'miter';
+    ctx.lineWidth = HUD.tagOutline;
+    tracePath(ctx, tag, tag.cells, 0, 0);
+    ctx.stroke();
+    ctx.fillStyle = PALETTE.cyan;
+    ctx.fill();
+  }
+
+  function drawCans(ctx, cx, filled) {
+    var C = HUD.can;
+    var width = C.count * C.w + (C.count - 1) * C.gap;
+    var x = cx - width / 2;
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = PALETTE.ink;
+    for (var i = 0; i < C.count; i++) {
+      var cx0 = x + i * (C.w + C.gap);
+      ctx.fillStyle = PALETTE.ink;                                // cap and nozzle
+      ctx.fillRect(cx0 + 3, C.top, 4, 3);
+      ctx.fillRect(cx0 + 6, C.top - 1, 3, 2);
+      ctx.fillStyle = i < filled ? PALETTE.magenta : HUD.can.empty;
+      ctx.fillRect(cx0, C.top + 3, C.w, C.h - 3);                 // the can
+      rectPath(ctx, cx0, C.top + 3, C.w, C.h - 3);
+      ctx.stroke();
+      if (i < filled) {                                           // its cel band and label
+        ctx.fillStyle = PALETTE.yellow;
+        ctx.fillRect(cx0 + 1, C.top + 9, C.w - 2, 4);
+      }
+    }
+  }
+
   // ------------------------------------------------------------------ frame
   function draw(ctx, state, opts, api) {
     var P = api || R;
@@ -389,8 +744,12 @@
     ctx.globalAlpha = 1;
     ctx.imageSmoothingEnabled = false;
     noteHits(T, cam, state);
+    var splat = notePoints(state);
+    var t = state.time || 0;
+    var flash = splat && t - splat.at >= 0 && t - splat.at < SCENE.blimp.flash
+      ? state.score.left + '-' + state.score.right : null;
 
-    backdrop(ctx, T, cam, state);                                 // 1
+    backdrop(ctx, T, cam, state, P, flash);                       // 1
     T.table(ctx, cam, tableStyle(T));                             // 2
 
     var sides = ['left', 'right'];                                // 4, the far paddle first
@@ -415,8 +774,23 @@
     }
 
     var mid = state.width / 2;                                    // 8, above the far edge
-    drawGraffiti(ctx, graffiti(P, state.score.left, mid - SCORE.offset, 'left'));
-    drawGraffiti(ctx, graffiti(P, state.score.right, mid + SCORE.offset, 'right'));
+    var numbers = {
+      left: graffiti(P, state.score.left, mid - SCORE.offset, 'left'),
+      right: graffiti(P, state.score.right, mid + SCORE.offset, 'right')
+    };
+    if (splat) {                                                  // the splat, behind the scorer's number
+      var n = numbers[splat.side];
+      drawSplat(ctx, n.cx, n.cy, splatAlpha(t - splat.at), splat.side === 'left' ? 11 : 23);
+    }
+    drawGraffiti(ctx, numbers.left);
+    drawGraffiti(ctx, numbers.right);
+    var showTags = tagsShown(matchPoint(state), t);
+    var filled = cansFilled(state.rally);
+    ['left', 'right'].forEach(function (side) {
+      var at = tagCentre(P, numbers[side], side);
+      if (showTags) drawTag(ctx, tagCells(P, at.text, at.cx));
+      drawCans(ctx, at.cx, filled);
+    });
     ctx.restore();
   }
 
@@ -705,6 +1079,19 @@
     speedLines: speedLines,
     graffiti: graffiti,
     sprayPoint: sprayPoint,
-    tagBottom: tagBottom
+    tagBottom: tagBottom,
+    // The rooftop, the tags, the cans and the splat (item 1231).
+    SCENE: SCENE,
+    WINDOWS: WINDOWS,
+    HUD: HUD,
+    windowLit: windowLit,
+    blimpX: blimpX,
+    skyOrder: skyOrder,
+    cansFilled: cansFilled,
+    splatAlpha: splatAlpha,
+    splatShape: splatShape,
+    tagsShown: tagsShown,
+    tagCells: tagCells,
+    tagCentre: tagCentre
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
