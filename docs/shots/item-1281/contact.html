@@ -1,0 +1,42 @@
+<!doctype html><meta charset="utf-8"><title>item 1281: era 4 pilots, old and new</title>
+<!-- item 1281's contact sheet: the pixellab pilots era 4 wore (item 1227) beside the spritegen
+     pilots that replace them, one frame of every beat, at game scale (field units: the old sheet
+     at 1.2 a pixel, the new at 3.125, one SNES pixel) and at 4x that. Shot with
+     py -3.10 "G:/Claude Stuff/fleet-console/scripts/shot.py" "file:///<repo>/docs/shots/item-1281/contact.html" contact.png -->
+<style>body{background:#16161c;color:#e8e8e0;font:14px Consolas,monospace;margin:16px}
+h1{font-size:18px;margin:0 0 6px}h2{font-size:15px;margin:18px 0 4px;color:#c8c8f0}
+.row{display:flex;gap:6px;align-items:flex-end;margin:4px 0 2px}.lab{color:#9a9ca8;margin-top:6px}
+.f{background-repeat:no-repeat;image-rendering:pixelated;background-color:#2a2c34;flex:none}
+.cap{display:flex;gap:6px;color:#9a9ca8;font-size:11px}.cap span{flex:none;text-align:center}</style>
+<h1>Era 4 (Super Nintendo) pilots: pixellab (before) and spritegen text grids (after)</h1>
+<div class="lab">one frame of each beat: idle, idle, up, down, swing x3 (the spin), miss x2 (pad lit, pad dark), win</div>
+<div id="out"></div>
+<script>
+var BEATS = ['idle', 'up', 'down', 'swing', 'miss', 'win'];
+var PICK = [['idle',0],['idle',1],['up',0],['down',0],['swing',0],['swing',1],['swing',2],['miss',0],['miss',1],['win',0]];
+var SHEETS = [
+  { name: 'red, before (pixellab era4-players-left)', src: '../../../assets/pixellab/era4-players-left.png', w: 32, h: 101, sw: 96, sh: 606, scale: 1.2 },
+  { name: 'red, after (spritegen era4-pilot-red)', src: '../../../assets/pixellab/era4-pilot-red.png', w: 12, h: 42, sw: 36, sh: 252, scale: 3.125 },
+  { name: 'blue, before (pixellab era4-players-right)', src: '../../../assets/pixellab/era4-players-right.png', w: 32, h: 101, sw: 96, sh: 606, scale: 1.2 },
+  { name: 'blue, after (spritegen era4-pilot-blue)', src: '../../../assets/pixellab/era4-pilot-blue.png', w: 12, h: 42, sw: 36, sh: 252, scale: 3.125 }
+];
+var out = document.getElementById('out');
+[['game scale (field units on the 800 x 600 field)', 1], ['4x game scale', 4]].forEach(function (z) {
+  var h2 = document.createElement('h2'); h2.textContent = z[0]; out.appendChild(h2);
+  SHEETS.forEach(function (s) {
+    var k = s.scale * z[1];
+    var lab = document.createElement('div'); lab.className = 'lab'; lab.textContent = s.name; out.appendChild(lab);
+    var row = document.createElement('div'); row.className = 'row';
+    PICK.forEach(function (p) {
+      var d = document.createElement('div'); d.className = 'f';
+      d.style.width = s.w * k + 'px'; d.style.height = s.h * k + 'px';
+      d.style.backgroundImage = 'url(' + s.src + ')';
+      d.style.backgroundSize = s.sw * k + 'px ' + s.sh * k + 'px';
+      d.style.backgroundPosition = (-p[1] * s.w * k) + 'px ' + (-BEATS.indexOf(p[0]) * s.h * k) + 'px';
+      d.title = p[0] + p[1];
+      row.appendChild(d);
+    });
+    out.appendChild(row);
+  });
+});
+</script>
