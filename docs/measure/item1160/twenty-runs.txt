@@ -1,0 +1,22 @@
+measured 2026-09-11T00:46:22.986Z
+run  1 exit 0: PASS  the player can score against the computer  -- score after 14.6s of scripted play: player 1, computer 0; 2 returns planned against the rules, 0 of them beyond every aim it can roll
+run  2 exit 0: PASS  the player can score against the computer  -- score after 13.5s of scripted play: player 1, computer 0; 2 returns planned against the rules, 0 of them beyond every aim it can roll
+run  3 exit 0: PASS  the player can score against the computer  -- score after 13.5s of scripted play: player 1, computer 0; 2 returns planned against the rules, 0 of them beyond every aim it can roll
+run  4 exit 0: PASS  the player can score against the computer  -- score after 17.1s of scripted play: player 1, computer 0; 3 returns planned against the rules, 0 of them beyond every aim it can roll
+run  5 exit 0: PASS  the player can score against the computer  -- score after 14.6s of scripted play: player 1, computer 0; 2 returns planned against the rules, 0 of them beyond every aim it can roll
+run  6 exit 0: PASS  the player can score against the computer  -- score after 12.7s of scripted play: player 1, computer 0; 2 returns planned against the rules, 0 of them beyond every aim it can roll
+run  7 exit 0: PASS  the player can score against the computer  -- score after 18.2s of scripted play: player 1, computer 0; 3 returns planned against the rules, 0 of them beyond every aim it can roll
+run  8 exit 0: PASS  the player can score against the computer  -- score after 8.1s of scripted play: player 1, computer 0; 1 returns planned against the rules, 0 of them beyond every aim it can roll
+run  9 exit 0: PASS  the player can score against the computer  -- score after 23.2s of scripted play: player 1, computer 0; 4 returns planned against the rules, 1 of them beyond every aim it can roll
+run 10 exit 0: PASS  the player can score against the computer  -- score after 9.6s of scripted play: player 1, computer 0; 1 returns planned against the rules, 0 of them beyond every aim it can roll
+run 11 exit 0: PASS  the player can score against the computer  -- score after 18.1s of scripted play: player 1, computer 0; 3 returns planned against the rules, 0 of them beyond every aim it can roll
+run 12 exit 0: PASS  the player can score against the computer  -- score after 19.8s of scripted play: player 1, computer 0; 3 returns planned against the rules, 0 of them beyond every aim it can roll
+run 13 exit 0: PASS  the player can score against the computer  -- score after 7.6s of scripted play: player 1, computer 0; 1 returns planned against the rules, 0 of them beyond every aim it can roll
+run 14 exit 0: PASS  the player can score against the computer  -- score after 13.9s of scripted play: player 1, computer 0; 2 returns planned against the rules, 0 of them beyond every aim it can roll
+run 15 exit 0: PASS  the player can score against the computer  -- score after 7.5s of scripted play: player 1, computer 0; 1 returns planned against the rules, 0 of them beyond every aim it can roll
+run 16 exit 0: PASS  the player can score against the computer  -- score after 8.2s of scripted play: player 1, computer 0; 1 returns planned against the rules, 0 of them beyond every aim it can roll
+run 17 exit 0: PASS  the player can score against the computer  -- score after 7.9s of scripted play: player 1, computer 0; 1 returns planned against the rules, 0 of them beyond every aim it can roll
+run 18 exit 0: PASS  the player can score against the computer  -- score after 8.2s of scripted play: player 1, computer 0; 1 returns planned against the rules, 0 of them beyond every aim it can roll
+run 19 exit 0: PASS  the player can score against the computer  -- score after 14.5s of scripted play: player 1, computer 0; 2 returns planned against the rules, 0 of them beyond every aim it can roll
+run 20 exit 0: PASS  the player can score against the computer  -- score after 13.6s of scripted play: player 1, computer 0; 2 returns planned against the rules, 0 of them beyond every aim it can roll
+20/20 consecutive runs passed "the player can score against the computer"
