@@ -46,6 +46,13 @@ Look file: [src/eras/era7-dreamcast.js](../../src/eras/era7-dreamcast.js). Chapt
   card for item 1184.
 - **Slow in software Chrome:** 22.6 ms a frame, 28.2 ms with the VGA screen on (card 1216 still
   running).
+- **The rooftop was built for a camera that hid it** (item 1263's finding, fixed by item 1266).
+  Under the old camera the table filled about three quarters of the picture. The posters, tower and
+  blimp got a strip about 70 pixels tall, mostly behind the spray-tag score, and the blimp flew at
+  screen `y` 9, right under the score. With the ladder camera (tilt 26, height 2000, fov 21) the
+  arena gets 0.52 of the picture, up from 0.26. The blimp now flies at `y` 80, under the score's
+  cans, which end at 68, and over the skyline. The before and after pictures are
+  `docs/shots/item-1266/before-era7-dreamcast.png` and `rally-era7-dreamcast.png`.
 
 ## SOUND AND MUSIC
 
@@ -75,6 +82,7 @@ Look file: [src/eras/era7-dreamcast.js](../../src/eras/era7-dreamcast.js). Chapt
 | Look | `src/eras/era7-dreamcast.js` | Poster palette, graffiti score, speed lines, starburst. |
 | VGA screen | `src/display-tv.js` | `tv-vga`. |
 | Voice and music | the era file's `voice`, `src/music.js` row 7 | The slap bass and its filter sweep; the `swing` and `ninth` arrangement options. |
+| The rally counter and callouts as graffiti (item 1262) | `src/feel.js` `LETTERING[7]` | Leans them like the score, yellow over a magenta extrusion with a fat ink outline, so a callout reads as another tag on the wall. |
 
 ## START HERE
 
@@ -149,3 +157,5 @@ arcade table. Rally frame: [rally-era7.png](../shots/item-1231/rally-era7.png).
 4. Real models for the players, not sprites (see above). The stand-in's concept (an orange
    skater in headphones against a blue one in a beanie, both on yellow skates) is the brief
    for them.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the placard already says CPU beside the right score, so DREAM CPU beside it said the same thing twice.

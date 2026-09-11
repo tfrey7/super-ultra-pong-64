@@ -15,7 +15,7 @@ const ROOT = path.join(__dirname, '..');
 const { Pong, R } = eralooks.loadRenderer(ROOT);
 const PongSound = require('../src/sound.js');
 
-const BIBLE_CAMERA = { tilt: 26, height: 900, fov: 39.5, screenY: 301 };
+const BIBLE_CAMERA = cameras.LADDER[6];   // the ladder camera (item 1266), solved from the bible's
 const BIBLE_FOG = { start: 0.25, end: 0.85, power: 1.4, max: 0.97, colour: '#b9d4ec' };
 const BIBLE_CARD = { flash: '#ffffff', wipe: ['#b9d4ec', '#3cb93c', '#1f5fd6'], box: '#1f5fd6', border: '#ffc72c',
   inner: null, year: '#ffc72c', name: '#ffffff', label: '#bfe3ff', dots: null };

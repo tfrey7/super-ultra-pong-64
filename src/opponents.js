@@ -14,8 +14,9 @@
  *   - stepCpu(state, dt): how the computer's paddle moves this frame. The rules
  *     (src/game.js) call it; it writes only state.right, never draws, never
  *     touches a timer or Math.random, so the headless suite runs it as is.
- *   - drawName(ctx, state, api): the opponent's name under its score, in the
- *     era's own lettering. The renderer calls it after the era's look.
+ *   - drawName(ctx, state, api): the opponent's name inside its era's score HUD,
+ *     in the era's own lettering, or nothing where that HUD already names it
+ *     (item 1261). The renderer calls it after the era's look.
  * From the Xbox on the opponent taunts on a point it wins -- through the
  * gamertag over its paddle and the Xbox 360's achievement toast -- and the
  * taunts are clean by construction: a short fixed list, nothing generated.
@@ -201,24 +202,45 @@
    * of the name, `size` the height of a letter in field units.
    *   block: the 3x5 score font; hd: the system font, with a block fallback
    *   ink: a colour, or 'paddle' for the computer's own paddle colour
+   *   hidden: the name is not drawn in this era, and why (item 1261)
+   *
+   * Item 1261: the AAA passes (items 1224-1234) gave every era from the Atari up
+   * a score HUD of its own, and the old spots here -- under where the plain score
+   * used to sit -- left the name hanging over the court, garbled at the machine's
+   * own resolution. Each row now either sits inside its era's HUD, legibly, or is
+   * `hidden` because that HUD already says who the opponent is (a CPU label, a
+   * portrait, a helmet, a gamertag): no second caption saying it again.
    */
   var LETTERING = [
     { font: 'block', at: [510, 124], size: 10, ink: '#ffffff' },                                  // 1972: the score's own blocks
-    { font: 'block', at: [510, 124], size: 10, ink: 'paddle' },                                  // Atari: in its colour
-    { font: 'block', at: [510, 124], size: 10, ink: '#fcfcfc', shadow: '#000000' },              // NES: white on a hard shadow
-    { font: 'block', at: [510, 124], size: 10, ink: '#ffffff', shadow: '#0038a8', skew: -0.25 }, // Genesis: italic, blue drop
-    { font: 'block', at: [510, 119], size: 10, ink: '#f8f8f8', outline: '#302070' },             // SNES: outlined, inside the score panel
-    { font: 'hd', at: [510, 72], size: 14, ink: '#e8e8f0', weight: 700, family: 'Arial, sans-serif' },                                // PlayStation: plain, under the digits
+    { font: 'block', at: [510, 124], size: 10, ink: 'paddle',
+      hidden: 'the 2600 HUD is two digits in the paddles\' own colours, and its 3x5 name read as a smudge under the right one' },
+    { font: 'block', at: [510, 124], size: 10, ink: '#fcfcfc', shadow: '#000000',
+      hidden: 'the Nintendo band along the top already says CPU beside the score' },
+    { font: 'block', at: [510, 124], size: 10, ink: '#ffffff', shadow: '#0038a8', skew: -0.25,
+      hidden: 'the stone panel already shows the knight\'s portrait beside the score' },
+    { font: 'block', at: [510, 119], size: 10, ink: '#f8f8f8', outline: '#302070',
+      hidden: 'the racer\'s helmet already sits beside the right score box' },
+    { font: 'hd', at: [510, 72], size: 14, ink: '#e8e8f0', weight: 700, family: 'Arial, sans-serif',
+      hidden: 'the top bar already says CPU over the right score' },
     { font: 'hd', at: [610, 50], size: 15, ink: '#ffd800', weight: 700, family: 'Arial Black, Arial, sans-serif', shadow: '#c00018' }, // N64: beside the score, red drop
-    { font: 'hd', at: [615, 34], size: 15, ink: '#ff7a1a', weight: 700, family: 'Verdana, sans-serif', shadow: '#1a1a1a' },           // Dreamcast: beside the placard, cel outline
-    { font: 'hd', at: [565, 28], size: 15, ink: '#9ec9ff', weight: 400, family: 'Arial, sans-serif', glow: '#2a6cff' },              // PS2: thin and blue, beside the digits
-    { font: 'hd', at: [528, 70], size: 14, ink: '#b8ff3c', weight: 700, family: 'Arial, sans-serif', glow: '#5cff2a' },              // Xbox: under the digit, green glow
+    { font: 'hd', at: [615, 34], size: 15, ink: '#ff7a1a', weight: 700, family: 'Verdana, sans-serif', shadow: '#1a1a1a',
+      hidden: 'the placard already says CPU beside the right score' },
+    { font: 'hd', at: [565, 28], size: 15, ink: '#9ec9ff', weight: 400, family: 'Arial, sans-serif', glow: '#2a6cff',
+      hidden: 'the bottom plates already say CPU' },
+    { font: 'hd', at: [528, 70], size: 14, ink: '#b8ff3c', weight: 700, family: 'Arial, sans-serif', glow: '#5cff2a',
+      hidden: 'the gamertag over the computer\'s paddle already carries its name' },
     { font: 'hd', at: [667, 106], size: 15, ink: '#ffffff', weight: 600, family: 'Segoe UI, Arial, sans-serif', glow: '#7ad73c' }     // Xbox 360: under its blade
   ];
 
   function letteringFor(era) {
     var n = profileFor(era).era;
     return LETTERING[n];
+  }
+
+  /** Whether this era draws the opponent's name at all (item 1261). */
+  function nameShown(era) {
+    return !letteringFor(era).hidden;
   }
 
   function blockText(ctx, api, text, x, top, cell) {
@@ -233,6 +255,7 @@
     if (!ctx || !state || state.phase === 'title' || (opts && opts.ink)) return;
     var prof = profileFor(state.era);
     var L = letteringFor(state.era);
+    if (L.hidden) return;
     var x = L.at[0] * (state.width / 800);
     var y = L.at[1] * (state.height / 600);
     var text = prof.name;
@@ -281,6 +304,7 @@
     TAUNT_SECONDS: TAUNT_SECONDS,
     LETTERING: LETTERING,
     profileFor: profileFor,
+    nameShown: nameShown,
     predictY: predictY,
     stepCpu: stepCpu,
     tauntFor: tauntFor,

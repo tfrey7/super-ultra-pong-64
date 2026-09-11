@@ -70,6 +70,7 @@ Look file: [src/eras/era8-ps2.js](../../src/eras/era8-ps2.js). Chapter 9 of [doc
 | Textures | `src/textures3d.js` | `court-metal`. |
 | Component TV | `src/display-tv.js` | `tv-component`. |
 | Voice and music | the era file's `voice`, `src/music.js` row 8 | The long reverb, the drone, stereo spread. |
+| The rally counter as a subtitle (item 1262) | `src/feel.js` `LETTERING[8]` | Sets it in thin wide-tracked blue type in the bottom letterbox bar (y 572), and the callouts in the same film type, so the playfield carries only the callout. |
 
 ## START HERE
 
@@ -144,3 +145,5 @@ art bible's era 8 page, [docs/ART.md](../ART.md)).
    sparks, the flare, the rain, the ball, and the letterbox with its subtitle and plates.
 4. The typed line: a subtitle that reveals one letter every 0.03 s and holds a second is the
    cheapest "cutscene" there is.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the bottom plates already say CPU, so a second caption beside the digits earned nothing.

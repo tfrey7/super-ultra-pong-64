@@ -78,6 +78,7 @@ Look file: [src/eras/era9-xbox.js](../../src/eras/era9-xbox.js). Chapter 10 of [
 | Textures | `src/textures3d.js` | `court-metal`. |
 | Taunts | `src/opponents.js` | Clean by construction: a fixed list, nothing generated. |
 | Voice and music | the era file's `voice`, `src/music.js` row 9 | FM metal, `shape`, and the rock arrangement's `drive` and `power` chords. |
+| The rally counter and callouts in the HUD's green glow (item 1262) | `src/feel.js` `LETTERING[9]` | Sets them in green-glow sans, the counter in a dark panel framed in the shield bar's green. |
 
 ## START HERE
 
@@ -167,3 +168,5 @@ playtest's 18.5 ms line, in software-drawn Chrome. With other runs loading the m
    vent. That is enough for a place, and each costs one or two draws a frame.
 4. The moments on the set rather than on the HUD: red beacons and a red outline say "point" in a
    2001 game's own language.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the gamertag over the computer's paddle already carries its name (and its taunts), so CPU 2001 under the digit said it twice.
