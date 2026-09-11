@@ -224,3 +224,39 @@ his emulator — never touch either.**
 
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
+
+## 9. Talk in the room as you go (item 1170)
+
+*Copied word for word from the fleet console's own bootstrap, section 21a, so a worker here gets
+the same rule without leaving this repo (item 1171). If that section changes, copy it again.*
+
+Tim follows the fleet in this room, and a worker that says nothing until its report leaves it silent
+for twenty minutes. **There is no post command to learn: the room invents nothing and draws only
+your own markers** (`chatroom.py`). What you post with is the marker, written at the start of a line
+in your ordinary output, and recorded on the card straight after with
+`mcp__fleet__queue_step(id, text, commit)` (or `workitem.py step`). Post at four moments, a sentence
+or two each, in plain words for Tim -- no file, branch, function or test names, never a stack trace:
+
+| when | what you write | the room draws |
+| --- | --- | --- |
+| you start | `PLAN:` with each step saying what you will do and how | *plan* |
+| each step | `PROGRESS k/n: <what just got done>; next, <what is next>` | *progress* |
+| something did not work | the next `PROGRESS` line says what you tried, what failed and what you will try instead | *progress* |
+| you finish or hand back | the ending line (`DONE` / `FAILED` / `TIMED OUT` / `STOOD DOWN`), its first sentence written for Tim | *outcome* |
+
+**A failed attempt has no post of its own yet.** A `PROGRESS` line re-emitted at the step you are
+still on replaces that step's earlier post instead of adding one, so the failure rides your next
+real marker. Item 1175 asks for a post kind that says it on its own.
+
+One of each:
+
+```
+PLAN:
+1. Find why the board forgets which columns you collapsed, by reloading it with two columns shut
+2. Keep that choice across a reload and a console restart
+3. Check it on a phone-sized screen
+
+PROGRESS 1/3: the board only remembered collapsed columns until the page reloaded; next, keeping that choice somewhere that lasts.
+PROGRESS 2/3: keeping the choice in the browser did not work, because a console restart wiped it, so the console keeps it now; next, the phone-sized check.
+DONE: the board remembers which columns you collapsed, across reloads and restarts, on a wide screen and a narrow one.
+```
