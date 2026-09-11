@@ -72,19 +72,22 @@
         big.width = cw; big.height = ch;
         big.getContext('2d').drawImage(full, cx, cy, cw, ch, 0, 0, cw, ch);
 
-        // Down to the machine's own pixels, then back up block for block.
+        // The whole screen down to the machine's own pixels, then the card's
+        // patch of that back up block for block. Squeezing the whole screen
+        // (item 1196) keeps the machine's pixel grid where the machine had it;
+        // squeezing only the crop shifted it by wherever the crop began.
         var res = S.resolution[era];
         var sx = res.w / g.width, sy = res.h / g.height;
         var tiny = document.createElement('canvas');
-        tiny.width = Math.max(1, Math.round(cw * sx)); tiny.height = Math.max(1, Math.round(ch * sy));
+        tiny.width = res.w; tiny.height = res.h;
         var tx = tiny.getContext('2d');
         tx.imageSmoothingEnabled = true;
-        tx.drawImage(full, cx, cy, cw, ch, 0, 0, tiny.width, tiny.height);
+        tx.drawImage(full, 0, 0, g.width, g.height, 0, 0, res.w, res.h);
         var low = document.createElement('canvas');
         low.width = cw; low.height = ch;
         var lx = low.getContext('2d');
         lx.imageSmoothingEnabled = false;
-        lx.drawImage(tiny, 0, 0, tiny.width, tiny.height, 0, 0, cw, ch);
+        lx.drawImage(tiny, cx * sx, cy * sy, cw * sx, ch * sy, 0, 0, cw, ch);
 
         var row = document.createElement('div');
         row.className = 'row';
