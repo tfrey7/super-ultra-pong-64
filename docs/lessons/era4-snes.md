@@ -47,6 +47,8 @@ Look file: [src/eras/era4-snes.js](../../src/eras/era4-snes.js).
   still measured 108 ms). It belonged to the ring engine, not the tilt. Items 1164 and 1203 traced
   it to Chrome compiling graphics programs for looks nothing had drawn yet, and fixed it with a
   warm-up that draws every real look (`warmUp` in `src/erachange.js`, bootstrap section 8a).
+  A smaller hitch, and one 279 ms frame at a ring's start, were left after that. Item 1218 traced
+  and fixed them in the ring engine.
 
 ## SOUND AND MUSIC
 

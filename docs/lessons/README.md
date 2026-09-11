@@ -60,6 +60,12 @@ machine.
    - the one `src/eras/eraN-*.js` you want
    - `src/table3d.js` and `src/textures3d.js` for a 3D era
    - `src/sprites.js` for an era that draws pixellab art from files
+   - `src/characters.js` if you want the players (item 1223). From era 1 up, a figure stands
+     behind each paddle with its hand on it. The figure only reads the state, and its beats come
+     from what the rules already report (idle, up, down, swing, miss, win). Each era has a config
+     block, and until an AAA era card (items 1224 to 1234) brings a sheet, the figure is a
+     placeholder silhouette. What each era's players taught is **not yet learned**; those cards
+     add it under `## LESSONS`.
 3. **Delete the climb.** The one-point-one-era ladder lives in these places:
    - `advanceEra` in `src/game.js`
    - the ring wipe and name card in `src/erachange.js`
