@@ -118,7 +118,7 @@ try {
   await mouse(0.5);
   await evalJs(force);
   const shots = [];
-  for (const [name, target] of [['dreamcast-beat1-page', 0.2], ['dreamcast-beat2-ink', 0.5], ['dreamcast-beat3-panel', 0.78]]) {
+  for (const [name, target] of [['dreamcast-beat1-page', 0.2], ['dreamcast-beat2-ink', 0.5], ['dreamcast-beat3-panel', 0.68]]) {
     let before = await evalJs(probe);
     for (let k = 0; k < 400 && !(before.raw !== null && before.raw >= target); k++) {
       await sleep(4); before = await evalJs(probe);

@@ -4,33 +4,33 @@
   "frames": 240,
   "meanMs": 4.17,
   "p95Ms": 4.3,
-  "maxMs": 4.4
+  "maxMs": 4.3
  },
  "ringFrames": {
-  "frames": 328,
-  "meanMs": 4.56,
+  "frames": 360,
+  "meanMs": 4.17,
   "p95Ms": 4.3,
-  "maxMs": 33.3
+  "maxMs": 4.4
  },
- "serveAtLastRingFrame": 0.30419999999999964,
+ "serveAtLastRingFrame": 0.3001000000000002,
  "paddle": {
   "top": {
    "era": 7,
-   "raw": 0.25279999999999997,
-   "p": 0.06462360780799997,
+   "raw": 0.2500000000000006,
+   "p": 0.06250000000000046,
    "wiping": true,
    "cardUp": false,
-   "serveDelay": 1.4208000000000007,
+   "serveDelay": 1.4250000000000003,
    "paddleY": 17.818731117824775,
    "hook": "function"
   },
   "bottom": {
    "era": 7,
-   "raw": 0.33613333333333334,
-   "p": 0.1519129292894815,
+   "raw": 0.3333333333333333,
+   "p": 0.14814814814814814,
    "wiping": true,
    "cardUp": false,
-   "serveDelay": 1.295800000000001,
+   "serveDelay": 1.3000000000000003,
    "paddleY": 497.2749244712991,
    "hook": "function"
   },
@@ -41,25 +41,25 @@
    "name": "dreamcast-beat1-page",
    "file": "G:\\Claude Stuff\\super-ultra-pong-64-item-1153\\docs\\shots\\item-1153\\dreamcast-beat1-page.png",
    "askedRaw": 0.2,
-   "rawBefore": 0.20006666666668357,
-   "pBefore": 0.032032010667859975,
-   "serveDelay": 1.4999000000000013
+   "rawBefore": 0.20280000000001644,
+   "pBefore": 0.03336290380800811,
+   "serveDelay": 1.495800000000002
   },
   {
    "name": "dreamcast-beat2-ink",
    "file": "G:\\Claude Stuff\\super-ultra-pong-64-item-1153\\docs\\shots\\item-1153\\dreamcast-beat2-ink.png",
    "askedRaw": 0.5,
-   "rawBefore": 0.5083333333333743,
-   "pBefore": 0.5245856481482669,
-   "serveDelay": 1.0375000000000025
+   "rawBefore": 0.5028000000000302,
+   "pBefore": 0.5083530478080897,
+   "serveDelay": 1.0458000000000045
   },
   {
    "name": "dreamcast-beat3-panel",
    "file": "G:\\Claude Stuff\\super-ultra-pong-64-item-1153\\docs\\shots\\item-1153\\dreamcast-beat3-panel.png",
-   "askedRaw": 0.78,
-   "rawBefore": 0.7832666666667277,
-   "pBefore": 0.959277247702553,
-   "serveDelay": 0.6251000000000017
+   "askedRaw": 0.68,
+   "rawBefore": 0.6833333333333679,
+   "pBefore": 0.8729814814815231,
+   "serveDelay": 0.7750000000000059
   }
  ],
  "settled": {
@@ -68,7 +68,7 @@
   "p": null,
   "wiping": false,
   "cardUp": false,
-  "serveDelay": -0.004099999999996949,
+  "serveDelay": -0.004299999999994845,
   "paddleY": 258,
   "hook": "function"
  },

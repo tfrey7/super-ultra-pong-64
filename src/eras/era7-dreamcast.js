@@ -428,7 +428,7 @@
   var ARRIVAL = {
     ignite: 0.25, snap: 0.8, fade: 0.9,
     page: 0.9, dot: 14, bounce: 40,
-    inkWidth: 5, inkBand: 28, edgeInk: 6,
+    inkWidth: 5, inkLead: 40, inkTrail: 12, edgeInk: 6,
     band: { inner: 40, outer: 28, alpha: 0.35 },
     swirl: { arms: 3, points: 24, width: 14, ink: 20, depth: 50, inside: 60, outside: 10 },
     spiral: { size: 46, turns: 1.6, points: 40, width: 9, ink: 15, spin: 5 * Math.PI },
@@ -568,11 +568,13 @@
       ctx.fill();
     }
 
-    // The ink line, from the first frame: it traces every shape the ring's edge crosses.
+    // The ink line, from the first frame: it runs just AHEAD of the ring and
+    // traces every shape it crosses, so each shape is inked before its colour
+    // arrives -- 40 pixels ahead at most, inside the 60-pixel limit.
     if (radius > 0 && p < 1) {
       if (cam && state) {
         ctx.save();
-        annulus(ctx, o, radius + 2, radius - ARRIVAL.inkBand);
+        annulus(ctx, o, radius + ARRIVAL.inkLead, radius - ARRIVAL.inkTrail);
         ctx.clip();
         inkShapes(ctx, T, cam, state);
         ctx.restore();
