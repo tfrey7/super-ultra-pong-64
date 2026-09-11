@@ -50,6 +50,12 @@
        them), for any era file to draw with one drawImage: window.PongSprites. -->
   <script src="src/sprites.js"></script>
   <script src="src/render.js"></script>
+  <!-- The display: each era drawn at its machine's own resolution and scaled
+       up to the page, then its screen's overlay. The CRT (eras 0-4) and the
+       TV/HDTV (eras 5-10) overlays each live in their own file. -->
+  <script src="src/display.js"></script>
+  <script src="src/display-crt.js"></script>
+  <script src="src/display-tv.js"></script>
   <!-- The shared 3D table the eras from the PlayStation up stand on
        (docs/ERAS.md section 2); PongRender hands it to every era as table3d. -->
   <script src="src/table3d.js"></script>

@@ -270,14 +270,26 @@ his emulator — never touch either.**
   `tools/playtest.mjs` compares the live canvas with each era drawn offscreen by calling
   `getImageData` in the page, and the page is opened from `file://`, where Chrome counts every
   image as another origin: one `drawImage` of a `assets/pixellab/*.png` taints the canvas, and the
-  read throws a SecurityError. The first era card that draws pixellab art has to deal with that
-  check (serve the repo over HTTP for it, or compare screenshots instead); item 1177, which built
-  the loader, measured none of this in a browser -- it is reasoned from the harness's own code.
+  read throws a SecurityError. **Handled since item 1179**: the harness starts Chrome with
+  `--allow-file-access-from-files`, which lets a `file://` page read back its own images, and the
+  ladder walk's pixel comparison passed with era 3's pixellab court and ball on the canvas
+  ("0 of 336000 pixels differ from era 3 drawn offscreen"). A page you open by hand off disk still
+  taints its canvas; nothing in the game reads pixels back, so only the harness cares.
 - **The pixellab balance lags the bill.** `node tools/pixellab.mjs` reads the subscription's
   generations left before and after a generation; on item 1177's test image the call was billed
   1 generation, the count read 9953 both times, and a `balance` run about two minutes later read
   9952. Trust the call's own `cost` in the manifest, not `generationsUsed` (which records 0 for
   that image), for what one image costs.
+
+- **An era's `ctx.canvas` is not the page's canvas, and not always 800 x 600** (item 1198). The
+  display (`src/display.js`) hands eras 0-4 a field-sized offscreen canvas, sampled down to the
+  machine's pixels afterwards, and eras 5-10 the native one itself (320 x 240 and up) with a
+  scale transform, so field units still work. Code that copies `ctx.canvas` with a bare
+  `drawImage(canvas, 0, 0)`, or refuses a canvas that is not 800 x 600, breaks on the 3D eras:
+  copy it with the full source and destination rectangles instead (era 1's arrival roll is the
+  worked example). `index.html?display=off` draws straight onto the page as before, and the
+  playtest's pixel check reads the native frame through `PongDisplay.canvas()` and draws its
+  comparisons through `PongDisplay.render()`.
 
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.

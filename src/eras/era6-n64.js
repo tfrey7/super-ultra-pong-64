@@ -49,10 +49,14 @@
     ballCore: '#ffffff', ballRim: '#ffe9a8', ballEdge: '#f0b020'
   };
 
-  var FOG = { start: 0.25, end: 1.15, power: 1.2, max: 0.92, colour: PAL.fog };
+  // Thick before the far rail (item 1197): the last stretch of court is all but
+  // gone at d = 0.85, where the fog is already at its maximum, and mid-court
+  // (d = 0.5) is only lightly hazed. The paddle cap below keeps the far paddle
+  // legible and the ball is drawn after all of it, so neither is ever lost.
+  var FOG = { start: 0.25, end: 0.85, power: 1.4, max: 0.97, colour: PAL.fog };
   var PADDLE_FOG_CAP = 0.35;     // the far paddle is paler, never illegible
   var PADDLE_Z = 24;             // R6: 28 or less
-  var BALL_RADIUS = 0.7;         // a big round ball (the stock table ball is 0.6)
+  var BALL_RADIUS = 0.9;         // a big round ball: half as wide again as the stock 0.6 (item 1197)
   var BUFFER = { key: 'n64', w: 400, h: 300 };
   // Checker cells two texels wide: every cell is only two texels across when
   // the table magnifies it, so the smoothing smears half of each cell -- the
@@ -283,7 +287,7 @@
       target.restore();
     }
 
-    // the world ends in a pale wall: fully fogged from d = 1.15
+    // the world ends in a pale wall: fully fogged from d = 0.85, before the far rail
     var wall = target.createLinearGradient(0, farY - 60, 0, farY);
     wall.addColorStop(0, T.rgba(PAL.fog, 0));
     wall.addColorStop(1, T.rgba(PAL.fog, FOG.max));

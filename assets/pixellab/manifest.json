@@ -354,6 +354,128 @@
       "verdict": "used: shrunk to the 12-unit ball box and inked in NES $30/$10/$00/$0F as era2-ball.png by era2-nes-quantize.mjs, the era 2 ball"
     },
     {
+      "name": "genesis-court",
+      "file": "genesis-court.png",
+      "prompt": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
+      "size": {
+        "width": 320,
+        "height": 240
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 530743640,
+      "date": "2026-09-11T01:16:13.015Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 22.4,
+      "pixels": {
+        "width": 320,
+        "height": 240
+      },
+      "bytes": 3062,
+      "sha256": "ba0e3aef89bf03a775421b300f63bb4ca1ae2b1ef194835e56e3b3538d69e4e4",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
+        "image_size": {
+          "width": 320,
+          "height": 240
+        },
+        "seed": 530743640,
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "4ad286a89080049decc3f353de7a4464de1ed516d53e325ffff0122f863d9dda"
+      }
+    },
+    {
+      "name": "genesis-ball",
+      "file": "genesis-ball.png",
+      "prompt": "shiny white chrome ball sprite, 16-bit Sega Genesis style, bright white core with a hard white highlight and pale blue shading at the edge",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 1527937682,
+      "date": "2026-09-11T01:16:30.804Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 17.1,
+      "pixels": {
+        "width": 24,
+        "height": 24
+      },
+      "bytes": 272,
+      "sha256": "283847bfafe01b5db4f7e126ac305e7ac6bf998645c860b1bd3342e345316694",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "shiny white chrome ball sprite, 16-bit Sega Genesis style, bright white core with a hard white highlight and pale blue shading at the edge",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1527937682,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "5f77f8760a3b897a8bd5c6d868c2c60bee9dc1d9ebe7c8195358559985749143",
+        "trim": {
+          "box": [
+            4,
+            4,
+            24,
+            24
+          ]
+        }
+      }
+    },
+    {
       "name": "snes-sky",
       "file": "snes-sky.png",
       "prompt": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",

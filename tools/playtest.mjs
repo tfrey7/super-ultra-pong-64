@@ -230,15 +230,21 @@ async function filmChange(s, clip, from) {
     else await sleep(8);
   }
   out.drawn = await s.eval(`new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => {
-    const g = window.__pong, R = window.PongRender, live = document.getElementById('field');
-    const w = live.width, h = live.height;
+    const g = window.__pong, R = window.PongRender, D = window.PongDisplay;
+    // With the display on, the frame to read is its native picture, before any
+    // overlay; both eras are drawn for comparison at that same size and scale.
+    const native = !!(D && D.enabled && D.canvas());
+    const live = native ? D.canvas() : document.getElementById('field');
+    const w = live.width, h = live.height, band = 90 * h / g.height;
     const pix = (c) => c.getContext('2d').getImageData(0, 0, w, h).data;
-    const render = (era) => { const c = document.createElement('canvas'); c.width = w; c.height = h;
-      R.draw(c.getContext('2d'), era === g.era ? g : Object.assign({}, g, { era: era })); return pix(c); };
+    const drawAs = (era) => (x) => R.draw(x, era === g.era ? g : Object.assign({}, g, { era: era }));
+    const render = (era) => { if (native) return pix(D.render(D.shownEra(g), g.width, g.height, drawAs(era)));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      drawAs(era)(c.getContext('2d')); return pix(c); };
     const L = pix(live), N = render(${from + 1}), O = render(${from});
     let asNew = 0, asOld = 0, apart = 0, counted = 0;
     for (let y = 0; y < h; y++) {
-      if (y >= h / 2 - 90 && y < h / 2 + 90) continue;
+      if (y >= h / 2 - band && y < h / 2 + band) continue;
       for (let x = 0; x < w; x++) {
         const i = (y * w + x) * 4; counted++;
         if (L[i] !== N[i] || L[i + 1] !== N[i + 1] || L[i + 2] !== N[i + 2]) asNew++;
@@ -382,7 +388,12 @@ async function main() {
   const chrome = launchChrome(CHROME, [
     // --mute-audio: the audio graph still runs and is still checked, but a
     // playtest never beeps through the speakers of the machine it runs on.
+    // --allow-file-access-from-files: the page is opened off disk, where Chrome
+    // counts every image as another origin, so one drawImage of the pixel art
+    // in assets/pixellab/ taints the canvas and the ladder walk's getImageData
+    // throws. With it, a file:// page may read back its own files (item 1179).
     '--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
+    '--allow-file-access-from-files',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
     '--no-first-run', '--no-default-browser-check',
     url
