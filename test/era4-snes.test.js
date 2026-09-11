@@ -142,9 +142,11 @@ test('soft shadows lie under both paddles and the ball, drawn before the sprites
   const shadows = ops.filter(isShadow);
   assert.strictEqual(shadows.length, 3, 'one each for two paddles and the ball');
   const floor = ops.findIndex((o) => o.op === 'fill' && o.subpaths.length > 100);
-  const sprites = [isPaddleSprite(R.paddleInk(g, 'left')), isPaddleSprite(R.paddleInk(g, 'right')), isBallSprite]
+  // Realism rung 4 (item 1267): the bats are rung 3's, their rubber a flat quad in the earned ink.
+  const isBat = (ink) => (o) => o.op === 'fill' && (o.style === ink || isPaddleSprite(ink)(o));
+  const sprites = [isBat(R.paddleInk(g, 'left')), isBat(R.paddleInk(g, 'right')), isBallSprite]
     .map((is) => ops.findIndex(is));
-  assert.ok(sprites.every((i) => i >= 0), 'both paddles and the ball are shaded sprites');
+  assert.ok(sprites.every((i) => i >= 0), 'both bats and the ball are drawn');
   const lastShadow = ops.lastIndexOf(shadows[shadows.length - 1]);
   assert.ok(ops.indexOf(shadows[0]) > floor, 'shadows lie on the floor');
   assert.ok(lastShadow < Math.min(...sprites), 'and under every sprite');

@@ -3,5 +3,6 @@
   "suite": "node --test",
   "build": null,
   "protect": [],
-  "restart": null
+  "restart": null,
+  "stamp": "node tools/stamp.mjs --item {item} --title {title} --sha {sha}"
 }

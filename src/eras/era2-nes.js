@@ -179,40 +179,29 @@
   // brightest thing on the court. Play is untouched: the net is the game's
   // dotted centre line, the paddles are the hit zones.
   var COURT_LINE = NES[0x10];
-  var LINES = {
-    base: [18, 237],            // baseline columns
-    service: [69, 186],         // service line columns
-    doubles: [38, 233],         // doubles sideline rows (top, bottom)
-    singles: [62, 209],         // singles sideline rows
-    centre: 135,                // the centre service line's row
-    mark: 3                     // the baseline's centre mark, in columns
-  };
 
-  /** The court's markings, as field rectangles [x, y, w, h]. */
-  function tennisLines() {
-    var nx = NATIVE.x, ny = NATIVE.y, L = LINES, out = [], i;
-    var colX = function (c) { return c * nx; };
-    var rowY = function (r) { return r * ny; };
-    var left = colX(L.base[0]), right = colX(L.base[1] + 1);
-    var top = rowY(L.doubles[0]), bottom = rowY(L.doubles[1] + 1);
-    for (i = 0; i < 2; i++) {
-      out.push([left, rowY(L.doubles[i]), right - left, ny]);                    // doubles sideline
-      out.push([left, rowY(L.singles[i]), right - left, ny]);                    // singles sideline
-      out.push([colX(L.base[i]), top, nx, bottom - top]);                        // baseline
-      out.push([colX(L.service[i]), rowY(L.singles[0]), nx,                      // service line
-        rowY(L.singles[1] + 1) - rowY(L.singles[0])]);
-    }
-    var net = colX(128);
-    out.push([colX(L.service[0] + 1), rowY(L.centre), net - colX(L.service[0] + 1), ny]);   // centre service lines
-    out.push([net, rowY(L.centre), colX(L.service[1]) - net, ny]);
-    out.push([colX(L.base[0] + 1), rowY(L.centre), L.mark * nx, ny]);                       // centre marks
-    out.push([colX(L.base[1] - L.mark), rowY(L.centre), L.mark * nx, ny]);
-    return out;
+  // ------------------------------------------ the table (item 1267, realism rung 2)
+  // The realism ladder (docs/ART.md sections 7 and 8) turns item 1259's tennis
+  // court into a table tennis table seen from straight above. The teal floor
+  // is now the table's top. Its ends are drawn at the paddles' outer faces
+  // (x 32 and 768), so each bat stands on its end of the table and each player
+  // on the dark floor behind it. The white border stays as the table's edge
+  // lines, the dotted net and its posts stay, and the centre service line now
+  // runs the table's whole length as its centre line. The baselines, service
+  // lines, singles sidelines and centre marks are painted out. Play is
+  // untouched: the ends are drawn where the paddles already stand.
+  var TABLE = { left: 32, right: 768 };
+  var FLOOR = NES[0x08];        // the hall's dark wooden floor beyond the table's ends
+
+  /** The table's centre line, as field rectangles [x, y, w, h]: one NES row on y 300, end to end. */
+  function tableLines() {
+    var ny = NATIVE.y;
+    return [[TABLE.left, 300 - ny / 2, TABLE.right - TABLE.left, ny]];
   }
-  var TENNIS_LINES = null;      // built on first use: NATIVE is set further down
+  var TABLE_LINES = null;       // built on first use: NATIVE is set further down
 
   function drawLines(ctx) {
-    var lines = TENNIS_LINES || (TENNIS_LINES = tennisLines());
+    var lines = TABLE_LINES || (TABLE_LINES = tableLines());
     ctx.fillStyle = COURT_LINE;
     for (var i = 0; i < lines.length; i++) {
       var r = lines[i];
@@ -220,19 +209,43 @@
     }
   }
 
+  /** The floor past each end, where the players stand. */
+  function drawFloor(ctx, state) {
+    ctx.fillStyle = FLOOR;
+    ctx.fillRect(0, 0, TABLE.left - 2 * PX, state.height);
+    ctx.fillRect(TABLE.right + 2 * PX, 0, state.width - TABLE.right - 2 * PX, state.height);
+  }
+
+  /** The table's edge lines: the landed white border, its ends moved in to the paddles' outer faces. */
   function drawBorder(ctx, state) {
-    var w = state.width, h = state.height;
+    var h = state.height;
+    var x0 = TABLE.left - 2 * PX, x1 = TABLE.right + 2 * PX, w = x1 - x0;
     ctx.fillStyle = LINE;
-    ctx.fillRect(0, 0, w, PX);
-    ctx.fillRect(0, h - PX, w, PX);
-    ctx.fillRect(0, 0, PX, h);
-    ctx.fillRect(w - PX, 0, PX, h);
+    ctx.fillRect(x0, 0, w, PX);
+    ctx.fillRect(x0, h - PX, w, PX);
+    ctx.fillRect(x0, 0, PX, h);
+    ctx.fillRect(x1 - PX, 0, PX, h);
     // The shaded inner edge, so the border reads as a raised line.
     ctx.fillStyle = LINE_SHADE;
-    ctx.fillRect(PX, PX, w - 2 * PX, PX);
-    ctx.fillRect(PX, h - 2 * PX, w - 2 * PX, PX);
-    ctx.fillRect(PX, PX, PX, h - 2 * PX);
-    ctx.fillRect(w - 2 * PX, PX, PX, h - 2 * PX);
+    ctx.fillRect(x0 + PX, PX, w - 2 * PX, PX);
+    ctx.fillRect(x0 + PX, h - 2 * PX, w - 2 * PX, PX);
+    ctx.fillRect(x0 + PX, PX, PX, h - 2 * PX);
+    ctx.fillRect(x1 - 2 * PX, PX, PX, h - 2 * PX);
+  }
+
+  // The bat's handle (rung 2): 3 NES pixels off the paddle's outer face at its
+  // middle, 2 rows thick, in the nearest wood brown -- ochre with a dark
+  // underside. The rig puts the figure's fist on its far end.
+  var WOOD = NES[0x18], WOOD_SHADE = NES[0x07];
+
+  function drawHandle(ctx, p, sprite, side) {
+    var len = 3 * NATIVE.x, th = 2 * NATIVE.y;
+    var x = side === 'left' ? sprite.x - len : sprite.x + sprite.w;
+    var y = Math.round(p.y + p.h / 2 - th / 2);
+    ctx.fillStyle = WOOD;
+    ctx.fillRect(x, y, len, th);
+    ctx.fillStyle = WOOD_SHADE;
+    ctx.fillRect(x, y + th - NATIVE.y / 2, len, NATIVE.y / 2);
   }
 
   function netDots(state) {
@@ -280,6 +293,12 @@
     ctx.fillRect(ox + PX, oy + hh - PX, 2 * PX, PX);
     ctx.fillRect(ox + PX, oy + 4 * PX, 2 * PX, PX);
     ctx.fillRect(ox + PX, oy + hh - 5 * PX, 2 * PX, PX);
+    return { x: ox, w: 4 * PX };
+  }
+
+  /** Where drawPaddle puts a paddle's sprite across the field. */
+  function paddleSprite(p) {
+    return { x: snap(p.x + p.w / 2) - 2 * PX, w: 4 * PX };
   }
 
   /**
@@ -519,13 +538,8 @@
     ctx.fillRect(Math.round(b.x), Math.round(b.y + b.size + 3 * NATIVE.y), b.size, 2 * NATIVE.y);
   }
 
-  /** The seam: one pale-yellow NES pixel on the ball's lit side. */
-  function drawSeam(ctx, state) {
-    if (state.serveDelay > 0) return;
-    var b = state.ball;
-    ctx.fillStyle = NES[0x38];
-    ctx.fillRect(Math.round(b.x + b.size / 4), Math.round(b.y + b.size / 4), Math.round(NATIVE.x), Math.round(NATIVE.y));
-  }
+  // (Item 1225's $38 seam pixel went with the tennis lines, item 1267: at 4 x 5
+  // NES pixels a tennis ball and a table tennis ball are the same sprite.)
 
   // ------------------------------------------------------------ the frame
   function draw(ctx, state, opts, api) {
@@ -539,17 +553,19 @@
     var match = isMatchPoint(state);
 
     drawCourt(ctx, state);
+    drawFloor(ctx, state);
     drawLines(ctx);
     drawBorder(ctx, state);
     drawNet(ctx, state);
     drawCrowd(ctx, state, point, match);
     drawUmpire(ctx, state);
     drawBand(ctx, state, left, right, point, match);
+    drawHandle(ctx, state.left, paddleSprite(state.left), 'left');
+    drawHandle(ctx, state.right, paddleSprite(state.right), 'right');
     drawPaddle(ctx, state.left, left);
     drawPaddle(ctx, state.right, right);
     drawBallShadow(ctx, state);
     drawBall(ctx, state);
-    drawSeam(ctx, state);
   }
 
   // ------------------------------------------------------------ the arrival
@@ -709,7 +725,9 @@
     nesPalette: NES,
     font: FONT,
     courtLine: COURT_LINE,
-    tennisLines: function () { return TENNIS_LINES || (TENNIS_LINES = tennisLines()); },
+    tableLines: function () { return TABLE_LINES || (TABLE_LINES = tableLines()); },
+    table: TABLE,
+    wood: WOOD,
     spriteInks: spriteInks,
     paddleInk: function (state, side) {
       return spriteInks(state, side).body;

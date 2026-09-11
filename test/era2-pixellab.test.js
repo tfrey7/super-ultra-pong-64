@@ -142,40 +142,43 @@ test('the court is a tennis floor: its floor ink and whole tile-grid lines, no p
   for (const x of fullCol) assert.ok(Math.abs(x - 99.5) > 3, `no grid column under the net (column ${x}) to read as a halfway line`);
 });
 
-test('the tennis lines: two baselines, doubles and singles sidelines, service lines and the centre service line, in one grey no brighter than the ball', async () => {
+test('the table (item 1267, realism rung 2): the tennis lines are gone, one centre line runs end to end, in a grey no brighter than the ball', async () => {
   const q = await quantizer();
   const look = R.eraLook(2);
   const g = midRally();
   const calls = frame(g);
   const lineInk = look.courtLine;
-  assert.strictEqual(lineInk, look.nesPalette[0x10], 'the lines are NES $10');
+  assert.strictEqual(lineInk, look.nesPalette[0x10], 'the centre line is NES $10');
   assert.ok(q.luma(lineInk) < q.luma(look.nesPalette[0x30]), 'darker than the ball\'s $30 core');
-  const lines = look.tennisLines();
-  const drawn = calls.filter((c) => c[0] === lineInk);
-  for (const r of lines) assert.ok(drawn.some((c) => c[1] === r[0] && c[2] === r[1] && c[3] === r[2] && c[4] === r[3]), `line ${r} is drawn`);
-  // Above the court, under everything else: straight after the court's picture.
-  const at = calls.findIndex((c) => c[0] === 'image:court');
-  assert.deepStrictEqual(calls.slice(at + 1, at + 1 + lines.length).map((c) => c.slice(1)), lines.map((r) => r.slice()),
-    'the lines go down right after the court, before the border, the net, the crowd and the band');
-  const vertical = lines.filter((r) => r[3] > r[2]), horizontal = lines.filter((r) => r[2] > r[3]);
-  const xs = [...new Set(vertical.map((r) => r[0]))].sort((a, b) => a - b);
-  // Baselines outside both service lines, just in front of the paddles, which stand behind them.
-  assert.strictEqual(xs.length, 4, `two baselines and two service lines (${xs})`);
-  assert.ok(xs[0] > g.left.x + g.left.w && xs[3] + vertical[0][2] < g.right.x, 'each baseline in front of its paddle');
-  assert.ok(xs[1] < 400 && xs[2] > 400, 'a service line each side of the net');
-  // Mirror-true about the net.
-  for (const r of lines) {
-    const mx = 800 - r[0] - r[2];
-    assert.ok(lines.some((o) => Math.abs(o[0] - mx) < 1e-9 && o[1] === r[1] && Math.abs(o[2] - r[2]) < 1e-9), `line ${r} has its mirror across the net`);
-  }
-  // Doubles sidelines along the top and bottom walls, below the crowd; singles inside them.
-  const ys = [...new Set(horizontal.filter((r) => r[2] > 400).map((r) => r[1]))].sort((a, b) => a - b);
-  assert.strictEqual(ys.length, 4, `doubles and singles sidelines (${ys})`);
-  assert.ok(ys[0] >= 84 && ys[3] < 596, 'between the crowd and the bottom wall');
-  // The centre service line runs from each service line to the net, halfway between the singles lines.
-  const centre = horizontal.filter((r) => r[2] < 400 && r[2] > 100);
-  assert.strictEqual(centre.length, 2, 'a centre service line each side');
-  for (const r of centre) assert.ok(Math.abs(r[1] - (ys[1] + ys[2]) / 2) < 5, 'halfway between the singles sidelines');
+  const lines = look.tableLines();
+  assert.strictEqual(lines.length, 1, 'one line: the centre line; baselines, service lines, sidelines and marks painted out');
+  const [x, y, w, h] = lines[0];
+  assert.strictEqual(x, g.left.x, 'it starts at the left end, the left paddle\'s outer face (x 32)');
+  assert.strictEqual(x + w, g.right.x + g.right.w, 'and ends at the right end, the right paddle\'s outer face (x 768)');
+  assert.ok(Math.abs(y + h / 2 - 300) < 1e-9, 'on y 300');
+  assert.ok(calls.some((c) => c[0] === lineInk && c[1] === x && c[2] === y && c[3] === w && c[4] === h), 'and it is drawn');
+  // The border's shaded inner edge and the band's rule share the grey; they sit at the top and bottom.
+  assert.strictEqual(calls.filter((c) => c[0] === lineInk && c[3] > 400 && c[2] > 60 && c[2] < 580).length, 1,
+    'no other long line in that grey across the table');
+});
+
+test('the table\'s ends are at the paddles\' outer faces, with the floor past them and a wood handle off each bat (item 1267)', () => {
+  const look = R.eraLook(2);
+  const g = midRally();
+  const calls = frame(g);
+  const white = look.nesPalette[0x30];
+  const ends = calls.filter((c) => c[0] === white && c[4] === 600 && c[3] <= 4);
+  assert.strictEqual(ends.length, 2, 'two white end lines, full height');
+  assert.ok(ends[0][1] + 8 === look.table.left && ends[1][1] + ends[1][3] - 8 === look.table.right,
+    `the end lines sit just past x 32 and 768 (${ends.map((c) => c[1])})`);
+  assert.ok(!calls.some((c) => c[0] === white && c[4] === 600 && (c[1] === 0 || c[1] === 796)), 'the old screen-edge verticals are gone');
+  // (the rig's figures may use the same ochre; a handle is 3 NES pixels by 2)
+  const wood = calls.filter((c) => c[0] === look.wood && Math.abs(c[3] - 3 * 800 / 256) < 1e-9);
+  assert.strictEqual(wood.length, 2, 'one handle a bat');
+  const [lh, rh] = wood[0][1] < 400 ? wood : [wood[1], wood[0]];
+  assert.ok(lh[1] + lh[3] <= g.left.x + 1 && lh[1] < g.left.x, 'the left handle comes off the outer face, into the player\'s room');
+  assert.ok(rh[1] >= g.right.x + g.right.w - 1, 'the right handle likewise');
+  assert.ok(Math.abs(lh[2] + lh[4] / 2 - (g.left.y + g.left.h / 2)) <= 1, 'at the paddle\'s middle');
 });
 
 test('with the art decoded, the court and the ball are one drawImage each: court first, ball exactly on its box and last', () => {
@@ -186,13 +189,10 @@ test('with the art decoded, the court and the ball are one drawImage each: court
   assert.deepStrictEqual(court, [['image:court', 0, 4, 800, 592]], '200x148 at 4 units a pixel, centred under the border');
   assert.deepStrictEqual(ball, [['image:ball', Math.round(g.ball.x), Math.round(g.ball.y), g.ball.size, g.ball.size]]);
   assert.strictEqual(calls.findIndex((c) => c[0] === 'image:court'), 1, 'the court goes down straight after its base fill');
-  // Nothing is drawn over the ball but its own seam: one pale-yellow NES pixel
-  // inside its box (item 1225, the tennis ball).
-  assert.deepStrictEqual(calls[calls.length - 2], ball[0], 'the ball is drawn last but for its seam');
-  const seam = calls[calls.length - 1];
-  assert.strictEqual(seam[0], R.eraLook(2).nesPalette[0x38], 'the seam is $38');
-  assert.ok(seam[1] >= g.ball.x && seam[2] >= g.ball.y && seam[1] + seam[3] <= g.ball.x + g.ball.size + 1 &&
-    seam[2] + seam[4] <= g.ball.y + g.ball.size + 1, 'inside the ball');
+  // Nothing is drawn over the ball: item 1225's seam pixel went with the
+  // tennis lines (item 1267), so the table tennis ball is drawn last.
+  assert.deepStrictEqual(calls[calls.length - 1], ball[0], 'the ball is drawn last');
+  assert.ok(!calls.some((c) => c[0] === R.eraLook(2).nesPalette[0x38]), 'no $38 seam');
   const mortar = calls.filter(([i, , , w, h]) => i === '#000000' && (w === 800 || h === 600));
   assert.strictEqual(mortar.length, 0, 'the hand-drawn tiles give way to the generated court');
 });

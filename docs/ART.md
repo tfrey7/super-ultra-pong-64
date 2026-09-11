@@ -159,6 +159,30 @@ Anything a page does not list is drawn in code.
 - **The 2D eras' images are drawn with `drawImage` only once decoded**, with a hand-drawn stand-in
   until then and always under `node --test` (the era 3 file is the worked example).
 
+### 5a. What draws what: canvas 2D, and one 3D library for the 3D eras' field (item 1273)
+
+**Eras 5 to 10 draw their field through the checked-in 3D library; everything else stays canvas
+2D.** The library is three.js, bundled once into one plain script, `vendor/three.js`
+(`window.THREE`, with its glTF loader and skeleton utilities for the model cards that follow).
+The game gains no build step, no modules and no network at play time. `src/field3d.js` renders the
+table, its centre line, the net, the two bats, the ball and its contact shadow, lit by one light,
+onto a WebGL canvas of its own. That picture is copied into the era's frame with one `drawImage` at
+the exact place `src/table3d.js` painted the table: it uses the same camera numbers and the same
+field-to-screen mapping, and a test pins that. So each era's painted arena behind the table, its HUD
+and effects in front, the display, the CRT and TV overlays, the ring wipes and eras 0 to 4 are
+untouched. Play still never changes (rule 1): the paddle rectangle is the hit zone, and the 3D
+draws only what the state says.
+
+- **An era wires its field as `T.field(ctx, cam, tableStyle, state, api)`** in place of
+  `T.table(...)`. When it answers true, the era skips its own paddles, its ball and anything that
+  belongs under them (shadows, reflections).
+- **With no WebGL, `T.field` paints today's canvas table**, and the era draws everything else as
+  before. That covers `?gl=off`, `node --test`, and a browser that refuses a context. The canvas
+  projection and item 1248's polygon players in `src/models3d.js` are that fallback.
+- **Each era's look may carry `render` knobs** for tuning its look later: `resolution`, `filter`,
+  `fog` and `lighting`. The header of `src/field3d.js` lists them. No era sets any yet.
+- The lessons page for the layer is [docs/lessons/3d-layer.md](lessons/3d-layer.md).
+
 ---
 
 ## The realism ladder: from Atari pong to table tennis (item 1265)
