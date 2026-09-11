@@ -61,9 +61,9 @@ test('it reads the state without writing it, and the white ball is the last fill
   assert.strictEqual(fills[fills.length - 1].style, '#ffffff');
 });
 
-test('the light orbits the table every 9 seconds, 520 units up', () => {
+test('the light orbits the table every 9 seconds, 160 units up (low, so the shadows read)', () => {
   const at = (t) => X.lightAt(t);
-  assert.deepStrictEqual(at(0), { x: 700, y: 300, z: 520 });
+  assert.deepStrictEqual(at(0), { x: 700, y: 300, z: 160 });
   const q = at(2.25);
   assert.ok(Math.abs(q.x - 400) < 1e-9 && Math.abs(q.y - 480) < 1e-9);
   const lap = at(9);

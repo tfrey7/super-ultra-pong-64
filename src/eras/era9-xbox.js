@@ -39,7 +39,11 @@
 
   var PADDLE_Z = 24;                     // R6: 28 or less
   var STRIPS = 12;
-  var LIGHT = { cx: 400, rx: 300, cy: 300, ry: 180, z: 520, period: 9 };
+  // The bible puts the light 520 up. Measured in the first screenshot, that
+  // casts a paddle's top only ~15 units past its footprint and the ball ~4:
+  // invisible. At 160 a paddle's shadow reaches ~57 units and the ball's ~15,
+  // so the hard shadows read at a glance, still at 0.45 over true footprints (R5).
+  var LIGHT = { cx: 400, rx: 300, cy: 300, ry: 180, z: 160, period: 9 };
   var SHADOW_ALPHA = 0.45;               // R5: lighter than the 0.55 contact shadow
   var POOL = { radius: 160, alpha: 0.35, tileAlpha: 0.6 };
   var TAGS = { left: 'PONG SLAYER', right: 'CPU 2001' };
