@@ -204,7 +204,7 @@ async function playToScore(s, midX, toClientY) {
     `${gp.rally} hits in the current rally, score ${gp.score.left}-${gp.score.right}`);
   check('the player can score against the computer', gp.score.left > 0,
     `score after ${secs}s of scripted play: player ${gp.score.left}, computer ${gp.score.right}; ` +
-    `${aim.certain} of ${aim.planned} incoming balls had a shot the rules say it cannot return`);
+    `${aim.planned} returns planned against the rules, ${aim.certain} of them beyond every aim it can roll`);
   return { gp, shotTaken };
 }
 
