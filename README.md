@@ -1,5 +1,7 @@
 # Super Ultra Pong 64: Remastered
 
+**Play it live:** https://tfrey7.github.io/super-ultra-pong-64/
+
 A Pong that **evolves while you play it**. You start at the 1972 arcade machine —
 black screen, two white bars, a square ball, a dashed line down the middle — and
 as the session goes on the game grows up through the eras around it: colour,
