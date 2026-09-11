@@ -21,7 +21,7 @@ import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { launchChrome, portTakenWhy, portTakenLine, pickOwnPage } from './chrome.mjs';
+import { launchChrome, refusePortTaken, pickOwnPage } from './chrome.mjs';
 import { CdpConnection, DroppedConnection } from './cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -59,6 +59,9 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 const SCORING_ONLY = process.argv.includes('--scoring');
 // --feel runs only the game-feel rallies (section 9), about a minute.
 const FEEL_ONLY = process.argv.includes('--feel');
+// --match runs only the match's end (section 10, item 1211): ten points in on the
+// Xbox 360, the eleventh, then the finale filmed through to the attract screen.
+const MATCH_ONLY = process.argv.includes('--match');
 // --reference also copies the eleven era frames the walk takes (era0-arcade.png to
 // era10-xbox360.png), and the ten frames it catches mid-change (change-era0-to-era1.png
 // to change-era9-to-era10.png),
@@ -125,7 +128,7 @@ class Session extends CdpConnection {
 class ForeignPage extends Error {}
 
 // Attach only to the page this checkout asked for. The port was free a moment ago
-// (main() checks), but another worker's Chrome can still take it in between, and
+// (launchChrome checks), but another worker's Chrome can still take it in between, and
 // then our Chrome runs with no port at all while the endpoint answers with theirs.
 async function targetUrl(asked) {
   for (let i = 0; i < 60; i++) {
@@ -376,7 +379,9 @@ async function filmChange(s, clip, from) {
     seen = true;
     if (!out.file && m.wiping && m.p >= 0.4) {
       out.p = m.p;
+      const t0 = Date.now();
       out.file = await s.shot(`change-era${from}-to-era${from + 1}`, clip);
+      out.shotMs = Date.now() - t0;
     } else if (!m.wiping) { out.end = m; break; }
     else await sleep(8);
   }
@@ -492,6 +497,9 @@ async function walkLadder(s, baseUrl) {
     const after = await playUntil(s, geo, 15000, outRight ? track : dodge, (x) => points(x) > before);
     moves.push({ from: g.era, to: after.era, scored: points(after) > before,
       score: `${after.score.left}-${after.score.right}` });
+    // The eleventh point ends the match (item 1211): film its finale straight
+    // away, even if a stray point on the way up got it there a rung early.
+    if (after.phase === 'over') break;
     // Below the top, that point started a change: film it while it plays.
     if (rung < eras.length - 1 && points(after) > before) {
       changes.push(Object.assign(await filmChange(s, clip, g.era), { want: outRight ? 'right' : 'left' }));
@@ -524,7 +532,7 @@ async function walkLadder(s, baseUrl) {
   check(`every era change on the climb is filmed: ${eras.length - 1} of them`,
     changes.length === eras.length - 1 && changes.every((c) => c.file),
     changes.map((c) => `era ${c.from} -> ${c.from + 1}: ` +
-      (c.file ? `caught at eased progress ${c.p.toFixed(2)}` : 'not caught mid-ring')).join('; '));
+      (c.file ? `caught at eased progress ${c.p.toFixed(2)} (shot took ${c.shotMs} ms)` : 'not caught mid-ring')).join('; '));
   // Where each ring started: the edge the ball went out of.
   const sideOf = (c) => (!c.end ? 'unseen' : c.end.origin.x >= c.end.width / 2 ? 'right' : 'left');
   const fromRight = changes.filter((c) => sideOf(c) === 'right').length;
@@ -544,12 +552,85 @@ async function walkLadder(s, baseUrl) {
       (d.same ? ' (the two rungs draw the same frame, so only an exact match with the new era is asked)' : ''));
   }
 
+  // That last point was the eleventh: the match is over, and its finale plays.
+  const finale = await filmFinale(s, clip, 'ladder');
+
   if (REFERENCE) {
     mkdirSync(ERA_SHOTS, { recursive: true });
     for (const f of frames) copyFileSync(f.file, path.join(ERA_SHOTS, ERA_NAMES[f.rung] + '.png'));
     for (const c of changes) if (c.file) copyFileSync(c.file, path.join(ERA_SHOTS, path.basename(c.file)));
   }
-  return [...frames.map((f) => f.file), ...changes.filter((c) => c.file).map((c) => c.file)];
+  return [...frames.map((f) => f.file), ...changes.filter((c) => c.file).map((c) => c.file), ...finale];
+}
+
+/**
+ * 10. The match's end (src/match.js, item 1211). Called the moment the eleventh
+ * point has gone in: the game is 'over' with a winner, the announcement holds
+ * the 360, the rewind walks the era down one rung a half second -- a frame is
+ * taken with the ring shrinking midway down -- then the 1972 thanks screen is
+ * filmed, and the machine goes back to the attract screen on its own.
+ */
+async function filmFinale(s, clip, tag) {
+  const shots = [];
+  const over = await s.eval(`(() => { const g = window.__pong, M = window.PongMatch;
+    const f = M && M.finale(g); return { phase: g.phase, winner: g.winner, era: g.era,
+      score: g.score.left + '-' + g.score.right, stage: f && f.stage, total: g.rules.matchPoints }; })()`);
+  check(`the eleventh point ends the match on the Xbox 360 (${tag})`,
+    over.phase === 'over' && over.era === 10 && (over.winner === 'left' || over.winner === 'right') && over.stage === 'announce',
+    `phase ${over.phase}, era ${over.era}, score ${over.score}, winner ${over.winner}, finale ${over.stage}`);
+  if (over.phase !== 'over') return shots;
+  await sleep(1400);
+  shots.push(await s.shot(`finale-announce-${tag}`, clip));
+  // Midway down the ladder, with the ring part-way closed.
+  const seen = [];
+  let mid = null;
+  const until = Date.now() + 12000;
+  while (Date.now() < until) {
+    const f = await s.eval(`(() => { const g = window.__pong, f = window.PongMatch.finale(g);
+      return f ? { stage: f.stage, era: g.era, from: f.from, raw: f.raw } : { stage: g.phase }; })()`);
+    if (f.stage === 'rewind' && seen[seen.length - 1] !== f.era) seen.push(f.era);
+    if (!mid && f.stage === 'rewind' && f.from <= 6 && f.raw > 0.3 && f.raw < 0.7) {
+      mid = f;
+      shots.push(await s.shot(`finale-rewind-${tag}`, clip));
+    }
+    if (f.stage === 'thanks') break;
+    await sleep(40);
+  }
+  check(`the rewind walks the eras back down to the arcade (${tag})`,
+    seen.length >= 6 && seen[seen.length - 1] === 0 && seen.every((e, i) => i === 0 || e < seen[i - 1]),
+    `eras seen on the way down: ${seen.join(', ')}`);
+  check(`a frame of the rewind is caught mid-ring (${tag})`, !!mid,
+    mid ? `the ${mid.from} shrinking to ${mid.from - 1} at ${(mid.raw * 100).toFixed(0)}%` : 'never caught');
+  await sleep(1500);
+  const th = await s.eval(`(() => { const g = window.__pong, f = window.PongMatch.finale(g);
+    return { stage: f && f.stage, era: g.era }; })()`);
+  shots.push(await s.shot(`finale-thanks-${tag}`, clip));
+  check(`the 1972 screen thanks the player (${tag})`, th.stage === 'thanks' && th.era === 0,
+    `finale ${th.stage}, era ${th.era}`);
+  let phase = null;
+  for (let i = 0; i < 100 && phase !== 'title'; i++) { await sleep(100); phase = (await state(s)).phase; }
+  check(`and then the machine is back on the attract screen (${tag})`, phase === 'title', `phase ${phase}`);
+  return shots;
+}
+
+/** --match: open on the 360 ten points in, let the eleventh through, film the finale. */
+async function matchEnd(s, baseUrl) {
+  await s.send('Page.navigate', { url: baseUrl + '?era=10' });
+  await sleep(1200);
+  const geo = await geometry(s);
+  const clip = { x: geo.left, y: geo.top, width: geo.width, height: geo.height };
+  // As if the match had climbed from the arcade (startEra 0), so the thanks
+  // screen counts the eleven eras a real match visits; the ladder walk plays one.
+  await s.eval(`(() => { const g = window.__pong; g.score.left = 6; g.score.right = 4; g.serveDelay = 1.2; })()`);
+  await sleep(300);
+  const mp = await s.eval('window.Pong.isMatchPoint(window.__pong) && window.PongMatch.overlays(window.__pong)');
+  const plate = await s.shot('finale-matchpoint', clip);
+  check('ten points in, the next point is match point and MATCH POINT is up', mp === true, `isMatchPoint and the plate: ${mp}`);
+  // The player's point: the ball just past the computer's paddle, heading out.
+  await s.eval(`(() => { const g = window.__pong, r = g.right; g.serveDelay = 0; g.startEra = 0;
+    g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0; })()`);
+  for (let i = 0; i < 60 && (await state(s)).phase === 'playing'; i++) await sleep(50);
+  return [plate, ...await filmFinale(s, clip, 'match')];
 }
 
 /**
@@ -649,15 +730,6 @@ function summarise(shots) {
 }
 
 async function main() {
-  // Refuse a port that is already listening, before Chrome is even started: a
-  // Chrome that cannot bind it runs on without one, and the endpoint on that
-  // number belongs to whoever holds it (item 1215).
-  const taken = await portTakenWhy(PORT);
-  if (taken) {
-    console.error(portTakenLine(PORT, taken));
-    process.exitCode = 2;
-    return;
-  }
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
   const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') +
     // ?era=N alone opens straight into play (item 1207); title=on keeps the
@@ -666,7 +738,7 @@ async function main() {
   // The profile is a fresh folder under the temp directory, deleted when Chrome
   // exits -- on success, on an error and on Ctrl+C (tools/chrome.mjs, item 1169) --
   // so two playtests on two ports never share one and none is left behind.
-  const chrome = launchChrome(CHROME, [
+  const chrome = await launchChrome(CHROME, [
     // --mute-audio: the audio graph still runs and is still checked, but a
     // playtest never beeps through the speakers of the machine it runs on.
     // --allow-file-access-from-files: the page is opened off disk, where Chrome
@@ -678,7 +750,10 @@ async function main() {
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
     '--no-first-run', '--no-default-browser-check',
     url
-  ], { name: 'playtest' });
+    // A port somebody already holds is refused in one line, exit 2, before anything is
+    // started: a Chrome that cannot bind it runs on without one, and the endpoint on
+    // that number belongs to whoever holds it (items 1215, 1220).
+  ], { name: 'playtest' }).catch(refusePortTaken);
   // Named up front so a run that loses Chrome can say which process it was.
   console.log(`chrome: pid ${chrome.pid}, DevTools port ${PORT}`);
 
@@ -710,6 +785,7 @@ async function main() {
     await sleep(400);
     if (LADDER_ONLY) return summarise(await walkLadder(s, url.split('?')[0]));
     if (FEEL_ONLY) return summarise(await feelRallies(s, url.split('?')[0]));
+    if (MATCH_ONLY) return summarise(await matchEnd(s, url.split('?')[0]));
 
     const geo = await geometry(s);
     const g0 = await state(s);

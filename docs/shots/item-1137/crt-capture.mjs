@@ -18,7 +18,7 @@
  * this file. Chrome runs muted.
  */
 import { writeFileSync, existsSync } from 'node:fs';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -115,11 +115,11 @@ async function timeRing(s) {
 async function main() {
   const url = pathToFileURL(path.join(ROOT, 'index.html')).href;
   // A fresh profile folder, deleted when Chrome exits (tools/chrome.mjs, item 1169).
-  const chrome = launchChrome(CHROME, [
+  const chrome = await launchChrome(CHROME, [
     '--headless=new', `--remote-debugging-port=${PORT}`,
     '--mute-audio', '--autoplay-policy=no-user-gesture-required', '--window-size=1000,750',
     '--no-first-run', '--no-default-browser-check', url
-  ], { name: 'crt' });
+  ], { name: 'crt' }).catch(refusePortTaken);
   const out = { root: ROOT, url, chromePid: chrome.pid };
   let ws;
   try {

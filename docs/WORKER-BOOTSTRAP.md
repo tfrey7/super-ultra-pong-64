@@ -12,7 +12,11 @@ Every point either side scores moves the machine **up one era** -- 0 the 1972 ar
 1 the 1977 Atari 2600 (the turn to colour), 2 the NES, 3 the Genesis, 4 the Super Nintendo, then
 the 3D table: 5 the PlayStation, 6 the Nintendo 64, 7 the Dreamcast, 8 the PlayStation 2, 9 the
 Xbox and 10 the 2005 Xbox 360, where it stops. It does not matter which side scored, so a match's
-tenth point lands on era 10 and every point after that leaves it there. **All eleven rungs are
+tenth point lands on era 10, and the **eleventh, scored there, ends the match** (item 1211: a match
+is eleven points, `RULES.matchPoints`; the rules go to phase `'over'` with `winner`, and
+`src/match.js` plays MATCH POINT, the 360-style result, the rewind down every era and the 1972
+thanks screen, then `Pong.backToTitle`). A game with `matchPoints: 0` never ends -- the attract
+rally's rules, and a test that wants points to go on past eleven. **All eleven rungs are
 built** -- each has its own look, its own voice and a change moment -- and the README's *The era
 ladder* tables them, with a tracked reference frame of each in `docs/shots/eras/`. Eras 5 to 10
 are specified in `docs/ERAS.md`, the era bible. It opens on a **title screen** -- a real `phase` in
@@ -101,7 +105,10 @@ timing over the ring, against ordinary play just before it) with the paddle stil
 saving `era-wipe.png` mid-ring -- and, last, it **walks one match up the whole ladder**: a fresh
 era-0 machine, one point let through per rung, a check that each point moved it up exactly one era,
 a screenshot of each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to
-`ladder-era10-xbox360.png`, cropped to the field) and one more point to prove it stops on era 10.
+`ladder-era10-xbox360.png`, cropped to the field) and one more point to prove it stops on era 10 --
+which is the eleventh, so it ends the match, and the walk films the finale to the attract screen
+(`finale-announce-ladder.png`, `finale-rewind-ladder.png`, `finale-thanks-ladder.png`; `--match`
+runs only that, from ten points in on the 360, in about twenty seconds).
 On the way up it **films each of the ten era changes**: a frame caught mid-ring
 (`change-era0-to-era1.png` to `change-era9-to-era10.png`), a check that the ring's radius reached
 the farthest corner from where the ball went out, and a check that once the ring has gone the live
@@ -246,24 +253,31 @@ his emulator — never touch either.**
   era's own hook, not that the others have none.
 - **The first ring on a cold page used to have one long frame** (about 100-120 ms). It was the
   ring engine's, not a flourish's (item 1140 proved it by A/B), and item 1203 removed it; section
-  8a says why, and what to reach for if a long frame comes back.
+  8a says why, and what to reach for if a long frame comes back. Item 1218 removed the next one,
+  the Super Nintendo tilt's 13-25 ms frame at raw 0.12, the same way.
 - **Start Chrome only through `tools/chrome.mjs`, never with a hand-built `--user-data-dir`.** A
   capture script that spawns Chrome itself leaves its profile behind -- about 18 MB a run, and on
   2026-09-10 the flourish cards' scripts left more than forty such folders in `G:/claude-tmp` (item
-  1169). `launchChrome(chromePath, flags, { name })` makes a fresh folder per launch and deletes it
-  when Chrome exits: when the script ends, on an uncaught error, on `process.exit` and on Ctrl+C.
-  Pass your flags as before, minus the profile (it refuses one), and end with `await chrome.close()`
-  in a `finally`. The playtest and every capture script under `docs/` already do. What it cannot
+  1169). `await launchChrome(chromePath, flags, { name }).catch(refusePortTaken)` makes a fresh
+  folder per launch and deletes it when Chrome exits: when the script ends, on an uncaught error, on
+  `process.exit` and on Ctrl+C. It is async (item 1220), so a launch without `await` hands you a
+  promise with no `close` on it. Pass your flags as before, minus the profile (it refuses one), and
+  end with `await chrome.close()` in a `finally`. The playtest and every capture script under `docs/` already do. What it cannot
   cover is the script itself being killed outright (Task Manager, `taskkill /F`): nothing runs
   then, and that one folder stays.
 - **Two playtests on one `--port` used to drive each other's game** (item 1215). A Chrome that
   cannot bind its debugging port starts anyway, with none, and the harness then attached to the
   Chrome that held the number: on 2026-09-10 item 1181's run on 9341 spent a minute clicking item
-  1205's page and reported 16/21 checks that measured the wrong game. Since item 1215 the playtest
-  checks the port before it launches anything -- `playtest: port N is already in use ... pick another
-  with --port <n>`, exit 2 -- and after launch attaches only to its own checkout's `index.html`. On
-  that line, pick another port and run again; it is not a failed check. A capture script of your own
-  should do the same: `portTakenWhy(port)` and `pickOwnPage(targets, url)` in `tools/chrome.mjs`.
+  1205's page and reported 16/21 checks that measured the wrong game. Since item 1220 the refusal is
+  in `launchChrome` itself, so it covers **every script that starts Chrome through it** -- the
+  playtest and every measurement and capture script under `docs/` alike: a `--remote-debugging-port`
+  something already listens on is refused before any folder is made or any process started, in one
+  line named for the launch -- `playtest: port N is already in use ... pick another with --port <n>
+  -- nothing was launched` (or `item1203: port N ...` from the trace script), exit 2. On that line,
+  pick another port and run again; it is not a failed check. A new script gets it by hanging
+  `.catch(refusePortTaken)` on its `await launchChrome(...)`; without the catch the refusal is an
+  ordinary thrown error, which still starts nothing. After launch the playtest also attaches only
+  to its own checkout's `index.html` (`pickOwnPage(targets, url)` in `tools/chrome.mjs`).
 - **Proof paths in a report must survive the landing.** The integrator deletes your worktree, so
   a picture cited at `G:/Claude Stuff/super-ultra-pong-64-<name>/...` is a dead link the moment the
   branch lands (item 1138). Cite the path the file will have in the main checkout.
@@ -331,10 +345,11 @@ his emulator — never touch either.**
   ms. A frame check on those eras has to compare against the era itself, not 16.7 ms -- and a
   switch that takes a layer out must leave the loop running (item 1205's first A/B threw every
   frame, killed the game loop and timed an idle page at a perfect 16.7 ms).
-- **Two playtests on one `--port` share one Chrome.** The harness does not refuse a port already
-  listening, so a second run attaches to the first run's page and drives it (item 1181 did, to
-  item 1205's, around 22:25 EDT on 2026-09-10): odd FAILs such as "Inspected target navigated or
-  closed" or a dropped connection early in a run can be the other run. Pick an unusual port.
+- **Two playtests on one `--port` used to share one Chrome** (item 1181 drove item 1205's page
+  around 22:25 EDT on 2026-09-10, with odd FAILs such as "Inspected target navigated or closed" or
+  a dropped connection early in the run). That can no longer happen through `tools/chrome.mjs`: the
+  second launch is refused in one line before it starts anything (items 1215 and 1220, the port
+  trap above). If you see those FAILs now, look for a script that spawns Chrome by hand.
 - **An era's `ctx.canvas` is not the page's canvas, and not always 800 x 600** (item 1198). The
   display (`src/display.js`) hands eras 0-4 a field-sized offscreen canvas, sampled down to the
   machine's pixels afterwards, and eras 5-10 the native one itself (320 x 240 and up) with a
@@ -344,6 +359,12 @@ his emulator — never touch either.**
   worked example). `index.html?display=off` draws straight onto the page as before, and the
   playtest's pixel check reads the native frame through `PongDisplay.canvas()` and draws its
   comparisons through `PongDisplay.render()`.
+- **A screen overlay blends on the native picture, never on the page** (item 1200). The playtest's
+  Chrome draws without a GPU, and `'lighten'`, `'color'` or `'soft-light'` over the page's million
+  pixels, seven times a frame, held eras 5-10 to 10-20 frames a second. `src/display-tv.js` does
+  every blend on a copy of the native picture and gives the page two plain draws, scaled with
+  `imageSmoothingQuality = 'low'` (`'high'` alone cost about 20 ms a frame there). Measure a new
+  overlay with the ladder's "holds full frame rate" lines, screens on against `overlay: 'none'`.
 
 - **Six "holds full frame rate in ordinary play" FAILs, eras 5 to 10, are card 1216's, not yours**
   (until 1216 lands). The playtest's Chrome runs `--disable-gpu`, so every canvas is drawn on the
@@ -384,6 +405,13 @@ Item 1203 traced 100-117 ms of shader compiles there, for era looks nothing had 
   `--timing` times the ring with no trace (tracing slows every frame), `--from-load` records from
   before the page loads (the warm-up's own work), and `--skia` names each GPU program built.
 - **Commit one or two representative traces, not one per leg**: each is 1-2 MB gzipped.
+- **A flourish that draws something no ring has drawn before brings a hitch back** as a GPU
+  program built mid-ring (item 1218: the Super Nintendo tilt's first turned strip, 13-25 ms at raw
+  0.12 on 15 of 20 cold legs). A/B with the flourish off first -- item 1218's copy of the recorder,
+  `docs/measure/item-1218/trace.mjs`, takes `--no-flourish` and `--at-raw <r>` -- then add a
+  matching draw to `warmUp`. **Draw it on one of the ring's layers and copy that layer onto the
+  canvas**: a draw made straight onto the canvas during the warm-up is thrown away unpainted by the
+  clear that ends it, and two tries that did that changed nothing (8 of 8 and 6 of 8 legs still long).
 
 ## 9. Talk in the room as you go (item 1170)
 

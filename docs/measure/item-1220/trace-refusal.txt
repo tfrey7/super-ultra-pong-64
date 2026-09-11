@@ -1,0 +1,20 @@
+Item 1220: docs/measure/item-1203/trace.mjs --timing --runs 1, run for real on 2026-09-10 at about 22:49 EDT.
+
+Port 9471 held by a real headless Chrome (pid 22112, started through tools/chrome.mjs by a stand-in
+script, answering /json/version with 200 before and after the run):
+
+  > node docs/measure/item-1203/trace.mjs --timing --runs 1 --port 9471 --label refused1220
+  item1203: port 9471 is already in use by another program (probably another worker's Chrome; cannot listen on 127.0.0.1:9471: EADDRINUSE); pick another with --port <n> -- nothing was launched
+  exit=2
+  refused1220.json written: False
+  item1203 profile folders in G:/claude-tmp before/after: 0 / 0
+  git status: [] (clean)
+
+Port 9472, free:
+
+  > node docs/measure/item-1203/trace.mjs --timing --runs 1 --port 9472 --label free1220
+  leg 1: ring 299 frames, median 4.2 ms, max 16.7 ms, over 3x median: 12.6 ms at raw 0.117, 16.7 ms at raw 0.5
+  wrote ...\docs\measure\item-1203\free1220.json
+  exit=0
+
+That record is trace-free-port.json beside this file (moved here so item 1203's folder keeps only its own data).

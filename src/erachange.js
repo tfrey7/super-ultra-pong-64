@@ -341,6 +341,7 @@
             { from: k - 1, era: k, origin: origin, radius: fracs[f] * reach }, cardStyle(k));
         }
       }
+      warmTurnedPicture(ctx);
     } catch (e) {
       // A warm-up is only ever an optimisation: never let it stop the page.
     } finally {
@@ -348,6 +349,52 @@
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.restore();
     }
+  }
+
+  /**
+   * A copy of the canvas drawn TURNED -- rotated, scaled and faded, through a
+   * thin strip of clip -- the way an arrival flourish moves the picture the ring
+   * composited (the Super Nintendo's Mode 7 tilt draws its field as seventy-odd
+   * such strips). None of the ring's own draws turn a picture, so the first ring
+   * whose flourish did built that GPU program in its first turned frame: a
+   * 13-25 ms frame at raw progress 0.12 of the change to era 4 on 15 of 20 fresh
+   * pages, 24-30 ms under trace, all of it one D3D shader compile
+   * (docs/measure/item-1218/). One small draw of each kind here pays it at load.
+   * A layer canvas is the picture, so it is the same kind of image a flourish copies.
+   */
+  function warmTurnedPicture(ctx) {
+    var pic = layers[0], into = layers[1];
+    if (!pic || !into) return;
+    var x = into.getContext('2d');
+    if (!x || typeof x.transform !== 'function') return;
+    var W = into.width, H = into.height;
+    var m = [0.62, 0.21, -0.35, 0.44, 0.225 * W, 0.233 * H];
+    // Each strip is placed across a corner of the turned picture. That matters:
+    // a strip the picture crosses edge to edge is cropped on the CPU into one
+    // plain quad and builds nothing new; only a strip with a corner of the
+    // picture inside it needs the textured, clipped program the receding field does.
+    var strips = [[m[5], 1], [m[1] * W + m[5], 0.7]];
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.clearRect(0, 0, W, H);
+    for (var i = 0; i < strips.length; i++) {
+      x.save();
+      x.beginPath();
+      x.rect(0, strips[i][0] - 3.5, W, 7.4);
+      x.clip();
+      x.globalAlpha = strips[i][1];
+      x.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      x.drawImage(pic, 0, 0, pic.width, pic.height, 0, 0, W, H);
+      x.restore();
+    }
+    // Drawn on a layer, then that layer copied once onto the canvas: the copy is
+    // what makes Chrome rasterise the layer's draws. Draws made straight onto the
+    // canvas would be thrown away unrasterised by the clear that ends the
+    // warm-up -- which is why the first attempt, drawing there, changed nothing
+    // (docs/measure/item-1218/timing-turned.json, timing-corner.json).
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(into, 0, 0);
+    ctx.restore();
   }
 
   /**
@@ -378,6 +425,7 @@
   R.ERA_CHANGE = {
     wipe: WIPE_S, edgePad: EDGE_PAD, styles: STYLES,
     wipeProgress: wipeProgress, easeWipe: easeWipe,
-    ringReach: ringReach, ringRadius: ringRadius, wipeOrigin: wipeOrigin
+    ringReach: ringReach, ringRadius: ringRadius, wipeOrigin: wipeOrigin,
+    composite: composite   // the finale's rewind (src/match.js) runs the ring backwards
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

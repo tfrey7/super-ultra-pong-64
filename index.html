@@ -77,6 +77,9 @@
   <script src="src/eras/era8-ps2.js"></script>
   <script src="src/eras/era9-xbox.js"></script>
   <script src="src/eras/era10-xbox360.js"></script>
+  <!-- The players who hold the paddles, from era 1 up (item 1223): wraps the
+       renderer's draw, reads the state and its events, writes nothing. -->
+  <script src="src/characters.js"></script>
   <!-- Every era's signboard -- the name card the ring brings in, lettered in
        that machine's own style -- which the era change looks up by rung. -->
   <script src="src/signboards.js"></script>
@@ -85,6 +88,8 @@
   <!-- Game feel -- hit-stop, shake, squash, trail, the rally counter -- whose
        amount climbs with the era. -->
   <script src="src/feel.js"></script>
+  <!-- The match's end: MATCH POINT, the winner, the rewind and the thanks. -->
+  <script src="src/match.js"></script>
   <!-- The voice: every era's notes, synthesised on the page, silent until the
        first click or key. -->
   <script src="src/sound.js"></script>

@@ -56,6 +56,22 @@ with the coin, not while the tube warms up.)
   one curved smash, frame by frame, its path traced in red on the last frame.
 - A point scores when the ball leaves either side, and the next serve starts from
   the centre after a short pause. The score is drawn across the top.
+- **A match is eleven points, one per era** (item 1211, `src/match.js`). Every
+  point moves the machine up a rung, so the tenth lands on the Xbox 360, and
+  **MATCH POINT** is lettered under its name plate while the eleventh waits to be
+  served; the slow motion of the game-feel layer plays on it. The eleventh ends
+  the match, and the higher score wins (eleven is odd, so there is no tie). The
+  360 announces it its own way: YOU WIN with an Achievement Unlocked, or YOU LOSE
+  with a message from the computer's gamertag. Then the tape **rewinds**: every
+  machine you climbed through shrinks away inside a closing ring to the one
+  before it, half a second a rung, the soundtrack stepping down with it, from the
+  360 to the arcade -- ending on the 1972 screen with THANKS FOR PLAYING, the
+  final score and the eras visited, and then INSERT COIN again. Pictures:
+  [match point](docs/shots/item1211/matchpoint.png),
+  [a win](docs/shots/item1211/announce-win.png),
+  [a loss](docs/shots/item1211/announce-loss.png),
+  [the rewind midway](docs/shots/item1211/rewind-midway.png) and
+  [the thanks](docs/shots/item1211/thanks.png).
 
 **The sound grows up with the machine.** Paddle hits, wall bounces and points
 each play a note made on the page itself, with no audio files: a bare
@@ -298,6 +314,18 @@ them). `src/display-tv.js` is where the TV overlays of eras 5-10 plug in. `index
 straight onto the page as before. All eleven side by side:
 `docs/shots/eras/contact-sheet-native.png` (from
 `docs/measure/item1198/contact-sheet.html`).
+
+**The 3D machines' screens** (`src/display-tv.js`, item 1200). The PlayStation and
+the N64 play on a 1990s TV over composite -- soft scanlines, colour bleeding
+sideways, a touch of blur, and on the PlayStation its 4 x 4 dither in the flat
+shading; the PS2 on a late TV over component, cleaner lines and a faint bloom; the
+Dreamcast and the Xbox sharp, only a faint line structure and a little edge glow;
+the Xbox 360 on a 720p flat panel, no lines, a hint of LCD softness and a slight
+smear behind fast movement. Every layer is a pre-drawn canvas or the frame drawn
+again at low alpha in a mode that only brightens, so the ball stays the brightest,
+sharpest thing on screen. Before and after, each era:
+`docs/shots/item1200/before-after-5-7.png` and `before-after-8-10.png` (from
+`docs/measure/item1200/before-after.html`).
 
 ### Each era change, step by step
 
