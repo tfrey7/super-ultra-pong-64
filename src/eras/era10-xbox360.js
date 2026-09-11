@@ -141,18 +141,25 @@
   }
 
   // ------------------------------------------------------------ the toast
-  var memo = { lastTime: null, total: 0, at: 0, kind: null };
+  var memo = { lastTime: null, total: 0, at: 0, kind: null, changedAt: null };
 
   /**
-   * Which achievement is showing, and how far through its 2.5 s. A frame
-   * that is not the next one after the last this file drew (the first frame
-   * of the era, a new game, a jump in time) is an arrival: WELCOME TO HD,
-   * timed from the era change when there was one. After that every rise in
-   * the score total is a point, and a new point replaces the toast showing.
+   * Which achievement is showing, and how far through its 2.5 s. An arrival
+   * is WELCOME TO HD, timed from the era change when there was one: a new
+   * era change stamped by the rules, or a frame that is not the next one
+   * after the last this file drew (the first frame of the era, a new game, a
+   * jump in time). Keying the arrival off the stamp matters: a page that drew
+   * era 10 a moment ago and is then brought in again by a point would
+   * otherwise read that point's rise as 10G - POINT SCORED. After an arrival
+   * every rise in the score total is a point, and a new point replaces the
+   * toast showing.
    */
   function toastFor(state) {
     var total = state.score.left + state.score.right;
-    var fresh = memo.lastTime === null || state.time < memo.lastTime || state.time - memo.lastTime > 0.5;
+    var changed = state.eraChangedAt || 0;
+    var fresh = memo.lastTime === null || state.time < memo.lastTime || state.time - memo.lastTime > 0.5 ||
+      changed !== memo.changedAt;
+    memo.changedAt = changed;
     if (fresh) {
       var since = state.time - (state.eraChangedAt || 0);
       memo.kind = 'welcome';

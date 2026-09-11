@@ -262,6 +262,16 @@ test('Achievement Unlocked: WELCOME TO HD on arriving, 10G on every point, slidi
   assert.strictEqual(t.text, '50G - WELCOME TO HD');
   assert.ok(Math.abs(t.t - 0.4) < 1e-9);
 
+  // Even when era 10 was on screen a moment before: the playtest's forced
+  // change from 9 to 10 caught the first version of this calling it a point.
+  const again = rally({ time: 250, eraChangedAt: 0 });
+  toast(again);
+  toast(Object.assign(again, { time: 250.1 }));
+  again.score.left += 1;
+  t = toast(Object.assign(again, { time: 250.2, eraChangedAt: 250.2 }));
+  assert.strictEqual(t.text, '50G - WELCOME TO HD', 'a change stamped by the rules is an arrival, not a point');
+  assert.strictEqual(t.t, 0);
+
   // Drawn: a dark rounded card at 0.92 in the top centre, with both lines.
   const ops = frame(rally({ time: 300.5 }));
   const card = ops.find((o) => o.op === 'fill' && o.fill === 'rgba(27,27,27,0.92)');
