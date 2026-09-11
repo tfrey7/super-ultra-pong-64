@@ -122,8 +122,8 @@
       "generationsUsed": 3,
       "seconds": 17.1,
       "pixels": {
-        "width": 32,
-        "height": 32
+        "width": 24,
+        "height": 24
       },
       "bytes": 272,
       "sha256": "283847bfafe01b5db4f7e126ac305e7ac6bf998645c860b1bd3342e345316694",
@@ -161,9 +161,7 @@
             4,
             24,
             24
-          ],
-          "width": 24,
-          "height": 24
+          ]
         }
       }
     },
@@ -190,7 +188,7 @@
       "generationsUsed": 2,
       "seconds": 18.1,
       "pixels": {
-        "width": 16,
+        "width": 12,
         "height": 96
       },
       "bytes": 331,
@@ -229,9 +227,7 @@
             0,
             12,
             96
-          ],
-          "width": 12,
-          "height": 96
+          ]
         }
       }
     }

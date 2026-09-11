@@ -50,7 +50,9 @@ test('balance and cost read as words, the cost of one image off the newest manif
   assert.strictEqual(t.describeCost({ type: 'usd', usd: 0.0125 }), '$0.0125');
   assert.match(t.describeCostOfOne({ images: [] }), /not measured yet/);
   const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets', 'pixellab', 'manifest.json'), 'utf8'));
-  assert.match(t.describeCostOfOne(manifest), /^1 generation \(measured on "test-ball"/);
+  // The newest entry, whichever card added it last (item 1179 added three).
+  const newest = manifest.images[manifest.images.length - 1].name;
+  assert.ok(t.describeCostOfOne(manifest).startsWith(`1 generation (measured on "${newest}"`));
 });
 
 test('a manifest entry records prompt, size, style, date, cost and the exact request', async () => {

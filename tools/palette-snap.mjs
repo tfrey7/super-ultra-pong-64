@@ -12,8 +12,8 @@
  * no half-transparent pixels. The file is rewritten in place as 8-bit RGBA.
  *
  * When the PNG has an entry in the manifest.json beside it (written by
- * tools/pixellab.mjs), that entry is brought up to date: its sha256 and bytes
- * now describe the snapped file, and a `palette` block records the snap and
+ * tools/pixellab.mjs), that entry is brought up to date: its sha256, bytes and
+ * pixels now describe the snapped file, and a `palette` block records the snap and
  * the sha256 of the image pixellab returned, so the whole chain -- the request,
  * then this snap -- reproduces the committed picture. With --trim the image is
  * also cropped to its solid pixels, and the block's `trim` names the box
@@ -205,7 +205,8 @@ export function main(argv, log = console.log) {
       if (entry) {
         const source = entry.palette ? entry.palette.sourceSha256 : entry.sha256;
         entry.palette = { tool: 'tools/palette-snap.mjs', bits, levels: levels(bits), alphaCut, sourceSha256: source };
-        if (box) entry.palette.trim = { box, width: img.width, height: img.height };
+        if (box) entry.palette.trim = { box };
+        entry.pixels = { width: img.width, height: img.height };
         entry.sha256 = sha(png);
         entry.bytes = png.length;
         fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);

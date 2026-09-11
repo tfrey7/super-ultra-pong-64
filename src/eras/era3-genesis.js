@@ -18,9 +18,17 @@
  *    game plays exactly as it did in the eras below.
  *  - A bolder block score with a drop shadow.
  *
- * It paints with fillStyle and fillRect only, like the stock frame, so the
- * recording canvas in tools/eralooks.js can check it headless. A dimmed frame
- * (the attract rally behind the title) is the stock frame, as in every era.
+ *  - Generated pixel art (item 1179): the far plane is a pixellab.ai night
+ *    court, the paddles and the ball are pixellab sprites, all three snapped
+ *    offline to the 512 colours (assets/pixellab/manifest.json says how). They
+ *    are drawn with drawImage only, once each has decoded; until then -- and
+ *    always under node --test, which has no Image -- the hand-drawn pieces
+ *    below stand in, so the look never has a hole.
+ *
+ * The hand-drawn look paints with fillStyle and fillRect only, like the stock
+ * frame, so the recording canvas in tools/eralooks.js can check it headless.
+ * A dimmed frame (the attract rally behind the title) is the stock frame, as
+ * in every era.
  *
  * Arrival flourish: THE SHATTER. The old picture breaks like glass from the
  * spot where the ball went out. The field around that point is cut into a
@@ -185,7 +193,12 @@
   var TRAIL_DT = 0.016;   // seconds of flight between one ghost and the next
   var TRAIL_INK = '146,182,255';
 
-  function drawBall(ctx, state) {
+  /**
+   * The ball: the motion trail and the drop shadow as ever, then the generated
+   * chrome ball (24x24 art drawn at the 12-unit ball, an exact half, so it stays
+   * crisp) when S has it decoded, or the hand-drawn one while it has not.
+   */
+  function drawBall(ctx, state, S) {
     var b = state.ball;
     var s = b.size;
     for (var i = TRAIL; i >= 1; i--) {
@@ -197,6 +210,16 @@
     }
     var q = Math.max(1, Math.round(s / 4));
     ctx.fillStyle = SHADOW;
+    if (S && S.ready(ART.ball)) {
+      // A round ball casts a round shadow: three rects that never overlap (the
+      // shadow is half clear), so the corners are stepped off.
+      ctx.fillRect(b.x + 4 + q, b.y + 4, s - 2 * q, q);
+      ctx.fillRect(b.x + 4, b.y + 4 + q, s, s - 2 * q);
+      ctx.fillRect(b.x + 4 + q, b.y + 4 + s - q, s - 2 * q, q);
+      S.draw(ctx, ART.ball, Math.round(b.x), Math.round(b.y), s, s);
+      return;
+    }
+    if (S) S.load(ART.ball);
     ctx.fillRect(b.x + 4, b.y + 4, s, s);
     ctx.fillStyle = '#b6b6db';
     ctx.fillRect(b.x, b.y, s, s);
