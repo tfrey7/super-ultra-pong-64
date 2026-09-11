@@ -383,11 +383,256 @@
     ctx.restore();
   }
 
+  // ------------------------------------------------------------ the arrival
+  /*
+   * THE PLAYSTATION 2 ARRIVES (docs/ERAS.md chapter 9, "Arrival flourish";
+   * item 1154), on the ring the engine grows from the miss. Three beats on the
+   * eased progress p:
+   *
+   *   1. ignition, p 0 to 0.25: the letterbox bars slide in from the top and
+   *      the bottom (0 to 70 pixels), and inside the ring the old machine's
+   *      colour drains -- a 'saturation' fill of grey, rising to 0.8.
+   *   2. the edge, p 0.25 to 0.8: the boot towers. 18 translucent columns of
+   *      flare blue stand on the ring's edge, 10 pixels wide and 40 to 140 tall
+   *      (seeded), each rising over 0.15 of p, staggered by its angle: they fan
+   *      across the half of the ring that faces the field and come up from the
+   *      middle outward, one after another, as the ring carries them out.
+   *      Each throws three sparks as it lights; dust spills outward from the
+   *      edge; and just inside the edge a band of grey drains the old colour, so
+   *      the picture cross-fades through the ring into the moody palette.
+   *   3. arrival, p 0.8 to 1: the flare sweeps from the miss to its resting
+   *      place behind the far rail, its ghosts stretching along, and the bars
+   *      settle from 70 to the era's own 52.
+   *
+   * It draws, and nothing else: its whole picture is planFor(), a pure function
+   * of p, the origin, the ring's radius and the game clock, so a frame drawn
+   * twice is the same frame. It never sounds a note -- the boot sting is the
+   * voice's `boot` list below, which the sound player plays in place of the
+   * point's `score` (item 1162). Nothing strays more than 60 pixels past the
+   * ring (the towers are shortened where they would) except the bars, which the
+   * storyboard puts across the whole frame: they sit where the era's own bars
+   * will, and the ball is hidden in the serve pause.
+   */
+  var ARRIVAL = {
+    ignite: 0.25, edge: 0.8,
+    bars: { from: 0, peak: 70, rest: BAR },
+    drain: { peak: 0.8, band: 90 },
+    towers: { count: 18, width: 10, hMin: 40, hMax: 140, rise: 0.15, alpha: 0.5, core: 2, coreAlpha: 0.75, fan: 160, reach: 60 },
+    motes: { count: 28, spill: 50, size: 2 },
+    sparks: { each: 3, life: 0.08, reach: 34 }
+  };
+
+  // The towers fan across the half of the ring that faces the field (the miss
+  // is always at a side wall, so the other half is off the screen): `offset` is
+  // each one's angle from the line toward the field's centre, and `order` its
+  // turn to rise -- the middle first, then outward both ways.
+  var TOWERS = (function () {
+    var rnd = lcg(8154);
+    var out = [];
+    var n = ARRIVAL.towers.count;
+    var fan = ARRIVAL.towers.fan * Math.PI / 180;
+    for (var i = 0; i < n; i++) {
+      var u = n > 1 ? i / (n - 1) : 0.5;
+      out.push({
+        offset: (u - 0.5) * fan + (rnd() - 0.5) * 0.06,
+        order: Math.abs(u - 0.5) * 2,
+        height: ARRIVAL.towers.hMin + rnd() * (ARRIVAL.towers.hMax - ARRIVAL.towers.hMin),
+        spark: rnd() * Math.PI * 2
+      });
+    }
+    return out;
+  })();
+
+  var SPILL = (function () {
+    var rnd = lcg(8155);
+    var out = [];
+    for (var i = 0; i < ARRIVAL.motes.count; i++) {
+      out.push({ angle: rnd() * Math.PI * 2, born: ARRIVAL.ignite + rnd() * 0.45, speed: 0.6 + rnd() * 0.4 });
+    }
+    return out;
+  })();
+
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function easeOut(k) { return 1 - Math.pow(1 - k, 3); }
+  function easeInOut(k) { return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; }
+
+  /** How tall a column standing at `base` may be and still end within `reach` of the ring. */
+  function capHeight(bx, by, o, radius, reach) {
+    var dx = bx - o.x, dy = by - o.y;
+    var limit = radius + reach;
+    // |(dx, dy - h)| <= limit  =>  h <= dy + sqrt(dy^2 - dx^2 - dy^2 + limit^2)
+    var disc = limit * limit - dx * dx;
+    if (disc <= 0) return 0;
+    return Math.max(0, dy + Math.sqrt(disc));
+  }
+
+  /**
+   * Everything the arrival draws at eased progress p, as plain numbers.
+   * `rest` is where the flare's light sits once the era has arrived (screen).
+   */
+  function planFor(p, o, radius, rest) {
+    var A = ARRIVAL;
+    var plan = { beat: p < A.ignite ? 1 : p < A.edge ? 2 : 3, bars: 0, drain: null, towers: [], motes: [], sparks: [], flare: null };
+
+    // The bars: slide in over beat 1, hold, settle over beat 3.
+    if (p < A.ignite) plan.bars = A.bars.peak * easeOut(p / A.ignite);
+    else if (p < A.edge) plan.bars = A.bars.peak;
+    else plan.bars = A.bars.peak + (A.bars.rest - A.bars.peak) * easeInOut((p - A.edge) / (1 - A.edge));
+
+    // The drain: the whole disc during ignition, then a band just inside the edge.
+    if (radius > 1) {
+      if (p < A.ignite) plan.drain = { inner: 0, outer: radius, alpha: A.drain.peak * (p / A.ignite) };
+      else plan.drain = { inner: Math.max(0, radius - A.drain.band), outer: radius, alpha: A.drain.peak * (1 - 0.5 * clamp01((p - A.ignite) / (1 - A.ignite))) };
+    }
+
+    // Beat 2: the towers on the edge, each rising in its turn; sparks as each lights.
+    if (p >= A.ignite && p < A.edge + 0.05 && radius > 1) {
+      var span = A.edge - A.ignite - A.towers.rise;
+      var toward = Math.atan2(300 - o.y, 400 - o.x);
+      for (var i = 0; i < TOWERS.length; i++) {
+        var tw = TOWERS[i];
+        var start = A.ignite + span * tw.order;
+        var k = clamp01((p - start) / A.towers.rise);
+        if (k <= 0) continue;
+        var fade = clamp01((A.edge + 0.05 - p) / 0.1);
+        var bx = o.x + Math.cos(toward + tw.offset) * radius;
+        var by = o.y + Math.sin(toward + tw.offset) * radius;
+        var h = Math.min(tw.height * easeOut(k), capHeight(bx, by, o, radius, A.towers.reach));
+        if (h > 0.5) plan.towers.push({ x: bx - A.towers.width / 2, y: by - h, w: A.towers.width, h: h, base: by, alpha: A.towers.alpha * fade });
+        var sk = (p - start) / A.sparks.life;
+        if (sk >= 0 && sk < 1) {
+          for (var s = 0; s < A.sparks.each; s++) {
+            var ang = -Math.PI / 2 + (s - 1) * 0.7 + 0.3 * Math.sin(tw.spark + s);
+            var len = A.sparks.reach * easeOut(sk);
+            plan.sparks.push({ x0: bx, y0: by, x1: bx + Math.cos(ang) * len, y1: by + Math.sin(ang) * len, k: sk });
+          }
+        }
+      }
+      // Dust spilling outward from the edge.
+      for (var j = 0; j < SPILL.length; j++) {
+        var m = SPILL[j];
+        var age = p - m.born;
+        if (age < 0 || age > 0.3) continue;
+        var out = Math.min(A.motes.spill, age / 0.3 * A.motes.spill * m.speed);
+        plan.motes.push({ x: o.x + Math.cos(m.angle) * (radius + out), y: o.y + Math.sin(m.angle) * (radius + out),
+          alpha: DUST.alphaMax * (1 - age / 0.3) });
+      }
+    }
+
+    // Beat 3: the flare slides from the miss to its resting place.
+    if (p >= A.edge && rest) {
+      var f = easeInOut(clamp01((p - A.edge) / (1 - A.edge)));
+      plan.flare = { x: o.x + (rest.x - o.x) * f, y: o.y + (rest.y - o.y) * f, alpha: 1 - f, stretch: 1 + 0.3 * (1 - f) };
+    }
+    return plan;
+  }
+
+  function annulus(ctx, o, outer, inner) {
+    ctx.beginPath();
+    ctx.arc(o.x, o.y, Math.max(0, outer), 0, Math.PI * 2);
+    if (inner > 0) ctx.arc(o.x, o.y, inner, 0, Math.PI * 2, true);
+  }
+
+  function arrival(ctx, p, origin, fromEra, toEra, info) {
+    if (toEra !== 8 || !info || info.dim) return;   // behind the title, and a borrowed look: the plain ring
+    var T = R.table3d;
+    var state = info.state;
+    var width = info.width || 800, height = info.height || 600;
+    var rest = (T && state) ? T.project(T.camera(poseAt(state.time || 0)), LIGHT[0], LIGHT[1], LIGHT[2]) : null;
+    var plan = planFor(p, origin, info.radius > 0 ? info.radius : 0, rest);
+    var o = origin;
+
+    ctx.globalAlpha = 1;
+    // The colour drains through the ring: grey in 'saturation', which keeps
+    // each pixel's brightness and hue and takes away its colour.
+    if (plan.drain && plan.drain.alpha > 0) {
+      ctx.globalCompositeOperation = 'saturation';
+      var g = ctx.createRadialGradient(o.x, o.y, plan.drain.inner, o.x, o.y, plan.drain.outer);
+      g.addColorStop(0, 'rgba(128,128,128,' + (plan.drain.inner > 0 ? 0 : plan.drain.alpha).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(128,128,128,' + plan.drain.alpha.toFixed(3) + ')');
+      annulus(ctx, o, plan.drain.outer, plan.drain.inner);
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // The boot towers, glowing upward out of the field.
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < plan.towers.length; i++) {
+      var tw = plan.towers[i];
+      var tg = ctx.createLinearGradient(0, tw.base, 0, tw.y);
+      tg.addColorStop(0, rgba(C.flare, tw.alpha));
+      tg.addColorStop(1, rgba(C.flare, 0));
+      ctx.fillStyle = tg;
+      ctx.fillRect(tw.x, tw.y, tw.w, tw.h);
+      // Its bright core: flare blue, never white (R1).
+      var cg = ctx.createLinearGradient(0, tw.base, 0, tw.y);
+      cg.addColorStop(0, rgba(C.flare, ARRIVAL.towers.coreAlpha * tw.alpha / ARRIVAL.towers.alpha));
+      cg.addColorStop(1, rgba(C.flare, 0));
+      ctx.fillStyle = cg;
+      ctx.fillRect(tw.x + (tw.w - ARRIVAL.towers.core) / 2, tw.y, ARRIVAL.towers.core, tw.h);
+    }
+    // The first sparks, where each tower lights.
+    ctx.lineWidth = SPARK.width;
+    ctx.lineCap = 'round';
+    for (var s = 0; s < plan.sparks.length; s++) {
+      var sp = plan.sparks[s];
+      ctx.globalAlpha = SPARK.alpha * (1 - sp.k);
+      ctx.strokeStyle = T ? T.mix(C.spark, C.ember, sp.k) : C.spark;
+      ctx.beginPath();
+      ctx.moveTo(sp.x0 + (sp.x1 - sp.x0) * 0.6, sp.y0 + (sp.y1 - sp.y0) * 0.6);
+      ctx.lineTo(sp.x1, sp.y1);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    // Dust spilling out of the edge.
+    ctx.fillStyle = C.dust;
+    for (var m = 0; m < plan.motes.length; m++) {
+      var mo = plan.motes[m];
+      ctx.globalAlpha = mo.alpha;
+      ctx.fillRect(mo.x - ARRIVAL.motes.size / 2, mo.y - ARRIVAL.motes.size / 2, ARRIVAL.motes.size, ARRIVAL.motes.size);
+    }
+    ctx.globalAlpha = 1;
+
+    // Beat 3: the flare sweeping home, fading into the era's own as it lands.
+    if (plan.flare && plan.flare.alpha > 0.01) {
+      ctx.globalCompositeOperation = 'lighter';
+      var fr = plan.flare;
+      var fg = ctx.createRadialGradient(fr.x, fr.y, 0, fr.x, fr.y, FLARE.radius);
+      fg.addColorStop(0, rgba(C.flare, FLARE.alpha * fr.alpha));
+      fg.addColorStop(1, rgba(C.flare, 0));
+      ctx.beginPath();
+      ctx.arc(fr.x, fr.y, FLARE.radius, 0, Math.PI * 2);
+      ctx.fillStyle = fg;
+      ctx.fill();
+      for (var k = 0; k < FLARE.ghosts.length; k++) {
+        var gh = FLARE.ghosts[k];
+        var gt = gh.t * fr.stretch;
+        var gx = fr.x + (400 - fr.x) * gt, gy = fr.y + (300 - fr.y) * gt;
+        if (Math.sqrt((gx - o.x) * (gx - o.x) + (gy - o.y) * (gy - o.y)) + gh.r > info.radius + ARRIVAL.towers.reach) continue;
+        hexagon(ctx, gx, gy, gh.r);
+        ctx.fillStyle = rgba(gh.ink, gh.alpha * fr.alpha);
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // The letterbox bars, sliding in from the top and the bottom.
+    if (plan.bars > 0) {
+      ctx.fillStyle = C.letterbox;
+      ctx.fillRect(0, 0, width, plan.bars);
+      ctx.fillRect(0, height - plan.bars, width, plan.bars);
+    }
+  }
+
   R.registerEra({
     era: 8,
     name: '2000 PlayStation 2',
     like: 1,              // paddle colours: the ones the session earned on its first point
-    flourish: null,       // not era 1's CRT sweep: this era's arrival is a later card
+    flourish: arrival,    // this era's own (a borrowed look replays nothing: it checks toEra)
+    ARRIVAL: ARRIVAL,
+    arrivalPlan: planFor,
     camera: CAMERA,
     drift: poseAt,
     card: { flash: '#9fc4ff', wipe: ['#000000', '#141c33', '#2d3e50'], box: '#0b1020', border: '#2d3e50',

@@ -273,7 +273,9 @@ test('the world is drawn at half resolution into its own buffer and copied up sm
 // ------------------------------------------------------------- the voice
 test('the voice is the bible\'s Nintendo 64 voice, reached through the look hook: muffled notes and a bassy thud on hits', () => {
   const v = R.eraLook(6).voice;
-  assert.deepStrictEqual(v, BIBLE_VOICE);
+  // The boot sting is the bible's, plus the arrival's soft swoop after it (item 1152).
+  assert.deepStrictEqual(Object.assign({}, v, { boot: undefined }), Object.assign({}, BIBLE_VOICE, { boot: undefined }));
+  assert.deepStrictEqual(v.boot.slice(0, BIBLE_VOICE.boot.length), BIBLE_VOICE.boot);
   for (const type of ['paddle', 'wall', 'score']) {
     assert.deepStrictEqual(PongSound.voicesFor(6, type), BIBLE_VOICE[type], type);
   }

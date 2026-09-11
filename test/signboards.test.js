@@ -74,19 +74,27 @@ function nameCells(k) {
   return out;
 }
 
-test('the hook takes all eleven rungs: eras 0 to 4 have their own signboard, the rest the plain card', () => {
+test('the hook takes all eleven rungs, and every machine has a signboard of its own', () => {
   const own = new Set();
   for (let era = 0; era <= 10; era++) {
     const fn = R.signboardFor(era);
     assert.strictEqual(typeof fn, 'function', `era ${era} finds a routine`);
-    if (era <= 4) {
-      assert.notStrictEqual(fn, S.plain, `era ${era} has a signboard of its own`);
-      own.add(fn);
-    } else {
-      assert.strictEqual(fn, S.plain, `era ${era} keeps the plain card until item 1184`);
-    }
+    assert.notStrictEqual(fn, S.plain, `era ${era} has a signboard of its own`);
+    own.add(fn);
   }
-  assert.strictEqual(own.size, 5, 'no two of the first five machines share a signboard');
+  assert.strictEqual(own.size, 11, 'no two machines share a signboard');
+  assert.strictEqual(R.signboardFor(11), S.plain, 'a rung with none falls back to the plain card');
+});
+
+test('the 3D machines\' signboards wear their era\'s own card colours', () => {
+  const g = playing({ era: 10 });
+  for (let era = 5; era <= 10; era++) {
+    const style = R.eraCardStyle(era);
+    const { k, calls } = board(g, era, 1);
+    const inks = new Set(calls.map((c) => c[0]));
+    assert.ok(inks.has(k.ink('name')), `era ${era}: the name is in its era's ink ${style.name}`);
+    assert.ok(inks.has(k.ink('label')), `era ${era}: the ERA line is in its era's ink ${style.label}`);
+  }
 });
 
 test('every signboard\'s name is lettered in the block font, so it is spelled right', () => {
@@ -116,8 +124,8 @@ test('everything a signboard fills stays inside the card, the rectangle era 4 cr
   }
 });
 
-test('each of the first five signboards stays legible for its whole display time, at its machine\'s resolution', () => {
-  for (let era = 1; era <= 4; era++) {
+test('every signboard stays legible for its whole display time, at its machine\'s resolution', () => {
+  for (let era = 1; era <= 10; era++) {
     const g = playing({ era: era - 1 });
     concede(g);
     assert.strictEqual(g.era, era);
