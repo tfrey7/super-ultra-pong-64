@@ -98,7 +98,18 @@
 
   // One block per rung. Era 0 has none: the 1972 machine stays bars and a dot.
   var ERAS = {
-    1:  { skin: '#d4a060', body: '#2c3c9c', scale: 2.5 },                    // Atari 2600
+    // Atari 2600 (item 1224): two one-colour 6 x 28 sprites painted in code by
+    // assets/pixellab/era1-sheets.mjs, one sheet per paddle ink and side; era
+    // 1's look names the pair this frame wears (playerSheets), so each figure
+    // is always in its own paddle's colour, as a 2600 player and its missile
+    // shared one colour register. Scale 5: one sheet pixel is one native
+    // 2600 pixel across; fps 7.5, a frame swap every 8 frames.
+    1:  { skin: '#d4a060', body: '#2c3c9c',
+          get sheets() {
+            var R = root.PongRender, L = R && R.eraLook ? R.eraLook(1) : null;
+            return L && typeof L.playerSheets === 'function' ? L.playerSheets() : null;
+          },
+          frame: { w: 6, h: 28 }, hand: { x: 6, y: 14 }, scale: 5, fps: 7.5 },
     2:  { sheets: { left: 'era2-sheet-left', right: 'era2-sheet-right' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' }, // NES (item 1225: assets/pixellab/era2-players-sheet.mjs)
     // Genesis (item 1226): the barbarian and the knight, pixflux sheets re-cut
     // offline to 20 x 25 frames (assets/pixellab/era3-players-cut.mjs), so the
