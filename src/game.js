@@ -36,7 +36,14 @@
     { era: 1, year: 1977, machine: 'Atari 2600' },        // the turn to colour
     { era: 2, year: 1985, machine: 'NES' },
     { era: 3, year: 1989, machine: 'Sega Genesis' },
-    { era: 4, year: 1991, machine: 'Super Nintendo' }
+    { era: 4, year: 1991, machine: 'Super Nintendo' },
+    // The climb to the Xbox 360, drawn on the shared 3D table (docs/ERAS.md).
+    { era: 5, year: 1994, machine: 'Sony PlayStation' },
+    { era: 6, year: 1996, machine: 'Nintendo 64' },
+    { era: 7, year: 1999, machine: 'Sega Dreamcast' },
+    { era: 8, year: 2000, machine: 'PlayStation 2' },
+    { era: 9, year: 2001, machine: 'Xbox' },
+    { era: 10, year: 2005, machine: 'Xbox 360' }
   ];
   var TOP_ERA = ERAS.length - 1;
 

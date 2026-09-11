@@ -30,7 +30,10 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   'use strict';
 
-  var TOP_ERA = 4;
+  // The top rung follows the rules' ladder, so registering an era extends it.
+  var RULES_API = root.Pong ||
+    (typeof module === 'object' && typeof require === 'function' ? require('./game.js') : null);
+  var TOP_ERA = RULES_API && RULES_API.ERAS ? RULES_API.ERAS.length - 1 : 4;
 
   // -------------------------------------------------------------- the design
   // A voice is one oscillator with a short envelope:
@@ -114,15 +117,34 @@
     return n > TOP_ERA ? TOP_ERA : n;
   }
 
-  /** The voices one event plays on one era: an array, empty for anything unknown. */
+  /**
+   * The sound hook (docs/ERAS.md section 3): a rung with no VOICES row keeps
+   * its voice on its look, as `voice`. Null when the look has none yet.
+   */
+  function lookVoice(n) {
+    var R = root.PongRender;
+    var look = R && typeof R.eraLook === 'function' ? R.eraLook(n) : null;
+    return (look && look.voice) || null;
+  }
+
+  /**
+   * The voices one event plays on one era: an array, empty for anything
+   * unknown. Eras 0 to 4 are their VOICES rows; above that, the look's voice,
+   * and a rung whose look has no voice yet plays the highest built row.
+   */
   function voicesFor(era, type) {
-    var set = VOICES[clampEra(era)];
+    var n = clampEra(era);
+    var set = VOICES[n] || lookVoice(n) || VOICES[VOICES.length - 1];
     return (set && set[type]) || [];
   }
 
   /** The echo an era runs its notes through, or null for none. */
   function echoFor(era) {
-    return ECHOES[clampEra(era)] || null;
+    var n = clampEra(era);
+    if (n < ECHOES.length) return ECHOES[n] || null;
+    var v = lookVoice(n);
+    if (v) return (v.effects && v.effects.echo) || null;
+    return ECHOES[ECHOES.length - 1] || null;
   }
 
   // -------------------------------------------------------------- the player
@@ -228,6 +250,9 @@
     }
 
     function voice(v, t0, echoBusIn) {
+      // Noise notes are part of the 3D eras' voice grammar and not built yet:
+      // skipped rather than handed to an oscillator that would refuse them.
+      if (v.wave === 'noise') return;
       var t = t0 + (v.at || 0);
       var end = t + v.dur;
       var osc = ctx.createOscillator();

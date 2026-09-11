@@ -315,4 +315,16 @@
     LETTERS: LETTERS,
     TITLE: TITLE
   };
+
+  // The shared 3D table (src/table3d.js), handed to every era's draw as
+  // api.table3d. Looked up when asked, because the page loads it after this
+  // file; under node --test it is required on first use.
+  Object.defineProperty(api, 'table3d', {
+    enumerable: true,
+    get: function () {
+      if (root.PongTable3D) return root.PongTable3D;
+      if (typeof module === 'object' && typeof require === 'function') return require('./table3d.js');
+      return null;
+    }
+  });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
