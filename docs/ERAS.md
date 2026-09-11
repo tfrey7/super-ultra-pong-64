@@ -880,11 +880,13 @@ them off with bump maps, specular highlights and real-time shadows. Card 1149.
    lights up where the light is and goes dull where it is not: that is the bump map. Paddles are
    `shade: 'gradient'` steel with a 2-pixel specular stripe on the top face whose position along
    the paddle follows the light's `y`. *Null tile:* flat gunmetal quads and the pool alone.
-2. **Hard dynamic shadows from a moving light.** The light orbits:
-   `L = (400 + 300 * cos(2 * Math.PI * t / 9), 300 + 180 * sin(2 * Math.PI * t / 9), 520)`. The
+2. **Hard dynamic shadows from a moving light.** The light is the ball: it follows the ball at
+   height 160, over its centre and led a little ahead along its travel (0.1 s of its velocity, at
+   most 44 units, the lead easing round when the ball turns), so the pool and every shadow cross the
+   table with it (card 1194; the orbit at 520 before it hid the shadows and wandered off the ball). The
    shadow of a point `P` falls on the table at `L + (P - L) * (L.z / (L.z - P.z))`. For each paddle,
    fill the hull of its footprint and its four projected top corners in `#000000` at **0.45**; the
-   ball's shadow is its centre at `z = r` cast the same way, as an ellipse. The shadows are
+   ball's shadow is its centre at `z = r` cast the same way, as an ellipse 1.9 times the ball's radius so it shows round the ball. The shadows are
    hard-edged, with no gradient. The contact shadow still sits under the ball at its true footprint
    (R5).
 3. **Green on black, glowing.** Everything is black or steel except the green: the rails' top faces

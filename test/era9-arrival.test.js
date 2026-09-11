@@ -141,15 +141,17 @@ test('the orb swells to 90 over the ignition, keyed to the clock, not the ring',
   assert.ok(X.orbRadius(0.2, 5) <= 5 + 56, 'but never more than 56 past the ring');
 });
 
-test('behind the sphere the light sits in the orb, then snaps out to its orbit', () => {
+test('behind the sphere the light sits in the orb, then snaps out to the ball', () => {
   const origin = { x: -8, y: 150 };
-  const at = (p) => X.arrivalLight(50, { p, origin });
+  const g = Pong.createGame({ rng: () => 0.1, phase: 'playing', era: 9 });
+  g.ball.x = 530; g.ball.y = 140; g.ball.vx = 380; g.ball.vy = -120; g.time = 50;
+  const at = (p) => X.arrivalLight(g, { p, origin });
   assert.deepStrictEqual([at(0.5).x, at(0.5).y], [origin.x, origin.y]);
-  const orbit = X.lightAt(50);
-  assert.ok(Math.abs(at(1).x - orbit.x) < 1e-9 && Math.abs(at(1).y - orbit.y) < 1e-9);
-  const half = (at(0.9).x - origin.x) / (orbit.x - origin.x);
+  const ball = X.lightFor(g.ball);
+  assert.ok(Math.abs(at(1).x - ball.x) < 1e-9 && Math.abs(at(1).y - ball.y) < 1e-9);
+  const half = (at(0.9).x - origin.x) / (ball.x - origin.x);
   assert.ok(half > 0.8 && half < 1, `a snap: ${half.toFixed(3)} of the way at half the beat`);
-  assert.deepStrictEqual(X.arrivalLight(50, null), orbit, 'in play the light orbits as before');
+  assert.deepStrictEqual(X.arrivalLight(g, null), ball, 'in play the light rides the ball');
 });
 
 test('a real change into era 9: the flourish plays, the tags fade in, the state is untouched and the paddle follows the hand', () => {
@@ -169,7 +171,7 @@ test('a real change into era 9: the flourish plays, the tags fade in, the state 
       const before = JSON.stringify(g);
       frame(g);
       assert.strictEqual(JSON.stringify(g), before, 'drawing the arrival writes nothing');
-      assert.ok(m.era === 9 && X.arrivalLight(g.time, m) !== null);
+      assert.ok(m.era === 9 && X.arrivalLight(g, m) !== null);
       if (m.p < 0.45) sawHidden = sawHidden || tagCells() === 0;
       if (m.p > 0.8) sawShown = sawShown || tagCells() > 40;
       const hand = i % 20 < 10 ? 120 : 480;
