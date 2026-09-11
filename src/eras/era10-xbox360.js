@@ -78,6 +78,18 @@
   var BLOOM = { main: 0.55, wide: 0.35, fallback: 0.35 };
   var DOF = { farY: 90, alpha: 0.6 };  // d 0.85 to 1 is field y 0 to 90
   var PADDLE = { z: 24, light: { top: 0.3, near: -0.05, side: -0.45 } };
+  // The plaza (docs/ART.md era 10, item 1234). The ruin plate is the pixellab
+  // columns, 400 x 120 at one field unit a pixel, tiled so its own sun sits
+  // under the HDR sun at x 560; the banner hangs off the second column and
+  // ripples; the ash drifts down and gusts sideways for half a second on a
+  // point; the sun's bloom breathes. The ruin and banner go through the
+  // depth-of-field buffer with the rest of the scenery, so they are soft.
+  var RUIN = { w: 400, h: 120, sunX: 170, alpha: 0.92, columns: 6 };
+  var BANNER = { x: 85, top: 22, w: 40, h: 60, slices: 6, ripple: 4, hz: 0.8 };
+  var ASH = { n: 40, alpha: 0.3, min: 8, max: 20, gust: 60, gustS: 0.5 };
+  var BREATHE = { amount: 0.05, period: 6 };
+  var GAMERPIC = { size: 24, y: 20, cell: 32 };
+  var MATCH = { title: 'MATCH POINT', text: '100G - FINISH IT', vignetteIn: 220 };
 
   var TABLE_COLOURS = { line: '#9a9488', rail: '#4a4339', railTop: C.ash, nearLip: '#2b261f' };
 
@@ -247,8 +259,60 @@
     P.drawText(ctx, text.toUpperCase(), cx, y - 5 * cell, cell, cell);
   }
 
+  // ----------------------------------------------------- the pixellab plates
+  var plates = {};
+  /** An embedded plate once the browser has decoded it; null before that and under node. */
+  function plate(name, uri) {
+    if (!(name in plates)) {
+      plates[name] = null;
+      if (typeof root.Image === 'function' && typeof uri === 'string') {
+        var img = new root.Image();
+        img.src = uri;
+        plates[name] = img;
+      }
+    }
+    var im = plates[name];
+    return im && im.complete && im.naturalWidth > 0 ? im : null;
+  }
+
+  /** The ruin: the pixellab plate tiled across, or six code columns until it decodes. */
+  function ruin(c, farY) {
+    var img = plate('ruin', typeof RUIN_URI === 'string' ? RUIN_URI : null);
+    var top = farY + 8 - RUIN.h;
+    if (img) {
+      c.save();
+      c.globalAlpha = RUIN.alpha;
+      for (var x = 560 - RUIN.sunX - RUIN.w; x < 800; x += RUIN.w) c.drawImage(img, x, top, RUIN.w, RUIN.h);
+      c.restore();
+      return;
+    }
+    var rnd = lcg(1234);
+    for (var i = 0; i < RUIN.columns; i++) {
+      var h = 50 + rnd() * 40, cx = 40 + i * 140 + rnd() * 30;
+      c.fillStyle = i % 2 ? C.umber : C.mud;
+      c.beginPath();
+      c.moveTo(cx, farY + 8);
+      c.lineTo(cx, farY + 8 - h);
+      c.lineTo(cx + 20, farY + 8 - h - (rnd() - 0.5) * 16);
+      c.lineTo(cx + 20, farY + 8);
+      c.closePath();
+      c.fill();
+    }
+  }
+
+  /** The torn banner on the second column, its lower slices swinging further. */
+  function banner(c, t) {
+    var img = plate('banner', typeof BANNER_URI === 'string' ? BANNER_URI : null);
+    if (!img) return;
+    var n = BANNER.slices, sh = img.naturalHeight / n, dh = BANNER.h / n;
+    for (var i = 0; i < n; i++) {
+      var off = Math.sin(t * 2 * Math.PI * BANNER.hz + i * 0.7) * BANNER.ripple * (i / (n - 1));
+      c.drawImage(img, 0, i * sh, img.naturalWidth, sh, BANNER.x + off, BANNER.top + i * dh, BANNER.w, dh + 0.5);
+    }
+  }
+
   // ------------------------------------------------------------ the scene
-  function scenery(c, farY) {
+  function scenery(c, farY, t) {
     var sky = c.createLinearGradient(0, 0, 0, farY + 10);
     sky.addColorStop(0, '#221d17');
     sky.addColorStop(0.65, C.mud);
@@ -270,17 +334,20 @@
     c.fillStyle = '#2c261f';
     c.fillRect(120, farY - 64, 6, 70);
     c.fillRect(120, farY - 64, 170, 5);
+    ruin(c, farY);
+    banner(c, t || 0);
   }
 
-  function sun(c, farY, glowOnly) {
+  function sun(c, farY, glowOnly, breathe) {
     var x = 560, y = farY - 40;
-    var g = c.createRadialGradient(x, y, 0, x, y, glowOnly ? 150 : 90);
+    var reach = (glowOnly ? 150 : 90) * (breathe || 1);
+    var g = c.createRadialGradient(x, y, 0, x, y, reach);
     g.addColorStop(0, rgba(C.sun, glowOnly ? 1 : 0.9));
     g.addColorStop(0.25, rgba(C.sun, glowOnly ? 0.6 : 0.4));
     g.addColorStop(1, rgba(C.sun, 0));
     c.fillStyle = g;
     c.beginPath();
-    c.arc(x, y, glowOnly ? 150 : 90, 0, Math.PI * 2);
+    c.arc(x, y, reach, 0, Math.PI * 2);
     c.fill();
     if (!glowOnly) {
       c.fillStyle = C.sun;
@@ -291,16 +358,16 @@
   }
 
   /** 1: umber, then the scenery soft from a third-scale buffer. */
-  function backdrop(ctx, T, farY) {
+  function backdrop(ctx, T, farY, t) {
     ctx.fillStyle = C.umber;
     ctx.fillRect(0, 0, 800, 600);
     var buf = T.offscreen('dof', 267, 200);
-    if (!buf) return scenery(ctx, farY);
+    if (!buf) return scenery(ctx, farY, t);
     var b = buf.ctx;
     b.setTransform(1, 0, 0, 1, 0, 0);
     b.clearRect(0, 0, 267, 200);
     b.setTransform(267 / 800, 0, 0, 200 / 600, 0, 0);
-    scenery(b, farY);
+    scenery(b, farY, t);
     ctx.save();
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(buf.canvas, 0, 0, 800, 600);
@@ -488,7 +555,7 @@
   }
 
   /** 6b: drain the colour, tint it brown, darken the corners. */
-  function gradePass(ctx) {
+  function gradePass(ctx, matchPoint) {
     ctx.save();
     ctx.globalCompositeOperation = 'saturation';
     ctx.globalAlpha = GRADE.drainAlpha;
@@ -500,7 +567,7 @@
     ctx.fillRect(0, 0, 800, 600);
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
-    var v = ctx.createRadialGradient(400, 300, GRADE.vignetteIn, 400, 300, GRADE.vignetteOut);
+    var v = ctx.createRadialGradient(400, 300, matchPoint ? MATCH.vignetteIn : GRADE.vignetteIn, 400, 300, GRADE.vignetteOut);
     v.addColorStop(0, rgba(C.vignette, 0));
     v.addColorStop(1, rgba(C.vignette, GRADE.vignetteAlpha));
     ctx.fillStyle = v;
@@ -525,7 +592,40 @@
     ctx.restore();
   }
 
-  /** 6d: each paddle's earned ink back at full saturation, after the grade (R4). */
+  /**
+   * 6d: forty flakes of ash drifting down through the haze, seeded and
+   * wrapping, and blown sideways at 60 a second for half a second on a point.
+   * The gust is kept continuous: every point so far has moved the field 30.
+   */
+  var flakes = null;
+  function ashPass(ctx, state) {
+    if (!flakes) {
+      var rnd = lcg(0xa54);
+      flakes = [];
+      for (var i = 0; i < ASH.n; i++) {
+        flakes.push({ x: rnd() * 800, y: rnd() * 600, v: ASH.min + rnd() * (ASH.max - ASH.min),
+                      s: rnd() < 0.5 ? 1 : 2, sway: rnd() * 6.283 });
+      }
+    }
+    var t = state.time || 0;
+    var total = state.score.left + state.score.right;
+    var since = memo.kind === 'point' ? t - memo.at : Infinity;
+    var gx = total * ASH.gust * ASH.gustS;
+    if (since >= 0 && since < ASH.gustS) gx -= ASH.gust * (ASH.gustS - since);
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = rgba(C.ash, ASH.alpha);
+    for (var k = 0; k < flakes.length; k++) {
+      var f = flakes[k];
+      var x = ((f.x + Math.sin(t * 0.5 + f.sway) * 6 + gx) % 800 + 800) % 800;
+      var y = ((f.y + f.v * t) % 600 + 600) % 600;
+      ctx.fillRect(x, y, f.s, f.s);
+    }
+    ctx.restore();
+  }
+
+  /** 6e: each paddle's earned ink back at full saturation, after the grade (R4). */
   function restoreInks(ctx, list) {
     ctx.save();
     ctx.lineWidth = 1.5;
@@ -585,7 +685,28 @@
       c.stroke();
       if (i === 0) hdText(c, P, String(state.score.left), cx, 80, HUD_PX, 'center', C.toastText);
       if (i === 1) hdText(c, P, String(state.score.right), cx, 80, HUD_PX, 'center', C.toast);
+      if (i < 2) gamerpic(c, i, BLADES.x + i * BLADES.step + dx);
     }
+  }
+
+  /**
+   * A gamerpic at the top of a score blade: the left player's helmet in blade
+   * green, the right's in ash, 24 x 24 in a 1-pixel blade-silver frame,
+   * centred on the blade where it runs through the picture's middle row.
+   */
+  function gamerpic(c, i, x) {
+    var lean = (BLADES.bottom - BLADES.top) * Math.tan(BLADES.slant * Math.PI / 180);
+    var mid = GAMERPIC.y + GAMERPIC.size / 2;
+    var px = Math.round(x + BLADES.w / 2 + lean * (1 - (mid - BLADES.top) / (BLADES.bottom - BLADES.top)) - GAMERPIC.size / 2);
+    c.fillStyle = C.toast;
+    c.fillRect(px, GAMERPIC.y, GAMERPIC.size, GAMERPIC.size);
+    var img = plate('gamerpics', typeof GAMERPICS_URI === 'string' ? GAMERPICS_URI : null);
+    if (img) c.drawImage(img, i * GAMERPIC.cell, 0, GAMERPIC.cell, GAMERPIC.cell, px, GAMERPIC.y, GAMERPIC.size, GAMERPIC.size);
+    c.strokeStyle = C.silver;
+    c.lineWidth = 1;
+    c.beginPath();
+    c.rect(px - 0.5, GAMERPIC.y - 0.5, GAMERPIC.size + 1, GAMERPIC.size + 1);
+    c.stroke();
   }
 
   function hud(ctx, state, P, bandBottom) {
@@ -647,7 +768,7 @@
     ctx.lineWidth = 1;
     ctx.stroke();
     badge(ctx, x, y, false);
-    hdText(ctx, P, 'ACHIEVEMENT UNLOCKED', x + 62, y + 22, 12, 'left', C.silver);
+    hdText(ctx, P, toast.title || 'ACHIEVEMENT UNLOCKED', x + 62, y + 22, 12, 'left', C.silver);
     hdText(ctx, P, toast.text, x + 62, y + 43, 16, 'left', C.toastText);
     ctx.restore();
   }
@@ -670,6 +791,11 @@
     if (!T) return P.drawBase(ctx, state, opts);
     var cam = cameraFor(T, CAMERA);
     var toast = toastFor(state);
+    var Rules = root.Pong;
+    var matchPoint = !!(Rules && typeof Rules.isMatchPoint === 'function' && Rules.isMatchPoint(state));
+    // Match point holds its own toast whenever no achievement is popping.
+    if (matchPoint && !toast) toast = { kind: 'match', title: MATCH.title, text: MATCH.text, t: TOAST.rise, y: TOAST.y };
+    var breathe = 1 + BREATHE.amount * Math.sin(2 * Math.PI * (state.time || 0) / BREATHE.period);
     var ball = state.serveDelay <= 0 ? T.ballScreen(cam, state) : null;
     var farY = T.project(cam, 400, 0, 0).y;
     var bloom = bloomBuffer(T);
@@ -678,8 +804,8 @@
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
 
-    backdrop(ctx, T, farY);                                    // 1
-    if (bloom) sun(bloom.ctx, farY, true);
+    backdrop(ctx, T, farY, state.time || 0);                   // 1
+    if (bloom) sun(bloom.ctx, farY, true, breathe);
     T.table(ctx, cam, tableStyle(T));                          // 2
     railDetail(ctx, T, cam, bloom);
     farStripSoft(ctx, T, cam);                                 // 3
@@ -691,8 +817,9 @@
       if (toast) badge(bloom.ctx, TOAST.x, toast.y, true);
     }
     bloomPass(ctx, T, bloom, ball);                            // 6
-    gradePass(ctx);
+    gradePass(ctx, matchPoint);
     grainPass(ctx, T, state);
+    ashPass(ctx, state);
     restoreInks(ctx, drawn);
     if (ball) T.ball(ctx, cam, state.ball, { fill: ballFill(ctx), texture: TEXTURE.ball });   // 7
     hud(ctx, state, P, farY - 6);                              // 8

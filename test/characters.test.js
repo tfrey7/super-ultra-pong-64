@@ -369,7 +369,8 @@ test('a block with only `sheet` still serves both sides, as before sheets existe
     assert.strictEqual(C.configFor(2, 'right').sheet, 'test-rival');
     // And no sheet anywhere is the placeholder on both sides, exactly as now.
     for (let e = 1; e <= 10; e++) {
-      if (e === 2) continue;
+      // An era whose card has brought its art (item 1234 on, era 10) wears it.
+      if (e === 2 || C.ERAS[e].sheet || C.ERAS[e].sheets) continue;
       assert.strictEqual(C.configFor(e, 'left').sheet, null, 'era ' + e + ' left is the placeholder');
       assert.deepStrictEqual(C.configFor(e, 'right'), Object.assign(C.configFor(e, 'left'), { side: 'right' }),
         'era ' + e + ': the two sides are the same config');
