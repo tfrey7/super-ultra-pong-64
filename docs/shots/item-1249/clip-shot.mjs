@@ -53,27 +53,44 @@ try {
     g.left = Object.assign({}, g.left, { y: 0, vy: 0 });
     g.right = Object.assign({}, g.right, { y: 0, vy: 0 });
     const frame = () => { const c = document.createElement('canvas'); c.width = 800; c.height = 600; R.draw(c.getContext('2d'), g); return c; };
-    const on = frame();
+    const px = (c) => c.getContext('2d').getImageData(0, 0, 800, 600).data;
+    const bar = R.eraLook(8).fx.BAR;
     const saved = PC.ERAS[8].clip;
+    // Pixels a frame differs from the same frame with no players, inside rows [y0, y1).
+    const diff = (d, n, y0, y1) => { let k = 0; for (let y = y0; y < y1; y++) for (let x = 0; x < 800; x++) {
+      const i = (y * 800 + x) * 4; if (d[i] !== n[i] || d[i + 1] !== n[i + 1] || d[i + 2] !== n[i + 2]) k++; } return k; };
+    const bars = (d, n) => diff(d, n, 0, bar) + diff(d, n, 600 - bar, 600);
+    const noPlayers = () => { PC.enabled = false; const c = frame(); PC.enabled = true; return c; };
+    // The camera drifts: sweep 40 s of it, clip off, for the moment a player reaches furthest into a bar.
+    let worst = { t: 0, px: -1 };
+    const sweep = [];
+    for (let t = 0; t <= 40; t += 1) {
+      g.time = t;
+      PC.ERAS[8].clip = null;
+      const k = bars(px(frame()), px(noPlayers()));
+      PC.ERAS[8].clip = saved;
+      sweep.push(k);
+      if (k > worst.px) worst = { t, px: k };
+    }
+    g.time = worst.t;
+    const none = noPlayers(), n = px(none);
+    const on = frame();
     PC.ERAS[8].clip = null;
     const off = frame();
+    // A deliberately tight band, to show the clip cutting the figures in the page.
+    PC.ERAS[8].clip = { y0: 110, y1: 548 };
+    const tight = frame();
     PC.ERAS[8].clip = saved;
-    PC.enabled = false;
-    const none = frame();
-    PC.enabled = true;
-    const bar = R.eraLook(8).fx.BAR;
-    const px = (c) => c.getContext('2d').getImageData(0, 0, 800, 600).data;
-    const a = px(on), b = px(off), n = px(none);
-    const inBars = (d) => { let k = 0; for (let y = 0; y < 600; y++) { if (y >= bar && y < 600 - bar) continue;
-      for (let x = 0; x < 800; x++) { const i = (y * 800 + x) * 4; if (d[i] !== n[i] || d[i + 1] !== n[i + 1] || d[i + 2] !== n[i + 2]) k++; } } return k; };
-    const inPicture = (d) => { let k = 0; for (let y = bar; y < 600 - bar; y++) for (let x = 0; x < 800; x++) {
-      const i = (y * 800 + x) * 4; if (d[i] !== n[i] || d[i + 1] !== n[i + 1] || d[i + 2] !== n[i + 2]) k++; } return k; };
-    const both = document.createElement('canvas'); both.width = 1616; both.height = 600;
-    const bc = both.getContext('2d'); bc.fillStyle = '#ff00ff'; bc.fillRect(0, 0, 1616, 600);
-    bc.drawImage(on, 0, 0); bc.drawImage(off, 816, 0);
-    return { sheetsReady: names.map((n) => S.ready(n)), bar,
-             barPixelsFromPlayers: { clipOn: inBars(a), clipOff: inBars(b) },
-             picturePixelsFromPlayers: { clipOn: inPicture(a), clipOff: inPicture(b) },
+    const a = px(on), b = px(off), c3 = px(tight);
+    const both = document.createElement('canvas'); both.width = 2432; both.height = 600;
+    const bc = both.getContext('2d'); bc.fillStyle = '#ff00ff'; bc.fillRect(0, 0, 2432, 600);
+    bc.drawImage(on, 0, 0); bc.drawImage(off, 816, 0); bc.drawImage(tight, 1632, 0);
+    return { sheetsReady: names.map((n) => S.ready(n)), bar, worstTime: worst.t,
+             barPixelsFromPlayersClipOffPerSecond: sweep,
+             barPixelsFromPlayers: { clipOn: bars(a, n), clipOff: bars(b, n) },
+             picturePixelsFromPlayers: { clipOn: diff(a, n, bar, 600 - bar), clipOff: diff(b, n, bar, 600 - bar),
+                                         tightBand110: diff(c3, n, bar, 600 - bar) },
+             tightBandPixelsAbove110: diff(c3, n, 0, 110),
              png: both.toDataURL('image/png') };
   })()` });
   if (r.exceptionDetails) throw new Error(JSON.stringify(r.exceptionDetails));
