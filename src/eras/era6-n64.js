@@ -425,6 +425,266 @@
     ctx.restore();
   }
 
+  // ------------------------------------------------------------ the arrival (item 1152)
+  /*
+   * THE NINTENDO 64 ARRIVES (docs/ERAS.md chapter 7, "Arrival flourish"), drawn
+   * over the engine's ring, which stays the truth of which era draws where.
+   * Three beats on the ring's eased progress p:
+   *   1. ignition (p 0 to 0.25): the world fades up out of fog at the spot the
+   *      ball went out -- a pale fog disc at 0.9 in the middle, thinning to
+   *      nothing by p = 0.25. Keyed off the time too, because the ring is under
+   *      a unit wide for its first frames.
+   *   2. the edge (p 0.25 to 0.8): the crisp, jittery PlayStation picture goes
+   *      SOFT from the origin outward -- the frame just outside the ring is
+   *      copied down to a fifth of its size and back up smoothed, so the old
+   *      picture melts into a blur as the ring reaches it (the melt) -- under
+   *      the chapter's soft fat band (white at 0.5, then fog at 0.8), with four
+   *      smooth toy balls riding the edge. Fog POURS over the far end of the
+   *      table, rolling down from the far wall toward the player and drawing
+   *      back into the era's own fog band as the ring finishes.
+   *   3. arrival (p 0.8 to 1): once the ring has passed the middle of the field,
+   *      a cube in the field's own colours (grass, rail red, toy yellow, toy
+   *      blue) pops in above the name card and spins once, smooth-shaded, in
+   *      the manner of the era's logo intros. It is a plain cube -- no letter,
+   *      no maker's mark (bible rule 1.9) -- and it is done spinning, and gone,
+   *      by the time the ring is.
+   * The boot sting, with its soft swoop, is the voice's `boot` list below,
+   * sounded by the player for the point; a flourish plays nothing. Everything
+   * stays within 60 of the ring (section 4's law) and the whole flourish ends
+   * with the ring, inside the serve pause.
+   */
+  var ARRIVAL = {
+    ignition: 0.25, settle: 0.8,
+    fogCore: 0.9, fogOpen: 300, reach: 60,
+    melt: { scale: 5, inside: 16, outside: 56, key: 'n64-melt' },
+    band: { inside: 28, outside: 12, white: 0.5, fog: 0.8 },
+    balls: { r: 10, turns: 2, colours: [PAL.rail, PAL.toyYellow, PAL.toyGreen, PAL.toyBlue] },
+    pour: { from: 0.18, depth: 0.5, alpha: 0.55, spill: 60, wisps: 6 },
+    cube: { x: 400, y: 150, size: 30, tilt: 0.5, eye: 7, spinTo: 0.85, pop: 0.2,
+            faces: [PAL.grass, PAL.rail, PAL.toyYellow, PAL.toyBlue], top: PAL.grassLight, bottom: PAL.grassDark }
+  };
+
+  function clamp01(v) { return v > 0 ? (v < 1 ? v : 1) : 0; }
+  function smooth(u) { u = clamp01(u); return u * u * (3 - 2 * u); }
+
+  /** How strongly beat 2 shows at p: in over the ignition, full across the field, out by the end. */
+  function edgeStrength(p) {
+    return clamp01(p / ARRIVAL.ignition) * (1 - clamp01((p - 0.9) / 0.1));
+  }
+
+  /** The fog pour at p: { k, alpha } -- how far it has rolled (0 to 1 of its depth) and how thick it is. */
+  function pourAt(p) {
+    var A = ARRIVAL.pour;
+    var u = clamp01((p - A.from) / (1 - A.from));
+    var k = Math.sin(Math.PI * u);           // rolls in, then draws back to the era's own band
+    return { k: k, alpha: A.alpha * k };
+  }
+
+  /** The cube's life at p: null before the ring has reached it; else { u, angle, scale, alpha }. */
+  function cubeAt(p, origin, radius) {
+    var C = ARRIVAL.cube;
+    var dx = C.x - origin.x, dy = C.y - origin.y;
+    var need = Math.sqrt(dx * dx + dy * dy) + C.size * 2;   // the whole cube inside the ring
+    if (!(radius >= need)) return null;
+    // p when the ring reached it: the ring grows in proportion to p, so R / p is its reach.
+    var reach = p > 0 ? radius / p : 0;
+    var start = reach > 0 ? Math.min(0.95, need / reach) : 0.95;
+    var u = clamp01((p - start) / (1 - start));
+    var spin = smooth(u / C.spinTo);
+    var pop = clamp01(u / C.pop);
+    var scale = pop < 1 ? 1 + 2.2 * Math.pow(pop - 1, 3) + 1.2 * Math.pow(pop - 1, 2) : 1;   // one springy overshoot
+    return { u: u, angle: 2 * Math.PI * spin, scale: Math.max(0, scale),
+             alpha: 1 - clamp01((u - C.spinTo) / (1 - C.spinTo)) };
+  }
+
+  var CUBE_FACES = [   // corner indices, and which colour; corners are (+-1, +-1, +-1)
+    { v: [0, 1, 3, 2], c: 'bottom' }, { v: [4, 6, 7, 5], c: 'top' },
+    { v: [0, 4, 5, 1], c: 0 }, { v: [1, 5, 7, 3], c: 1 },
+    { v: [3, 7, 6, 2], c: 2 }, { v: [2, 6, 4, 0], c: 3 }
+  ];
+
+  /** The cube's six faces on screen, back to front, the hidden ones left out. */
+  function cubeFaces(cx, cy, size, angle) {
+    var C = ARRIVAL.cube;
+    var ca = Math.cos(angle + Math.PI / 4), sa = Math.sin(angle + Math.PI / 4);
+    var ct = Math.cos(C.tilt), st = Math.sin(C.tilt);
+    var pts = [];
+    for (var i = 0; i < 8; i++) {
+      var x = i & 1 ? 1 : -1, y = i & 4 ? 1 : -1, z = i & 2 ? 1 : -1;   // y is up
+      var rx = x * ca - z * sa, rz = x * sa + z * ca;                     // spin about the vertical
+      var ry = y * ct - rz * st, rz2 = y * st + rz * ct;                  // lean the top toward the eye
+      var k = C.eye / (C.eye + rz2);
+      pts.push({ x: cx + rx * size * k, y: cy - ry * size * k, z: rz2 });
+    }
+    var out = [];
+    for (var f = 0; f < CUBE_FACES.length; f++) {
+      var q = CUBE_FACES[f].v.map(function (n) { return pts[n]; });
+      var cross = (q[1].x - q[0].x) * (q[2].y - q[0].y) - (q[1].y - q[0].y) * (q[2].x - q[0].x);
+      if (cross >= 0) continue;                                           // facing away
+      out.push({ pts: q, colour: CUBE_FACES[f].c, depth: (q[0].z + q[1].z + q[2].z + q[3].z) / 4 });
+    }
+    out.sort(function (a, b) { return b.depth - a.depth; });
+    return out;
+  }
+
+  /** The melt: the frame just outside the ring, smeared by a fifth-size copy, fading out past the edge. */
+  function melt(ctx, origin, r, k, W, H) {
+    var M = ARRIVAL.melt, T = R.table3d, src = ctx.canvas;
+    if (!T || !src || !(src.width > 0) || typeof ctx.drawImage !== 'function') return false;
+    var sw = Math.ceil(W / M.scale), sh = Math.ceil(H / M.scale);
+    var buf = T.offscreen(M.key, sw, sh);
+    if (!buf || typeof buf.ctx.createRadialGradient !== 'function') return false;
+    var b = buf.ctx;
+    b.setTransform(1, 0, 0, 1, 0, 0);
+    b.globalCompositeOperation = 'source-over';
+    b.globalAlpha = 1;
+    b.clearRect(0, 0, sw, sh);
+    b.imageSmoothingEnabled = true;
+    b.imageSmoothingQuality = 'high';
+    b.drawImage(src, 0, 0, src.width, src.height, 0, 0, sw, sh);
+    // keep only a soft ring around the edge: none inside, strongest just past it, gone by +56
+    var inner = Math.max(0, r - M.inside), outer = r + M.outside;
+    var g = b.createRadialGradient(origin.x / M.scale, origin.y / M.scale, inner / M.scale,
+                                   origin.x / M.scale, origin.y / M.scale, outer / M.scale);
+    var peak = (r + 6 - inner) / (outer - inner);
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(clamp01(peak), 'rgba(0,0,0,' + (0.95 * k).toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    b.globalCompositeOperation = 'destination-in';
+    b.fillStyle = g;
+    b.fillRect(0, 0, sw, sh);
+    b.globalCompositeOperation = 'source-over';
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(buf.canvas, 0, 0, sw, sh, 0, 0, W, H);
+    return true;
+  }
+
+  function ring(ctx, x, y, r0, r1) {
+    ctx.beginPath();
+    ctx.arc(x, y, r1, 0, Math.PI * 2);
+    if (r0 > 0) ctx.arc(x, y, r0, 0, Math.PI * 2, true);
+  }
+
+  /** The flourish hook (the header of src/erachange.js is the contract). */
+  function arrival(ctx, p, origin, fromEra, toEra, info) {
+    if (toEra !== 6 || !info || info.dim) return;   // this era's arrival only, never behind the title
+    var A = ARRIVAL, T = R.table3d, r = Math.max(0, info.radius || 0), t = info.t || 0;
+    var W = info.width || 800, H = info.height || 600, ox = origin.x, oy = origin.y;
+    var TAU = Math.PI * 2;
+
+    // 2a. the melt, first, so everything after sits crisp on the softened picture
+    var k = edgeStrength(p);
+    if (r > 1 && k > 0) melt(ctx, origin, r, k, W, H);
+
+    // 2b. fog pours over the far end of the table, inside the ring
+    var pour = pourAt(p);
+    if (T && pour.alpha > 0.01 && r > 1) {
+      var cam = cameraFor(T, CAMERA);
+      var farY = T.project(cam, W / 2, 0, 0).y, nearY = T.project(cam, W / 2, H, 0).y;
+      var front = farY + (nearY - farY) * A.pour.depth * pour.k;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(ox, oy, r + A.reach * 0.5, 0, TAU);
+      ctx.clip();
+      var sheet = ctx.createLinearGradient(0, farY - A.pour.spill, 0, front);
+      sheet.addColorStop(0, T.rgba(PAL.fog, pour.alpha));
+      sheet.addColorStop(0.55, T.rgba(PAL.fog, pour.alpha * 0.8));
+      sheet.addColorStop(1, T.rgba(PAL.fog, 0));
+      ctx.fillStyle = sheet;
+      ctx.fillRect(0, farY - A.pour.spill, W, front - farY + A.pour.spill);
+      // billows along the front, rolling toward the player
+      for (var i = 0; i < A.pour.wisps; i++) {
+        var wx = ((i + 0.5) / A.pour.wisps) * W + 22 * Math.sin(t * 2.2 + i * 1.9);
+        var wr = 46 + 14 * Math.sin(i * 2.7);
+        var puff = ctx.createRadialGradient(wx, front - wr * 0.3, 0, wx, front - wr * 0.3, wr);
+        puff.addColorStop(0, T.rgba(PAL.fog, pour.alpha * 0.7));
+        puff.addColorStop(1, T.rgba(PAL.fog, 0));
+        ctx.fillStyle = puff;
+        ctx.beginPath();
+        ctx.arc(wx, front - wr * 0.3, wr, 0, TAU);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // 1. ignition: the world fades up out of fog at the point
+    var lift = 1 - clamp01(p / A.ignition);
+    if (lift > 0) {
+      var fr = Math.max(r, Math.min(A.reach, A.fogOpen * t));
+      if (fr > 0.5) {
+        var disc = ctx.createRadialGradient(ox, oy, 0, ox, oy, fr);
+        disc.addColorStop(0, T ? T.rgba(PAL.fog, A.fogCore * lift) : PAL.fog);
+        disc.addColorStop(1, T ? T.rgba(PAL.fog, 0) : PAL.fog);
+        ctx.fillStyle = disc;
+        ctx.beginPath();
+        ctx.arc(ox, oy, fr, 0, TAU);
+        ctx.fill();
+      }
+    }
+
+    // 2c. the soft fat band on the edge, and four toy balls riding it
+    if (r > 1 && k > 0 && T) {
+      var B = A.band, b0 = Math.max(0, r - B.inside), b1 = r + B.outside;
+      var soft = ctx.createRadialGradient(ox, oy, b0, ox, oy, b1);
+      soft.addColorStop(0, T.rgba(PAL.fog, 0));
+      soft.addColorStop(0.45, T.rgba('#ffffff', B.white * k));
+      soft.addColorStop(0.75, T.rgba(PAL.fog, B.fog * k));
+      soft.addColorStop(1, T.rgba(PAL.fog, 0));
+      ctx.fillStyle = soft;
+      ring(ctx, ox, oy, b0, b1);
+      ctx.fill();
+
+      var balls = A.balls;
+      for (var j = 0; j < balls.colours.length; j++) {
+        var a = p * balls.turns * TAU + j * Math.PI / 2;
+        var bx = ox + Math.cos(a) * r, by = oy + Math.sin(a) * r;
+        var shine = ctx.createRadialGradient(bx - balls.r / 3, by - balls.r / 3, 0, bx, by, balls.r);
+        shine.addColorStop(0, T.mix('#ffffff', balls.colours[j], 0.25));
+        shine.addColorStop(0.5, balls.colours[j]);
+        shine.addColorStop(1, T.shade(balls.colours[j], -0.35));
+        ctx.globalAlpha = k;
+        ctx.fillStyle = shine;
+        ctx.beginPath();
+        ctx.arc(bx, by, balls.r, 0, TAU);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // 3. the cube: pops in once the ring has reached it, spins once, bows out with the ring
+    var cube = cubeAt(p, origin, r);
+    if (cube && cube.alpha > 0 && cube.scale > 0 && T) {
+      var C = A.cube, size = C.size * cube.scale;
+      ctx.globalAlpha = cube.alpha;
+      var halo = ctx.createRadialGradient(C.x, C.y, 0, C.x, C.y, size * 2.6);
+      halo.addColorStop(0, T.rgba(PAL.fog, 0.6));
+      halo.addColorStop(1, T.rgba(PAL.fog, 0));
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(C.x, C.y, size * 2.6, 0, TAU);
+      ctx.fill();
+      var faces = cubeFaces(C.x, C.y, size, cube.angle);
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 2;
+      for (var f = 0; f < faces.length; f++) {
+        var q = faces[f].pts;
+        var ink = typeof faces[f].colour === 'number' ? C.faces[faces[f].colour] : C[faces[f].colour];
+        var shade = ctx.createLinearGradient(q[0].x, q[0].y, q[2].x, q[2].y);   // Gouraud across the face
+        shade.addColorStop(0, T.shade(ink, 0.3));
+        shade.addColorStop(1, T.shade(ink, -0.25));
+        ctx.beginPath();
+        ctx.moveTo(q[0].x, q[0].y);
+        for (var n = 1; n < 4; n++) ctx.lineTo(q[n].x, q[n].y);
+        ctx.closePath();
+        ctx.fillStyle = shade;
+        ctx.fill();
+        ctx.strokeStyle = T.shade(ink, -0.45);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
   R.registerEra({
     era: 6,
     name: '1996 Nintendo 64',
@@ -451,9 +711,16 @@
                 { wave: 'sawtooth', freq: 523, at: 0.12, attack: 0.01, dur: 0.9, gain: 0.06, unison: { voices: 3, spread: 15 }, filter: { type: 'lowpass', freq: 2800 } },
                 { wave: 'sawtooth', freq: 659, at: 0.12, attack: 0.01, dur: 0.9, gain: 0.06, unison: { voices: 3, spread: 15 }, filter: { type: 'lowpass', freq: 2800 } },
                 { wave: 'sawtooth', freq: 784, at: 0.12, attack: 0.01, dur: 0.9, gain: 0.06, unison: { voices: 3, spread: 15 }, filter: { type: 'lowpass', freq: 2800 } },
-                { wave: 'sine', freq: 131, at: 0.12, dur: 0.9, gain: 0.25 } ],
+                { wave: 'sine', freq: 131, at: 0.12, dur: 0.9, gain: 0.25 },
+                // the soft swoop the arrival rides on (item 1152): a rounded sine gliding up
+                // an octave and a half as the fog rolls in, a quieter one an octave under it
+                { wave: 'sine', freq: 262, slideTo: 784, at: 0.04, attack: 0.18, dur: 0.7, gain: 0.12,
+                  filter: { type: 'lowpass', freq: 1600 } },
+                { wave: 'triangle', freq: 131, slideTo: 392, at: 0.04, attack: 0.18, dur: 0.7, gain: 0.07 } ],
       effects: { bus: { type: 'lowpass', freq: 3200, q: 0.7 }, reverb: { seconds: 1.0, decay: 3, mix: 0.2 } }
     },
-    draw: draw
+    draw: draw,
+    arrival: { spec: ARRIVAL, pourAt: pourAt, cubeAt: cubeAt, cubeFaces: cubeFaces, edgeStrength: edgeStrength },
+    flourish: arrival
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
