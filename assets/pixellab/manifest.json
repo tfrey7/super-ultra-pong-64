@@ -931,6 +931,98 @@
         "shading": "medium shading",
         "detail": "low detail"
       }
+    },
+    {
+      "name": "era1-players-left",
+      "file": "era1-players-left.png",
+      "prompt": "Atari 2600 1977 sprite sheet, tiny blocky one-colour athlete, 3 columns by 6 rows of 6x28 pixel frames facing right, solid white figure on transparent: row 1 idle standing legs together, row 2 running upward legs apart, row 3 running downward legs apart, row 4 swinging arm raised, row 5 slumped head dropped, row 6 cheering both arms raised above head",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1501391548,
+      "date": "2026-09-11T03:23:57.266Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 21.7,
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 465,
+      "sha256": "9b9c9f0027894b59b8ce233304aee635900f6189912ddd34117d7bf287873f01",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "Atari 2600 1977 sprite sheet, tiny blocky one-colour athlete, 3 columns by 6 rows of 6x28 pixel frames facing right, solid white figure on transparent: row 1 idle standing legs together, row 2 running upward legs apart, row 3 running downward legs apart, row 4 swinging arm raised, row 5 slumped head dropped, row 6 cheering both arms raised above head",
+        "image_size": {
+          "width": 18,
+          "height": 168
+        },
+        "seed": 1501391548,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era1-players-right",
+      "file": "era1-players-right.png",
+      "prompt": "Atari 2600 1977 sprite sheet, tiny blocky one-colour athlete, 3 columns by 6 rows of 6x28 pixel frames facing right, solid white figure on transparent, short neck head low on shoulders: row 1 idle standing legs together, row 2 running upward legs apart, row 3 running downward legs apart, row 4 swinging arm raised, row 5 slumped head dropped, row 6 cheering both arms raised above head",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 915340210,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 16.5,
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 885,
+      "sha256": "2d76711abc1f92a0b2d4a4b1e5ac63fa94a9bb7a8b6a35c3f1d9bfd5ffcac001",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "Atari 2600 1977 sprite sheet, tiny blocky one-colour athlete, 3 columns by 6 rows of 6x28 pixel frames facing right, solid white figure on transparent, short neck head low on shoulders: row 1 idle standing legs together, row 2 running upward legs apart, row 3 running downward legs apart, row 4 swinging arm raised, row 5 slumped head dropped, row 6 cheering both arms raised above head",
+        "image_size": {
+          "width": 18,
+          "height": 168
+        },
+        "seed": 915340210,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
     }
   ]
 }
