@@ -271,11 +271,16 @@
     ];
     for (var hi = 0; hi < hills.length; hi++) {
       var h = hills[hi];
+      // a half-ellipse, as an arc under a vertical squash (no ctx.ellipse needed)
+      target.save();
+      target.translate(h.cx, farY + 40);
+      target.scale(1, (h.top + 40) / h.rx);
       target.beginPath();
-      target.ellipse(h.cx, farY + 40, h.rx, h.top + 40, 0, Math.PI, Math.PI * 2);
+      target.arc(0, 0, h.rx, Math.PI, Math.PI * 2);
       target.closePath();
       target.fillStyle = T.fogColour(h.ink, h.depth, FOG);
       target.fill();
+      target.restore();
     }
 
     // the world ends in a pale wall: fully fogged from d = 1.15

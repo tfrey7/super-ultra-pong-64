@@ -134,8 +134,10 @@ test('the ball is the last thing drawn on the table: a smooth sphere, then its w
   assert.deepStrictEqual(body.fill.stops.map((s) => s[1]), ['#ffffff', '#ffe9a8', '#f0b020']);
   const [hx, hy, , cx, cy, r] = body.fill.args;
   assert.ok(hx < cx && hy < cy && r > 0, 'the hot spot sits up and to the left');
-  const s = T.ballScreen(T.camera(BIBLE_CAMERA), g);
-  assert.ok(Math.abs(cx - s.x) < 1e-9 && Math.abs(cy - s.y) < 1e-9, 'the ball stands where the rules put it');
+  const cam = T.camera(BIBLE_CAMERA);
+  const s = T.ballScreen(cam, g);
+  const centre = T.project(cam, g.ball.x + g.ball.size / 2, g.ball.y + g.ball.size / 2, g.ball.size * 0.7);
+  assert.ok(Math.abs(cx - centre.x) < 1e-9 && Math.abs(cy - centre.y) < 1e-9, 'the ball stands on its true footprint, one radius up');
   assert.ok(r > s.r, 'a bigger ball than the stock table ball');
   assert.ok(fills.slice(0, -1).every((o) => o.fill !== '#ffffff'), 'R1: no other fill is pure white');
 });
