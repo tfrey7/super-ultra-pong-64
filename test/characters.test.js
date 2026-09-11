@@ -26,7 +26,13 @@ function recorder() {
   const ctx = new Proxy({ calls }, {
     get(t, k) {
       if (k in t) return t[k];
-      return (...args) => { calls.push([k, args]); };
+      return (...args) => {
+        calls.push([k, args]);
+        // A gradient or pattern the era asks for: one that takes colour stops.
+        if (typeof k === 'string' && /^create/.test(k)) return { addColorStop() {} };
+        if (k === 'measureText') return { width: 0 };
+        return undefined;
+      };
     },
     set(t, k, v) { t[k] = v; return true; }
   });
@@ -264,6 +270,67 @@ test('headless, a block naming `sheet` or `sheets` draws the placeholder on both
   } finally {
     C.ERAS[3] = saved;
   }
+});
+
+test('clip: { y0, y1 } draws both players inside that band, and an era without one clips nothing', () => {
+  const saved = C.ERAS[4];
+  try {
+    assert.strictEqual(C.configFor(4).clip, null, 'no clip by default');
+    let ctx = recorder();
+    C.drawPlayers(ctx, playing(4), null, R);
+    assert.ok(!ctx.calls.some(([k]) => k === 'clip'), 'an era with no clip never clips');
+
+    C.ERAS[4] = Object.assign({}, saved, { clip: { y0: 52, y1: 548 } });
+    assert.deepStrictEqual(C.configFor(4, 'right').clip, { y0: 52, y1: 548 }, 'both sides carry it');
+    const g = playing(4);
+    ctx = recorder();
+    C.drawPlayers(ctx, g, null, R);
+    const calls = ctx.calls;
+    const at = (k) => calls.findIndex(([n]) => n === k);
+    const clipAt = at('clip');
+    assert.ok(clipAt > 0, 'the players are clipped');
+    assert.strictEqual(calls.filter(([k]) => k === 'clip').length, 1, 'one clip for both players');
+    const rect = calls.slice(0, clipAt).reverse().find(([k]) => k === 'rect');
+    assert.deepStrictEqual(rect[1], [0, 52, g.width, 496], 'the band: the whole width, y 52 to 548');
+    assert.strictEqual(calls[0][0], 'save', 'the clip is inside its own save');
+    // Every figure is drawn after the clip, and the clip's save is the last restored.
+    const drawn = calls.map(([k], i) => (k === 'fillRect' || k === 'drawImage' ? i : -1)).filter((i) => i >= 0);
+    assert.ok(drawn.length > 0 && drawn.every((i) => i > clipAt), 'nothing of a player is drawn outside the clip');
+    assert.strictEqual(calls[calls.length - 1][0], 'restore', 'the clip is lifted when the players are done');
+    assert.strictEqual(calls.filter(([k]) => k === 'save').length, calls.filter(([k]) => k === 'restore').length);
+
+    // A band that makes no sense clips nothing rather than hiding the players.
+    assert.strictEqual(C.clipBand({ y0: 300, y1: 100 }), null);
+    assert.strictEqual(C.clipBand({ y0: 'a', y1: 5 }), null);
+    assert.deepStrictEqual(C.clipBand({ y0: '10', y1: 20 }), { y0: 10, y1: 20 });
+
+    // A stand-in canvas that knows no clip() (the era tests' own) still gets its players.
+    const plain = recorder();
+    plain.clip = undefined;
+    assert.strictEqual(C.drawPlayers(plain, playing(4), null, R), true);
+    assert.ok(plain.calls.some(([k]) => k === 'fillRect'), 'drawn, unclipped');
+  } finally {
+    C.ERAS[4] = saved;
+  }
+});
+
+test('era 8 keeps its players between its letterbox bars, through the rig and not a wrapper of its own', () => {
+  const bar = R.eraLook(8).fx.BAR;
+  const g = playing(8);
+  assert.deepStrictEqual(C.configFor(8).clip, { y0: bar, y1: g.height - bar });
+  // Through the renderer: the bars are drawn, then the players clipped to the picture between them.
+  const ctx = recorder();
+  R.draw(ctx, g);
+  const calls = ctx.calls;
+  const topBar = calls.findIndex(([k, a]) => k === 'fillRect' && a.join() === [0, 0, g.width, bar].join());
+  const clipAt = calls.findIndex(([k]) => k === 'clip');
+  assert.ok(topBar >= 0, 'the letterbox is drawn');
+  assert.ok(clipAt > topBar, 'the players are clipped, after the bars');
+  const rect = calls.slice(0, clipAt).reverse().find(([k]) => k === 'rect');
+  assert.deepStrictEqual(rect[1], [0, bar, g.width, g.height - 2 * bar]);
+  // Nothing lays the bars a second time over the players any more.
+  const bars = calls.filter(([k, a]) => k === 'fillRect' && a.join() === [0, 0, g.width, bar].join());
+  assert.strictEqual(bars.length, 1, 'the top bar is drawn once a frame');
 });
 
 test('through the renderer: PongRender.draw draws the era, then the players over it', () => {
