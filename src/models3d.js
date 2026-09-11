@@ -554,6 +554,11 @@
    * Answers the number of items drawn.
    */
   function drawScene(ctx, T, cam, figures, opts) {
+    // Item 1274: when the real 3D layer has just stood the glTF figures (and
+    // their bats and the ball) in this frame, this polygon drawing is the
+    // fallback it replaces, so it draws nothing.
+    var F3 = root.PongField3D;
+    if (F3 && typeof F3.takeFigures === 'function' && F3.takeFigures()) return null;
     opts = opts || {};
     var mode = MODES.indexOf(opts.mode) >= 0 ? opts.mode : 'flat';
     var fog = opts.fog && opts.fog.colour ? { spec: opts.fog, rgb: hexRgb(opts.fog.colour), cap: opts.fogCap === undefined ? 0.6 : opts.fogCap } : null;
