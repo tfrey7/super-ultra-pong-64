@@ -21,7 +21,7 @@ import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { launchChrome, portTakenWhy, portTakenLine, pickOwnPage } from './chrome.mjs';
+import { launchChrome, refusePortTaken, pickOwnPage } from './chrome.mjs';
 import { CdpConnection, DroppedConnection } from './cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -128,7 +128,7 @@ class Session extends CdpConnection {
 class ForeignPage extends Error {}
 
 // Attach only to the page this checkout asked for. The port was free a moment ago
-// (main() checks), but another worker's Chrome can still take it in between, and
+// (launchChrome checks), but another worker's Chrome can still take it in between, and
 // then our Chrome runs with no port at all while the endpoint answers with theirs.
 async function targetUrl(asked) {
   for (let i = 0; i < 60; i++) {
@@ -730,15 +730,6 @@ function summarise(shots) {
 }
 
 async function main() {
-  // Refuse a port that is already listening, before Chrome is even started: a
-  // Chrome that cannot bind it runs on without one, and the endpoint on that
-  // number belongs to whoever holds it (item 1215).
-  const taken = await portTakenWhy(PORT);
-  if (taken) {
-    console.error(portTakenLine(PORT, taken));
-    process.exitCode = 2;
-    return;
-  }
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
   const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') +
     // ?era=N alone opens straight into play (item 1207); title=on keeps the
@@ -747,7 +738,7 @@ async function main() {
   // The profile is a fresh folder under the temp directory, deleted when Chrome
   // exits -- on success, on an error and on Ctrl+C (tools/chrome.mjs, item 1169) --
   // so two playtests on two ports never share one and none is left behind.
-  const chrome = launchChrome(CHROME, [
+  const chrome = await launchChrome(CHROME, [
     // --mute-audio: the audio graph still runs and is still checked, but a
     // playtest never beeps through the speakers of the machine it runs on.
     // --allow-file-access-from-files: the page is opened off disk, where Chrome
@@ -759,7 +750,10 @@ async function main() {
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
     '--no-first-run', '--no-default-browser-check',
     url
-  ], { name: 'playtest' });
+    // A port somebody already holds is refused in one line, exit 2, before anything is
+    // started: a Chrome that cannot bind it runs on without one, and the endpoint on
+    // that number belongs to whoever holds it (items 1215, 1220).
+  ], { name: 'playtest' }).catch(refusePortTaken);
   // Named up front so a run that loses Chrome can say which process it was.
   console.log(`chrome: pid ${chrome.pid}, DevTools port ${PORT}`);
 

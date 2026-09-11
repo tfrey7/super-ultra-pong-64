@@ -14,7 +14,7 @@
 //   3. what the page's own sound player took the point for (the Xbox's boot).
 // Writes the PNGs and sphere-capture.json beside this file.
 import { writeFileSync, existsSync } from 'node:fs';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -28,11 +28,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const url = pathToFileURL(path.join(ROOT, 'index.html')).href + '?era=8';
 
 // A fresh profile folder, deleted when Chrome exits (tools/chrome.mjs, item 1169).
-const chrome = launchChrome(CHROME, [
+const chrome = await launchChrome(CHROME, [
   '--headless=new', `--remote-debugging-port=${PORT}`,
   '--mute-audio', '--autoplay-policy=no-user-gesture-required',
   '--no-first-run', '--no-default-browser-check', '--window-size=1000,760', url
-], { name: 'sphere' });
+], { name: 'sphere' }).catch(refusePortTaken);
 console.log(`chrome pid ${chrome.pid}`);
 
 let ws;
