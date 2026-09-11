@@ -277,8 +277,12 @@
    * centre line and stop. All drawn in code, into the 320 x 240 buffer, so the
    * city is as chunky, snapped and wobbling as the table.
    */
-  var SKYLINE = { count: 10, from: -260, to: 1060, wMin: 40, wMax: 90, hMin: 60, hMax: 200,
-                  yNear: -60, yFar: -120, depth: 30, windows: 24, winW: 8, winH: 10, winAlpha: 0.5, switchS: 0.7 };
+  // Nearer and lower than the bible's y -60 to -120 and 60 to 200 tall: under this
+  // camera only the top 100 screen units lie behind the far wall, most of them
+  // under the HUD, and the bible's city ran off the top of the frame (measured
+  // with T.project: a 200-unit roof at y -90 lands at screen y -69).
+  var SKYLINE = { count: 10, from: -260, to: 1060, wMin: 40, wMax: 90, hMin: 30, hMax: 90,
+                  yNear: -20, yFar: -50, depth: 20, windows: 24, winW: 8, winH: 8, winAlpha: 0.5, switchS: 0.7 };
   var SEARCH = { from: [3, 6], width: 40, length: 320, swing: 25, period: 5, alpha: 0.18,
                  targets: [[400, 170], [400, 430]] };
 
@@ -306,7 +310,7 @@
       var b = BOXES[i % SKYLINE.count], tier = Math.floor(i / SKYLINE.count);
       var room = Math.max(1, b.w - 2 * SKYLINE.winW);
       out.push({ box: i % SKYLINE.count, x: b.x + SKYLINE.winW / 2 + ((i * 23) % room),
-                 z: b.h * (0.25 + 0.25 * tier), base: (i * 5) % 3 !== 0 });
+                 z: b.h * (0.2 + 0.25 * tier), base: (i * 5) % 3 !== 0 });
     }
     return out;
   })();
@@ -323,10 +327,10 @@
     return SEARCH.swing * Math.sin(2 * Math.PI * (t || 0) / SEARCH.period + i * Math.PI);
   }
 
-  /** Where beam i starts: the middle of its box's roofline, on screen. */
+  /** Where beam i starts: street level behind the middle of its box, on screen (the box hides the foot). */
   function beamBase(T, cam, i) {
     var b = BOXES[SEARCH.from[i]];
-    return T.project(cam, b.x + b.w / 2, b.y - SKYLINE.depth / 2, b.h);
+    return T.project(cam, b.x + b.w / 2, b.y - SKYLINE.depth / 2, 0);
   }
 
   /** The beam's triangle: from its base, `length` along the angle, `width` across at the far end. */
