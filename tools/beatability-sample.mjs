@@ -65,7 +65,8 @@ function trial(Pong, seed, aimStyle) {
     }
     Pong.step(g, DT, { pointerY: hand, up: false, down: false });
   }
-  return g.score.left;
+  return { points: g.score.left, planned: g.scorer ? g.scorer.planned : 0,
+    certain: g.scorer ? g.scorer.certain : 0 };
 }
 
 /**
@@ -89,10 +90,14 @@ function sample(modulePath, label, aimStyle) {
   const Pong = require(modulePath);
   let scored = 0;
   let points = 0;
+  let planned = 0;
+  let certain = 0;
   for (let i = 1; i <= TRIALS; i++) {
     const s = trial(Pong, i * 2654435761, aimStyle);
-    points += s;
-    if (s > 0) scored += 1;
+    points += s.points;
+    planned += s.planned;
+    certain += s.certain;
+    if (s.points > 0) scored += 1;
   }
   return {
     label,
@@ -102,7 +107,9 @@ function sample(modulePath, label, aimStyle) {
     windowSeconds: WINDOW,
     sessionsThatScored: scored,
     passRate: scored / TRIALS,
-    pointsPerMinute: (points / TRIALS) * (60 / WINDOW)
+    pointsPerMinute: (points / TRIALS) * (60 / WINDOW),
+    // scripted only: incoming balls planned, and how many had a certain shot
+    ...(aimStyle === 'scripted' ? { ballsPlanned: planned, ballsWithCertainShot: certain } : {})
   };
 }
 
@@ -119,7 +126,9 @@ for (const style of STYLES) {
 for (const r of runs) {
   console.log(`${r.aim.padEnd(6)} ${r.label}: ${r.sessionsThatScored}/${r.trials} ` +
     `sessions scored in ${r.windowSeconds}s (${(r.passRate * 100).toFixed(1)}%), ` +
-    `${r.pointsPerMinute.toFixed(2)} player points per minute`);
+    `${r.pointsPerMinute.toFixed(2)} player points per minute` +
+    (r.ballsPlanned !== undefined
+      ? `; ${r.ballsWithCertainShot} of ${r.ballsPlanned} incoming balls had a certain shot` : ''));
 }
 
 const out = path.join(HERE, 'beatability-sample.json');

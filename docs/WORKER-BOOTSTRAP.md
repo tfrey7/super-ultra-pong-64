@@ -96,7 +96,8 @@ saving `era-wipe.png` mid-ring -- and, last, it **walks one match up the whole l
 era-0 machine, one point let through per rung, a check that each point moved it up exactly one era,
 a screenshot of each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to
 `ladder-era4-snes.png`, cropped to the field) and one more point to prove it stops on era 4.
-`--ladder` runs only that walk (about half a minute); `--reference` also copies its five frames into
+`--ladder` runs only that walk (about half a minute); `--scoring` runs only the rally and the
+scoring check (about ten seconds); `--reference` also copies its five frames into
 the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
 `index.html?era=N` (N is 0 to 4) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
@@ -168,11 +169,15 @@ his emulator — never touch either.**
   the browser (`window.Pong`) and `node --test` (CommonJS). `tools/playtest.mjs` is `.mjs` because
   Node runs it, not the page.
 - **Run `node --test` from the repo root.** The suite reaches `src/game.js` by relative path.
-- **One playtest check is a coin flip and always has been.** "The player can score against the
-  computer" allows 22 seconds of ball-tracking play and asks for a point;
-  `node tools/beatability-sample.mjs` measures that at 44% over 300 sessions, identically on
-  master. Do not read a single failure of that one line as a regression you caused -- run the
-  sampler before you believe it.
+- **The scoring check plays a scripted hand, so believe its FAIL.** "The player can score against
+  the computer" used to give 22 seconds of plain ball-tracking and passed only 44% of the time --
+  the computer is beatable by design, not beatable every 22 seconds. Since item 1160 the harness
+  plays `tools/scoring-rally.js` instead, which asks the rules where to stand so the computer
+  cannot return the shot whatever aim it rolls. A FAIL on that line now means scoring is really
+  broken, or the computer has been made unbeatable -- both regressions. `node tools/playtest.mjs
+  --scoring` runs just that check in about ten seconds. `node tools/beatability-sample.mjs` still
+  measures how beatable the game itself is: its `track` and `corner` rows are the design, its
+  `scripted` row is the check's hand.
 - **Eras 0 and 1 are pinned to the pixel.** `tools/eralooks-today.json` holds every draw call
   those two eras made before the ladder existed, and a test compares the live renderer against
   it. A deliberate change to either look re-records it: `node tools/eralooks.js`, committed with

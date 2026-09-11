@@ -89,13 +89,18 @@ function plan(Pong, snap) {
   if (at === null) return { hand: snap.height / 2, certain: false, width: 0 };
   const rules = snap.rules || Pong.RULES;
   const reach = rules.paddleHeight / 2 + rules.ballSize;
+  // The paddle stops at the walls, so a hand past these edges stands exactly
+  // where the edge does -- and a hand kept on the field keeps the harness's
+  // mouse on the canvas.
+  const lo = Math.max(at - reach, rules.paddleHeight / 2);
+  const hi = Math.min(at + reach, snap.height - rules.paddleHeight / 2);
   let best = null;
   let run = [];
   const close = () => {
     if (run.length && (!best || run.length > best.length)) best = run;
     run = [];
   };
-  for (let hand = at - reach; hand <= at + reach; hand += HAND_STEP) {
+  for (let hand = lo; hand <= hi; hand += HAND_STEP) {
     if (AIM_ROLLS.every((u) => scores(Pong, snap, hand, u))) run.push(hand);
     else close();
   }
@@ -104,7 +109,8 @@ function plan(Pong, snap) {
   // Nothing certain: take the ball on the tip away from where the computer
   // stands, the steepest shot there is, and hope.
   const away = (snap.rightY + rules.paddleHeight / 2) < snap.height / 2 ? 1 : -1;
-  return { hand: at - away * rules.paddleHeight * 0.45, certain: false, width: 0 };
+  const tip = at - away * rules.paddleHeight * 0.45;
+  return { hand: Math.max(lo, Math.min(hi, tip)), certain: false, width: 0 };
 }
 
 /**

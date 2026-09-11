@@ -18,6 +18,7 @@
  * part of the game: nothing in src/ knows it exists.
  */
 import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -26,6 +27,11 @@ import os from 'node:os';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const SHOTS = path.join(ROOT, 'docs', 'shots', 'playtest');
+// The rules the page loads, read here too so the scoring hand can plan its
+// shots against them (tools/scoring-rally.js). Nothing is changed by reading.
+const require = createRequire(import.meta.url);
+const Pong = require(path.join(ROOT, 'src', 'game.js'));
+const Rally = require(path.join(HERE, 'scoring-rally.js'));
 
 const CHROMES = [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -47,6 +53,9 @@ const ERA = arg('era', '');
 const NO_AUDIO = process.argv.includes('--no-audio');
 // --ladder runs only the walk up the era ladder (section 8), about 30 seconds.
 const LADDER_ONLY = process.argv.includes('--ladder');
+// --scoring runs only the rally and the scoring check (section 6), about ten
+// seconds -- the quick way to ask "can the player still score?" many times.
+const SCORING_ONLY = process.argv.includes('--scoring');
 // --reference also copies the five era frames the walk takes into the TRACKED
 // docs/shots/eras/, the reference pictures a reader opens. Off by default,
 // because every walk's frames differ and a plain playtest must leave git clean.
@@ -130,7 +139,7 @@ function check(name, ok, detail) {
 }
 
 const state = (s) => s.eval(`(() => { const g = window.__pong; return {
-  phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally, era: g.era,
+  phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally, era: g.era, rules: g.rules,
   score: { left: g.score.left, right: g.score.right },
   ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy },
   leftY: g.left.y, rightY: g.right.y, h: g.left.h, height: g.height, width: g.width
@@ -161,6 +170,40 @@ async function playUntil(s, geo, ms, aim, done) {
     g = await state(s);
   }
   return g;
+}
+
+/**
+ * 6. Play a rally, then score against the computer. The hand is scripted, not
+ * a plain ball-chase: a chase scores within 22 seconds only 44% of the time
+ * (the computer is beatable by design, not that beatable), which made this
+ * check a coin flip. tools/scoring-rally.js plans each incoming ball against
+ * the page's own rules and stands where the return cannot be reached whatever
+ * aim the computer rolls, so a point comes on the first shot -- and a FAIL here
+ * means scoring really is broken, or the computer has been made unbeatable.
+ * It stops as soon as the point and the rally picture are both in.
+ */
+async function playToScore(s, midX, toClientY) {
+  const aim = Rally.createScorer(Pong);
+  const started = Date.now();
+  const deadline = started + 22000;
+  let shotTaken = false;
+  let gp = await state(s);
+  while (Date.now() < deadline && !(gp.score.left > 0 && shotTaken)) {
+    await s.mouseTo(midX, toClientY(aim(gp)));
+    if (!shotTaken && gp.rally >= 2 && gp.serveDelay <= 0) {
+      await s.shot('rally');
+      shotTaken = true;
+    }
+    await sleep(45);
+    gp = await state(s);
+  }
+  const secs = ((Date.now() - started) / 1000).toFixed(1);
+  check('rallies happen: the ball bounces off the paddles', gp.rally > 0 || gp.score.left > 0,
+    `${gp.rally} hits in the current rally, score ${gp.score.left}-${gp.score.right}`);
+  check('the player can score against the computer', gp.score.left > 0,
+    `score after ${secs}s of scripted play: player ${gp.score.left}, computer ${gp.score.right}; ` +
+    `${aim.certain} of ${aim.planned} incoming balls had a shot the rules say it cannot return`);
+  return { gp, shotTaken };
 }
 
 /**
@@ -281,6 +324,14 @@ async function main() {
     const toClientY = (fieldY) => geo.top + (fieldY / g0.height) * geo.height;
     const midX = geo.left + geo.width / 2;
 
+    if (SCORING_ONLY) {
+      await s.key('keyDown', 'Space', ' ', 32);
+      await s.key('keyUp', 'Space', ' ', 32);
+      await sleep(150);
+      const played = await playToScore(s, midX, toClientY);
+      return summarise(played.shotTaken ? [path.join(SHOTS, 'rally.png')] : []);
+    }
+
     // 1. The machine opens on its title screen, and stays there.
     const t0 = await state(s);
     await sleep(700);
@@ -361,23 +412,8 @@ async function main() {
     check('the S key moves the paddle down', afterDown > afterUp + 20,
       `moved from ${afterUp.toFixed(0)} to ${afterDown.toFixed(0)}`);
 
-    // 6. Play properly for a while: track the ball with the mouse and rally.
-    let shotTaken = false;
-    const deadline = Date.now() + 22000;
-    while (Date.now() < deadline) {
-      const g = await state(s);
-      await s.mouseTo(midX, toClientY(g.ball.y + 6));
-      if (!shotTaken && g.rally >= 2 && g.serveDelay <= 0) {
-        await s.shot('rally');
-        shotTaken = true;
-      }
-      await sleep(45);
-    }
-    const gp = await state(s);
-    check('rallies happen: the ball bounces off the paddles', gp.rally > 0 || gp.score.left > 0,
-      `${gp.rally} hits in the current rally, score ${gp.score.left}-${gp.score.right}`);
-    check('the player can score against the computer', gp.score.left > 0,
-      `score after ~22s of tracking play: player ${gp.score.left}, computer ${gp.score.right}`);
+    // 6. Play a rally and score against the computer (playToScore, above).
+    const { gp, shotTaken } = await playToScore(s, midX, toClientY);
 
     // 6b. The rally was heard (the key press after the reload unlocked it), and
     // every era's voice schedules on the real Web Audio API.
