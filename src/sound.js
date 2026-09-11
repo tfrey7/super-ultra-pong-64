@@ -48,6 +48,19 @@
   //   dur      seconds the note lasts;  gain  peak loudness, 0..1
   //   fm       optional { ratio, index }: a sine modulator at freq * ratio,
   //            swinging the carrier by freq * index Hz and decaying with it
+  // and the 3D eras' additions (docs/ERAS.md section 3), all optional:
+  //   wave: 'noise'  white noise from one shared 2-second looped buffer made at
+  //            unlock; freq is ignored
+  //   attack   seconds to peak (default 0.004)
+  //   filter   { type, freq, q, to }: a BiquadFilter on the note; q defaults to
+  //            0.7, `to` glides the cutoff exponentially over the note
+  //   unison   { voices, spread }: that many copies detuned evenly from -spread
+  //            to +spread cents, each at gain / voices
+  //   lfo      { freq, depth }: tremolo on the note's gain, depth 0..1
+  //   shape    0..1: WaveShaper drive, curve tanh(k x) with k = 1 + 20 * shape
+  // A voice's `effects` are per era: echo { time, feedback, mix }, reverb
+  // { seconds, decay, mix }, bus { type, freq, q } (one filter every note of the
+  // era passes through) and shape (a WaveShaper on that bus).
   // The Atari's and the NES's point notes, each shared by its era's `score` and
   // the front of its `boot` sting: the point that brings the era in is still heard.
   var ATARI_POINT = [{ wave: 'square', freq: 147, slideTo: 110, dur: 0.36, gain: 0.2 }];
@@ -195,6 +208,59 @@
     return ECHOES[ECHOES.length - 1] || null;
   }
 
+  // Eras 0 to 4 have no effects object of their own: their echo is the whole of it.
+  var ECHO_EFFECTS = ECHOES.map(function (e) { return e ? { echo: e } : {}; });
+
+  /**
+   * Everything an era runs its notes through, as the voice's `effects` object:
+   * { echo, reverb, bus, shape }, each optional. Never null; {} for none.
+   */
+  function effectsFor(era) {
+    var n = clampEra(era);
+    if (n < ECHO_EFFECTS.length) return ECHO_EFFECTS[n];
+    var v = lookVoice(n);
+    if (v) return v.effects || {};
+    return ECHO_EFFECTS[ECHO_EFFECTS.length - 1];
+  }
+
+  /** The WaveShaper curve for a drive of `shape` (0..1): tanh(k x), k = 1 + 20 * shape. */
+  var SHAPE_POINTS = 1024;
+  var curves = {};
+  function shapeCurve(shape) {
+    var k = 1 + 20 * shape;
+    if (curves[k]) return curves[k];
+    var c = typeof Float32Array === 'function' ? new Float32Array(SHAPE_POINTS) : new Array(SHAPE_POINTS);
+    for (var i = 0; i < SHAPE_POINTS; i++) {
+      var x = (i / (SHAPE_POINTS - 1)) * 2 - 1;
+      c[i] = Math.tanh(k * x);
+    }
+    curves[k] = c;
+    return c;
+  }
+
+  /** The copies a unison note plays: { cents } for each, -spread to +spread. */
+  function unisonCents(u) {
+    var n = u && u.voices > 1 ? Math.floor(u.voices) : 1;
+    var spread = u && u.spread ? u.spread : 0;
+    var out = [];
+    for (var i = 0; i < n; i++) out.push(n > 1 ? -spread + (2 * spread * i) / (n - 1) : 0);
+    return out;
+  }
+
+  /**
+   * White noise in -1..1 from a fixed seed, so the buffers are the same every
+   * session and a test can read them. A one-time fill of an audio buffer.
+   */
+  function fillNoise(data, seed, envelope) {
+    var s = seed >>> 0;
+    var n = data.length;
+    for (var i = 0; i < n; i++) {
+      s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+      var w = (s / 4294967296) * 2 - 1;
+      data[i] = envelope ? w * envelope(i, n) : w;
+    }
+  }
+
   // -------------------------------------------------------------- the player
   var MAX_PER_FRAME = 4;   // a pathological frame never schedules a pile of notes
 
@@ -211,13 +277,16 @@
 
     var ctx = null;
     var master = null;
-    var echoIn = null;
+    var noise = null;     // the shared 2-second white-noise buffer, made at unlock
+    var noiseAt = 0;      // where in it the next noise note starts, so clicks differ
+    var buses = {};       // era -> { dry, sends }: its effects, built on first use
     var sounded = null;   // the era of the last event this player sounded
     var player = {
       unlocked: false,    // has the player touched the page yet?
       available: false,   // did an audio context actually open?
       played: 0,          // events turned into sound
       errors: 0,          // anything the audio API threw, swallowed
+      skipped: 0,         // notes or effects this audio context has no node for
       boots: 0,           // boot stings played: one per change into an era that has one
       last: null,         // { era, type, waves } of the latest event played ('boot' for a sting)
       unlock: unlock,
@@ -251,7 +320,21 @@
         master = null;
         player.errors += 1;
       }
+      if (player.available) makeNoise();
       return player.available;
+    }
+
+    /** The one noise buffer every noise note loops: 2 seconds, made once. */
+    function makeNoise() {
+      if (typeof ctx.createBuffer !== 'function') return;
+      try {
+        var rate = ctx.sampleRate || 44100;
+        noise = ctx.createBuffer(1, Math.round(2 * rate), rate);
+        fillNoise(noise.getChannelData(0), 0x5eed);
+      } catch (e) {
+        noise = null;
+        player.errors += 1;
+      }
     }
 
     function resume() {
@@ -302,10 +385,10 @@
       var voices = voicesFor(ev.era, type);
       if (!voices.length) return false;
       try {
-        var echo = echoFor(ev.era);
-        var out = echo ? echoBus(echo) : null;
+        var fx = effectsFor(ev.era);
+        var bus = busFor(clampEra(ev.era), fx);
         var t0 = ctx.currentTime + 0.005;
-        for (var i = 0; i < voices.length; i++) voice(voices[i], t0, out);
+        for (var i = 0; i < voices.length; i++) voice(voices[i], t0, bus);
         player.played += 1;
         if (type === 'boot') player.boots += 1;
         sounded = clampEra(ev.era);
@@ -313,7 +396,9 @@
           era: clampEra(ev.era),
           type: type,
           waves: voices.map(function (v) { return v.fm ? 'fm' : v.wave; }),
-          echo: !!echo
+          echo: !!fx.echo,
+          reverb: !!fx.reverb,
+          bus: !!(fx.bus || fx.shape)
         };
         return true;
       } catch (e) {
@@ -322,47 +407,168 @@
       }
     }
 
-    function voice(v, t0, echoBusIn) {
-      // Noise notes are part of the 3D eras' voice grammar and not built yet:
-      // skipped rather than handed to an oscillator that would refuse them.
-      if (v.wave === 'noise') return;
+    /**
+     * One note: its sources (an oscillator, a unison's detuned copies, or the
+     * looped noise), then its drive, its filter, its envelope and its tremolo,
+     * into the era's bus. A note with none of the 3D fields makes exactly the
+     * nodes and calls it always made (tools/sound-eras0-4.json pins that).
+     */
+    function voice(v, t0, bus) {
       var t = t0 + (v.at || 0);
       var end = t + v.dur;
-      var osc = ctx.createOscillator();
-      osc.type = v.wave;
-      osc.frequency.setValueAtTime(v.freq, t);
-      if (v.slideTo) osc.frequency.exponentialRampToValueAtTime(v.slideTo, end);
+      var sources = [];
+      var ratios = [];
+      if (v.wave === 'noise') {
+        if (!noise) { player.skipped += 1; return; }
+        var src = ctx.createBufferSource();
+        src.buffer = noise;
+        src.loop = true;
+        sources.push(src);
+      } else {
+        var cents = v.unison ? unisonCents(v.unison) : [0];
+        for (var c = 0; c < cents.length; c++) {
+          var r = cents[c] ? Math.pow(2, cents[c] / 1200) : 1;
+          var osc = ctx.createOscillator();
+          osc.type = v.wave;
+          osc.frequency.setValueAtTime(r === 1 ? v.freq : v.freq * r, t);
+          if (v.slideTo) osc.frequency.exponentialRampToValueAtTime(r === 1 ? v.slideTo : v.slideTo * r, end);
+          sources.push(osc);
+          ratios.push(r);
+        }
+      }
+
+      // The stages between the sources and the envelope, in signal order.
+      var stages = [];
+      if (v.shape > 0) {
+        if (typeof ctx.createWaveShaper === 'function') {
+          var ws = ctx.createWaveShaper();
+          ws.curve = shapeCurve(v.shape);
+          stages.push(ws);
+        } else player.skipped += 1;
+      }
+      if (v.filter) {
+        if (typeof ctx.createBiquadFilter === 'function') stages.push(filterNode(v.filter, t, end));
+        else player.skipped += 1;
+      }
 
       var env = ctx.createGain();
+      var attack = v.attack > 0 ? Math.min(v.attack, v.dur * 0.9) : 0.004;
+      var peak = sources.length > 1 ? v.gain / sources.length : v.gain;
       env.gain.setValueAtTime(0.0001, t);
-      env.gain.linearRampToValueAtTime(v.gain, t + 0.004);
+      env.gain.linearRampToValueAtTime(peak, t + attack);
       env.gain.exponentialRampToValueAtTime(0.0001, end);
-      osc.connect(env);
-      env.connect(master);
-      if (echoBusIn) env.connect(echoBusIn);
+      var first = stages.length ? stages[0] : env;
+      for (var s = 0; s < sources.length; s++) sources[s].connect(first);
+      for (var k = 0; k < stages.length; k++) stages[k].connect(k + 1 < stages.length ? stages[k + 1] : env);
 
-      var mod = null;
-      if (v.fm) {
+      var out = env;
+      var lfo = null;
+      if (v.lfo && v.lfo.freq > 0) {
+        // Tremolo: the note's gain swings between 1 - depth and 1.
+        var depthOf = Math.max(0, Math.min(1, v.lfo.depth || 0));
+        var trem = ctx.createGain();
+        trem.gain.value = 1 - depthOf / 2;
+        lfo = ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(v.lfo.freq, t);
+        var swing = ctx.createGain();
+        swing.gain.value = depthOf / 2;
+        lfo.connect(swing);
+        swing.connect(trem.gain);
+        env.connect(trem);
+        out = trem;
+      }
+      out.connect(bus.dry);
+      for (var e = 0; e < bus.sends.length; e++) out.connect(bus.sends[e]);
+
+      if (v.fm && v.wave !== 'noise') {
         // Two-operator FM: a sine swinging the carrier's pitch, its depth
         // decaying with the note so the attack is bright and the tail pure.
-        mod = ctx.createOscillator();
+        var mod = ctx.createOscillator();
         mod.type = 'sine';
         mod.frequency.setValueAtTime(v.freq * v.fm.ratio, t);
         var depth = ctx.createGain();
         depth.gain.setValueAtTime(v.freq * v.fm.index, t);
         depth.gain.exponentialRampToValueAtTime(1, end);
         mod.connect(depth);
-        depth.connect(osc.frequency);
+        for (var m = 0; m < sources.length; m++) depth.connect(sources[m].frequency);
         mod.start(t);
         mod.stop(end + 0.02);
       }
-      osc.start(t);
-      osc.stop(end + 0.02);
+      if (lfo) {
+        lfo.start(t);
+        lfo.stop(end + 0.02);
+      }
+      for (var q = 0; q < sources.length; q++) {
+        if (v.wave === 'noise') {
+          sources[q].start(t, noiseAt);
+          noiseAt = (noiseAt + 0.618034) % 2;   // the next click starts elsewhere in the loop
+        } else sources[q].start(t);
+        sources[q].stop(end + 0.02);
+      }
     }
 
-    /** The echo is built once, on the first note that needs it, and kept. */
-    function echoBus(spec) {
-      if (echoIn) return echoIn;
+    /** A BiquadFilter from a { type, freq, q, to } spec, its cutoff gliding to `to`. */
+    function filterNode(spec, t, end) {
+      var f = ctx.createBiquadFilter();
+      f.type = spec.type || 'lowpass';
+      f.frequency.setValueAtTime(spec.freq, t);
+      f.Q.setValueAtTime(typeof spec.q === 'number' ? spec.q : 0.7, t);
+      if (spec.to > 0) f.frequency.exponentialRampToValueAtTime(spec.to, end);
+      return f;
+    }
+
+    /**
+     * An era's effects, built the first time one of its notes plays and kept
+     * for that era alone: every era gets its own echo and its own reverb.
+     *   dry    where a note goes: the era's bus (drive, then filter) or master
+     *   sends  where a note also goes when there is no bus: the echo and the
+     *          reverb. With a bus, the bus's end feeds them instead, so a tail
+     *          is muffled with the note it came from.
+     */
+    function busFor(era, fx) {
+      if (buses[era]) return buses[era];
+      var bus = { dry: master, sends: [] };
+      var head = null;
+      var tail = null;
+      function chain(node) {
+        if (tail) tail.connect(node); else head = node;
+        tail = node;
+      }
+      if (fx.shape > 0) {
+        if (typeof ctx.createWaveShaper === 'function') {
+          var ws = ctx.createWaveShaper();
+          ws.curve = shapeCurve(fx.shape);
+          chain(ws);
+        } else player.skipped += 1;
+      }
+      if (fx.bus) {
+        if (typeof ctx.createBiquadFilter === 'function') {
+          var f = ctx.createBiquadFilter();
+          f.type = fx.bus.type || 'lowpass';
+          f.frequency.value = fx.bus.freq;
+          f.Q.value = typeof fx.bus.q === 'number' ? fx.bus.q : 0.7;
+          chain(f);
+        } else player.skipped += 1;
+      }
+      if (tail) {
+        tail.connect(master);
+        bus.dry = head;
+      }
+      var sends = [];
+      if (fx.echo) sends.push(echoNet(fx.echo));
+      if (fx.reverb) {
+        var rev = reverbNet(fx.reverb);
+        if (rev) sends.push(rev); else player.skipped += 1;
+      }
+      if (tail) for (var i = 0; i < sends.length; i++) tail.connect(sends[i]);
+      else bus.sends = sends;
+      buses[era] = bus;
+      return bus;
+    }
+
+    /** A slapback echo: a delay feeding back through a gain, and a wet level. */
+    function echoNet(spec) {
       var delay = ctx.createDelay(1.0);
       delay.delayTime.value = spec.time;
       var feedback = ctx.createGain();
@@ -373,8 +579,32 @@
       feedback.connect(delay);
       delay.connect(wet);
       wet.connect(master);
-      echoIn = delay;
-      return echoIn;
+      return delay;
+    }
+
+    /**
+     * A room: a ConvolverNode on a stereo impulse of noise times
+     * (1 - i / n) ** decay, `seconds` long, and a wet level. Null when this
+     * context cannot make one.
+     */
+    function reverbNet(spec) {
+      if (typeof ctx.createConvolver !== 'function' || typeof ctx.createBuffer !== 'function') return null;
+      var rate = ctx.sampleRate || 44100;
+      var n = Math.max(1, Math.round((spec.seconds || 1) * rate));
+      var decay = typeof spec.decay === 'number' ? spec.decay : 2;
+      var impulse = ctx.createBuffer(2, n, rate);
+      for (var ch = 0; ch < 2; ch++) {
+        fillNoise(impulse.getChannelData(ch), 0x7e7b + ch, function (i, len) {
+          return Math.pow(1 - i / len, decay);
+        });
+      }
+      var conv = ctx.createConvolver();
+      conv.buffer = impulse;
+      var wet = ctx.createGain();
+      wet.gain.value = typeof spec.mix === 'number' ? spec.mix : 0.25;
+      conv.connect(wet);
+      wet.connect(master);
+      return conv;
     }
 
     return player;
@@ -385,6 +615,9 @@
     VOICES: VOICES,
     voicesFor: voicesFor,
     echoFor: echoFor,
+    effectsFor: effectsFor,
+    shapeCurve: shapeCurve,
+    unisonCents: unisonCents,
     createPlayer: createPlayer
   };
 });
