@@ -496,6 +496,147 @@
     if (sp.field) c.setTransform(sp.field, 0, 0, sp.field, 0, 0);
   }
 
+  // ------------------------------------------------------------ the 3D layer (item 1291)
+  /*
+   * Ridge Racer and Tekken: the picture through the PlayStation's limits, inside
+   * the real 3D layer (src/field3d.js). The look's `render` knobs ask for the
+   * layer at 1 GL pixel per picture pixel -- the field already goes into the
+   * 320 x 240 buffer, so that is 320 x 240, and the sharp copy up is the vertex
+   * snap: every edge lands on a 2.5-pixel chunk -- with no smoothing and one flat
+   * colour a face. fieldSetup() then does, through PongField3D.internals(), what
+   * no knob can:
+   *   - the slab gets the era's own 64 x 64 texture (the 8 x 8 checker and its
+   *     scuff), nearest texels, 4 across the table and 3 down it, on a top cut
+   *     into 2 x 2 quads (8 triangles, the canvas table's own), and its shader
+   *     maps it AFFINE: the texture coordinate is interpolated straight across
+   *     the screen, no perspective divide, so the checker kinks along every
+   *     triangle's diagonal and swims as the camera wobbles;
+   *   - the far rail and the near lip are Gouraud, a vertex colour at each
+   *     corner (the rail's grey on top, its shadow below) run across the face.
+   * The scene is one, shared by eras 5 to 10, and the eras above call this first
+   * and build on it; so it re-applies itself whenever the frame before was
+   * another era's, and whenever the layer has rebuilt its meshes.
+   */
+  var RENDER = { resolution: 1, filter: false, lighting: 'flat' };
+  var SLAB = { segments: 2, repeat: [TEX.repeats, TEX.repeats * 600 / 800] };
+
+  /** The texture's texels, RGBA, row by row: the canvas tile's own checker and scuff. Pure. */
+  function texels() {
+    var n = TEX.size, cell = n / TEX.cells, out = new Uint8Array(n * n * 4);
+    function rgb(hex) { return [1, 3, 5].map(function (i) { return parseInt(hex.slice(i, i + 2), 16); }); }
+    var light = rgb(PAL.texLight), dark = rgb(PAL.texDark), scuff = rgb(PAL.scuff);
+    for (var y = 0; y < n; y++) {
+      for (var x = 0; x < n; x++) {
+        var c = (Math.floor(x / cell) + Math.floor(y / cell)) % 2 ? dark : light;
+        var s = Math.floor(x / 2);
+        if (s < n / 2 && y >= n - 2 - s * 2 && y < n - s * 2) c = scuff;   // the stair-stepped diagonal
+        out.set([c[0], c[1], c[2], 255], (y * n + x) * 4);
+      }
+    }
+    return out;
+  }
+
+  /*
+   * The affine chunk, for onBeforeCompile on a three.js material. Perspective-
+   * correct interpolation of (uv * w) and of w, divided per fragment, gives uv
+   * interpolated linearly in screen space: the PlayStation's texture mapper. The
+   * texel replaces the face's colour (the slab's colour is the layer's default)
+   * and the light still falls on it, flat.
+   */
+  var AFFINE = {
+    declare: 'varying float vPs1W;\n',
+    vertex: '#include <project_vertex>\n\tvPs1W = gl_Position.w;\n#ifdef USE_MAP\n\tvMapUv *= gl_Position.w;\n#endif\n',
+    fragment: '#ifdef USE_MAP\n\tvec4 sampledDiffuseColor = texture2D( map, vMapUv / vPs1W );\n' +
+      '\tdiffuseColor = vec4( sampledDiffuseColor.rgb, diffuseColor.a * sampledDiffuseColor.a );\n#endif\n'
+  };
+
+  function affineChunk(shader) {
+    shader.vertexShader = AFFINE.declare + shader.vertexShader.replace('#include <project_vertex>', AFFINE.vertex);
+    shader.fragmentShader = AFFINE.declare + shader.fragmentShader.replace('#include <map_fragment>', AFFINE.fragment);
+  }
+
+  var slabTexture = null;   // { THREE, texture }: made once per library
+  function textureFor(THREE) {
+    if (slabTexture && slabTexture.THREE === THREE) return slabTexture.texture;
+    var t = new THREE.DataTexture(texels(), TEX.size, TEX.size, THREE.RGBAFormat);
+    t.magFilter = t.minFilter = THREE.NearestFilter;
+    t.generateMipmaps = false;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(SLAB.repeat[0], SLAB.repeat[1]);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.userData = { era: 5 };
+    t.needsUpdate = true;
+    slabTexture = { THREE: THREE, texture: t };
+    return t;
+  }
+
+  /** The slab: the canvas table's 8 triangles, the 64 x 64 texture, the affine chunk. */
+  function slabSetup(THREE, slab, force) {
+    var mat = slab.material;
+    if (!mat) return;
+    mat.userData = mat.userData || {};
+    if (!force && mat.userData.ps1Affine) return;
+    var geo = slab.geometry, par = geo && geo.parameters;
+    if (par && par.widthSegments !== SLAB.segments && typeof THREE.BoxGeometry === 'function') {
+      slab.geometry = new THREE.BoxGeometry(par.width, par.height, par.depth, SLAB.segments, 1, SLAB.segments);
+      slab.geometry.userData = { era: 5 };
+      if (typeof geo.dispose === 'function') geo.dispose();
+    }
+    var tex = textureFor(THREE);
+    if (mat.map !== tex || mat.onBeforeCompile !== affineChunk) {
+      mat.map = tex;
+      mat.onBeforeCompile = affineChunk;
+      mat.needsUpdate = true;
+    }
+    mat.userData.ps1Affine = true;
+    mat.userData.era = 5;
+  }
+
+  /** A rail: its own material, lit, coloured by a vertex colour at each corner -- light on top, shadow below. */
+  function railSetup(THREE, mesh, force) {
+    if (!mesh || !mesh.geometry) return;
+    var mat = mesh.material;
+    if (!force && mat && mat.userData && mat.userData.ps1Gouraud) return;
+    var geo = mesh.geometry, pos = geo.getAttribute('position');
+    if (pos && !(geo.userData && geo.userData.ps1Gouraud)) {
+      var top = new THREE.Color(PAL.rail), low = new THREE.Color(PAL.railShadow), col = new Float32Array(pos.count * 3);
+      for (var i = 0; i < pos.count; i++) {
+        var c = pos.getY(i) > 0 ? top : low;
+        col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+      }
+      geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      geo.userData = Object.assign(geo.userData || {}, { era: 5, ps1Gouraud: true });
+    }
+    if (!(mat && mat.userData && mat.userData.ps1Gouraud)) {
+      mesh.material = new THREE.MeshLambertMaterial({ color: 0xffffff, vertexColors: true });
+      mesh.material.userData = { era: 5, ps1Gouraud: true };
+    }
+  }
+
+  var setupLast = { era: null };   // private memory (bible rule 1.4): whose frame asked last
+
+  /**
+   * The era's scene work inside the 3D layer, before T.field draws: F is the
+   * layer (PongField3D; its internals() answer, or the answer itself, also
+   * serves). Does nothing, and answers null, when there is no scene -- node
+   * --test, ?gl=off, no WebGL -- so the canvas fallback draws exactly as before.
+   * Answers the internals it worked on.
+   */
+  function fieldSetup(F, state) {
+    if (!F) return null;
+    if (typeof F.available === 'function' && !F.available()) return null;
+    var I = typeof F.internals === 'function' ? F.internals() : F;
+    if (!I || !I.THREE || !I.parts || !I.parts.slab) return null;
+    var era = state ? Math.floor(state.era) : 5;
+    var force = setupLast.era !== era;
+    setupLast.era = era;
+    var p = I.parts;
+    slabSetup(I.THREE, p.slab, force);
+    railSetup(I.THREE, p.farRail, force);
+    railSetup(I.THREE, p.nearLip, force);
+    return I;
+  }
+
   /** Steps 1 to 4 and the HUD, into whichever context is the low-resolution picture. */
   function scene(c, state, cam, T, P, sp) {
     // 1. backdrop, in buffer pixels
@@ -516,6 +657,8 @@
     c.fill();
     // Through the real 3D layer when the page has WebGL (item 1273): it then
     // draws the table, bats, ball and shadow itself, and 3 and 4 are skipped.
+    // The PlayStation's own limits go into its scene first (item 1291).
+    fieldSetup(root.PongField3D, state);
     var gl = T.field(c, cam, {
       surface: tex ? surface(T, sp, tex) : PAL.base,
       line: PAL.line,
@@ -840,6 +983,10 @@
     uv: UV,
     cameraAt: cameraAt,
     affine: affine,
+    // The 3D layer's knobs and the era's scene work in it (item 1291); eras 6 to 10 call fieldSetup first.
+    render: RENDER,
+    fieldSetup: fieldSetup,
+    layer: { TEX: TEX, SLAB: SLAB, AFFINE: AFFINE, texels: texels, affineChunk: affineChunk },
     card: { flash: '#ffffff', wipe: ['#e03a3e', '#f3c300', '#00a99d', '#2e6db4'], box: '#1a1a1f',
             border: '#8a8f9c', inner: null, year: '#f3c300', name: '#ffffff', label: '#8a8f9c', dots: null },
     // The bible's voice, to the letter (chapter 6): clean CD-era samples, plucky, one room reverb.
