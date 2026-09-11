@@ -125,7 +125,7 @@ test('an Atari colour becomes its NES cousin, so the machine change swaps nobody
   }
 });
 
-test('the centre line is a dotted net between two posts, and the court has a border', () => {
+test('the centre line is a dotted net between two posts, and the table has a border with its ends at the paddles (item 1267)', () => {
   const g = midRally(2);
   const calls = frame(g);
   const net = calls.filter(([, x, , w, h]) => x >= 394 && x + w <= 406 && w <= 12 && h <= 12);
@@ -135,8 +135,10 @@ test('the centre line is a dotted net between two posts, and the court has a bor
   for (let i = 1; i < dots.length; i++) assert.ok(dots[i] - dots[i - 1] > 8, 'dots, not a solid line');
   assert.strictEqual(inksOf(net).size, 3, 'lit dots, their shade, and the posts');
   const has = (x, y, w, h) => calls.some((c) => c[1] === x && c[2] === y && c[3] === w && c[4] === h);
-  assert.ok(has(0, 0, 800, 4) && has(0, 596, 800, 4), 'top and bottom border');
-  assert.ok(has(0, 0, 4, 600) && has(796, 0, 4, 600), 'left and right border');
+  // Realism rung 2: the border is the table's edge lines, its ends moved in to
+  // the paddles' outer faces (x 32 and 768), the floor beyond them.
+  assert.ok(has(24, 0, 752, 4) && has(24, 596, 752, 4), 'the table\'s side edges, top and bottom');
+  assert.ok(has(24, 0, 4, 600) && has(772, 0, 4, 600), 'its end lines, just past each paddle\'s outer face');
 });
 
 test('the score is its own pixel font, drawn with a shadow, and it is the score that moves', () => {

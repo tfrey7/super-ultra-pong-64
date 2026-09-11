@@ -1,0 +1,152 @@
+{
+ "taken": "2026-09-11T04:47:36.338Z",
+ "era": 7,
+ "stage": "climax",
+ "label": "before",
+ "rows": [
+  {
+   "solo": -1,
+   "count": 17,
+   "what": "the whole mix",
+   "notes": 682,
+   "rmsDb": -5.2,
+   "peak": 0.7676
+  },
+  {
+   "solo": 0,
+   "count": 17,
+   "what": "melody full sawtooth",
+   "notes": 58,
+   "rmsDb": -45.6,
+   "peak": 0.0295
+  },
+  {
+   "solo": 1,
+   "count": 17,
+   "what": "chords rhythm sine",
+   "notes": 29,
+   "rmsDb": -44.5,
+   "peak": 0.0368
+  },
+  {
+   "solo": 2,
+   "count": 17,
+   "what": "bass octaves sine",
+   "notes": 65,
+   "rmsDb": -36.1,
+   "peak": 0.0443
+  },
+  {
+   "solo": 3,
+   "count": 17,
+   "what": "drum kick",
+   "notes": 35,
+   "rmsDb": -40.9,
+   "peak": 0.0936
+  },
+  {
+   "solo": 4,
+   "count": 17,
+   "what": "drum noise from 0.3",
+   "notes": 44,
+   "rmsDb": -57.2,
+   "peak": 0.0228
+  },
+  {
+   "solo": 5,
+   "count": 17,
+   "what": "drum noise",
+   "notes": 97,
+   "rmsDb": -66.1,
+   "peak": 0.0079
+  },
+  {
+   "solo": 6,
+   "count": 17,
+   "what": "drum noise",
+   "notes": 3,
+   "rmsDb": -68.2,
+   "peak": 0.0093
+  },
+  {
+   "solo": 7,
+   "count": 17,
+   "what": "chords broken sine from 0.3",
+   "notes": 65,
+   "rmsDb": -55.8,
+   "peak": 0.0077
+  },
+  {
+   "solo": 8,
+   "count": 17,
+   "what": "drum clap from 0.3",
+   "notes": 16,
+   "rmsDb": -65.9,
+   "peak": 0.0115
+  },
+  {
+   "solo": 9,
+   "count": 17,
+   "what": "melody arp sawtooth from 0.7",
+   "notes": 126,
+   "rmsDb": -52.9,
+   "peak": 0.0123
+  },
+  {
+   "solo": 10,
+   "count": 17,
+   "what": "chords rhythm sawtooth from 0.7 drive 0.8",
+   "notes": 42,
+   "rmsDb": -5.1,
+   "peak": 0.7297
+  },
+  {
+   "solo": 11,
+   "count": 17,
+   "what": "chords pad sawtooth from 0.7",
+   "notes": 9,
+   "rmsDb": -55.5,
+   "peak": 0.0084
+  },
+  {
+   "solo": 12,
+   "count": 17,
+   "what": "drum kick from 0.7",
+   "notes": 33,
+   "rmsDb": -39.5,
+   "peak": 0.0956
+  },
+  {
+   "solo": 13,
+   "count": 17,
+   "what": "drum open from 0.7",
+   "notes": 32,
+   "rmsDb": -66,
+   "peak": 0.0093
+  },
+  {
+   "solo": 14,
+   "count": 17,
+   "what": "drum clap from 0.7",
+   "notes": 16,
+   "rmsDb": -63.5,
+   "peak": 0.015
+  },
+  {
+   "solo": 15,
+   "count": 17,
+   "what": "drum tom from 0.7 LIFT",
+   "notes": 12,
+   "rmsDb": -47.3,
+   "peak": 0.0594
+  },
+  {
+   "solo": 16,
+   "count": 17,
+   "what": "drum crash from 0.9 LIFT",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  }
+ ]
+}

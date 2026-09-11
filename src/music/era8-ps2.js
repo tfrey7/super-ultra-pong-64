@@ -24,6 +24,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, {
   era: 8,
   year: 2000,
+  level: -4,   // dB on the whole bus: item 1275's balance
   voices: 48,
   kit: {
     kick: [{ wave: 'kick', freq: 70, gain: 0.34, env: { a: 0.001, d: 0.35, s: 0, r: 0.03 } }, { wave: 'noise', gain: 0.05, env: { a: 0.001, d: 0.02, s: 0, r: 0.02 }, filter: { type: 'bandpass', freq: 3000, q: 0.8 } }],
