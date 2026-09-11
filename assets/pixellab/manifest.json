@@ -957,7 +957,17 @@
       "bytes": 26913,
       "sha256": "7223536321110e6472eeed9f9ffe23fba184c27fd7fba149f1d26fe89ff752d5",
       "date": "2026-09-11T03:38:38.534Z",
-      "note": "item 1230: 3 x 6 frames of 32 x 44, idle up down swing miss win; dated as its newest source and listed before the generations, so the tool reads the cost of one image off a real bill"
+      "note": "item 1230: 3 x 6 frames of 32 x 44, idle up down swing miss win; dated as its newest source and listed before the generations, so the tool reads the cost of one image off a real bill",
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "request": {
+        "description": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-penguin-raw2 (the stand) and era6-penguin-win-raw (the jump for joy); their prompts and seeds are their own entries",
+        "seed": 1793498882,
+        "derived": "py -3.10 assets/pixellab/era6-n64-sheets.py -- no request is sent; the sources are the entries named in derivedFrom"
+      }
     },
     {
       "name": "tex3d-era6-frog",
@@ -984,7 +994,17 @@
       "bytes": 30052,
       "sha256": "0f1b240973bce354842c34cacea104b064815c3d26ef72b8ba079570fb4c6b8d",
       "date": "2026-09-11T03:38:59.548Z",
-      "note": "item 1230: 3 x 6 frames of 32 x 44, idle up down swing miss win; dated as its newest source and listed before the generations, so the tool reads the cost of one image off a real bill"
+      "note": "item 1230: 3 x 6 frames of 32 x 44, idle up down swing miss win; dated as its newest source and listed before the generations, so the tool reads the cost of one image off a real bill",
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "request": {
+        "description": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-frog-sheet-raw (the stand) and era6-frog-win-raw (the jump for joy); their prompts and seeds are their own entries",
+        "seed": 1594989580,
+        "derived": "py -3.10 assets/pixellab/era6-n64-sheets.py -- no request is sent; the sources are the entries named in derivedFrom"
+      }
     },
     {
       "name": "era6-penguin-sheet-raw",
