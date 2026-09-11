@@ -18,6 +18,7 @@
  * part of the game: nothing in src/ knows it exists.
  */
 import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -26,6 +27,11 @@ import os from 'node:os';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const SHOTS = path.join(ROOT, 'docs', 'shots', 'playtest');
+// The rules the page loads, read here too so the scoring hand can plan its
+// shots against them (tools/scoring-rally.js). Nothing is changed by reading.
+const require = createRequire(import.meta.url);
+const Pong = require(path.join(ROOT, 'src', 'game.js'));
+const Rally = require(path.join(HERE, 'scoring-rally.js'));
 
 const CHROMES = [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -47,6 +53,9 @@ const ERA = arg('era', '');
 const NO_AUDIO = process.argv.includes('--no-audio');
 // --ladder runs only the walk up the era ladder (section 8), about 30 seconds.
 const LADDER_ONLY = process.argv.includes('--ladder');
+// --scoring runs only the rally and the scoring check (section 6), about ten
+// seconds -- the quick way to ask "can the player still score?" many times.
+const SCORING_ONLY = process.argv.includes('--scoring');
 // --reference also copies the five era frames the walk takes, and the four
 // frames it catches mid-change (change-era0-to-era1.png to change-era3-to-era4.png),
 // into the TRACKED docs/shots/eras/, the reference pictures a reader opens. Off by default,
@@ -132,7 +141,7 @@ function check(name, ok, detail) {
 }
 
 const state = (s) => s.eval(`(() => { const g = window.__pong; return {
-  phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally, era: g.era,
+  phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally, era: g.era, rules: g.rules,
   score: { left: g.score.left, right: g.score.right },
   ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy },
   leftY: g.left.y, rightY: g.right.y, h: g.left.h, height: g.height, width: g.width
@@ -166,6 +175,42 @@ async function playUntil(s, geo, ms, aim, done) {
 }
 
 /**
+ * 6. Play a rally, then score against the computer. The hand is scripted, not
+ * a plain ball-chase: a chase scores within 22 seconds only 44% of the time
+ * (the computer is beatable by design, not that beatable), which made this
+ * check a coin flip. tools/scoring-rally.js plans each incoming ball against
+ * the page's own rules and stands where the return cannot be reached whatever
+ * aim the computer rolls, so a point comes on the first shot -- and a FAIL here
+ * means scoring really is broken, or the computer has been made unbeatable.
+ * A slow early ball can still be caught, so it keeps shooting: it stops as soon
+ * as the point and the rally picture are both in, and gives up after 45
+ * seconds -- the window the sampler's 'scripted' row measures.
+ */
+async function playToScore(s, midX, toClientY) {
+  const aim = Rally.createScorer(Pong);
+  const started = Date.now();
+  const deadline = started + 45000;
+  let shotTaken = false;
+  let gp = await state(s);
+  while (Date.now() < deadline && !(gp.score.left > 0 && shotTaken)) {
+    await s.mouseTo(midX, toClientY(aim(gp)));
+    if (!shotTaken && gp.rally >= 2 && gp.serveDelay <= 0) {
+      await s.shot('rally');
+      shotTaken = true;
+    }
+    await sleep(45);
+    gp = await state(s);
+  }
+  const secs = ((Date.now() - started) / 1000).toFixed(1);
+  check('rallies happen: the ball bounces off the paddles', gp.rally > 0 || gp.score.left > 0,
+    `${gp.rally} hits in the current rally, score ${gp.score.left}-${gp.score.right}`);
+  check('the player can score against the computer', gp.score.left > 0,
+    `score after ${secs}s of scripted play: player ${gp.score.left}, computer ${gp.score.right}; ` +
+    `${aim.planned} returns planned against the rules, ${aim.certain} of them beyond every aim it can roll`);
+  return { gp, shotTaken };
+}
+
+/**
  * Film the era change a point has just started, and check that it ran. Three
  * readings of the page's own ring (PongRender.eraChangeMoment): a frame taken
  * with the ring about half way; the ring's radius once the wipe has finished,
@@ -180,7 +225,7 @@ async function filmChange(s, clip, from) {
     const m = window.PongRender.eraChangeMoment(g);
     if (!m) return null;
     const o = m.origin, dx = Math.max(o.x, g.width - o.x), dy = Math.max(o.y, g.height - o.y);
-    return { from: m.from, era: m.era, p: m.p, wiping: m.wiping, radius: m.radius,
+    return { from: m.from, era: m.era, p: m.p, wiping: m.wiping, radius: m.radius, width: g.width,
       corner: Math.sqrt(dx * dx + dy * dy), origin: { x: o.x, y: o.y } }; })()`);
   const out = { from, file: null, p: null, end: null, drawn: null };
   const deadline = Date.now() + 3000;
@@ -258,13 +303,23 @@ async function walkLadder(s, baseUrl) {
     const g = await playUntil(s, geo, 500, track);
     const file = await s.shot('ladder-' + ERA_NAMES[rung], clip);
     frames.push({ rung, era: g.era, file });
-    // One point either way moves the machine; letting the ball past is quickest.
+    // One point either way moves the machine, and the ring starts where the ball
+    // went out. Even changes are a real miss past the player (the ring starts on
+    // the left); odd ones are the player's own point, the way a human climbs, so
+    // the ring starts on the right. Beating the computer in a rally is a coin
+    // flip, so the ball is put just past the computer's paddle, heading out --
+    // outside the paddle, so it cannot be bounced back.
+    const outRight = rung % 2 === 1;
     const before = points(g);
-    const after = await playUntil(s, geo, 15000, dodge, (x) => points(x) > before);
+    if (outRight) await s.eval(`(() => { const g = window.__pong, r = g.right;
+      g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0; })()`);
+    const after = await playUntil(s, geo, 15000, outRight ? track : dodge, (x) => points(x) > before);
     moves.push({ from: g.era, to: after.era, scored: points(after) > before,
       score: `${after.score.left}-${after.score.right}` });
     // Below the top, that point started a change: film it while it plays.
-    if (rung < eras.length - 1 && points(after) > before) changes.push(await filmChange(s, clip, g.era));
+    if (rung < eras.length - 1 && points(after) > before) {
+      changes.push(Object.assign(await filmChange(s, clip, g.era), { want: outRight ? 'right' : 'left' }));
+    }
   }
 
   check('each era is on screen when its frame is taken',
@@ -284,11 +339,17 @@ async function walkLadder(s, baseUrl) {
     changes.length === eras.length - 1 && changes.every((c) => c.file),
     changes.map((c) => `era ${c.from} -> ${c.from + 1}: ` +
       (c.file ? `caught at eased progress ${c.p.toFixed(2)}` : 'not caught mid-ring')).join('; '));
+  // Where each ring started: the edge the ball went out of.
+  const sideOf = (c) => (!c.end ? 'unseen' : c.end.origin.x >= c.end.width / 2 ? 'right' : 'left');
+  const fromRight = changes.filter((c) => sideOf(c) === 'right').length;
+  check(`era changes start from both edges: odd changes from the right (the player's point), even from the left`,
+    changes.every((c) => sideOf(c) === c.want) && fromRight >= 2,
+    changes.map((c) => `era ${c.from} -> ${c.from + 1}: from the ${sideOf(c)}`).join('; '));
   for (const c of changes) {
     const e = c.end, d = c.drawn;
     const reached = !!e && e.radius >= e.corner;
     const newDraws = d.era === c.from + 1 && !d.ring && d.asNew < d.asOld;
-    check(`the change to the ${eras[c.from + 1]} ran: the ring reached the far corner and the new era draws afterwards`,
+    check(`the change to the ${eras[c.from + 1]} ran from the ${sideOf(c)} edge: the ring reached the far corner and the new era draws afterwards`,
       !!c.file && reached && newDraws,
       (e ? `ring from ${e.origin.x.toFixed(0)},${e.origin.y.toFixed(0)} ended at radius ` +
         `${e.radius.toFixed(0)}, far corner ${e.corner.toFixed(0)}` : 'the ring was never seen to finish') +
@@ -347,6 +408,14 @@ async function main() {
       });
       await s.reload();
     }
+    // Wait for the page to actually be there -- the game and its field -- rather
+    // than a fixed beat: on a busy machine 400 ms was sometimes not enough, and
+    // the first read threw "Uncaught" before any check ran (item 1160).
+    for (let i = 0; i < 100; i++) {
+      const ready = await s.eval('!!(window.__pong && document.getElementById("field"))').catch(() => false);
+      if (ready) break;
+      await sleep(100);
+    }
     await sleep(400);
     if (LADDER_ONLY) return summarise(await walkLadder(s, url.split('?')[0]));
 
@@ -354,6 +423,14 @@ async function main() {
     const g0 = await state(s);
     const toClientY = (fieldY) => geo.top + (fieldY / g0.height) * geo.height;
     const midX = geo.left + geo.width / 2;
+
+    if (SCORING_ONLY) {
+      await s.key('keyDown', 'Space', ' ', 32);
+      await s.key('keyUp', 'Space', ' ', 32);
+      await sleep(150);
+      const played = await playToScore(s, midX, toClientY);
+      return summarise(played.shotTaken ? [path.join(SHOTS, 'rally.png')] : []);
+    }
 
     // 1. The machine opens on its title screen, and stays there.
     const t0 = await state(s);
@@ -435,23 +512,8 @@ async function main() {
     check('the S key moves the paddle down', afterDown > afterUp + 20,
       `moved from ${afterUp.toFixed(0)} to ${afterDown.toFixed(0)}`);
 
-    // 6. Play properly for a while: track the ball with the mouse and rally.
-    let shotTaken = false;
-    const deadline = Date.now() + 22000;
-    while (Date.now() < deadline) {
-      const g = await state(s);
-      await s.mouseTo(midX, toClientY(g.ball.y + 6));
-      if (!shotTaken && g.rally >= 2 && g.serveDelay <= 0) {
-        await s.shot('rally');
-        shotTaken = true;
-      }
-      await sleep(45);
-    }
-    const gp = await state(s);
-    check('rallies happen: the ball bounces off the paddles', gp.rally > 0 || gp.score.left > 0,
-      `${gp.rally} hits in the current rally, score ${gp.score.left}-${gp.score.right}`);
-    check('the player can score against the computer', gp.score.left > 0,
-      `score after ~22s of tracking play: player ${gp.score.left}, computer ${gp.score.right}`);
+    // 6. Play a rally and score against the computer (playToScore, above).
+    const { gp, shotTaken } = await playToScore(s, midX, toClientY);
 
     // 6b. The rally was heard (the key press after the reload unlocked it), and
     // every era's voice schedules on the real Web Audio API.

@@ -85,7 +85,13 @@ Super Nintendo. `--ladder` runs only that walk, in about half a minute:
 ```bash
 node tools/playtest.mjs --ladder              # just the walk up the ladder
 node tools/playtest.mjs --ladder --reference  # and re-take the tracked era frames
+node tools/playtest.mjs --scoring             # just a rally and a point against the computer
 ```
+
+The point against the computer is played by a scripted hand
+(`tools/scoring-rally.js`) that plans each return against the rules, so that
+check passes every run -- the computer itself stays exactly as beatable as it
+was, and `node tools/beatability-sample.mjs` is how to measure that.
 
 Every run rewrites the screenshots it drops in `docs/shots/playtest/` —
 `ladder-era0-arcade.png` to `ladder-era4-snes.png` among them. Those are ignored
@@ -117,6 +123,29 @@ The point of the layout is that later eras are additions, not rewrites.
 | `test/game.test.js` | The headless suite over `src/game.js`, plus the era-look checks. |
 | `test/sound.test.js` | The rules' event list, each era's voice, and the player through a recording stand-in for Web Audio. |
 | `tools/eralooks.js` | Draws fixed scenes on a recording canvas; `eralooks-today.json` beside it is what eras 0 and 1 drew before the ladder. |
+| `src/sprites.js` | **Named pixel art.** `PongSprites.draw(ctx, name, x, y, w, h)` draws `assets/pixellab/<name>.png` with one `drawImage`, and answers `false` until it has loaded so the era draws its own look meanwhile. |
+| `tools/pixellab.mjs` | Makes that pixel art through [pixellab.ai](https://www.pixellab.ai) — see *Pixel art* below. |
+| `assets/pixellab/` | The generated PNGs, committed, and `manifest.json`: the prompt, size, style, seed, date, cost and exact request behind each one. |
+
+### Pixel art
+
+```bash
+node tools/pixellab.mjs balance
+node tools/pixellab.mjs gen paddle-nes "an NES tennis paddle, side view" --size 32x64 \
+     --outline "single color black outline" --shading "flat shading" --no-background
+```
+
+Node 18+, no dependencies, and nothing in it is about Pong, so another game can copy the file as
+it is. It needs `PIXELLAB_API_KEY` in the environment. Every run **checks the key first** and
+prints the account balance and the cost of one image (as the newest manifest entry measured it); a
+refused key stops it there with exit code 2. `gen` makes one image, saves it as
+`assets/pixellab/<name>.png` and records it in `manifest.json`, always with a seed (a random one
+unless you pass `--seed`), so the entry holds everything needed to ask for the same picture again.
+An existing name is refused unless `--force`. Sizes are 16 to 400 a side with an area of at least
+32x32 — the server enforces the area, its schema does not say so. The account is billed in
+*generations* on a subscription, so `credits $0.00` is not "out of credit". An era file draws the
+result by name through `src/sprites.js`; it is loaded before the era files, so `root.PongSprites`
+is always there.
 
 `step` takes a **delta time in seconds** and never assumes 60fps; long frames are
 cut into substeps so a fast ball cannot pass through a paddle. Randomness goes

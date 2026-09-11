@@ -39,6 +39,9 @@
   <!-- Plain scripts, in dependency order, so this page opens straight off disk:
        ES modules are blocked over file:// and would need a dev server. -->
   <script src="src/game.js"></script>
+  <!-- Named pixel-art images from assets/pixellab/ (tools/pixellab.mjs makes
+       them), for any era file to draw with one drawImage: window.PongSprites. -->
+  <script src="src/sprites.js"></script>
   <script src="src/render.js"></script>
   <!-- The shared 3D table the eras from the PlayStation up stand on
        (docs/ERAS.md section 2); PongRender hands it to every era as table3d. -->
