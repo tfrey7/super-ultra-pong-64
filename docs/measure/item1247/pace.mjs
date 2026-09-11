@@ -97,7 +97,7 @@ function readingExpr(era, seconds) {
     for (const p of [g.left, g.right]) p.y = Math.max(0, Math.min(g.height - p.h, g.ball.y + g.ball.size / 2 + 6 - p.h / 2));
   }
   let phase = 'wait', t0 = 0, last = 0, time0 = 0, prev = null, prevS = null;
-  const acc = { wall: 0, game: 0, dist: 0, sdist: 0, stop: 0, slow: 0, pause: 0, hits: 0, frames: 0, capped: 0, maxFrame: 0 };
+  const acc = { wall: 0, game: 0, dist: 0, sdist: 0, stop: 0, slow: 0, pause: 0, hits: 0, frames: 0, capped: 0, maxFrame: 0, long: [] };
   function tick(now) {
     hold();
     if (phase === 'wait') {
@@ -109,7 +109,7 @@ function readingExpr(era, seconds) {
       return requestAnimationFrame(tick);
     }
     const dt = now - last; last = now;
-    acc.frames++; acc.wall += dt; if (dt > 50) acc.capped++; if (dt > acc.maxFrame) acc.maxFrame = dt;
+    acc.frames++; acc.wall += dt; if (dt > 50) { acc.capped++; acc.long.push({ ms: Math.round(dt), at: +((now - t0) / 1000).toFixed(2), conv: (window.__conv || []).length }); } if (dt > acc.maxFrame) acc.maxFrame = dt;
     const m = F ? F.moment(g) : { hitStop: 0, slow: false };
     if (m.hitStop > 5e-4) acc.stop += dt;
     if (m.slow) acc.slow += dt;
@@ -150,6 +150,7 @@ function summarise(r) {
     frameMs: +(r.wall / Math.max(1, r.frames)).toFixed(2),
     maxFrameMs: +r.maxFrame.toFixed(1),
     framesOver50ms: r.capped,
+    longFrames: r.long,
     score: r.score, matchPoint: r.matchPoint, canvasW: r.canvasW, dpr: r.dpr
   };
 }
@@ -176,6 +177,7 @@ async function fresh(s) {
     const x = summarise(await s.eval(readingExpr(era, SECONDS)));
     rows.push(x);
     console.log(line('fresh', x));
+    if (x.longFrames.length) console.log('      long frames ' + JSON.stringify(x.longFrames));
   }
   return rows;
 }
@@ -193,6 +195,7 @@ async function climb(s) {
     if (pauseS !== undefined) x.pauseS = pauseS;
     rows.push(x);
     console.log(line('climb', x));
+    if (x.longFrames.length) console.log('      long frames ' + JSON.stringify(x.longFrames));
     if (rung === 10) break;
     // One point: the ball put just past the computer's paddle, heading out; then
     // the real time until the next serve leaves the centre.
@@ -234,9 +237,18 @@ try {
   const s = new Session(ws);
   await s.send('Page.enable');
   await s.send('Runtime.enable');
+  // Counts only: how long each reverb's buffer takes to hand to a ConvolverNode (Chrome
+  // prepares the whole impulse there, on the page's own thread), so a long frame can be
+  // told apart from a first draw.
+  await s.send('Page.addScriptToEvaluateOnNewDocument', { source: `(() => {
+    const d = Object.getOwnPropertyDescriptor(ConvolverNode.prototype, 'buffer'); const log = window.__conv = [];
+    Object.defineProperty(ConvolverNode.prototype, 'buffer', { configurable: true, get() { return d.get.call(this); },
+      set(v) { const t = performance.now(); d.set.call(this, v); log.push({ ms: +(performance.now() - t).toFixed(1),
+        len: v ? v.length : 0, era: window.__pong ? window.__pong.era : -1 }); } });
+  })();` });
   const [w, h] = SIZE.split(',').map(Number);
   await s.send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: false });
-  if (ONLY !== 'fresh') out.climb = await climb(s);
+  if (ONLY !== 'fresh') { out.climb = await climb(s); out.climbConvolverSets = await s.eval('window.__conv'); console.log('convolver buffer sets on the climb: ' + JSON.stringify(out.climbConvolverSets)); }
   if (ONLY !== 'climb') out.fresh = await fresh(s);
 } finally {
   try { ws && ws.close(); } catch { /* gone */ }
