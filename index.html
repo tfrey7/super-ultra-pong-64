@@ -45,6 +45,7 @@
        page but not its scripts, so without the stamp a new game stayed hidden
        behind the old scripts until a hard refresh (item 1193). -->
   <template id="game-scripts">
+  <script src="src/opponents.js"></script>
   <script src="src/game.js"></script>
   <!-- Named pixel-art images from assets/pixellab/ (tools/pixellab.mjs makes
        them), for any era file to draw with one drawImage: window.PongSprites. -->
@@ -88,6 +89,8 @@
   <script src="src/attract.js"></script>
   <script src="src/input.js"></script>
   <script src="src/main.js"></script>
+  <!-- The soundtrack: one theme, arranged per era, on the same first click. -->
+  <script src="src/music.js"></script>
   </template>
   <script>
     (function () {

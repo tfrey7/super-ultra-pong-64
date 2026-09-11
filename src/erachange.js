@@ -248,6 +248,20 @@
   }
 
   function drawRing(ctx, state, opts, m, style) {
+    var dim = composite(ctx, state, opts, m, style);
+    var look = R.eraLook(m.era);
+    if (look && typeof look.flourish === 'function') {
+      ctx.save();
+      look.flourish(ctx, m.p, { x: m.origin.x, y: m.origin.y }, m.from, m.era, {
+        radius: m.radius, t: m.t, duration: m.duration,
+        width: state.width, height: state.height, state: state, dim: dim
+      });
+      ctx.restore();
+    }
+  }
+
+  /** The two eras through the ring, and its plain edge; returns the dim ink. */
+  function composite(ctx, state, opts, m, style) {
     var w = state.width;
     var h = state.height;
     // The layers match the canvas they land on, pixel for pixel, and draw in
@@ -285,14 +299,53 @@
     }
     var dim = (opts && opts.ink) || null;
     drawEdge(ctx, m, dim || style.edge || '#ffffff');
+    return dim;
+  }
 
-    var look = R.eraLook(m.era);
-    if (look && typeof look.flourish === 'function') {
-      ctx.save();
-      look.flourish(ctx, m.p, { x: m.origin.x, y: m.origin.y }, m.from, m.era, {
-        radius: m.radius, t: m.t, duration: m.duration,
-        width: w, height: h, state: state, dim: dim
-      });
+  // ------------------------------------------------- the first ring, paid up front
+  var warmed = false;
+
+  /**
+   * The first ring on a fresh page used to stall: about 125 ms for its first
+   * frame from a cold Chrome profile (item 1164), the canvas making the two
+   * layers, compiling the clip, copy and gradient work, and each era's renderer
+   * drawing off-screen for the first time -- all in the serve pause, with the
+   * paddle frozen. So the page's first framed draw pays that instead, before
+   * anything has been shown: every rung's ring at a spread of radii, onto the
+   * page's own canvas (a layer that is never copied anywhere is never
+   * rasterised, so it would warm nothing), then the canvas is cleared and the
+   * ordinary frame draws on a blank field. No flourish runs, no state is
+   * written, and nothing of it reaches the screen. Off-page (node --test) it
+   * does nothing at all.
+   */
+  function warmUp(ctx, state, opts) {
+    warmed = true;
+    if (typeof document === 'undefined' || !document.createElement || !ctx || !ctx.canvas) return;
+    var P = root.Pong;
+    var top = P && typeof P.TOP_ERA === 'number' ? P.TOP_ERA : 4;
+    var origin = { x: -8, y: state.height / 4 };
+    var reach = ringReach(origin, state.width, state.height);
+    var fracs = [0.04, 0.3, 0.6, 1];
+    // The real looks, never the dimmed ones (item 1203). The page's first framed
+    // draw is the attract rally behind the title, whose opts carry the dimming
+    // ink -- and every era look handed that ink falls back to the plain dimmed
+    // frame. Warmed with it, not one era's own gradients, rounded paddles or
+    // shaded ball ever reached the GPU, so the first real ring still built about
+    // ten GPU programs in its first frame (~100 ms, docs/measure/item-1203/).
+    var real = null;
+    ctx.save();
+    try {
+      for (var k = 1; k <= top; k++) {
+        for (var f = 0; f < fracs.length; f++) {
+          composite(ctx, state, real,
+            { from: k - 1, era: k, origin: origin, radius: fracs[f] * reach }, cardStyle(k));
+        }
+      }
+    } catch (e) {
+      // A warm-up is only ever an optimisation: never let it stop the page.
+    } finally {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.restore();
     }
   }
@@ -305,6 +358,7 @@
    * its ring without a card under the title. Returns whether a change showed.
    */
   function drawEraFrame(ctx, state, opts) {
+    if (!warmed) warmUp(ctx, state, opts);
     var m = eraChangeMoment(state);
     if (!m) {
       R.draw(ctx, state, opts);
