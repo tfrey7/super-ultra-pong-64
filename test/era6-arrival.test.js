@@ -94,7 +94,8 @@ test('fog pours over the far end and draws back into the era\'s own band by the 
   const mid = at(0.75, { x: 0, y: 450 });
   const sheet = mid.log.find((c) => c[0] === 'createLinearGradient');
   assert.ok(sheet, 'the pouring sheet');
-  assert.ok(sheet[1][1] < 102 && sheet[1][3] > 102, 'from above the far wall down onto the table');
+  const farY = R.table3d.project(R.table3d.camera(look.camera), 400, 0, 0).y;
+  assert.ok(sheet[1][1] < farY && sheet[1][3] > farY, `from above the far wall (y ${farY.toFixed(1)}) down onto the table`);
 });
 
 test('the cube: waits for the ring, spins exactly once, and is gone with the ring', () => {

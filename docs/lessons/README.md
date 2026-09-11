@@ -30,7 +30,10 @@ rungs themselves are in the art bible, [docs/ART.md](../ART.md), sections 6 to 9
 
 The figures on the 2D eras (1 to 4) are drawn the EarthBound way: as text grids, checked against
 what the machine could draw. [sprites.md](sprites.md) covers the tool, what carried over and how long
-one sheet takes.
+one sheet takes. The figures on the 3D eras (5 to 10) are made in Blender and saved as standard glTF
+files with their moves in them, which the 3D layer loads and animates:
+[blender-figures.md](blender-figures.md) (item 1274), with the contract in
+[tools/blender/README.md](../../tools/blender/README.md).
 
 ## The six headings every page answers
 

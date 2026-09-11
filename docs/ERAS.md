@@ -1097,8 +1097,25 @@ list's closing blip moved from 2.0 s to 0.95 s so it sounds with the pop, inside
 ## 12. Camera measurements
 
 `node tools/table3d-cameras.js` measures every camera above against rule R3, at rest and at every
-motion extreme each chapter names. `test/eras-bible.test.js` fails if any pose stops passing. The
-run at the time of writing:
+motion extreme each chapter names. `test/eras-bible.test.js` fails if any pose stops passing.
+
+**Since item 1266 the eras draw with the realism ladder's cameras** (docs/ART.md section 8): each
+one solved by `node tools/table3d-cameras.js --players` from the camera its chapter gives, keeping
+its tilt within 4 degrees and its lens within 6, pulled back until two 250-unit players stand whole,
+feet to head, behind the table ends, with R3 passing in every pose. The chapters' cameras above are
+where each era started, and the tool keeps them (`BEFORE`); `test/table-ladder.test.js` holds each
+era file's `CAMERA` to its row here. The arena's share is the picture outside the table top.
+
+| Era | Ladder camera | Near edge on screen | Far edge `y` | Paddle at far / near wall | Players, feet to head | Arena's share, before -> after |
+| --- | --- | --- | --- | --- | --- | --- |
+| 5 PlayStation | tilt 30, height 1675, fov 24.5, screenY 388 | x 90.2 to 709.8, y 589.2 | 215.8 | 45.7 px / 59.7 px | x 8 to 792, y 315 to 444 | 0.332 -> 0.553 |
+| 6 Nintendo 64 | tilt 24, height 1250, fov 35, screenY 382 | x 94.6 to 705.4, y 591.2 | 207.0 | 46.0 px / 62.6 px | x 5 to 795, y 318 to 429 | 0.352 -> 0.551 |
+| 7 Dreamcast | tilt 26, height 2000, fov 21, screenY 383 | x 90.8 to 709.2, y 591.5 | 197.8 | 49.7 px / 61.0 px | x 4 to 796, y 315 to 436 | 0.256 -> 0.521 |
+| 8 PlayStation 2 | tilt 26, height 1900, fov 23.5, screenY 333 | x 109.0 to 691.0, y 529.2 | 159.8 | 46.4 px / 57.5 px | x 28 to 773, y 269 to 382 | 0.428 -> 0.578 |
+| 9 Xbox | tilt 29, height 1300, fov 32, screenY 387 | x 87.9 to 712.1, y 591.7 | 218.8 | 44.0 px / 61.7 px | x 5 to 795, y 316 to 440 | 0.340 -> 0.558 |
+| 10 Xbox 360 | tilt 36, height 1925, fov 19.5, screenY 399 | x 83.0 to 717.0, y 591.3 | 233.2 | 44.1 px / 56.9 px | x 4 to 796, y 318 to 462 | 0.335 -> 0.560 |
+
+The run before item 1266, on the chapters' own cameras:
 
 | Era | Camera | Near edge on screen | Far edge on screen | Far/near width | Far/near depth | Paddle at far / near wall | Worst motion pose, depth | Steepest passing tilt |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |

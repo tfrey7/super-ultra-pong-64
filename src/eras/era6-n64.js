@@ -36,7 +36,7 @@
   var R = root.PongRender;
 
   // The bible's measured camera for era 6, at rest (section 12).
-  var CAMERA = { tilt: 26, height: 900, fov: 39.5, screenY: 301 };
+  var CAMERA = { tilt: 24, height: 1250, fov: 35, screenY: 382 };   // the ladder camera (item 1266)
 
   var PAL = {
     skyTop: '#3a8ee6', skyHorizon: '#bfe3ff',
