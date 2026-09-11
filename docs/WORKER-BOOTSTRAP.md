@@ -10,8 +10,10 @@ project's `CLAUDE.md` and none of ours. This is the two-minute on-ramp. Read it,
 game is meant to grow up through the eras around it as the session goes on. Evoland, but for Pong.
 Every point either side scores moves the machine **up one era** -- 0 the 1972 arcade machine,
 1 the 1977 Atari 2600 (the turn to colour), 2 the NES, 3 the Genesis, 4 the Super Nintendo, where
-it stops -- and eras 2 to 4 are placeholders drawing era 1 until their own cards land (the README's
-*The era ladder* is the recipe). It opens on a **title screen** -- a real `phase` in
+it stops. It does not matter which side scored, so a match's fourth point lands on era 4 and every
+point after that leaves it there. **All five rungs are built** -- each has its own look, its own
+voice and a change moment -- and the README's *The era ladder* tables them, with a tracked
+reference frame of each in `docs/shots/eras/`. It opens on a **title screen** -- a real `phase` in
 `src/game.js`, where `step()` moves nothing at all until `startGame()` is called -- with a
 self-playing demo rally behind it, drawn from the score's own block font. It is plain HTML and plain JavaScript — **no npm, no
 `package.json`, no build step, no framework, no dependencies of any kind** — and that is a
@@ -88,9 +90,15 @@ title screen with the ball held still, that a click and a keypress each start it
 runs in real time, that the mouse and keys move the paddle, that rallies happen, that a miss
 scores, and that the next serve starts from the centre -- and that the title screen opens no audio,
 the first click switches sound on, the rally is heard, and every era's voice schedules on the real
-Web Audio API -- and that a forced era change plays its ring at full frame rate (the page's own rAF
+Web Audio API -- that a forced era change plays its ring at full frame rate (the page's own rAF
 timing over the ring, against ordinary play just before it) with the paddle still following the hand,
-saving `era-wipe.png` mid-ring (19 checks). Chrome runs `--mute-audio`, so a playtest never beeps through the
+saving `era-wipe.png` mid-ring -- and, last, it **walks one match up the whole ladder**: a fresh
+era-0 machine, one point let through per rung, a check that each point moved it up exactly one era,
+a screenshot of each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to
+`ladder-era4-snes.png`, cropped to the field) and one more point to prove it stops on era 4.
+`--ladder` runs only that walk (about half a minute); `--reference` also copies its five frames into
+the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
+`index.html?era=N` (N is 0 to 4) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
 plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
 it cannot find a browser, and `--port <n>` if 9333 is busy; each port gets its own Chrome profile,
@@ -127,9 +135,11 @@ you ever add one of those things, this is the file that has to say so.
   conversation, not a commit.
 - **Playtest screenshots.** The harness rewrites `docs/shots/playtest/` on every run, so that
   directory is gitignored and a playtest leaves `git status --short` empty — there is nothing to
-  check afterwards and nothing to restore. The one screenshot that *is* tracked is
-  `docs/shots/bootstrap/era-zero.png`, the reference frame a reader opens; if you deliberately
-  change how era zero looks, update that file on purpose, in its own commit.
+  check afterwards and nothing to restore. The screenshots that *are* tracked are the reference
+  frames a reader opens: `docs/shots/eras/era0-arcade.png` to `era4-snes.png`, one per rung, and
+  the older `docs/shots/bootstrap/era-zero.png`. If you deliberately change how an era looks,
+  re-take them with `node tools/playtest.mjs --ladder --reference` and commit them on purpose, in
+  their own commit. Only `--reference` writes there; a plain playtest never touches them.
 - Chrome's throwaway profile directories and any temp files from a playtest run — keep them on
   `G:/claude-tmp`, outside the worktree.
 
