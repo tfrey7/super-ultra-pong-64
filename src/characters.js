@@ -98,7 +98,15 @@
     3:  { skin: '#eeaa88', body: '#222266', scale: 2.5, res: 2 },            // Genesis
     4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
-    6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
+    // Nintendo 64 (item 1230, docs/ART.md Era 6): the penguin holds the player's paddle and the
+    // frog the computer's, chunky toy mascots drawn smoothed and fogged at their paddle's depth
+    // (capped at 0.35, as the era caps its paddles). Sheets derived by
+    // assets/pixellab/era6-n64-sheets.py, embedded in src/textures3d.js and handed to the sprite
+    // loader by src/eras/era6-n64.js.
+    6:  { skin: '#e8b890', body: '#283080', scale: 2, res: 3, round: true,
+          sheets: { left: 'era6-penguin', right: 'era6-frog' },
+          frame: { w: 32, h: 44 }, hand: { x: 29, y: 28 }, anchor: { dx: 0, dy: 0, dz: 24 },
+          fps: 6, smooth: true, fogCap: 0.35 },
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
     8:  { skin: '#dcae8c', body: '#20242c', scale: 3.2, res: 4, round: true }, // PlayStation 2
     9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
@@ -376,6 +384,53 @@
   // -------------------------------------------------------------- drawing
   var enabled = !(root.location && /[?&]characters=off\b/.test(String(root.location.search || '')));
 
+  /**
+   * The fog over a 3D figure (item 1230): { colour, amount } -- the era look's
+   * own fog at its paddle's depth, capped at the block's `fogCap` the way the
+   * era caps its paddles -- or null when the block asks for none.
+   */
+  function fogOf(state, sideName, cfg, R, T) {
+    if (!cfg.is3d || !(cfg.fogCap > 0) || !T || typeof T.fogAmount !== 'function') return null;
+    var look = R && typeof R.eraLook === 'function' ? R.eraLook(cfg.era) : null;
+    var fog = look && look.fog;
+    if (!fog || !fog.colour) return null;
+    var p = state[sideName];
+    var amount = Math.min(cfg.fogCap, T.fogAmount(p.y + p.h, fog));
+    return amount > 0 ? { colour: fog.colour, amount: amount } : null;
+  }
+
+  var tints = {};   // frame size -> one offscreen canvas a fogged figure is drawn through
+
+  /** One frame of a sheet with the fog laid over the figure only ('source-atop' on its own copy). */
+  function drawFogged(ctx, image, s, box, fog, smooth) {
+    var key = s.w + 'x' + s.h;
+    var t = tints[key];
+    if (t === undefined) {
+      t = null;
+      if (hasDocument()) {
+        var canvas = document.createElement('canvas');
+        canvas.width = s.w; canvas.height = s.h;
+        var c = canvas.getContext && canvas.getContext('2d');
+        if (c) t = { canvas: canvas, ctx: c };
+      }
+      tints[key] = t;
+    }
+    if (!t) { ctx.drawImage(image, s.x, s.y, s.w, s.h, box.x, box.y, box.w, box.h); return; }
+    var c2 = t.ctx;
+    c2.globalCompositeOperation = 'source-over';
+    c2.globalAlpha = 1;
+    c2.clearRect(0, 0, s.w, s.h);
+    c2.drawImage(image, s.x, s.y, s.w, s.h, 0, 0, s.w, s.h);
+    c2.globalCompositeOperation = 'source-atop';
+    c2.globalAlpha = fog.amount;
+    c2.fillStyle = fog.colour;
+    c2.fillRect(0, 0, s.w, s.h);
+    c2.globalCompositeOperation = 'source-over';
+    c2.globalAlpha = 1;
+    ctx.imageSmoothingEnabled = !!smooth;
+    ctx.drawImage(t.canvas, 0, 0, s.w, s.h, box.x, box.y, box.w, box.h);
+  }
+
   /** One player, onto ctx, in its era's config. */
   function drawPlayer(ctx, state, sideName, cfg, mem, R, cam, T) {
     var p = state[sideName];
@@ -387,11 +442,13 @@
     ctx.translate(a.x, a.y);
     if (a.mirror < 0) ctx.scale(-1, 1);
     var smooth = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = !!cfg.smooth;   // a block may ask for its sheet smoothed (item 1230)
     var sheet = sheetFrames(cfg);
     if (sheet && sheet.rects[pose.beat] && sheet.rects[pose.beat][pose.frame]) {
       var s = sheet.rects[pose.beat][pose.frame];
-      ctx.drawImage(sheet.image, s.x, s.y, s.w, s.h, box.x, box.y, box.w, box.h);
+      var fog = fogOf(state, sideName, cfg, R, T);
+      if (fog) drawFogged(ctx, sheet.image, s, box, fog, cfg.smooth);
+      else ctx.drawImage(sheet.image, s.x, s.y, s.w, s.h, box.x, box.y, box.w, box.h);
     } else {
       var ink = R && typeof R.paddleInk === 'function' ? R.paddleInk(state, sideName) : null;
       var ph = placeholderSheet(cfg, ink);
