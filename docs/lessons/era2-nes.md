@@ -202,3 +202,17 @@ North America), with the heft of *Super Mario Bros.* in the sprites.
   handles, paddles, ball shadow, ball, then the players. The ball is the last thing the era draws.
 
 - **The opponent's name is not drawn in this era (item 1261)**: the band along the top already says CPU beside the score, and the caption left over the court read as four garbled glyphs at 256 x 240.
+
+### The players, redrawn as text grids (item 1279)
+
+- **LESSON: on the NES, count sprites a line, not colours a figure.** The machine drew three
+  colours in an 8 x 8 sprite tile and eight sprites on one scanline; a fourth colour in a tile means
+  a second sprite stacked on it, and that spends the line budget the two players, the ball and its
+  shadow share (three each). The pixellab boy and rival broke it on 5 and 7 bands. Drawn as grids
+  (`assets/spritegen/era2-players-compose.mjs`: a head, a torso with its arm, hips and legs stacked,
+  the upper body dropped onto the legs for a bend or a slump), the pair are 5 and 6 colours and
+  never over it, and `node tools/spritegen.mjs lint` now faults a band that is.
+- Motion at 10 x 44 comes from the legs and the head, not the arm: a stride against feet together
+  for moving, the head tipped up or down for which way, the knees pushed a pixel forward for the
+  idle breath, a lunge for the swing. Twelve frames, twelve different poses; the fist stays within
+  three pixels of the hand, so the paddle never floats. Proof: `docs/shots/item-1279/contact.png`.

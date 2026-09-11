@@ -4757,6 +4757,94 @@
         "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
+    },
+    {
+      "name": "era2-boy",
+      "file": "era2-boy.png",
+      "prompt": "NES 1985, the player: a boy athlete in a red headband and red shirt, grey shorts, black sneakers with white toes, facing right, a fist on the bat handle",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "tool": "tools/spritegen.mjs",
+        "era": 2,
+        "machine": "NES",
+        "frame": {
+          "w": 10,
+          "h": 44
+        },
+        "hand": {
+          "x": 10,
+          "y": 22
+        }
+      },
+      "seed": null,
+      "date": "2026-09-11T03:23:42.867Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "assets/spritegen/era2-boy.json",
+      "derivedBy": "node assets/spritegen/era2-players-compose.mjs && node tools/spritegen.mjs build assets/spritegen/era2-boy.json --out assets/pixellab/era2-boy.png",
+      "how": "drawn as a text grid, one letter a pixel, from head, torso, hips and legs parts (the EarthBound way, not a model); lint PASS inside the NES line budget; six rows (idle, up, down, swing, miss, win) of 3 frames of 10 x 44",
+      "card": "item 1279",
+      "verdict": "worn by the player on era 2 (src/characters.js, the NES block's sheets.left), in place of item 1225's era2-sheet-left",
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 908,
+      "sha256": "4632112bf898230a0c7b4adc75c13559cd3e0a7cea528fadf00d6635f556b018",
+      "endpoint": null,
+      "request": {
+        "description": "NES 1985, the player: a boy athlete in a red headband and red shirt, grey shorts, black sneakers with white toes, facing right, a fist on the bat handle",
+        "seed": null
+      }
+    },
+    {
+      "name": "era2-rival",
+      "file": "era2-rival.png",
+      "prompt": "NES 1985, the computer: a rival in a blue cap and green shirt, blue shorts, brown hair, black sneakers with white toes, facing right (the rig mirrors him), a fist on the bat handle",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "tool": "tools/spritegen.mjs",
+        "era": 2,
+        "machine": "NES",
+        "frame": {
+          "w": 10,
+          "h": 44
+        },
+        "hand": {
+          "x": 10,
+          "y": 22
+        }
+      },
+      "seed": null,
+      "date": "2026-09-11T03:24:06.548Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "assets/spritegen/era2-rival.json",
+      "derivedBy": "node assets/spritegen/era2-players-compose.mjs && node tools/spritegen.mjs build assets/spritegen/era2-rival.json --out assets/pixellab/era2-rival.png",
+      "how": "drawn as a text grid, one letter a pixel, from head, torso, hips and legs parts (the EarthBound way, not a model); lint PASS inside the NES line budget; six rows (idle, up, down, swing, miss, win) of 3 frames of 10 x 44",
+      "card": "item 1279",
+      "verdict": "worn by the computer on era 2 (src/characters.js, the NES block's sheets.right), in place of item 1225's era2-sheet-right",
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 909,
+      "sha256": "f4262fdf16ffcd5bc9a918485910209cb3503cebc34c5a5845b6a4cbde48fc82",
+      "endpoint": null,
+      "request": {
+        "description": "NES 1985, the computer: a rival in a blue cap and green shirt, blue shorts, brown hair, black sneakers with white toes, facing right (the rig mirrors him), a fist on the bat handle",
+        "seed": null
+      }
     }
   ]
 }

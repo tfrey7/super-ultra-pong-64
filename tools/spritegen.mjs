@@ -75,7 +75,11 @@ function nesTable() {
  */
 export const ERAS = {
   1: { name: 'Atari 2600', colours: 8, perRow: 1, snap: (c) => c },
-  2: { name: 'NES', colours: 12, tile: 3, table: null,
+  // NES (item 1279): the 2C02 table only; four sprite palettes of three colours
+  // (12); three colours in any 8 x 8 sprite tile, and a tile that needs more is
+  // a second sprite stacked on it; eight sprites a scanline shared by the two
+  // figures, the ball and its shadow, so one figure spends at most three a line.
+  2: { name: 'NES', colours: 12, tile: 3, lineSprites: 3, table: null,
        snap(c) { this.table = this.table || nesTable(); const t = rgbOf(c); let b = this.table[0];
          for (const e of this.table) if (dist2(rgbOf(e), t) < dist2(rgbOf(b), t)) b = e; return b; } },
   3: { name: 'Sega Genesis', colours: 15, bits: 3, snap: (c) => hexOf(...rgbOf(c).map((v) => nearestLevel(v, levels(3)))) },
@@ -188,10 +192,16 @@ export function lint(doc) {
       if (era && era.perRow && rowCols.size > era.perRow) faults.push(`frame ${n} row ${y} has ${rowCols.size} colours; the ${era.name} draws one a line`);
     });
     if (era && era.tile) {
-      for (let ty = 0; ty < g.length; ty += 8) for (let tx = 0; tx < g[0].length; tx += 8) {
-        const s = new Set();
-        for (let y = ty; y < Math.min(ty + 8, g.length); y++) for (let x = tx; x < Math.min(tx + 8, g[0].length); x++) if (g[y][x] !== '.') s.add(g[y][x]);
-        if (s.size > era.tile) notes.push(`frame ${n} tile (${tx},${ty}) has ${s.size} colours; an NES sprite tile holds ${era.tile}`);
+      for (let ty = 0; ty < g.length; ty += 8) {
+        let sprites = 0;
+        for (let tx = 0; tx < g[0].length; tx += 8) {
+          const s = new Set();
+          for (let y = ty; y < Math.min(ty + 8, g.length); y++) for (let x = tx; x < Math.min(tx + 8, g[0].length); x++) if (g[y][x] !== '.') s.add(g[y][x]);
+          if (s.size > era.tile) notes.push(`frame ${n} tile (${tx},${ty}) has ${s.size} colours; an NES sprite tile holds ${era.tile}, so it is ${Math.ceil(s.size / era.tile)} sprites stacked`);
+          sprites += Math.ceil(s.size / era.tile);
+        }
+        // a stacked tile is another hardware sprite on every line of that band
+        if (era.lineSprites && sprites > era.lineSprites) faults.push(`frame ${n} rows ${ty}-${Math.min(ty + 7, g.length - 1)} need ${sprites} sprites a line; the ${era.name} gives one figure ${era.lineSprites} (8 a line, two figures, the ball and its shadow)`);
       }
     }
     bases[n] = base;
