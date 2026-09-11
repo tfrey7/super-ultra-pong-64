@@ -1,5 +1,5 @@
 {
-  "when": "2026-09-11T02:54:42.457Z",
+  "when": "2026-09-11T02:56:59.624Z",
   "results": [
     {
       "name": "era 5: its arrangement books notes after the first click",
@@ -57,7 +57,7 @@
         "scheduled": 24,
         "crossfades": 0,
         "errors": 0,
-        "tempo": 132,
+        "tempo": 133.6,
         "gameEra": 8
       }
     },
@@ -69,10 +69,10 @@
         "available": true,
         "audio": "running",
         "era": 9,
-        "scheduled": 56,
+        "scheduled": 64,
         "crossfades": 0,
         "errors": 0,
-        "tempo": 132,
+        "tempo": 133.6,
         "gameEra": 9
       }
     },
@@ -84,7 +84,7 @@
         "available": true,
         "audio": "running",
         "era": 10,
-        "scheduled": 30,
+        "scheduled": 31,
         "crossfades": 0,
         "errors": 0,
         "tempo": 132,
@@ -111,15 +111,15 @@
           10
         ],
         "changesAt": [
-          "0->1 @ bar 1 step 13",
-          "1->2 @ bar 2 step 2",
-          "2->3 @ bar 2 step 8",
-          "3->4 @ bar 2 step 13",
-          "4->5 @ bar 3 step 2",
-          "5->6 @ bar 3 step 8",
-          "6->7 @ bar 3 step 13",
-          "7->8 @ bar 4 step 3",
-          "8->9 @ bar 4 step 9",
+          "0->1 @ bar 1 step 11",
+          "1->2 @ bar 1 step 16",
+          "2->3 @ bar 2 step 6",
+          "3->4 @ bar 2 step 12",
+          "4->5 @ bar 3 step 1",
+          "5->6 @ bar 3 step 6",
+          "6->7 @ bar 3 step 12",
+          "7->8 @ bar 4 step 2",
+          "8->9 @ bar 4 step 8",
           "9->10 @ bar 4 step 14"
         ]
       }
