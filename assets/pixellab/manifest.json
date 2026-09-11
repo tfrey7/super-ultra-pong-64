@@ -1,0 +1,47 @@
+{
+  "about": "Every image tools/pixellab.mjs made, with the request that made it.",
+  "images": [
+    {
+      "name": "test-ball",
+      "file": "test-ball.png",
+      "prompt": "a small round white ball, simple pixel art game sprite, plain",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "seed": 771721126,
+      "date": "2026-09-11T01:03:55.409Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 15.5,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 246,
+      "sha256": "0657b2b25971e65e04d438263db0f5f899546c7fe3c949413e685a8b35802071",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a small round white ball, simple pixel art game sprite, plain",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 771721126,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "no_background": true
+      }
+    }
+  ]
+}
