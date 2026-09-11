@@ -67,6 +67,62 @@
 
   var HUD = { cell: 12, gap: 9, top: 20, offset: 110, spread: 3 };
 
+  // ------------------------------------------------ the AAA dressing (item 1230)
+  // docs/ART.md, Era 6: a grassy toy park on a sunny afternoon, in the manner of
+  // Super Mario 64 / Wave Race 64 / Pilotwings 64. All of it drawn in code.
+  //
+  // Two flagpoles just beyond the end rails, toy-yellow poles with a waving
+  // pennant, fogged at their depth like the rails; three toy-yellow butterflies
+  // circling over the far hills. Both go into the half-resolution world, so the
+  // bilinear smear takes them with the table.
+  var POLES = [
+    { x: -40, y: 150, pennant: PAL.toyBlue, out: -1 },
+    { x: 840, y: 150, pennant: PAL.toyGreen, out: 1 }
+  ];
+  // fogged at their depth like the rails, but capped (as the paddles are) so the set dressing still
+  // reads: at y 150 the full fog is 0.9, and the first browser look showed bare lines and no cloth.
+  var POLE = { height: 90, width: 4, pennant: { w: 30, h: 20 }, swing: 6, rate: 1.5, fogCap: 0.45 };
+  // Over the pale wall the world ends in, drawn after it and fogged to 0.4: under it, at the hills'
+  // own depth, the first browser look lost them entirely.
+  var BUTTERFLIES = { loop: 30, period: 8, wing: 4, flap: 14, fog: 0.4,
+                      at: [[190, -74, 0], [430, -86, 2.7], [630, -70, 5.3]] };
+  // The power meter: a round pie of 8 slices, one lit per rally hit, reset at
+  // the serve (it reads state.rally). The bible puts it UNDER each score; this
+  // camera's far edge is at y 102, so under the score (which ends at y 80) it
+  // would cross R8's line at 96. It sits beside each score, on its inner side (the outer side of the
+  // right-hand score is where the computer's name is written).
+  var METER = { r: 14, slices: 8, outline: 2, beside: 22, lit: PAL.toyYellow, unlit: PAL.toyBlue, unlitAlpha: 0.6 };
+  // A point: 5 toy-yellow stars pop from the scorer's paddle and arc up and out.
+  var STARS = { n: 5, size: 8, life: 0.6, speed: 230, gravity: 420, spread: 120 };
+  // Match point: the meters spin once a second, the horizon pulses toy yellow.
+  var MATCH = { spin: 1, pulse: 0.15 };
+
+  // The players' sheets (docs/ART.md, Era 6, ASSETS) are embedded as data: URIs
+  // in src/textures3d.js like the table's tiles, so they never taint the canvas;
+  // src/characters.js asks the sprite loader for them by name, and this hands
+  // the loader the embedded picture before it goes looking on disk.
+  var SHEETS = ['era6-penguin', 'era6-frog'];
+  function primeSheets() {
+    var S = root.PongSprites, X = root.PongTextures3D;
+    if (!S || !X || !X.TILES || typeof root.Image !== 'function') return 0;
+    var n = 0;
+    for (var i = 0; i < SHEETS.length; i++) {
+      var uri = X.TILES[SHEETS[i]];
+      if (!uri || S.status(SHEETS[i]) !== 'unloaded') continue;
+      try {
+        S.load(SHEETS[i]).src = uri;   // replaces the file load the loader just began
+        n++;
+      } catch (e) { /* no real Image here (a test's stand-in): the rig draws its placeholder */ }
+    }
+    return n;
+  }
+  primeSheets();
+
+  function isMatchPoint(state) {
+    var G = root.Pong;
+    return !!(G && typeof G.isMatchPoint === 'function' && G.isMatchPoint(state));
+  }
+
   var SHAKE = {
     point: { amp: 6, len: 0.25 },   // R7: 6 px or less, 0.25 s or less
     hit: { amp: 3, len: 0.12 },     // R7: 3 px or less on a hit
@@ -88,7 +144,7 @@
   // Private memory of what the last frame looked like, so a rise in the rally
   // (a paddle hit) or the score total (a point) starts a shake. A clock that
   // runs backwards is a new game: forget, and do not shake for it.
-  var memory = { time: -Infinity, total: null, rally: null, at: -Infinity, amp: 0, len: 0 };
+  var memory = { time: -Infinity, total: null, rally: null, at: -Infinity, amp: 0, len: 0, pointAt: -Infinity };
 
   function ballSpeed(state) {
     return Math.sqrt(state.ball.vx * state.ball.vx + state.ball.vy * state.ball.vy);
@@ -100,9 +156,11 @@
     var rally = state.rally || 0;
     if (memory.total === null || state.time < memory.time) {
       memory.at = -Infinity;
+      memory.pointAt = -Infinity;
     } else if (state.time > memory.time) {
       if (total > memory.total) {
         memory.at = state.time; memory.amp = SHAKE.point.amp; memory.len = SHAKE.point.len;
+        memory.pointAt = state.time;
       } else if (rally > memory.rally) {
         var kind = ballSpeed(state) > SHAKE.fastBall ? SHAKE.hit : SHAKE.softHit;
         memory.at = state.time; memory.amp = kind.amp; memory.len = kind.len;
@@ -232,6 +290,84 @@
     };
   }
 
+  // --------------------------------------------------- set dressing (item 1230)
+  /** The two flagpoles and their pennants, fogged at their depth; the tip waves. */
+  function flagpoles(target, T, cam, t) {
+    var P = POLE, w = 2 * Math.PI * P.rate;
+    var fog = Math.min(P.fogCap, T.fogAmount(POLES[0].y, FOG));
+    function fogged(ink) { return T.mix(ink, FOG.colour, fog); }
+    for (var i = 0; i < POLES.length; i++) {
+      var pole = POLES[i];
+      var foot = T.project(cam, pole.x, pole.y, 0), top = T.project(cam, pole.x, pole.y, P.height);
+      target.strokeStyle = fogged(PAL.toyYellow);
+      target.lineWidth = Math.max(1, P.width * top.scale);
+      target.lineCap = 'round';
+      target.beginPath();
+      target.moveTo(foot.x, foot.y);
+      target.lineTo(top.x, top.y);
+      target.stroke();
+      // the knob on top
+      target.fillStyle = fogged(T.shade(PAL.toyYellow, 0.3));
+      target.beginPath();
+      target.arc(top.x, top.y, Math.max(1, 2.5 * top.scale), 0, Math.PI * 2);
+      target.fill();
+      // the pennant: from the pole's top 20 units down, out 30, the tip waving
+      var wave = Math.sin(t * w + i * 1.3);
+      var hi = T.project(cam, pole.x, pole.y, P.height - 1);
+      var lo = T.project(cam, pole.x, pole.y, P.height - 1 - P.pennant.h);
+      var mid = T.project(cam, pole.x + pole.out * P.pennant.w * 0.5, pole.y + P.swing * 0.5 * Math.sin(t * w + i * 1.3 - 0.8),
+                          P.height - 1 - P.pennant.h * 0.3);
+      var tip = T.project(cam, pole.x + pole.out * P.pennant.w, pole.y + P.swing * wave,
+                          P.height - 1 - P.pennant.h * 0.5 + 2 * Math.cos(t * w + i * 1.3));
+      target.fillStyle = fogged(pole.pennant);
+      target.beginPath();
+      target.moveTo(hi.x, hi.y);
+      target.quadraticCurveTo(mid.x, mid.y, tip.x, tip.y);
+      target.lineTo(lo.x, lo.y);
+      target.closePath();
+      target.fill();
+      // a lighter fold where the cloth turns toward the sun
+      target.fillStyle = fogged(T.shade(pole.pennant, 0.3));
+      target.beginPath();
+      target.moveTo(hi.x, hi.y);
+      target.quadraticCurveTo(mid.x, mid.y, tip.x, tip.y);
+      target.lineTo((hi.x + lo.x) / 2, (hi.y + lo.y) / 2);
+      target.closePath();
+      target.fill();
+    }
+  }
+
+  /** Three toy-yellow butterflies circling a 60-unit loop over the far hills every 8 s, fogged. */
+  function butterflies(target, T, farY, t) {
+    var B = BUTTERFLIES;
+    target.fillStyle = T.mix(PAL.toyYellow, FOG.colour, B.fog);
+    for (var i = 0; i < B.at.length; i++) {
+      var a = 2 * Math.PI * t / B.period + B.at[i][2];
+      var x = B.at[i][0] + B.loop * Math.cos(a), y = farY + B.at[i][1] + B.loop * 0.4 * Math.sin(a);
+      var open = 0.35 + 0.65 * Math.abs(Math.sin(t * B.flap + i));   // the wings beat
+      for (var s = -1; s <= 1; s += 2) {
+        target.save();
+        target.translate(x + s * B.wing * 0.3 * open, y);
+        target.scale(open, 1);
+        target.beginPath();
+        target.arc(0, 0, B.wing * 0.5, 0, Math.PI * 2);
+        target.fill();
+        target.restore();
+      }
+    }
+  }
+
+  /** Match point: the sky's horizon pulses toward toy yellow, once a second. */
+  function horizonPulse(target, T, farY, t) {
+    var k = MATCH.pulse * (0.5 - 0.5 * Math.cos(2 * Math.PI * t));
+    if (!(k > 0.005)) return;
+    var g = target.createLinearGradient(0, farY * 0.3, 0, farY);
+    g.addColorStop(0, T.rgba(PAL.toyYellow, 0));
+    g.addColorStop(1, T.rgba(PAL.toyYellow, k));
+    target.fillStyle = g;
+    target.fillRect(0, farY * 0.3, T.W, farY * 0.7);
+  }
+
   // ------------------------------------------------------------- the world
   /**
    * Steps 1 to 3 of the painter's order, in field units on target: the sky,
@@ -249,6 +385,7 @@
     sky.addColorStop(1, PAL.skyHorizon);
     target.fillStyle = sky;
     target.fillRect(0, 0, W, H);
+    if (isMatchPoint(state)) horizonPulse(target, T, farY, state.time);
 
     // two clouds, three overlapping circles each, drifting 4 units a second.
     // A breath off pure white, so the ball stays the brightest thing (R1).
@@ -293,6 +430,7 @@
     wall.addColorStop(1, T.rgba(PAL.fog, FOG.max));
     target.fillStyle = wall;
     target.fillRect(0, farY - 60, W, 60);
+    butterflies(target, T, farY, state.time);
 
     // the ground beside the table, fogged along its depth
     var ground = target.createLinearGradient(0, farY, 0, nearY);
@@ -312,6 +450,7 @@
       texture: TEXTURE.court,
       trim: TEXTURE.trim
     });
+    flagpoles(target, T, cam, state.time);
 
     // 3. on the table: the fog band swallowing the far end
     T.fogBand(target, cam, FOG);
@@ -384,7 +523,93 @@
       }
       ctx.fillStyle = PAL.hudFill;
       P.drawText(ctx, text, at, HUD.top, HUD.cell, HUD.gap);
+      // the power meter, on the score's inner side (item 1230)
+      var half = (text.length * 3 * HUD.cell + (text.length - 1) * HUD.gap) / 2;
+      powerMeter(ctx, at - (s ? 1 : -1) * (half + METER.beside), HUD.top + 2.5 * HUD.cell,
+                 state.rally || 0, isMatchPoint(state) ? state.time * MATCH.spin * 2 * Math.PI : 0);
     }
+  }
+
+  /** How many of the meter's slices are lit: one per rally hit, all 8 at most. */
+  function meterLit(rally) { return Math.max(0, Math.min(METER.slices, Math.floor(rally) || 0)); }
+
+  /** A round pie-slice power meter: lit slices toy yellow, the rest toy blue at 0.6, outlined. */
+  function powerMeter(ctx, cx, cy, rally, turn) {
+    var M = METER, lit = meterLit(rally), step = 2 * Math.PI / M.slices;
+    for (var i = 0; i < M.slices; i++) {
+      var a0 = -Math.PI / 2 + turn + i * step;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, M.r, a0, a0 + step);
+      ctx.closePath();
+      ctx.globalAlpha = i < lit ? 1 : M.unlitAlpha;
+      ctx.fillStyle = i < lit ? M.lit : M.unlit;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = PAL.hudOutline;
+    ctx.lineWidth = M.outline;
+    for (var j = 0; j < M.slices; j++) {   // the slice lines, then the rim
+      var a = -Math.PI / 2 + turn + j * step;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + M.r * Math.cos(a), cy + M.r * Math.sin(a));
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(cx, cy, M.r, 0, 2 * Math.PI);
+    ctx.stroke();
+  }
+
+  // ------------------------------------------------------ the point (item 1230)
+  /**
+   * The point moment's stars: { side, age } while they fly, else null. Every
+   * point below the Xbox 360 moves the machine up an era, so the point is at
+   * state.eraChangedAt, and the side that scored is the one the ball did NOT
+   * go out past (state.missAt). The rumble's own memory covers a point with no
+   * era change (a match made longer than the ladder).
+   */
+  function starsAt(state) {
+    var at = -Infinity;
+    if (state.eraChangedAt > 0) at = state.eraChangedAt;
+    if (memory.pointAt > at) at = memory.pointAt;
+    var age = state.time - at;
+    if (!(age >= 0 && age < STARS.life) || !state.missAt) return null;
+    return { side: state.missAt.x < state.width / 2 ? 'right' : 'left', age: age };
+  }
+
+  function starPath(ctx, x, y, r) {
+    ctx.beginPath();
+    for (var i = 0; i < 10; i++) {
+      var a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r;
+      if (i) ctx.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a));
+      else ctx.moveTo(x + rr * Math.cos(a), y + rr * Math.sin(a));
+    }
+    ctx.closePath();
+  }
+
+  /** Five toy-yellow stars popping from the scorer's paddle, arcing up and out over 0.6 s. */
+  function pointStars(ctx, T, cam, state) {
+    var st = starsAt(state);
+    if (!st) return false;
+    var p = state[st.side], out = st.side === 'left' ? -1 : 1;
+    var from = T.project(cam, p.x + p.w / 2, p.y + p.h / 2, PADDLE_Z);
+    var u = st.age / STARS.life, fade = 1 - Math.max(0, (u - 0.6) / 0.4);
+    ctx.fillStyle = PAL.toyYellow;
+    ctx.strokeStyle = T.shade(PAL.toyYellow, -0.4);
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = fade;
+    for (var i = 0; i < STARS.n; i++) {
+      // fanned from straight up to STARS.spread degrees out, away from the table's middle
+      var a = (-90 + out * STARS.spread * (i / (STARS.n - 1)) * 0.5 - out * 15) * Math.PI / 180;
+      var x = from.x + Math.cos(a) * STARS.speed * st.age;
+      var y = from.y + Math.sin(a) * STARS.speed * st.age + 0.5 * STARS.gravity * st.age * st.age;
+      starPath(ctx, x, y, STARS.size / 2 * (1 + 0.3 * Math.sin(st.age * 30 + i)));
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    return true;
   }
 
   // ------------------------------------------------------------------ draw
@@ -435,6 +660,9 @@
       ctx.fillStyle = PAL.ballCore;
       ctx.fill();
     }
+
+    // the point moment: stars from the scorer's paddle (item 1230); they shake with the world
+    pointStars(ctx, T, cam, state);
     ctx.restore();
 
     // 8. the HUD, above the far edge, not shaking
@@ -739,6 +967,9 @@
     },
     draw: draw,
     arrival: { spec: ARRIVAL, pourAt: pourAt, cubeAt: cubeAt, cubeFaces: cubeFaces, edgeStrength: edgeStrength },
-    flourish: arrival
+    flourish: arrival,
+    // the AAA dressing (item 1230, docs/ART.md Era 6), for the tests
+    dressing: { POLES: POLES, POLE: POLE, BUTTERFLIES: BUTTERFLIES, METER: METER, STARS: STARS, MATCH: MATCH,
+                SHEETS: SHEETS, meterLit: meterLit, starsAt: starsAt, primeSheets: primeSheets }
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);

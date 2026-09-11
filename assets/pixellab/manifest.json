@@ -3400,6 +3400,282 @@
       ],
       "derivedBy": "py -3.10 assets/pixellab/era7-skater-cut.py",
       "how": "pixflux drew a 2 x 4 grid of 36 x 81 figures, not the 3 x 6 sheet asked for; each figure found as a cluster of pixels, the action row scaled to the standing height (nearest), paper white pulled to 224, laid out as the rig's six rows (idle 2, up 2, down 2, swing 3, miss 1, win 2) of 44 x 84 frames, feet on the bottom row"
+    },
+    {
+      "name": "tex3d-era6-penguin",
+      "file": "tex3d-era6-penguin.png",
+      "prompt": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-penguin-raw2 (the stand) and era6-penguin-win-raw (the jump for joy); their prompts and seeds are their own entries",
+      "derivedFrom": [
+        "era6-penguin-raw2",
+        "era6-penguin-win-raw"
+      ],
+      "seed": 1793498882,
+      "size": {
+        "width": 96,
+        "height": 264
+      },
+      "pixels": {
+        "width": 96,
+        "height": 264
+      },
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "bytes": 26913,
+      "sha256": "7223536321110e6472eeed9f9ffe23fba184c27fd7fba149f1d26fe89ff752d5",
+      "date": "2026-09-11T03:38:38.534Z",
+      "note": "item 1230: 3 x 6 frames of 32 x 44, idle up down swing miss win; dated as its newest source and listed before the generations, so the tool reads the cost of one image off a real bill",
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "request": {
+        "description": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-penguin-raw2 (the stand) and era6-penguin-win-raw (the jump for joy); their prompts and seeds are their own entries",
+        "seed": 1793498882,
+        "derived": "py -3.10 assets/pixellab/era6-n64-sheets.py -- no request is sent; the sources are the entries named in derivedFrom"
+      }
+    },
+    {
+      "name": "tex3d-era6-frog",
+      "file": "tex3d-era6-frog.png",
+      "prompt": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-frog-sheet-raw (the stand) and era6-frog-win-raw (the jump for joy); their prompts and seeds are their own entries",
+      "derivedFrom": [
+        "era6-frog-sheet-raw",
+        "era6-frog-win-raw"
+      ],
+      "seed": 1594989580,
+      "size": {
+        "width": 96,
+        "height": 264
+      },
+      "pixels": {
+        "width": 96,
+        "height": 264
+      },
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "bytes": 30052,
+      "sha256": "0f1b240973bce354842c34cacea104b064815c3d26ef72b8ba079570fb4c6b8d",
+      "date": "2026-09-11T03:38:59.548Z",
+      "note": "item 1230: 3 x 6 frames of 32 x 44, idle up down swing miss win; dated as its newest source and listed before the generations, so the tool reads the cost of one image off a real bill",
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "request": {
+        "description": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-frog-sheet-raw (the stand) and era6-frog-win-raw (the jump for joy); their prompts and seeds are their own entries",
+        "seed": 1594989580,
+        "derived": "py -3.10 assets/pixellab/era6-n64-sheets.py -- no request is sent; the sources are the entries named in derivedFrom"
+      }
+    },
+    {
+      "name": "era6-penguin-sheet-raw",
+      "file": "era6-penguin-sheet-raw.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, the same cute chunky round penguin mascot in every cell, dark blue body, cream white belly, red scarf, big round head, stubby flippers, smooth rounded 1996 3D toy game character, facing right, hugging a board to its chest. Row 1 idle waddle bob. Row 2 hop step leaning forward. Row 3 hop step leaning back. Row 4 belly bump lunge forward. Row 5 dizzy spin with three yellow stars round its head. Row 6 victory jump with both flippers raised. Full body in each cell, evenly spaced",
+      "size": {
+        "width": 60,
+        "height": 270
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 796592394,
+      "date": "2026-09-11T03:36:54.343Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 18,
+      "pixels": {
+        "width": 60,
+        "height": 270
+      },
+      "bytes": 4004,
+      "sha256": "6e5e4aa17e6822bc35832e34c52a7a0c5b45e1cab8411804f728e99fa5550661",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, the same cute chunky round penguin mascot in every cell, dark blue body, cream white belly, red scarf, big round head, stubby flippers, smooth rounded 1996 3D toy game character, facing right, hugging a board to its chest. Row 1 idle waddle bob. Row 2 hop step leaning forward. Row 3 hop step leaning back. Row 4 belly bump lunge forward. Row 5 dizzy spin with three yellow stars round its head. Row 6 victory jump with both flippers raised. Full body in each cell, evenly spaced",
+        "image_size": {
+          "width": 60,
+          "height": 270
+        },
+        "seed": 796592394,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "note": "restored by hand on item 1230: this run and the frog run wrote the manifest at the same time and this entry was lost; prompt and seed are from the run output, bytes 4004, 18 s"
+    },
+    {
+      "name": "era6-frog-sheet-raw",
+      "file": "era6-frog-sheet-raw.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, the same cute chunky round green frog mascot in every cell, bright green body, pale mint belly, yellow baseball cap, big round head, stubby arms, smooth rounded 1996 3D toy game character, facing right, hugging a board to its chest. Row 1 idle bob. Row 2 hop step leaning forward. Row 3 hop step leaning back. Row 4 belly bump lunge forward. Row 5 dizzy spin with three yellow stars round its head. Row 6 victory jump with both arms raised. Full body in each cell, evenly spaced",
+      "size": {
+        "width": 60,
+        "height": 270
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 1594989580,
+      "date": "2026-09-11T03:36:54.343Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 29.6,
+      "pixels": {
+        "width": 60,
+        "height": 270
+      },
+      "bytes": 6730,
+      "sha256": "80bd7b1d959b83d470dc743f0bc1cf1459f9d8d22aa1d75d3af932565d2cb240",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, the same cute chunky round green frog mascot in every cell, bright green body, pale mint belly, yellow baseball cap, big round head, stubby arms, smooth rounded 1996 3D toy game character, facing right, hugging a board to its chest. Row 1 idle bob. Row 2 hop step leaning forward. Row 3 hop step leaning back. Row 4 belly bump lunge forward. Row 5 dizzy spin with three yellow stars round its head. Row 6 victory jump with both arms raised. Full body in each cell, evenly spaced",
+        "image_size": {
+          "width": 60,
+          "height": 270
+        },
+        "seed": 1594989580,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "note": "renamed from tex3d-era6-frog on item 1230: pixflux drew one pose seven times, so the sheet the game uses is derived (era6-n64-sheets.py)"
+    },
+    {
+      "name": "era6-penguin-raw2",
+      "file": "era6-penguin-raw2.png",
+      "prompt": "one cute chunky round penguin mascot, full body, dark blue body, cream white belly, red scarf, big round head, stubby flippers, orange feet, smooth rounded 1996 3D toy game character, three quarter view facing right, hugging a small board to its chest",
+      "size": {
+        "width": 32,
+        "height": 40
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 1793498882,
+      "date": "2026-09-11T03:38:22.927Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 14.1,
+      "pixels": {
+        "width": 32,
+        "height": 40
+      },
+      "bytes": 1499,
+      "sha256": "9967c4596825e0f09b727db435c23cbdb5bfe3dd1973923a053177cf0085c637",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "one cute chunky round penguin mascot, full body, dark blue body, cream white belly, red scarf, big round head, stubby flippers, orange feet, smooth rounded 1996 3D toy game character, three quarter view facing right, hugging a small board to its chest",
+        "image_size": {
+          "width": 32,
+          "height": 40
+        },
+        "seed": 1793498882,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era6-penguin-win-raw",
+      "file": "era6-penguin-win-raw.png",
+      "prompt": "one cute chunky round penguin mascot, full body, dark blue body, cream white belly, red scarf, big round head, orange feet, smooth rounded 1996 3D toy game character, three quarter view facing right, jumping for joy with both flippers raised high above its head",
+      "size": {
+        "width": 32,
+        "height": 40
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 150740665,
+      "date": "2026-09-11T03:38:38.534Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 14.9,
+      "pixels": {
+        "width": 32,
+        "height": 40
+      },
+      "bytes": 1136,
+      "sha256": "1a9b32cf9b042e55ce027eb6f36116df62fa84b8b543cff1c83e37612a96c6ff",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "one cute chunky round penguin mascot, full body, dark blue body, cream white belly, red scarf, big round head, orange feet, smooth rounded 1996 3D toy game character, three quarter view facing right, jumping for joy with both flippers raised high above its head",
+        "image_size": {
+          "width": 32,
+          "height": 40
+        },
+        "seed": 150740665,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era6-frog-win-raw",
+      "file": "era6-frog-win-raw.png",
+      "prompt": "one cute chunky round green frog mascot, full body, bright green body, pale mint belly, yellow baseball cap, big round head, smooth rounded 1996 3D toy game character, three quarter view facing right, jumping for joy with both arms raised high above its head",
+      "size": {
+        "width": 32,
+        "height": 40
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 1680196899,
+      "date": "2026-09-11T03:38:59.548Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 20.1,
+      "pixels": {
+        "width": 32,
+        "height": 40
+      },
+      "bytes": 1587,
+      "sha256": "596f85642cc0ca8bfe589af81aacbf0ef57f73fb8cbd4b34b5be9a594fb34605",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "one cute chunky round green frog mascot, full body, bright green body, pale mint belly, yellow baseball cap, big round head, smooth rounded 1996 3D toy game character, three quarter view facing right, jumping for joy with both arms raised high above its head",
+        "image_size": {
+          "width": 32,
+          "height": 40
+        },
+        "seed": 1680196899,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      }
     }
   ]
 }
