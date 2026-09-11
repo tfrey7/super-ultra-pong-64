@@ -1,7 +1,8 @@
 'use strict';
 /*
- * Era 3's generated pixel art (item 1179): the pixellab court, paddles and
- * ball, snapped to the Genesis palette and drawn with drawImage. Node has no
+ * Era 3's generated pixel art (item 1179): the pixellab court and ball,
+ * snapped to the Genesis palette and drawn with drawImage (the paddles stay
+ * hand-drawn: both generated paddles read wrong). Node has no
  * Image, so each test hands the era a stand-in sprite loader for the length of
  * the test and takes it away again; the rest of the suite sees the plain
  * hand-drawn look, exactly as the page does until the pictures have decoded.
@@ -16,7 +17,7 @@ const ROOT = path.join(__dirname, '..');
 const ASSETS = path.join(ROOT, 'assets', 'pixellab');
 const { Pong, R } = eralooks.loadRenderer(ROOT);
 const look = R.eraLook(3);
-const ART = ['genesis-court', 'genesis-paddle', 'genesis-ball'];
+const ART = ['genesis-court', 'genesis-ball'];
 
 function rally() {
   const g = Pong.createGame({ rng: () => 0.1, phase: 'playing', era: 3 });
@@ -40,15 +41,14 @@ function recorder() {
 }
 
 /**
- * Run fn with a stand-in PongSprites (every name decoded when `ready`), an
- * Image constructor and a document whose canvases record, then restore them.
+ * Run fn with a stand-in PongSprites (every name decoded when `ready`) and an
+ * Image constructor, then put the globals back as they were.
  */
 function withArt(ready, fn) {
-  const saved = { S: globalThis.PongSprites, Image: globalThis.Image, document: globalThis.document };
-  const sizes = { 'genesis-court': [320, 240], 'genesis-paddle': [12, 96], 'genesis-ball': [24, 24] };
+  const saved = { S: globalThis.PongSprites, Image: globalThis.Image };
   const loaded = [];
   const fake = {
-    load(name) { loaded.push(name); return { name, naturalWidth: sizes[name][0], naturalHeight: sizes[name][1] }; },
+    load(name) { loaded.push(name); return { name }; },
     ready: () => ready,
     draw(ctx, name, x, y, w, h) {
       if (!ready) { loaded.push(name); return false; }
@@ -58,17 +58,10 @@ function withArt(ready, fn) {
   };
   globalThis.PongSprites = fake;
   globalThis.Image = function Image() {};
-  globalThis.document = {
-    createElement: () => {
-      const c = { width: 0, height: 0, tinted: true };
-      c.getContext = () => recorder().ctx;
-      return c;
-    }
-  };
   try {
     return fn(loaded);
   } finally {
-    for (const [k, v] of [['PongSprites', saved.S], ['Image', saved.Image], ['document', saved.document]]) {
+    for (const [k, v] of [['PongSprites', saved.S], ['Image', saved.Image]]) {
       if (v === undefined) delete globalThis[k]; else globalThis[k] = v;
     }
   }
@@ -87,13 +80,17 @@ test('with the art decoded, the court, the paddles and the ball are drawn from t
   assert.ok(!rec.calls.some(([ink, x, y, w]) => ink === '#000024' && x === 0 && y === 0 && w === g.width),
     'the banded sky is not drawn under the picture');
 
-  // One tinted copy of the paddle art per side, drawn into the paddle's own box.
+  // The paddles stay hand-drawn (both generated paddles read wrong): the
+  // stepped palette gradient, in the side's own colour, and no picture.
   for (const side of ['left', 'right']) {
     const p = g[side];
-    const hits = rec.images.filter(([img, x, y, w, h]) => img.tinted && x === p.x && y === p.y && w === p.w && h === p.h);
-    assert.strictEqual(hits.length, 1, `${side} paddle drawn once from its picture`);
+    assert.ok(!rec.images.some(([, x, y]) => x === p.x && y === p.y), `${side} paddle is not a picture`);
+    const inside = rec.calls.filter(([, x, y, w, h]) =>
+      x >= p.x && y >= p.y && x + w <= p.x + p.w + 1e-9 && y + h <= p.y + p.h + 1e-9);
+    assert.ok(new Set(inside.map((c) => c[0])).size >= 4, `${side} paddle is the shaded bar`);
     assert.ok(rec.calls.some(([ink, x, y]) => ink === look.SHADOW && x === p.x + 5 && y === p.y + 5), `${side} paddle casts a shadow`);
   }
+  assert.strictEqual(rec.images.length, byName('genesis-court').length + 1, 'the court and the ball, nothing else');
 
   // The ball is its picture at the ball's own box, and the trail still follows it.
   const ball = byName('genesis-ball');
@@ -135,7 +132,7 @@ test('the era file never reads or writes a pixel', () => {
   }
 });
 
-test('the three pictures are on the Genesis palette, recorded with their snap, and the ball is the brightest', async () => {
+test('the two pictures are on the Genesis palette, recorded with their snap, and the ball is the brightest', async () => {
   const snap = await import('../tools/palette-snap.mjs');
   const manifest = JSON.parse(fs.readFileSync(path.join(ASSETS, 'manifest.json'), 'utf8'));
   const levels = new Set(look.LEVELS);
@@ -159,8 +156,7 @@ test('the three pictures are on the Genesis palette, recorded with their snap, a
     }
     mean[name] = sum / solid;
   }
-  // Readability: the ball outshines everything else. The paddle art is before
-  // its tint, which only darkens it (a multiply), so this is the hardest case.
-  assert.ok(mean['genesis-ball'] > mean['genesis-paddle'] + 40, `ball ${mean['genesis-ball'].toFixed(0)} vs paddle ${mean['genesis-paddle'].toFixed(0)}`);
+  // Readability: the ball outshines the court it flies over, by a mile.
+  assert.ok(mean['genesis-ball'] > 180, `the ball is bright: ${mean['genesis-ball'].toFixed(0)} of 255`);
   assert.ok(mean['genesis-ball'] > 4 * mean['genesis-court'], `ball ${mean['genesis-ball'].toFixed(0)} vs court ${mean['genesis-court'].toFixed(0)}`);
 });

@@ -19,8 +19,9 @@
  *  - A bolder block score with a drop shadow.
  *
  *  - Generated pixel art (item 1179): the far plane is a pixellab.ai night
- *    court, the paddles and the ball are pixellab sprites, all three snapped
- *    offline to the 512 colours (assets/pixellab/manifest.json says how). They
+ *    court and the ball a pixellab chrome sprite, both snapped offline to the
+ *    512 colours (assets/pixellab/manifest.json says how); the paddles stay
+ *    hand-drawn, after two generated ones read wrong (see drawShadedBar). They
  *    are drawn with drawImage only, once each has decoded; until then -- and
  *    always under node --test, which has no Image -- the hand-drawn pieces
  *    below stand in, so the look never has a hole.
@@ -250,13 +251,13 @@
   }
 
   // ------------------------------------------------------- the pixel art
-  // Three pieces generated with tools/pixellab.mjs and snapped offline to the
+  // Two pieces generated with tools/pixellab.mjs and snapped offline to the
   // palette above by tools/palette-snap.mjs (assets/pixellab/manifest.json
   // holds the request and the snap for each). Every piece is drawImage calls
   // only -- nothing here reads or loops over pixels. Until an image has
   // decoded, and always under node --test (there is no Image in Node), the
   // hand-drawn piece is drawn in its place, so the look never has a hole.
-  var ART = { court: 'genesis-court', paddle: 'genesis-paddle', ball: 'genesis-ball' };
+  var ART = { court: 'genesis-court', ball: 'genesis-ball' };
 
   /** The sprite loader, when this page can decode images at all. */
   function art() {
@@ -292,40 +293,14 @@
     return true;
   }
 
-  // One tinted copy of the paddle art per ink, made once: the grey chrome
-  // multiplied by the side's colour, then cut back to the sprite's own shape.
-  var tints = {};
-
-  function paddleArt(S, ink) {
-    if (!S.ready(ART.paddle)) { S.load(ART.paddle); return null; }
-    if (tints[ink]) return tints[ink];
-    if (typeof document === 'undefined' || !document.createElement) return null;
-    var img = S.load(ART.paddle);
-    var c = document.createElement('canvas');
-    c.width = img.naturalWidth || img.width;
-    c.height = img.naturalHeight || img.height;
-    var o = c.getContext('2d');
-    o.drawImage(img, 0, 0);
-    o.globalCompositeOperation = 'multiply';
-    o.fillStyle = onPalette(ink, 1);
-    o.fillRect(0, 0, c.width, c.height);
-    o.globalCompositeOperation = 'destination-in';
-    o.drawImage(img, 0, 0);
-    o.globalCompositeOperation = 'source-over';
-    tints[ink] = c;
-    return c;
-  }
-
-  function drawPaddle(ctx, p, ink, S) {
-    var tint = S ? paddleArt(S, ink) : null;
-    if (!tint) { drawShadedBar(ctx, p, ink); return; }
-    ctx.fillStyle = SHADOW;
-    ctx.fillRect(p.x + 5, p.y + 5, p.w, p.h);
-    var smooth = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(tint, p.x, p.y, p.w, p.h);
-    ctx.imageSmoothingEnabled = smooth;
-  }
+  // The paddles stay hand-drawn (drawShadedBar). Two generated paddles were
+  // tried at 16x96 and both read wrong at play size: seed 393692841 ("vertical
+  // bat paddle ... chrome bar") came back a baseball bat, its bottom third a
+  // dark thin handle, so the paddle looked shorter than it hits; seed
+  // 1170815782 ("one plain vertical rectangular bar ... same width top to
+  // bottom", negative "handle, grip, bat") came back a battery -- a dark cap
+  // over the top quarter and a '+' near the foot. The brief allows one retry,
+  // so the stepped palette gradient below is the Genesis paddle.
 
   function draw(ctx, state, opts) {
     if (opts && opts.ink) return R.drawBase(ctx, state, opts);
@@ -343,8 +318,8 @@
     drawScore(ctx, state, 'left', state.width / 2 - SCORE.offset);
     drawScore(ctx, state, 'right', state.width / 2 + SCORE.offset);
 
-    drawPaddle(ctx, state.left, paddleInk(state, 'left'), S);
-    drawPaddle(ctx, state.right, paddleInk(state, 'right'), S);
+    drawShadedBar(ctx, state.left, paddleInk(state, 'left'));
+    drawShadedBar(ctx, state.right, paddleInk(state, 'right'));
 
     // The ball blinks out while the serve waits, as in every era.
     if (state.serveDelay <= 0) drawBall(ctx, state, S);
