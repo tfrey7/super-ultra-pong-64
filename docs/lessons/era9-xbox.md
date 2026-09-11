@@ -90,3 +90,61 @@ Look file: [src/eras/era9-xbox.js](../../src/eras/era9-xbox.js). Chapter 10 of [
    `src/match.js`, and `advanceEra`'s call.
 5. Look at your own screenshot before calling the light done. That is how item 1149 found its
    faint shadows.
+
+## LESSONS
+
+*The AAA pass, item 1233: era 9 drawn as a 2001 Xbox flagship (a Halo-style hangar match) that
+happens to be Pong, to its page in [docs/ART.md](../ART.md).*
+
+**What sold the flagship look here**
+
+- **People with weight standing at the table.** An armoured space marine on the left and a steel
+  cyborg on the right, each 90 table units tall at the paddle's outer edge, holding the paddle as
+  an energy shield. Each is a pixellab sheet drawn by the shared player rig (`src/characters.js`,
+  era 9's block), scaled by the table's depth. The marine's glowing-shield frames are the swing.
+- **The light touches the players too.** Each player casts a hard shadow 40 units long from its
+  feet, directly away from the ball's moving light, at 0.30, lighter than the paddles' 0.45 (R5).
+  When the ball comes within 160 units the player's frame is drawn a second time in `'lighter'`,
+  up to 0.35, fading with distance. That glint is what makes the armour read as metal under the
+  same light as the plate.
+- **A place, not a void.** A pixellab hangar wall (400 x 80, dimmed to about half so it never
+  competes with the ball, and lifted where the light is) stands behind the far rail with six
+  steel ribs out of it. Two beacon posts past the end rails sweep a green wedge every 2 s, and
+  steam puffs from the feet of ribs 2 and 5 every 3 s.
+- **The moments are the set's.** A point turns both beacons alarm red for 1 s, and the losing
+  player's outline flashes red for 0.3 s. At match point the beacons stay red, the steam blows
+  without stopping and the gamertags' borders pulse green once a second. A Halo motion-tracker
+  ring sits in the HUD band's centre with a dot at the ball's `x`.
+
+**What did not work**
+
+- **pixflux does not draw a sprite sheet on a grid.** Asked for 3 x 6 frames of 24 x 54, it drew
+  the marine as 13 figures in 7 rows of two, and the cyborg as four figures of two different
+  sizes. The fix costs no generations: `assets/pixellab/era9-derive.mjs` keys out the ground (the
+  border's exact colour, flood filled, so the near-black outline survives), cuts each figure from
+  its cell, and pastes it onto the rig's grid with its feet down and its front on the hand edge.
+  **Ask pixflux for one row of three frames at the frame size.** The cyborg's re-roll asked for
+  exactly that (72 x 54) and came back on the grid.
+- **The re-roll kept the grid but lost the poses.** The cyborg's three frames are three nearly
+  identical stances, so its swing and recoil are made by sliding a stance 1 to 3 pixels. Read
+  plainly, the cyborg's beats show through its position and the red miss flash, not its body.
+  One row per beat (six small images) would have given real poses, and would still fit the
+  12-image budget.
+- **The rig draws the players after the era, so an era cannot light them from inside its own
+  draw.** The glint and the miss flash need to land on the players. The era file hooks the
+  renderer once more, outside the rig, and draws those two things over era 9 frames only.
+- **The rig loads a sheet by name off disk** (`src/sprites.js`), not as a `data:` URI, so a page
+  opened off disk by hand has its canvas tainted by the players. Nothing in the game reads pixels
+  back, and the playtest's Chrome is started with file access, so nothing breaks today. The
+  hangar and the beacon, which the era draws itself, are embedded in `src/textures3d.js`.
+
+**What a one-era game would copy**
+
+1. The rig plus two sheets: `src/characters.js` with only the era 9 block, the two sheets, and
+   `era9-derive.mjs` as the recipe for turning whatever pixflux draws into a grid.
+2. The four light rules, together: the ball is the light, every shadow falls away from it, every
+   extra shadow is lighter than the contact shadow, and anything metal within reach glints.
+3. One set, three moving things: a dimmed backdrop picture behind the far rail, two beacons and a
+   vent. That is enough for a place, and each costs one or two draws a frame.
+4. The moments on the set rather than on the HUD: red beacons and a red outline say "point" in a
+   2001 game's own language.
