@@ -115,10 +115,10 @@ torch-lit castle arena. It used 6 of its 12 pixellab generations.
    0.3 s and flares every torch; at match point the torches burn double speed and the panel's frame
    turns gold. Nothing is drawn in the name card's band.
 
-Measured on the playtest: the twelve-hit Genesis rally with the feel layer on ran 1,172 frames at a
-mean of 16.7 ms, p95 16.7 ms. The pictures are about ten `drawImage` calls a frame, and they cost
-nothing measurable. The frame is `docs/shots/playtest/feel-era3-genesis.png`, taken on the tenth
-hit.
+Measured on the playtest, on the tree merged with master: ordinary play on the ladder ran 61 frames
+in 1.02 s at a mean of 16.7 ms (the line is 18.5), and the twelve-hit rally with the feel layer on
+ran 1,116 frames at a mean of 16.7 ms, p95 16.7 ms. The pictures are about ten `drawImage` calls a
+frame, and they cost nothing measurable. The tenth hit is `docs/shots/item-1226/rally-era3-genesis.png`.
 
 **What did not work**
 
