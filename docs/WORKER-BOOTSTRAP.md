@@ -12,7 +12,11 @@ Every point either side scores moves the machine **up one era** -- 0 the 1972 ar
 1 the 1977 Atari 2600 (the turn to colour), 2 the NES, 3 the Genesis, 4 the Super Nintendo, then
 the 3D table: 5 the PlayStation, 6 the Nintendo 64, 7 the Dreamcast, 8 the PlayStation 2, 9 the
 Xbox and 10 the 2005 Xbox 360, where it stops. It does not matter which side scored, so a match's
-tenth point lands on era 10 and every point after that leaves it there. **All eleven rungs are
+tenth point lands on era 10, and the **eleventh, scored there, ends the match** (item 1211: a match
+is eleven points, `RULES.matchPoints`; the rules go to phase `'over'` with `winner`, and
+`src/match.js` plays MATCH POINT, the 360-style result, the rewind down every era and the 1972
+thanks screen, then `Pong.backToTitle`). A game with `matchPoints: 0` never ends -- the attract
+rally's rules, and a test that wants points to go on past eleven. **All eleven rungs are
 built** -- each has its own look, its own voice and a change moment -- and the README's *The era
 ladder* tables them, with a tracked reference frame of each in `docs/shots/eras/`. Eras 5 to 10
 are specified in `docs/ERAS.md`, the era bible. It opens on a **title screen** -- a real `phase` in
@@ -101,7 +105,10 @@ timing over the ring, against ordinary play just before it) with the paddle stil
 saving `era-wipe.png` mid-ring -- and, last, it **walks one match up the whole ladder**: a fresh
 era-0 machine, one point let through per rung, a check that each point moved it up exactly one era,
 a screenshot of each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to
-`ladder-era10-xbox360.png`, cropped to the field) and one more point to prove it stops on era 10.
+`ladder-era10-xbox360.png`, cropped to the field) and one more point to prove it stops on era 10 --
+which is the eleventh, so it ends the match, and the walk films the finale to the attract screen
+(`finale-announce-ladder.png`, `finale-rewind-ladder.png`, `finale-thanks-ladder.png`; `--match`
+runs only that, from ten points in on the 360, in about twenty seconds).
 On the way up it **films each of the ten era changes**: a frame caught mid-ring
 (`change-era0-to-era1.png` to `change-era9-to-era10.png`), a check that the ring's radius reached
 the farthest corner from where the ball went out, and a check that once the ring has gone the live
@@ -244,17 +251,10 @@ his emulator — never touch either.**
 - **A test that pins "era N has no flourish" goes stale when a sibling card gives it one.** Item
   1161 had to rewrite era 3's shatter test after era 2 grew a flourish; pin that the effect is your
   era's own hook, not that the others have none.
-- **The first ring on a cold page has one long frame** (about 110-120 ms at raw progress 0.006).
-  It is the ring engine's (item 1164), not your flourish's: item 1140 proved it by A/B with its
-  flourish removed. Do not chase it in an era file. (Item 1203 removed it by warming the real
-  looks at load, and item 1218 removed the Super Nintendo tilt's 13-25 ms frame at raw 0.12 the
-  same way; `docs/measure/item-1218/trace.mjs --timing --runs 20` re-times it.)
-- **A flourish that draws something no ring has drawn before brings a first-ring hitch back**,
-  as a GPU program built mid-ring (item 1218: the SNES tilt's turned strips). The cure is a
-  matching draw in `warmUp` in `src/erachange.js` -- and it has to be drawn on one of the ring's
-  layers and that layer copied onto the canvas, because a draw made straight onto the canvas
-  during the warm-up is thrown away unpainted by the clear that ends it (two tries that did that
-  changed nothing). A/B with the flourish off (`--no-flourish`) before you warm anything.
+- **The first ring on a cold page used to have one long frame** (about 100-120 ms). It was the
+  ring engine's, not a flourish's (item 1140 proved it by A/B), and item 1203 removed it; section
+  8a says why, and what to reach for if a long frame comes back. Item 1218 removed the next one,
+  the Super Nintendo tilt's 13-25 ms frame at raw 0.12, the same way.
 - **Start Chrome only through `tools/chrome.mjs`, never with a hand-built `--user-data-dir`.** A
   capture script that spawns Chrome itself leaves its profile behind -- about 18 MB a run, and on
   2026-09-10 the flourish cards' scripts left more than forty such folders in `G:/claude-tmp` (item
@@ -352,6 +352,12 @@ his emulator — never touch either.**
   worked example). `index.html?display=off` draws straight onto the page as before, and the
   playtest's pixel check reads the native frame through `PongDisplay.canvas()` and draws its
   comparisons through `PongDisplay.render()`.
+- **A screen overlay blends on the native picture, never on the page** (item 1200). The playtest's
+  Chrome draws without a GPU, and `'lighten'`, `'color'` or `'soft-light'` over the page's million
+  pixels, seven times a frame, held eras 5-10 to 10-20 frames a second. `src/display-tv.js` does
+  every blend on a copy of the native picture and gives the page two plain draws, scaled with
+  `imageSmoothingQuality = 'low'` (`'high'` alone cost about 20 ms a frame there). Measure a new
+  overlay with the ladder's "holds full frame rate" lines, screens on against `overlay: 'none'`.
 
 - **Six "holds full frame rate in ordinary play" FAILs, eras 5 to 10, are card 1216's, not yours**
   (until 1216 lands). The playtest's Chrome runs `--disable-gpu`, so every canvas is drawn on the
@@ -361,8 +367,44 @@ his emulator — never touch either.**
   `node docs/measure/item1192/eraspeed.mjs` re-takes all four setups in about two minutes. A FAIL
   on eras 0 to 4, or one far above those numbers, is new and is yours to look at.
 
+- **The ball carries more than its position and velocity** (item 1208): `ball.spin` bends its
+  flight and `ball.burst` is a smash's extra speed, and each paddle has a smoothed `vy`. Anything
+  that copies the ball to replay it -- the scripted scoring hand's `snapshotOf`/`copyOf`, the
+  playtest's `state()` -- must copy spin and burst too, or it plans against a straight ball that
+  is not coming. The spin read for the computer is `Pong.spinBend(state, x)` times
+  `rules.cpuSpinRead`, left on `state.right.spinRead` every step for whichever opponent moves
+  the paddle (the era profiles in `src/opponents.js` add it to their target). A spin or paddle
+  change is re-measured with `node tools/beatability-sample.mjs` (its `track` row between 35
+  and 60 percent: 58.3 after item 1208) and `--eras` (every era 30 to 65, the top the hardest).
+
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
+
+## 8a. A long frame can be the page's own graphics work (item 1219)
+
+What the player saw: at the first era change on a freshly opened page, the paddle froze for one
+frame, about 100 ms, as the ring began. Item 1164 found only 2-3 ms of page JavaScript in that
+frame, called it browser time no page code could remove, and handed back blocked. It was the
+page's all the same: **Chrome's graphics process compiles a shader the first time a fill, gradient
+or shape is actually drawn to the screen, and the compile lands in the frame that first draws it.**
+Item 1203 traced 100-117 ms of shader compiles there, for era looks nothing had drawn yet.
+
+- **A warm-up helps only if it draws the exact looks the game will draw later**, on the page's own
+  canvas. 1164's drew the title's dimmed stand-ins and prevented nothing; 1203's draws every rung's
+  real look (`warmUp` in `src/erachange.js`) and the stall was gone on 14 of 14 cold legs.
+- **Trace before you change any code**: `node docs/measure/item-1203/trace.mjs --label <name>
+  --port <n>`, copied into your own `docs/measure/` folder first, since it writes beside itself.
+  Every leg is a fresh profile on the next port up from `--port`, so pick a range nobody holds.
+  `--timing` times the ring with no trace (tracing slows every frame), `--from-load` records from
+  before the page loads (the warm-up's own work), and `--skia` names each GPU program built.
+- **Commit one or two representative traces, not one per leg**: each is 1-2 MB gzipped.
+- **A flourish that draws something no ring has drawn before brings a hitch back** as a GPU
+  program built mid-ring (item 1218: the Super Nintendo tilt's first turned strip, 13-25 ms at raw
+  0.12 on 15 of 20 cold legs). A/B with the flourish off first -- item 1218's copy of the recorder,
+  `docs/measure/item-1218/trace.mjs`, takes `--no-flourish` and `--at-raw <r>` -- then add a
+  matching draw to `warmUp`. **Draw it on one of the ring's layers and copy that layer onto the
+  canvas**: a draw made straight onto the canvas during the warm-up is thrown away unpainted by the
+  clear that ends it, and two tries that did that changed nothing (8 of 8 and 6 of 8 legs still long).
 
 ## 9. Talk in the room as you go (item 1170)
 

@@ -59,12 +59,18 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 const SCORING_ONLY = process.argv.includes('--scoring');
 // --feel runs only the game-feel rallies (section 9), about a minute.
 const FEEL_ONLY = process.argv.includes('--feel');
+// --match runs only the match's end (section 10, item 1211): ten points in on the
+// Xbox 360, the eleventh, then the finale filmed through to the attract screen.
+const MATCH_ONLY = process.argv.includes('--match');
 // --reference also copies the eleven era frames the walk takes (era0-arcade.png to
 // era10-xbox360.png), and the ten frames it catches mid-change (change-era0-to-era1.png
 // to change-era9-to-era10.png),
 // into the TRACKED docs/shots/eras/, the reference pictures a reader opens. Off by default,
 // because every walk's frames differ and a plain playtest must leave git clean.
 const REFERENCE = process.argv.includes('--reference');
+// --curve runs only the curved-shot check (item 1208), a few seconds; with
+// --reference it also writes its film strip to the tracked docs/shots/paddle-physics/.
+const CURVE_ONLY = process.argv.includes('--curve');
 const ERA_SHOTS = path.join(ROOT, 'docs', 'shots', 'eras');
 // One name per rung, the same as that era's file in src/eras/.
 const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes',
@@ -151,7 +157,7 @@ function check(name, ok, detail) {
 const state = (s) => s.eval(`(() => { const g = window.__pong; return {
   phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally, era: g.era, rules: g.rules,
   score: { left: g.score.left, right: g.score.right },
-  ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy },
+  ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy, spin: g.ball.spin, burst: g.ball.burst },
   leftY: g.left.y, rightY: g.right.y, h: g.left.h, height: g.height, width: g.width
 }; })()`);
 
@@ -253,6 +259,101 @@ async function playToScore(s, midX, toClientY) {
 }
 
 /**
+ * 7. A curved shot (item 1208). The ball is sent flat at the player's paddle,
+ * and the page's own mouse input swings the paddle down through it -- the
+ * pointer is moved every frame so the paddle meets the ball dead centre while
+ * travelling at `swing` units a second, which is a smash with spin on it. Then
+ * the ball's flight is recorded frame by frame to the far side: it must leave
+ * flat (the middle segment) and TURN, by at least 15 degrees, with no wall to
+ * help it, and end well off the straight line it left on. Five frames of the
+ * flight, the last with the path drawn over it, are stitched into a film strip.
+ */
+async function curveShot(s) {
+  const out = await s.eval(`new Promise((done) => {
+    const g = window.__pong, c = document.getElementById('field');
+    const box = () => c.getBoundingClientRect();
+    const point = (fy) => window.dispatchEvent(new MouseEvent('mousemove',
+      { clientY: box().top + (fy / g.height) * box().height, clientX: box().left + 40 }));
+    const Y = g.height / 2, swing = 520, face = g.left.x + g.left.w;
+    g.serveDelay = 0;
+    Object.assign(g.ball, { x: face + 150, y: Y - g.ball.size / 2, vx: -440, vy: 0, spin: 0, burst: 0 });
+    const path = [], shots = [], hits = [];
+    let t0 = null, walls = 0, frames = 0;
+    const strip = document.createElement('canvas');
+    const W = 320, H = 240, N = 5;
+    strip.width = W * N; strip.height = H;
+    const sx = strip.getContext('2d');
+    function frame(now) {
+      frames++;
+      const b = g.ball, cy = b.y + b.size / 2;
+      for (const e of g.events || []) { if (e.type === 'wall') walls++; if (e.type === 'paddle') hits.push(e); }
+      if (b.vx < 0 && !hits.length) {
+        // Before the hit: stand so the paddle arrives at Y exactly at contact.
+        const tau = Math.max(0, (b.x - face) / -b.vx);
+        point(Y - swing * Math.min(tau, 0.22));
+      } else if (hits.length) {
+        if (t0 === null) t0 = now;
+        const t = (now - t0) / 1000;
+        path.push({ t, x: b.x + b.size / 2, y: cy, vx: b.vx, vy: b.vy, spin: b.spin, walls });
+        if (shots.length < N - 1 && t >= shots.length * 0.18) {
+          sx.drawImage(c, shots.length * W, 0, W, H); shots.push(t);
+        }
+        if (b.vx < 0 || b.x > g.right.x - 30 || t > 1.6 || walls > 0) {
+          // The last panel: this frame with the flight traced over it, and the
+          // straight line it left on, dashed, for comparison.
+          const k = W / g.width, ox = (N - 1) * W;
+          sx.drawImage(c, ox, 0, W, H);
+          const p0 = path[0], a0 = Math.atan2(p0.vy, p0.vx);
+          sx.setLineDash([4, 4]); sx.strokeStyle = '#888'; sx.lineWidth = 2; sx.beginPath();
+          sx.moveTo(ox + p0.x * k, p0.y * k);
+          sx.lineTo(ox + (p0.x + Math.cos(a0) * 700) * k, (p0.y + Math.sin(a0) * 700) * k); sx.stroke();
+          sx.setLineDash([]); sx.strokeStyle = '#ff3b3b'; sx.beginPath();
+          path.forEach((p, i) => (i ? sx.lineTo : sx.moveTo).call(sx, ox + p.x * k, p.y * k)); sx.stroke();
+          sx.strokeStyle = '#555'; sx.lineWidth = 2;
+          for (let i = 1; i < N; i++) { sx.beginPath(); sx.moveTo(i * W, 0); sx.lineTo(i * W, H); sx.stroke(); }
+          return done({ path, hit: hits[0], shots, png: strip.toDataURL('image/png'), frames });
+        }
+      }
+      if (frames > 400) return done({ path, hit: hits[0] || null, shots, png: null, frames });
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })`);
+  const p = out.path;
+  const hit = out.hit;
+  check('a swinging paddle hits the ball: a smash with spin on it',
+    !!hit && hit.smash === true && Math.abs(hit.spin) > 0.5,
+    hit ? `smash ${hit.smash}, spin ${hit.spin.toFixed(2)} rad/s, speed ${hit.speed.toFixed(0)}` : 'the paddle never met the ball');
+  if (!p.length) { check('a curved shot: the flight bends', false, 'no flight recorded'); return out; }
+  // Measured up to the first wall, if the bend carried it into one.
+  const clear = p.filter((q) => q.walls === 0);
+  const first = p[0], last = clear.length ? clear[clear.length - 1] : p[0];
+  const deg = (v) => Math.atan2(v.vy, Math.abs(v.vx)) * 180 / Math.PI;
+  const a0 = Math.atan2(first.vy, first.vx);
+  const off = Math.abs((last.y - first.y) * Math.cos(a0) - (last.x - first.x) * Math.sin(a0));
+  const turned = Math.abs(deg(last) - deg(first));
+  check('a curved shot: the flight bends, with no wall to help it',
+    last.walls === 0 && turned >= 15 && off >= 40,
+    `left at ${deg(first).toFixed(1)} deg, ${last.t.toFixed(2)}s later heading ${deg(last).toFixed(1)} deg ` +
+    `(turned ${turned.toFixed(1)} deg), ${off.toFixed(0)} units off the straight line, ${last.walls} walls`);
+  if (out.png) {
+    const file = await (async () => {
+      mkdirSync(SHOTS, { recursive: true });
+      const f = path.join(SHOTS, 'curve-strip.png');
+      writeFileSync(f, Buffer.from(out.png.split(',')[1], 'base64'));
+      taken.push(f);
+      return f;
+    })();
+    if (REFERENCE) {
+      const dir = path.join(ROOT, 'docs', 'shots', 'paddle-physics');
+      mkdirSync(dir, { recursive: true });
+      copyFileSync(file, path.join(dir, 'curve-strip.png'));
+    }
+  }
+  return out;
+}
+
+/**
  * Film the era change a point has just started, and check that it ran. Three
  * readings of the page's own ring (PongRender.eraChangeMoment): a frame taken
  * with the ring about half way; the ring's radius once the wipe has finished,
@@ -278,7 +379,9 @@ async function filmChange(s, clip, from) {
     seen = true;
     if (!out.file && m.wiping && m.p >= 0.4) {
       out.p = m.p;
+      const t0 = Date.now();
       out.file = await s.shot(`change-era${from}-to-era${from + 1}`, clip);
+      out.shotMs = Date.now() - t0;
     } else if (!m.wiping) { out.end = m; break; }
     else await sleep(8);
   }
@@ -334,8 +437,13 @@ async function walkLadder(s, baseUrl) {
   // Stand at the edge away from the ball so it goes past -- but stop choosing
   // once it is close, or the paddle sweeps across its path at the last moment.
   let edge = 30;
+  // A ball with spin on it bends (item 1208), so the edge is chosen from where the
+  // rules say it will ARRIVE, not from where it is now.
   const dodge = (g) => {
-    if (g.ball.x > g.width * 0.35) edge = g.ball.y < g.height / 2 ? g.height - 30 : 30;
+    if (g.ball.x > g.width * 0.35) {
+      const at = g.ball.vx < 0 ? Rally.arrivalY(Pong, g) : null;
+      edge = (at === null ? g.ball.y : at) < g.height / 2 ? g.height - 30 : 30;
+    }
     return edge;
   };
 
@@ -389,6 +497,9 @@ async function walkLadder(s, baseUrl) {
     const after = await playUntil(s, geo, 15000, outRight ? track : dodge, (x) => points(x) > before);
     moves.push({ from: g.era, to: after.era, scored: points(after) > before,
       score: `${after.score.left}-${after.score.right}` });
+    // The eleventh point ends the match (item 1211): film its finale straight
+    // away, even if a stray point on the way up got it there a rung early.
+    if (after.phase === 'over') break;
     // Below the top, that point started a change: film it while it plays.
     if (rung < eras.length - 1 && points(after) > before) {
       changes.push(Object.assign(await filmChange(s, clip, g.era), { want: outRight ? 'right' : 'left' }));
@@ -421,7 +532,7 @@ async function walkLadder(s, baseUrl) {
   check(`every era change on the climb is filmed: ${eras.length - 1} of them`,
     changes.length === eras.length - 1 && changes.every((c) => c.file),
     changes.map((c) => `era ${c.from} -> ${c.from + 1}: ` +
-      (c.file ? `caught at eased progress ${c.p.toFixed(2)}` : 'not caught mid-ring')).join('; '));
+      (c.file ? `caught at eased progress ${c.p.toFixed(2)} (shot took ${c.shotMs} ms)` : 'not caught mid-ring')).join('; '));
   // Where each ring started: the edge the ball went out of.
   const sideOf = (c) => (!c.end ? 'unseen' : c.end.origin.x >= c.end.width / 2 ? 'right' : 'left');
   const fromRight = changes.filter((c) => sideOf(c) === 'right').length;
@@ -441,12 +552,85 @@ async function walkLadder(s, baseUrl) {
       (d.same ? ' (the two rungs draw the same frame, so only an exact match with the new era is asked)' : ''));
   }
 
+  // That last point was the eleventh: the match is over, and its finale plays.
+  const finale = await filmFinale(s, clip, 'ladder');
+
   if (REFERENCE) {
     mkdirSync(ERA_SHOTS, { recursive: true });
     for (const f of frames) copyFileSync(f.file, path.join(ERA_SHOTS, ERA_NAMES[f.rung] + '.png'));
     for (const c of changes) if (c.file) copyFileSync(c.file, path.join(ERA_SHOTS, path.basename(c.file)));
   }
-  return [...frames.map((f) => f.file), ...changes.filter((c) => c.file).map((c) => c.file)];
+  return [...frames.map((f) => f.file), ...changes.filter((c) => c.file).map((c) => c.file), ...finale];
+}
+
+/**
+ * 10. The match's end (src/match.js, item 1211). Called the moment the eleventh
+ * point has gone in: the game is 'over' with a winner, the announcement holds
+ * the 360, the rewind walks the era down one rung a half second -- a frame is
+ * taken with the ring shrinking midway down -- then the 1972 thanks screen is
+ * filmed, and the machine goes back to the attract screen on its own.
+ */
+async function filmFinale(s, clip, tag) {
+  const shots = [];
+  const over = await s.eval(`(() => { const g = window.__pong, M = window.PongMatch;
+    const f = M && M.finale(g); return { phase: g.phase, winner: g.winner, era: g.era,
+      score: g.score.left + '-' + g.score.right, stage: f && f.stage, total: g.rules.matchPoints }; })()`);
+  check(`the eleventh point ends the match on the Xbox 360 (${tag})`,
+    over.phase === 'over' && over.era === 10 && (over.winner === 'left' || over.winner === 'right') && over.stage === 'announce',
+    `phase ${over.phase}, era ${over.era}, score ${over.score}, winner ${over.winner}, finale ${over.stage}`);
+  if (over.phase !== 'over') return shots;
+  await sleep(1400);
+  shots.push(await s.shot(`finale-announce-${tag}`, clip));
+  // Midway down the ladder, with the ring part-way closed.
+  const seen = [];
+  let mid = null;
+  const until = Date.now() + 12000;
+  while (Date.now() < until) {
+    const f = await s.eval(`(() => { const g = window.__pong, f = window.PongMatch.finale(g);
+      return f ? { stage: f.stage, era: g.era, from: f.from, raw: f.raw } : { stage: g.phase }; })()`);
+    if (f.stage === 'rewind' && seen[seen.length - 1] !== f.era) seen.push(f.era);
+    if (!mid && f.stage === 'rewind' && f.from <= 6 && f.raw > 0.3 && f.raw < 0.7) {
+      mid = f;
+      shots.push(await s.shot(`finale-rewind-${tag}`, clip));
+    }
+    if (f.stage === 'thanks') break;
+    await sleep(40);
+  }
+  check(`the rewind walks the eras back down to the arcade (${tag})`,
+    seen.length >= 6 && seen[seen.length - 1] === 0 && seen.every((e, i) => i === 0 || e < seen[i - 1]),
+    `eras seen on the way down: ${seen.join(', ')}`);
+  check(`a frame of the rewind is caught mid-ring (${tag})`, !!mid,
+    mid ? `the ${mid.from} shrinking to ${mid.from - 1} at ${(mid.raw * 100).toFixed(0)}%` : 'never caught');
+  await sleep(1500);
+  const th = await s.eval(`(() => { const g = window.__pong, f = window.PongMatch.finale(g);
+    return { stage: f && f.stage, era: g.era }; })()`);
+  shots.push(await s.shot(`finale-thanks-${tag}`, clip));
+  check(`the 1972 screen thanks the player (${tag})`, th.stage === 'thanks' && th.era === 0,
+    `finale ${th.stage}, era ${th.era}`);
+  let phase = null;
+  for (let i = 0; i < 100 && phase !== 'title'; i++) { await sleep(100); phase = (await state(s)).phase; }
+  check(`and then the machine is back on the attract screen (${tag})`, phase === 'title', `phase ${phase}`);
+  return shots;
+}
+
+/** --match: open on the 360 ten points in, let the eleventh through, film the finale. */
+async function matchEnd(s, baseUrl) {
+  await s.send('Page.navigate', { url: baseUrl + '?era=10' });
+  await sleep(1200);
+  const geo = await geometry(s);
+  const clip = { x: geo.left, y: geo.top, width: geo.width, height: geo.height };
+  // As if the match had climbed from the arcade (startEra 0), so the thanks
+  // screen counts the eleven eras a real match visits; the ladder walk plays one.
+  await s.eval(`(() => { const g = window.__pong; g.score.left = 6; g.score.right = 4; g.serveDelay = 1.2; })()`);
+  await sleep(300);
+  const mp = await s.eval('window.Pong.isMatchPoint(window.__pong) && window.PongMatch.overlays(window.__pong)');
+  const plate = await s.shot('finale-matchpoint', clip);
+  check('ten points in, the next point is match point and MATCH POINT is up', mp === true, `isMatchPoint and the plate: ${mp}`);
+  // The player's point: the ball just past the computer's paddle, heading out.
+  await s.eval(`(() => { const g = window.__pong, r = g.right; g.serveDelay = 0; g.startEra = 0;
+    g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0; })()`);
+  for (let i = 0; i < 60 && (await state(s)).phase === 'playing'; i++) await sleep(50);
+  return [plate, ...await filmFinale(s, clip, 'match')];
 }
 
 /**
@@ -538,7 +722,8 @@ async function feelRallies(s, baseUrl) {
 function summarise(shots) {
   console.log('\nscreenshots:');
   for (const f of shots) console.log('  ' + f);
-  if (REFERENCE) console.log(`the era frames and the mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
+  if (REFERENCE && CURVE_ONLY) console.log('the film strip was also copied to docs/shots/paddle-physics/curve-strip.png (tracked)');
+  else if (REFERENCE) console.log(`the era frames and the mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
   process.exitCode = failed.length ? 1 : 0;
@@ -606,11 +791,24 @@ async function main() {
     await sleep(400);
     if (LADDER_ONLY) return summarise(await walkLadder(s, url.split('?')[0]));
     if (FEEL_ONLY) return summarise(await feelRallies(s, url.split('?')[0]));
+    if (MATCH_ONLY) return summarise(await matchEnd(s, url.split('?')[0]));
 
     const geo = await geometry(s);
     const g0 = await state(s);
     const toClientY = (fieldY) => geo.top + (fieldY / g0.height) * geo.height;
     const midX = geo.left + geo.width / 2;
+
+    if (CURVE_ONLY) {
+      await s.key('keyDown', 'Space', ' ', 32);
+      await s.key('keyUp', 'Space', ' ', 32);
+      await sleep(150);
+      // Past the cabinet's held first serve (item 1207), so its CREDIT 1 /
+      // PLAYER 1 READY card is not over the film.
+      await playUntil(s, geo, 8000, (g) => g.height / 2, (g) => g.serveDelay <= 0);
+      await sleep(400);
+      await curveShot(s);
+      return summarise([path.join(SHOTS, 'curve-strip.png')]);
+    }
 
     if (SCORING_ONLY) {
       await s.key('keyDown', 'Space', ' ', 32);
@@ -743,6 +941,9 @@ async function main() {
       `errors ${voices.errors}, skipped ${voices.skipped}; ` + voices.out.map((v) => `era ${v.era}: ` +
         (v.last ? v.n + ' sounds, ' + [...new Set(v.last.waves)].join('+') + (v.last.echo ? '+echo' : '') +
           (v.last.reverb ? '+reverb' : '') + (v.last.bus ? '+bus' : '') : 'silent')).join('; '));
+
+    // 6c. A curved shot off a swinging paddle (curveShot, above; item 1208).
+    await curveShot(s);
 
     // 7. Miss on purpose: park the paddle in a corner and let one through.
     const missDeadline = Date.now() + 15000;
