@@ -92,24 +92,47 @@ test('era 0 stays 1972 Pong, bars and a dot, and has no page of headings to buil
   assert.deepStrictEqual(Object.keys(sections(body)), [], 'era 0 has no build headings');
 });
 
-test('a 56-unit player on the end strip never leans over its paddle, in any 3D camera pose', () => {
-  // The claim in the art bible's "Where a player stands": feet at x 4 to 30
-  // (left) and 770 to 796 (right), head at z 56, measured in every pose the
-  // era bible measures, every 50 units along the table.
-  const cameras = require('../tools/table3d-cameras.js');
-  assert.deepStrictEqual(cameras.ERAS.map((e) => e.era), [5, 6, 7, 8, 9, 10]);
-  for (const e of cameras.ERAS) {
-    for (const pose of cameras.poses(e)) {
-      const c = cameras.camera(pose);
-      for (let y = 0; y <= 600; y += 50) {
-        const p = (x, z) => cameras.project(c, x, y, z).x;
-        const left = p(46, 0) - Math.max(p(30, 56), p(30, 0));
-        const right = Math.min(p(770, 56), p(770, 0)) - p(754, 0);
-        assert.ok(left >= 11, `era ${e.era} at y ${y}: the left player is ${left.toFixed(1)} px clear of its paddle`);
-        assert.ok(right >= 11, `era ${e.era} at y ${y}: the right player is ${right.toFixed(1)} px clear of its paddle`);
-        const h = cameras.project(c, 17, y, 0).y - cameras.project(c, 17, y, 56).y;
-        assert.ok(h >= 9 && h <= 30, `era ${e.era} at y ${y}: the player is ${h.toFixed(1)} px tall, outside the bible's 9 to 30`);
-      }
+/** An era's **Sheet:** line in its PLAYERS section: { w, h, hx, hy, scale }. */
+function sheetOf(era) {
+  const players = sections(pages()[era].body).PLAYERS;
+  const m = /\*\*Sheet:\*\* `frame` (\d+) x (\d+), `hand` \((\d+), (\d+)\), `scale` ([\d.]+)/.exec(players);
+  assert.ok(m, `era ${era}'s PLAYERS ends with a Sheet line: frame, hand and scale`);
+  return { w: +m[1], h: +m[2], hx: +m[3], hy: +m[4], scale: +m[5] };
+}
+
+test('every era\'s player sheet fits the rig (src/characters.js) and pixellab\'s limits', () => {
+  const C = require('../src/characters.js');
+  assert.deepStrictEqual(C.BEATS, ['idle', 'up', 'down', 'swing', 'miss', 'win'],
+    'the rig still reads a sheet as six rows in this order, as the bible says');
+  assert.deepStrictEqual([C.MOVE, C.SWING_S, C.REACT_S], [60, 0.3, 1.2],
+    'the rig\'s move threshold, swing and reaction times are the ones the bible\'s beat table gives');
+  const cols = Math.max(...C.BEATS.map((b) => C.DEFAULTS.frames[b]));
+  for (let era = 1; era <= 10; era++) {
+    const s = sheetOf(era);
+    // The hand is on the frame's right-hand edge (the rig mirrors for the right player).
+    assert.strictEqual(s.hx, s.w, `era ${era}'s hand is on the frame's edge that meets the paddle`);
+    assert.ok(s.hy > 0 && s.hy < s.h, `era ${era}'s hand is inside the frame`);
+    // A 2D player fits the 32 units between the wall and the paddle's outer face.
+    if (era <= 4) assert.ok(s.w * s.scale <= 32, `era ${era}'s player is ${s.w * s.scale} units wide, room for 32`);
+    // The whole sheet is one pixflux image: each side 16 to 400, at least 1,024 pixels.
+    const W = s.w * cols, H = s.h * C.BEATS.length;
+    assert.ok(W >= 16 && H >= 16 && W <= 400 && H <= 400 && W * H >= 1024,
+      `era ${era}'s sheet is ${W} x ${H}, outside what pixflux makes`);
+    const assets = sections(pages()[era].body).ASSETS;
+    assert.ok(assets.includes(`${W} x ${H}`), `era ${era}'s ASSETS generates its ${W} x ${H} sheet`);
+  }
+});
+
+test('every generation an era asks for is a size pixflux can make', () => {
+  for (let era = 1; era <= 10; era++) {
+    const rows = sections(pages()[era].body).ASSETS.split(/\r?\n/).filter((l) => /^\|\s*\d+\s*\|/.test(l));
+    for (const l of rows) {
+      const c = l.split('|').map((s) => s.trim());
+      const m = /^(\d+) x (\d+)/.exec(c[3]);
+      if (!m) continue;   // the re-roll reserve
+      const [w, h] = [+m[1], +m[2]];
+      assert.ok(w >= 16 && h >= 16 && w <= 400 && h <= 400 && w * h >= 1024,
+        `era ${era}'s ${c[2]} is ${w} x ${h}, outside what pixflux makes`);
     }
   }
 });

@@ -52,97 +52,75 @@ drawn (ERAS.md rule 1.9). Every player below is an original stand-in in that gam
   less**, and anything that moves on its own behind the play area moves at 30 field units a
   second or less (the ball starts at several hundred).
 
-### 2. Where a player stands
+### 2. Where a player stands: the rig that landed (item 1223)
 
-**The 2D eras (1 to 4)** draw in the machine's native pixels through `src/display.js`: the era
-draws in field units on a field-sized canvas and the display samples it down. A player lives in
-its **figure box**: from the side wall to the paddle's inner face (x 0 to 46 on the left, 754 to
-800 on the right), and from 30 units above the paddle's top to 30 below its bottom (144 units
-tall, clipped to the field). The box in each machine's pixels:
+**`src/characters.js` is the players' engine, and every page below is written to it.** It wraps
+the renderer's `draw`, so after an era has drawn its frame it draws one figure behind each paddle:
+the player on the left, the computer on the right, mirrored. Each era has a config block in its
+`ERAS` table, and **an era card that brings art fills in that block and nothing else there**:
 
-| Era | Native frame | One native pixel is | Figure box | Sprite cell | Figure drawn |
-| --- | --- | --- | --- | --- | --- |
-| 1 Atari 2600 | 160 x 192 | 5 x 3.125 units | 9.2 x 46 px | 8 x 46 | 8 x 46 |
-| 2 NES | 256 x 240 | 3.125 x 2.5 | 14.7 x 57.6 | 16 x 56 | 14 x 56 |
-| 3 Genesis | 320 x 224 | 2.5 x 2.68 | 18.4 x 53.8 | 24 x 56 | 18 x 52 |
-| 4 Super Nintendo | 256 x 224 | 3.125 x 2.68 | 14.7 x 53.8 | 16 x 56 | 14 x 52 |
+- `sheet` -- a pixellab name (`assets/pixellab/<sheet>.png`, loaded through `src/sprites.js`),
+  **one row per beat in the order idle, up, down, swing, miss, win**, one frame per column, each
+  frame `frame.w` x `frame.h` sheet pixels. A beat with no frames falls back to idle, so a sheet
+  that is only an idle row still plays.
+- `frames` -- frames per beat; the default is idle 2, up 2, down 2, swing 3, miss 1, win 2, so a
+  sheet is 3 frames wide and 6 rows tall. Every page below uses that default.
+- `hand` -- the sheet pixel, in a frame facing right, that holds the paddle; `anchor` -- where it
+  goes, from the middle of the paddle's **outer** edge, in field units (on the 3D eras also `dz`,
+  the hand's height off the table, default 18).
+- `scale` -- field units per sheet pixel; on the 3D eras, table units, multiplied by the table's
+  depth scale at the paddle, so a figure shrinks toward the far wall.
+- `fps` -- how fast idle, up, down and win cycle (default 6).
+- **Two players, two sheets.** The rig takes one `sheet` per era and mirrors it for the right-hand
+  player. Every page below gives two different players, so the rig needs one optional field,
+  `sheets: { left, right }`, falling back to `sheet` -- card 1245, filed beside this document,
+  and the first era card to bring art waits for it. Until it lands, an era card ships the left
+  player's sheet as `sheet` and both sides wear it.
 
-The sprite is drawn with its inner edge on the paddle's inner face and centred on the paddle's
-height, snapped to the native grid; its outer columns fall on or past the side wall and are
-clipped there. The right player is its own drawing, not the left one mirrored.
+So a player always stands **outside** its paddle, its hand on the outer edge, and never reaches
+into play. It is drawn after the era's frame (and so over its paddle's outer edge only where the
+hand is); the paddle rectangle stays the whole hit zone. Each page's PLAYERS section ends with
+its **Sheet** line: the frame size, the hand pixel and the scale for that era's block.
 
-**The 3D eras (5 to 10)** stand the players on the table in `src/table3d.js`, so they are
-depth-scaled by the camera for free: every part is a `T.box` at world coordinates, projected with
-the era's camera. A player stands on the **end strip**, the 32 units between the end rail and its
-paddle's outer face: feet at x 4 to 30 (left; 770 to 796 on the right), centred on the paddle's
-`y`, facing the centre. It is **56 world units tall**, so the Xbox's gamertag at `z` 60 (ERAS.md
-era 9, item 4) floats just over its head. It is drawn in painter's step 4 immediately **before**
-its paddle box, and its contact shadow is an ellipse 30 x 20 units at 0.30 opacity, lighter than
-the ball's (R5). A downward-tilted camera makes vertical edges lean outward as they rise, so a
-figure on the end strip leans away from the table, never over it. `test/art-bible.test.js`
-measures it with `tools/table3d-cameras.js` in every camera pose ERAS.md measures (its section
-12), at every 50 units along the table: the figure's inner top corner stays at least 11 page
-pixels outside its paddle's inner face. The same measurement gives each era's figure size -- the
-cameras look steeply down, so a standing figure is short on screen, and **taller at the far end
-than the near one**:
+**The room a 2D player has** is the 32 field units between the side wall and the paddle's outer
+face; a frame is sized so `frame.w x scale` is at most 32, and anything past the wall is clipped.
+Its height is about 1.6 times the paddle's (84 units). In the machine's own pixels, which the
+display samples the frame down to (`src/display.js`):
 
-| Era | Figure height, near end to far end | In that machine's pixels | Clearance from the paddle's face |
-| --- | --- | --- | --- |
-| 5 PlayStation (320 wide) | 15 to 29 page px | 6 to 11 | 12 px |
-| 6 Nintendo 64 (320) | 9 to 28 | 4 to 11 | 11.5 |
-| 7 Dreamcast (640) | 11 to 25 | 9 to 20 | 13 |
-| 8 PlayStation 2 (512) | 15 to 28 | 10 to 18 | 11 |
-| 9 Xbox (640) | 12 to 28 | 10 to 23 | 12 |
-| 10 Xbox 360 (960) | 22 to 30 | 27 to 36 | 13 |
+| Era | Native frame | One native pixel is | Sheet frame | Scale | On screen, field units | In native pixels |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 Atari 2600 | 160 x 192 | 5 x 3.125 units | 6 x 28 | 5 | 30 x 140 | 6 x 45 |
+| 2 NES | 256 x 240 | 3.125 x 2.5 | 10 x 44 | 3.125 | 31 x 138 | 10 x 55 |
+| 3 Genesis | 320 x 224 | 2.5 x 2.68 | 12 x 52 | 2.6 | 31 x 135 | 12 x 50 |
+| 4 Super Nintendo | 256 x 224 | 3.125 x 2.68 | 10 x 44 | 3.1 | 31 x 136 | 10 x 51 |
 
-At the table's near end the head of a figure on the Nintendo 64 and the Xbox cameras projects just
-past the canvas's side edge (4 and 2 page pixels past it) and is clipped there; that is allowed, and no
-figure is ever moved to avoid it. The figures take the era's fog, grade and bloom like any
-scenery; the paddles alone are exempt (R4).
-
-**The 3D rig.** Every 3D figure is the same rig of 10 boxes, drawn in code; an era changes its
-proportions, materials and shading, never its joints. Sizes in world units (x toward the centre,
-y along the paddle, z up), for the standard 56-unit figure:
-
-| Part | Size (x, y, z) | Hangs from |
-| --- | --- | --- |
-| legs, left and right | 6, 6, 20 | the pelvis, 4 units apart |
-| pelvis | 8, 14, 6 | the floor, at z 20 |
-| torso | 10, 16, 20 | the pelvis |
-| head | 10, 10, 10 | the torso, at z 46 |
-| upper arms, left and right | 4, 4, 12 | the torso's top corners |
-| forearms and hands, left and right | 4, 4, 11 | the elbows; the hands grip the paddle's outer face |
+**The 3D players (eras 5 to 10) are the same sheets drawn as upright billboards**, at the
+projection of the paddle's outer edge with the hand `dz` 18 units off the table, scaled by the
+table's depth there -- the "depth-scaled figure at the paddle's projected spot" the climb asks
+for. Every 3D page draws its figure 90 table units tall and about 40 wide (twice the paddle box's
+height of 22 to 28 is the point: the players read as people standing at the table's ends). Because
+the rig draws after the era's own frame, **the era's treatment is not applied to the players by
+the era's draw**: each 3D page's TREATMENT says what the sheet carries baked in (its shading,
+outline, grade) and what the era card adds in the rig's draw for its era (a fog tint by depth, a
+letterbox clip). The display layer's TV treatment still lands on top of them (item 1223's own
+note).
 
 ### 3. The five beats
 
-Every era animates the same five beats on the same triggers. The triggers come from
-`state.events` (`paddle` and `score` entries, each with its `side`) and the paddle's smoothed
-`vy` (item 1208), remembered in the era file's own variables.
+Tim's five beats are idle, move, swing, miss and win; the rig splits **move** into two rows,
+**up** and **down** (the paddle moving toward the top or the bottom of the field), so each page's
+move pose is drawn twice, leaning each way. The rig's own timing, which no page changes:
 
-| Beat | Starts on | Lasts | Wins over |
-| --- | --- | --- | --- |
-| **idle** | nothing else playing | loops every 1.0 s | nothing |
-| **move** | the paddle's `vy` above 90 units a second | while it stays above 60 | idle |
-| **swing** | a `paddle` event on this side | 0.18 s: wind-up 0.05, contact 0.05, follow-through 0.08 | move, idle |
-| **miss** | a `score` event against this side | 0.6 s | swing, move, idle |
-| **win** | a `score` event for this side | 0.8 s; 1.6 s on match point | swing, move, idle |
-
-**2D frames.** Each beat has **one generated key pose** per player (five in all, one pose strip).
-The in-between frames are derived in code, never generated: idle's second frame is the key pose
-one native pixel lower; move alternates the key pose with itself shifted one native pixel toward
-the travel, every 0.133 s; swing's wind-up is the move pose and its follow-through the swing pose
-with the paddle-side arm one pixel further in; win's hop is the win pose at 2 then 4 native pixels
-up and back; miss holds its pose. So a player is 5 drawn frames and about 9 derived ones.
-
-**3D poses.** The rig's angles, in degrees (0 is the idle stance):
-
-| Beat | Torso lean | Arms (shoulder pitch forward) | Legs | Other |
+| Beat | Row | Starts on | Lasts | Frames |
 | --- | --- | --- | --- | --- |
-| **idle** | 0 | 40, hands on the paddle's outer face | straight | a 1.5-unit bob in `z`, once a second |
-| **move** | 12 toward the travel | 40 | split plus and minus 20, 3 times a second | none |
-| **swing** | twist 25 toward the ball | 40 to 80 at contact, back to 40 | plant | contact at 0.075 s |
-| **miss** | 15 back | drop to 10 | straight | head down 30 |
-| **win** | 0 | both up to 160 | jump to `z` 8 at 0.2 s, land at 0.4 s | on match point a second jump at 0.8 s |
+| **idle** | 1 | nothing else playing | cycles at `fps` | 2 |
+| **move** | 2 (up) and 3 (down) | the paddle's `vy` past 60 units a second | while it lasts | 2 each |
+| **swing** | 4 | a `paddle` event on this side | 0.3 s, the 3 frames spread across it | 3 |
+| **miss** | 5 | a `score` event for the other side | 1.2 s | 1 |
+| **win** | 6 | a `score` event for this side | 1.2 s | 2 |
+
+A pose a page describes ("the arm to 80 degrees", "lean 12 into the travel") is **how that row's
+frames are drawn in the sheet**, and the proportions it gives are the drawn figure's.
 
 ### 4. The moments
 
@@ -150,14 +128,15 @@ up and back; miss holds its pose. So a player is 5 drawn frames and about 9 deri
   a rung, and the ring (ERAS.md section 4, `src/erachange.js`) wipes the old era away from where
   the ball went out. So each page's point moment is played by **both** eras: the departing one for
   as long as the ring leaves it on screen, and the **arriving** one over its first 0.8 s, keyed off
-  its own memory of the last score total it saw. The name card covers the middle 180 rows until the
-  serve; anything a moment draws in that band is not seen, so a page's moment puts its
-  drawing in the players and the scoreboard.
+  its own memory of the last score total it saw (the rig plays win and miss for that point on its
+  own). The name card covers the middle 180 rows until the serve; anything a moment draws in that
+  band is not seen, so a page's moment puts its drawing in the players and the scoreboard.
 - **Era 10 is the only era a point is scored without leaving.**
-- **Match point** is whatever the feel layer's `isMatchPoint(state)` says (`src/feel.js`): the
-  rules' own `Pong.isMatchPoint` once the match card lands, and until then the point that reaches
-  era 10 -- a point scored in era 9. Every page gives its match-point moment anyway, so it is
-  ready for the match card.
+- **Match point** is `Pong.isMatchPoint(state)` (item 1211): a match is eleven points, one per era
+  (`rules.matchPoints`), so the match point is the eleventh point, and with ten scored the machine
+  is already on era 10. **Only era 10's match point plays in a normal match.** Every other page
+  still gives one, drawn whenever `isMatchPoint` holds while that era is on screen, so a match
+  made longer than the ladder (a raised `matchPoints`) is dressed on every rung.
 
 ### 5. The asset budget
 
@@ -169,14 +148,14 @@ Each page's ASSETS table lists every generation one row each, the first column t
 **two generations are always held back as re-rolls** for whichever image comes back wrong.
 Anything a page does not list is drawn in code.
 
-- **A pose strip is untried.** No generation in this repo has yet asked pixflux for five poses of
-  one character in a row. The first era card to try measures it and says how it went. If a strip
-  comes back with fewer than five usable poses, that player's missing poses are asked for once
-  more from a re-roll; if that fails too, the missing beat is derived in code from the idle pose
-  (move: shifted one pixel toward the travel; miss: its top quarter one pixel lower; win: two
-  pixels higher) and the page's report says which.
-- **The 3D eras' textures go in as data: URIs** through `src/textures3d.js`, the way item 1187 did
-  (`assets/pixellab/tex3d-embed.mjs`), so they never taint the canvas.
+- **Each player is one generation: the whole six-row sheet at once**, 3 frames by 6 rows at the
+  page's frame size, prompted row by row ("row 1 idle, two frames; row 2 moving up ..."). **That is
+  untried**: no generation in this repo has yet asked pixflux for a sprite sheet. The first era
+  card to try it says how it went. A row that comes back unusable is asked for once more from a
+  re-roll, as a single-row image; if that fails too, the row is left empty and the rig plays idle
+  in its place (it does that already), and the report names the beat.
+- **The 3D eras' images go in as data: URIs**, the way item 1187 did
+  (`assets/pixellab/tex3d-embed.mjs` writing `src/textures3d.js`), so they never taint the canvas.
 - **The 2D eras' images are drawn with `drawImage` only once decoded**, with a hand-drawn stand-in
   until then and always under `node --test` (the era 3 file is the worked example).
 
@@ -203,8 +182,8 @@ Style targets: *Combat* (1977, the cartridge that came in the box), *Air-Sea Bat
   the 2600's picture chip had, and nothing else. No text but the score.
 - **Palette:** 4 colours at once: black background, one playfield colour, and the two players'
   inks, which are the paddles' earned colours from era 1's own 12-entry palette.
-- **Sprite size:** players are 8 native pixels wide, one colour per sprite, drawn in **double
-  lines** (each sprite row is 2 of the 192 scanlines), so a 46-line figure is 23 drawn rows.
+- **Sprite size:** players are 6 native pixels wide (a 2600 player graphic is 8; its outer 2
+  columns stay clear), one colour per sprite, 28 sheet rows laid over 45 of the 192 scanlines.
 - **Animation:** 2 frames a beat at most, swapped every 8 frames (0.133 s), the way a 2600 kernel
   swapped a graphics pointer.
 - **Interface:** the score as two big playfield-block numbers at the top, each in its player's
@@ -226,14 +205,16 @@ Style targets: *Combat* (1977, the cartridge that came in the box), *Air-Sea Bat
 - **Who:** two blocky athletes in the manner of *Street Racer*'s cars and *Combat*'s tanks made
   into people: the left player in the left paddle's ink, the right in the right paddle's. Brightest
   figure colour: the brighter paddle ink, never the ball's white.
-- **Silhouette** (8 x 46 native, rows are double lines): a 4 x 3-row head, a 6 x 8-row torso, 2
-  legs 2 pixels wide and 8 rows long with a 2-pixel gap. The left player's is the right's with the
-  head one pixel toward the centre, so they do not read as one sprite mirrored.
+- **Silhouette** (6 x 28 sheet pixels): a 4 x 5 head, a 6 x 10 torso, 2 legs 2 pixels wide and
+  12 long with a 2-pixel gap. The right player is its own sheet with the head one pixel lower, so
+  the two do not read as one sprite mirrored.
 - **How it holds the paddle:** upright in front of it, one arm a single double-line row, 3 pixels
   long, from the torso to the paddle's outer face at the paddle's middle height.
 - **idle:** legs together; the 1-row bob. **move:** legs apart on alternate frames. **swing:** the
   arm row jumps up 4 rows, then back. **miss:** the head drops into the torso (the torso 2 rows
   shorter). **win:** both arm rows raised above the head, with the 2-pixel hop.
+- **Sheet:** `frame` 6 x 28, `hand` (6, 14), `scale` 5, `anchor` dx 0 dy 0, `fps` 7.5 (every 8
+  frames, the 2600 swap), the default frames: an 18 x 168 sheet.
 
 ### BALL
 
@@ -272,12 +253,12 @@ a generator can; pixellab gives only the players' shapes.
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era1-players-left` | 40 x 46, 5 cells of 8 x 46 | 8 x 46 native, 1 colour | the left player's five key poses, `lineless`, `flat shading`, reduced to one colour |
-| 1 | `era1-players-right` | 40 x 46 | 8 x 46 native | the right player's five |
+| 1 | `era1-players-left` | 18 x 168, 3 x 6 frames of 6 x 28 | 30 x 140 field units, 1 colour | the left player's sheet, `lineless`, `flat shading`, reduced to one colour |
+| 1 | `era1-players-right` | 18 x 168 | 30 x 140 field units | the right player's sheet |
 | 2 | re-roll reserve | -- | -- | for a strip that comes back wrong |
 
 Drawn in code instead: the playfield wall and stand, the flicker, the score and its rally bar,
-every flash, and each player's derived frames. If both player strips fail, the players are drawn
+every flash. If both player sheets fail, the players are drawn
 in code from the silhouette rows above.
 
 ---
@@ -294,10 +275,10 @@ America) and *Duck Hunt* (1985). What the era borrows:
 - **Palette:** the 2C02's 54 usable colours (era 2's `NES` table), **4 background palettes of 3
   colours plus a shared backdrop, and 4 sprite palettes of 3 colours plus transparent**. Every
   colour named here is an index into that table.
-- **Sprite size:** players are 2 x 7 tiles (16 x 56 cell, 14 x 56 drawn), 3 colours each --
+- **Sprite size:** players are 10 x 44 sheet pixels (about 10 x 55 NES pixels), 3 colours each --
   *Tennis*'s players are 2 x 4 tiles, so these are the big, *Super Mario Bros.*-heavy version, a
   head one third of the height.
-- **Animation:** 2 or 3 frames a beat, changed every 8 frames (0.133 s); *Duck Hunt*'s dog is the
+- **Animation:** the default 2 frames a beat (3 for the swing) at `fps` 7.5, every 8 frames; *Duck Hunt*'s dog is the
   model for a readable win pose held still.
 - **Interface:** *Tennis*'s umpire-and-scoreline presentation: white-on-black pixel text in a
   status band, the NES pixel font era 2 already draws.
@@ -321,8 +302,8 @@ America) and *Duck Hunt* (1985). What the era borrows:
   figure's shirt takes the nearest NES hue to its paddle's earned colour, the way era 2 already
   maps a paddle's ink. Brightest figure colour: `$30` white on the shorts, 4 pixels at most, never
   adjacent to the ball's path (they are behind the paddle).
-- **Silhouette:** 14 x 56 native: head 8 x 10 with the headband or cap, torso 10 x 18, legs 2 at 4
-  x 20, a 1-pixel black outline on the outside edge only (NES sprites had none; *Super Mario
+- **Silhouette:** 10 x 44 sheet pixels: head 8 x 9 with the headband or cap, torso 8 x 14, legs 2
+  at 3 x 16, a 1-pixel black outline on the outside edge only (NES sprites had none; *Super Mario
   Bros.* drew one in the palette).
 - **How it holds the paddle:** two-handed, like a bat held upright, both fists on the paddle's
   outer face at its middle 12 pixels.
@@ -330,6 +311,8 @@ America) and *Duck Hunt* (1985). What the era borrows:
   body turns side-on for the contact frame, the fists jump 6 pixels up the paddle. **miss:** the
   head turns away, shoulders slump 2 pixels. **win:** a fist in the air, the *Duck Hunt* dog's
   held pose, with the hop.
+- **Sheet:** `frame` 10 x 44, `hand` (10, 22), `scale` 3.125, `fps` 7.5, the default frames: a
+  30 x 264 sheet.
 
 ### BALL
 
@@ -365,15 +348,15 @@ flip copies, so they turn over with the court.
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era2-players-left` | 80 x 56, 5 cells of 16 x 56 | 14 x 56 native, NES palette | the left player's five key poses, `single color black outline`, `basic shading` |
-| 1 | `era2-players-right` | 80 x 56 | 14 x 56 native | the right player's five |
+| 1 | `era2-players-left` | 30 x 264, 3 x 6 frames of 10 x 44 | 31 x 138 field units, NES palette | the left player's sheet, `single color black outline`, `basic shading` |
+| 1 | `era2-players-right` | 30 x 264 | 31 x 138 field units | the right player's sheet |
 | 1 | `era2-crowd` | 96 x 32, 3 cells of 32 x 32 | 3 patterns, 8 x 8 tiles, 3 colours | the crowd patterns, quantised to `$0C`, `$1C`, `$2D` |
 | 1 | `era2-umpire` | 32 x 48 | 16 x 24 native | the chair and the umpire, two head positions drawn in code |
 | 2 | re-roll reserve | -- | -- | for a strip that comes back wrong |
 
 Each image is reduced to the NES palette by a derived step like `era2-nes-quantize.mjs` (0
 generations). Drawn in code instead: the status band, the umpire's calls, the ball's seam and
-shadow, the flashes and the derived frames. The court, net and ball sprite already on master stay.
+shadow and the flashes. The court, net and ball sprite already on master stay.
 
 ---
 
@@ -389,9 +372,9 @@ Style targets: *Altered Beast* (1989, the launch pack-in), *Golden Axe* (1989 on
 - **Palette:** the 512-colour, 3-bit-a-channel palette era 3 already snaps to (values `00`, `24`,
   `49`, `6d`, `92`, `b6`, `db`, `ff`); **4 palettes of 15 colours plus transparent**, so each
   player has 15 colours.
-- **Sprite size:** players are 24 x 56 cells, 18 x 52 drawn -- *Golden Axe*'s heroes are about
-  that tall on a 224-line screen.
-- **Animation:** 3 or 4 frames a beat, changed every 6 frames (0.1 s).
+- **Sprite size:** players are 12 x 52 sheet pixels, about 12 x 50 Genesis pixels on screen --
+  *Golden Axe*'s heroes are about that tall on a 224-line screen.
+- **Animation:** `fps` 10 over the default frames (2 a beat, 3 for the swing).
 - **Interface:** *Golden Axe*'s bottom panel: portraits, bars of magic pots, a stone frame; here
   shifted to the top so it stays off play (rule R8's spirit in 2D).
 
@@ -415,7 +398,7 @@ Style targets: *Altered Beast* (1989, the launch pack-in), *Golden Axe* (1989 on
   (`#6d6d92`, `#b6b6db`, `#924924` crest). The left one's belt and the knight's crest take the
   paddle's earned colour snapped to 512. Brightest figure colour: `#dbdbff` on the helmet's lit
   edge, 3 pixels, never the ball's white.
-- **Silhouette:** 18 x 52 native: a broad-shouldered V (shoulders 16 wide, waist 10), head 8 x 9,
+- **Silhouette:** 12 x 52 sheet pixels: a broad-shouldered V (shoulders 12 wide, waist 7), head 7 x 9,
   stepped two-tone shading (lit toward the centre, one palette step darker away from it), 1-pixel
   dark outline in the palette's darkest.
 - **How it holds the paddle:** as a **tower shield**, the near arm's forearm across it at the
@@ -424,6 +407,8 @@ Style targets: *Altered Beast* (1989, the launch pack-in), *Golden Axe* (1989 on
   **swing:** a *Golden Axe* shield bash -- the body lunges 2 pixels toward the paddle, the smear
   (shared rule 1) in the palette's lightest orange. **miss:** knocked back 3 pixels, knees bent.
   **win:** the barbarian raises an axe, the knight a sword, above the head, with the hop.
+- **Sheet:** `frame` 12 x 52, `hand` (12, 26), `scale` 2.6, `fps` 10, the default frames: a 36 x
+  312 sheet.
 
 ### BALL
 
@@ -460,8 +445,8 @@ shatter copies, so they break with it. Feel's intensity table leaves era 3's tra
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era3-players-left` | 120 x 56, 5 cells of 24 x 56 | 18 x 52 native, 15 colours | the barbarian's five key poses, `single color black outline`, `medium shading` |
-| 1 | `era3-players-right` | 120 x 56 | 18 x 52 native | the knight's five |
+| 1 | `era3-players-left` | 36 x 312, 3 x 6 frames of 12 x 52 | 31 x 135 field units, 15 colours | the barbarian's sheet, `single color black outline`, `medium shading` |
+| 1 | `era3-players-right` | 36 x 312 | 31 x 135 field units | the knight's sheet |
 | 1 | `era3-arena-wall` | 320 x 48 | 320 x 24 native band, tiled | the near plane's stone wall |
 | 1 | `era3-torch` | 48 x 32, 3 cells of 16 x 32 | 8 x 16 native | the torch's three flame frames |
 | 1 | `era3-portraits` | 64 x 32, 2 cells of 32 x 32 | 16 x 16 native each | the two portraits |
@@ -469,7 +454,7 @@ shatter copies, so they break with it. Feel's intensity table leaves era 3's tra
 | 2 | re-roll reserve | -- | -- | for a strip that comes back wrong |
 
 Each image is snapped to the 512 colours offline (0 generations). Drawn in code instead: the
-magic pots, the pennants, every flash, the derived frames, and the stand-ins for all of it until
+magic pots, the pennants, every flash, and the stand-ins for all of it until
 the images decode. The far plane and the chrome ball on master stay.
 
 ---
@@ -485,8 +470,8 @@ Style targets: *Super Mario World* (1991 in North America), *F-Zero* (1991) and 
   interface -- colour math was the SNES's showpiece.
 - **Palette:** 15-bit colour, 256 on screen; **8 sprite palettes of 15 colours**, so each player
   has 15, with the soft, saturated ramps of *Super Mario World*.
-- **Sprite size:** 16 x 56 cells, 14 x 52 drawn.
-- **Animation:** 4 frames a beat for idle and move, 3 for the rest, changed every 5 frames (0.083 s).
+- **Sprite size:** 10 x 44 sheet pixels, about 10 x 51 Super Nintendo pixels on screen.
+- **Animation:** `fps` 12 over the default frames (2 a beat, 3 for the swing): quick and bouncy.
 - **Interface:** *F-Zero*'s translucent panels and *Pilotwings*' instrument readouts: numbers in
   boxes with a 50% see-through fill.
 
@@ -508,8 +493,8 @@ Style targets: *Super Mario World* (1991 in North America), *F-Zero* (1991) and 
   pad** with a jet flame under it -- left in `#f83800` red and white, right in `#3868f8` blue and
   yellow; each suit's stripe is the paddle's earned colour. Brightest figure colour: the helmet's
   highlight, `#f8f8d0`, 2 pixels, under the ball's white.
-- **Silhouette:** 14 x 52 native: a round helmet 10 x 10 with a dark visor band, a slim suit, the
-  pad an ellipse 14 x 4 at the feet with its flame 4 x 6 under it.
+- **Silhouette:** 10 x 44 sheet pixels: a round helmet 8 x 8 with a dark visor band, a slim suit,
+  the pad an ellipse 10 x 3 at the feet with its flame 3 x 5 under it.
 - **How it holds the paddle:** as a **glowing energy board** gripped at both ends by
   outstretched arms; the paddle's own sprite is unchanged, the hands sit on its outer face at its
   top and bottom quarters.
@@ -518,6 +503,8 @@ Style targets: *Super Mario World* (1991 in North America), *F-Zero* (1991) and 
   turning, *F-Zero*'s spin attack. **miss:** the pad dips 3 pixels and the flame gutters.
   **win:** a *Super Mario World* victory pose, both arms up, the flame at full 10 pixels, with the
   hop.
+- **Sheet:** `frame` 10 x 44, `hand` (10, 22), `scale` 3.1, `fps` 12, the default frames: a 30 x
+  264 sheet.
 
 ### BALL
 
@@ -552,16 +539,16 @@ balloons are drawn into the composite the flourish tilts, so they spin with it.
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era4-players-left` | 80 x 56, 5 cells of 16 x 56 | 14 x 52 native, 15 colours | the red pilot's five key poses on the pad, `single color outline`, `detailed shading` |
-| 1 | `era4-players-right` | 80 x 56 | 14 x 52 native | the blue pilot's five |
+| 1 | `era4-players-left` | 30 x 264, 3 x 6 frames of 10 x 44 | 31 x 136 field units, 15 colours | the red pilot's sheet on the pad, `single color outline`, `detailed shading` |
+| 1 | `era4-players-right` | 30 x 264 | 31 x 136 field units | the blue pilot's sheet |
 | 1 | `era4-balloon` | 32 x 32 | 10 x 14 native | one hot-air balloon, the second a palette swap in code |
 | 1 | `era4-pylon` | 32 x 32 | 4 x 10 native | the marker pylon |
 | 1 | `era4-helmets` | 64 x 32, 2 cells of 32 x 32 | 8 x 8 native each | the two scoreboard icons |
 | 1 | `era4-flame` | 32 x 32 | 4 x 6 to 4 x 10 native | the jet flame, stretched in code |
 | 2 | re-roll reserve | -- | -- | for a strip that comes back wrong |
 
-Drawn in code instead: the halo, the panels and power bars, the streamers, every blink, the derived
-frames, and the flame's stretch. The sky, the Mode 7 floor, the paddle and the ball on master stay.
+Drawn in code instead: the halo, the panels and power bars, the streamers, every blink, and the
+flame's stretch. The sky, the Mode 7 floor, the paddle and the ball on master stay.
 
 ---
 
@@ -577,10 +564,10 @@ the era borrows:
   triangles in all.
 - **Palette:** 15-bit colour through ERAS.md's era 5 palette; each fighter adds 3 colours
   *(new)* of its own.
-- **Model size:** the fighters are the shared rig, **10 boxes, 30 visible faces**, 6 to 11
-  PlayStation pixels tall (the table above), every vertex snapped to the 2.5-pixel chunk grid.
-- **Animation:** the rig's poses stepped at **15 poses a second** -- the angles hold for 4 frames
-  and jump, the choppy keyframing of early 3D fighters.
+- **Figure size:** a 20 x 45 sheet frame drawn 40 x 90 table units, painted as a low-poly figure
+  of about 30 visible flat faces, snapped to the 2.5-pixel chunk grid (TREATMENT).
+- **Animation:** `fps` 8 and no in-betweens: each frame held hard and then jumped, the choppy
+  keyframing of early 3D fighters.
 - **Interface:** *Tekken*'s long health bars at the top, and the round text in big chunky
   letters.
 
@@ -602,14 +589,17 @@ the era borrows:
   `#c8906a` *(new)*), right in a blue sleeveless top and grey trousers (accent blue, rail colour,
   skin `#a8704a` *(new)*). Brightest figure colour: the gi's lit face, accent red lit by 0.3,
   never white.
-- **Silhouette:** the shared rig with the torso widened to 12 units at the shoulders, flat-shaded
-  (`shade: 'flat'`, the paddles' `light`), each face one colour, the head a plain box with the
-  face texture affine-mapped onto its front (so it swims with the table).
+- **Silhouette:** a blocky low-poly fighter, shoulders 12 of the frame's 20 pixels, every face one
+  flat colour (lit toward the table, the far side 0.4 darker, the paddles' flat light), the head a
+  plain box with a painted face.
 - **How it holds the paddle:** in a fighting stance, the lead forearm along the paddle's outer
   face at its middle, the rear fist on its top edge.
-- **idle:** the stance bob (shared 3D table), stepped at 15 a second. **move:** the side-step,
+- **idle:** a two-frame stance bob. **move:** the side-step,
   legs split. **swing:** a palm strike -- the lead arm to 80 at contact. **miss:** the stagger,
   torso back 15. **win:** a *Tekken*-style victory: one fist up to 160, the other on the hip.
+- **Sheet:** `frame` 20 x 45, `hand` (20, 33), `scale` 2 (table units, so the figure is about 40
+  x 90 on the table), `anchor` dz 24 (the paddle box's top), `fps` 8, the default frames: a
+  60 x 270 sheet.
 
 ### BALL
 
@@ -638,8 +628,9 @@ under them in the block font at cell 2.
 
 ERAS.md's **wobbly polygons**, all six of them: the 320 x 240 chunk buffer, the affine texture
 swim, vertex snapping with the camera wobble, flat and Gouraud shading, dithered gradients and
-seam sparkle. The fighters are drawn into the chunk buffer in step 4, snapped like everything
-else, so they jitter; that is the era, and R4 protects only the paddles.
+seam sparkle. The fighters are drawn by the rig after the era's frame, so they are not in the
+chunk buffer: the era card draws their sheet with smoothing off and snaps each figure's anchor to
+the 2.5-pixel chunk grid, so they jitter with the table. R4 protects only the paddles.
 
 ### ASSETS
 
@@ -647,14 +638,14 @@ else, so they jitter; that is the era, and R4 protects only the paddles.
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era5-fighter-left` | 64 x 64, 4 cells of 32 x 32 | 32 x 32 textures | the red fighter's face, gi front, gi back, belt |
-| 1 | `era5-fighter-right` | 64 x 64 | 32 x 32 textures | the blue fighter's four |
+| 1 | `era5-fighter-left` | 60 x 270, 3 x 6 frames of 20 x 45 | 40 x 90 table units | the red fighter's sheet, `lineless`, `flat shading`, low-poly facets |
+| 1 | `era5-fighter-right` | 60 x 270 | 40 x 90 table units | the blue fighter's sheet |
 | 1 | `era5-windows` | 64 x 64 | a 64 x 64 tile | the skyline's window texture, affine-mapped |
 | 1 | `era5-hud-text` | 128 x 32 | 128 x 32 | `POINT` and `FINAL ROUND` lettering, snapped to the chunk grid |
 | 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
 
-Embedded as data: URIs through `src/textures3d.js`. Drawn in code instead: the rig and every
-pose, the skyline boxes, the searchlights, the health bars and the damage chunk.
+Embedded as data: URIs through `src/textures3d.js`. Drawn in code instead: the figures' chunk-grid
+snap, the skyline boxes, the searchlights, the health bars and the damage chunk.
 
 ---
 
@@ -668,12 +659,10 @@ the era borrows:
 - **How much is on screen:** a whole toybox world to the horizon, cut off by fog; round, smooth
   low-poly characters.
 - **Palette:** ERAS.md's era 6 toy colours; each character 3 colours *(new)* plus the palette.
-- **Model size:** the shared rig **re-proportioned to a chunky mascot**: legs 14, pelvis 6, torso
-  18 (14 wide), head 16 (1.6 times), a 2-unit hat, still 56 in all; 4 to 11 Nintendo 64 pixels
-  tall. Every box gets the paddles' rounded half-ellipse caps, Gouraud-shaded (`shade:
-  'gradient'`).
-- **Animation:** smooth -- the rig's angles eased every frame, never stepped, with a 10% overshoot
-  on each beat's arrival (*Super Mario 64*'s squash).
+- **Figure size:** a 20 x 45 sheet frame drawn 40 x 90 table units: a **chunky mascot**, the head
+  30% of the height, every limb rounded and Gouraud-smooth like the paddles' capped ends.
+- **Animation:** `fps` 6, squash and stretch drawn into the frames: each beat's second frame 5%
+  shorter and wider (*Super Mario 64*'s squash).
 - **Interface:** big outlined numbers and a round pie-slice power meter.
 
 ### SCENE
@@ -694,13 +683,16 @@ the era borrows:
   cloud-soft `#f4f0e0` *(new)*, scarf rail red); right, a round **frog** in a yellow cap (toy
   green, toy yellow, `#9ee6a0` *(new)* belly). Brightest figure colour: the penguin's belly,
   `#f4f0e0`, below the ball's white.
-- **Silhouette:** the mascot rig above: a big round head on a pear-shaped body, stubby arms.
+- **Silhouette:** a big round head on a pear-shaped body, stubby arms, drawn smooth.
 - **How it holds the paddle:** hugged to the chest, both flippers or hands wrapped round its outer
   face at the middle, the way a toy holds a board.
 - **idle:** a waddle-bob, squashing 5% at the bottom of each bob. **move:** a hop-step, the body
   tilting 12 into the travel. **swing:** a belly bump -- the body lunges 6 units toward the paddle
-  at contact. **miss:** a spin-out, the whole rig turning 360 about its feet over 0.6 s.
+  at contact. **miss:** a spin-out, drawn mid-turn with 3 stars round the head (miss is one frame).
   **win:** a *Super Mario 64* jump -- up to `z` 12, arms up, with a 3-frame squash on landing.
+- **Sheet:** `frame` 20 x 45, `hand` (20, 33), `scale` 2 (table units, so the figure is about 40
+  x 90 on the table), `anchor` dz 24 (the paddle box's top), `fps` 6, the default frames: a
+  60 x 270 sheet.
 
 ### BALL
 
@@ -725,9 +717,10 @@ toy blue at 0.6), resetting at the serve, outlined 2 pixels in HUD outline.
 ### TREATMENT
 
 ERAS.md's **fog** (full from `d` 0.85, the scenery beyond fully fogged) and **bilinear smear**,
-and the rumble. The players take fog like the paddles, **capped at 0.35**, so the far player is
-paler but always readable; their 16 x 16 textures are drawn with smoothing on, smeared like the
-table's.
+and the rumble. The players are drawn by the rig after the era's frame, so the era card fogs
+them there: a fill of `T.fogColour` at the paddle's depth over the figure (`'source-atop'` on the
+figure's own copy), at that depth's fog amount **capped at 0.35**, as the paddles are, and the
+sheet drawn with smoothing on, smeared like the table.
 
 ### ASSETS
 
@@ -735,13 +728,13 @@ table's.
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era6-penguin` | 64 x 32, 2 cells of 32 x 32 | 16 x 16 textures, smoothed | the penguin's face and belly |
-| 1 | `era6-frog` | 64 x 32 | 16 x 16 textures | the frog's face and belly |
+| 1 | `era6-penguin` | 60 x 270, 3 x 6 frames of 20 x 45 | 40 x 90 table units, smoothed | the penguin's sheet, `medium shading` |
+| 1 | `era6-frog` | 60 x 270 | 40 x 90 table units | the frog's sheet |
 | 1 | `era6-pennants` | 64 x 32, 2 cells | 32 x 32 | the two pennant faces |
 | 1 | `era6-star` | 32 x 32 | 8 page px | the pop star, drawn smoothed |
 | 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
 
-Drawn in code instead: the rig, its caps and every pose, the poles, the butterflies, the power
+Drawn in code instead: the players' fog, the poles, the butterflies, the power
 meters and the shake.
 
 ---
@@ -757,10 +750,10 @@ What the era borrows:
 - **How much is on screen:** a crisp 640 x 480 city, bold flat colour, ink outlines, big type.
 - **Palette:** ERAS.md's poster colours, **no gradients anywhere** -- flat fills and 2-band cel
   shading only.
-- **Model size:** the shared rig with **long legs** (legs 24, pelvis 6, torso 16, head 10) and a
-  skate box 10 x 4 x 3 under each foot; 9 to 20 Dreamcast pixels tall, ink-outlined 3 pixels.
-- **Animation:** snappy -- each beat's key angle reached in 2 frames, held, then released;
-  *Soulcalibur*'s sharp poses rather than tweening.
+- **Figure size:** a 24 x 54 sheet frame drawn 40 x 90 table units, **long legs** (45% of the
+  height) and a skate under each foot, ink-outlined 1 sheet pixel.
+- **Animation:** `fps` 10, each frame a sharp held pose -- *Soulcalibur*'s poses rather than
+  tweening.
 - **Interface:** graffiti numbers and tags.
 
 ### SCENE
@@ -781,14 +774,17 @@ What the era borrows:
   and big headphones, right in a poster-blue hoodie and a beanie, both in poster-yellow skates.
   Brightest figure colour: poster yellow; **no paper white on a figure** (R1: paper white is the
   ball's luminance).
-- **Silhouette:** tall and lean with big feet: the long-leg rig, the headphones two 4 x 4 x 4
+- **Silhouette:** tall and lean with big feet: long legs, the headphones two 4 x 4 x 4
   boxes on the head, the hood a 12 x 12 x 6 box behind it.
 - **How it holds the paddle:** one-handed, at arm's length, like a skater holding a board out
   sideways; the free arm out for balance at 60.
 - **idle:** rolling on the spot, the skates sliding 2 units back and forth. **move:** a skating
-  stride, legs split plus and minus 25. **swing:** a spin -- the rig turns 180 and back over the
-  0.18 s, the paddle hand leading. **miss:** a stumble, torso forward 20 then back. **win:** a
-  trick jump to `z` 10 with a 360 turn and a pose held for 0.3 s.
+  stride, legs split plus and minus 25. **swing:** a spin -- the figure turns 180 and back across the
+  swing's 3 frames, the paddle hand leading. **miss:** a stumble, torso forward 20 then back. **win:** a
+  trick jump to `z` 10 with a 360 turn, the landing pose its second frame.
+- **Sheet:** `frame` 24 x 54, `hand` (24, 40), `scale` 1.667 (table units, so the figure is about 40
+  x 90 on the table), `anchor` dz 24 (the paddle box's top), `fps` 10, the default frames: a
+  72 x 324 sheet.
 
 ### BALL
 
@@ -814,21 +810,24 @@ rally hits.
 ### TREATMENT
 
 ERAS.md's **cel shading with thick ink outlines**: outline mode on for every shape (the players
-too, `cam.outline` width 3), banded shading with the hard edge 40% down each face, flat poster
+carry theirs in the sheet: a 1-pixel ink outline and 2 flat bands), banded shading with the hard edge 40% down each face, flat poster
 fills and the speed lines -- all at 640 x 480 with no smoothing.
 
 ### ASSETS
 
-**Budget:** 5 of 12 generations. Cel shading is code; pixellab gives only flat decals.
+**Budget:** 7 of 12 generations. Cel shading is code for the scene; the skaters are generated as
+flat, outlined sheets.
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era7-decals` | 64 x 32, 2 cells of 32 x 32 | 32 x 32, flat | the two jackets' back decals: original graffiti marks, no real logo |
+| 1 | `era7-skater-left` | 72 x 324, 3 x 6 frames of 24 x 54 | 40 x 90 table units | the orange skater's sheet, `single color black outline`, `flat shading` |
+| 1 | `era7-skater-right` | 72 x 324 | 40 x 90 table units | the blue skater's sheet |
+| 1 | `era7-decals` | 64 x 32, 2 cells of 32 x 32 | 32 x 32, flat | the scoreboard tags' spray marks: original graffiti, no real logo |
 | 1 | `era7-posters` | 192 x 32, 3 cells of 64 x 32 | 60 x 30 units each | the three billboards, `lineless`, `flat shading` |
 | 1 | `era7-spraycan` | 32 x 32 | 10 x 18 page px | the scoreboard icon |
 | 2 | re-roll reserve | -- | -- | for a decal that comes back wrong |
 
-Drawn in code instead: both skaters and every pose, the water tower, the blimp, the windows, the
+Drawn in code instead: the water tower, the blimp, the windows, the
 tags and the splat.
 
 ---
@@ -842,10 +841,10 @@ Solid 2* (2001, a year past the rung: the film look ERAS.md gives the era). What
 
 - **How much is on screen:** a moody night set, particles everywhere, a letterboxed frame.
 - **Palette:** ERAS.md's era 8 navy, slate and amber; the players add 2 colours *(new)*.
-- **Model size:** the shared rig at standard proportions with **soft edges**: every box drawn
-  with a 1-unit bevel face (the slab's sheen colour); 10 to 18 PlayStation 2 pixels tall.
-- **Animation:** motion-captured smoothness -- angles eased every frame with a 0.1 s lag on the
-  head and arms behind the torso.
+- **Figure size:** a 24 x 54 sheet frame drawn 40 x 90 table units, standard proportions, **soft
+  edges**: a 1-pixel bevel in the slab's sheen colour round every form.
+- **Animation:** `fps` 8, the frames drawn as motion-captured poses: the head and arms a beat
+  behind the torso from frame to frame.
 - **Interface:** film subtitles and codec-style name plates in the letterbox bars.
 
 ### SCENE
@@ -872,10 +871,13 @@ Solid 2* (2001, a year past the rung: the film look ERAS.md gives the era). What
   riot shield carried at hip height.
 - **idle:** a slow breath, 1.5-unit bob every 2 s (half the shared rate). **move:** a crouched
   run, legs split plus and minus 20, torso forward 15. **swing:** a shoulder charge into the
-  paddle. **miss:** the head turns to follow the ball out, 0.6 s. **win:** a two-finger salute,
-  one arm to 120, held 0.8 s.
-- **Reflections:** each player drawn a second time with `z` negated at 0.18 opacity, before the
-  real one, the same as the paddles (ERAS.md).
+  paddle. **miss:** the head turns to follow the ball out. **win:** a two-finger salute,
+  one arm to 120, both frames.
+- **Reflections:** each player's frame drawn a second time, flipped vertically about its feet, at
+  0.18 opacity before the real one, as the paddles' reflections are (ERAS.md).
+- **Sheet:** `frame` 24 x 54, `hand` (24, 40), `scale` 1.667 (table units, so the figure is about 40
+  x 90 on the table), `anchor` dz 24 (the paddle box's top), `fps` 8, the default frames: a
+  72 x 324 sheet.
 
 ### BALL
 
@@ -900,8 +902,9 @@ beside it in that player's visor colour.
 ### TREATMENT
 
 ERAS.md's **cinematic letterbox** (52 pixels top and bottom), the spark particles, the glow trail,
-the slow drift, the lens flare, the dust and the glossy reflections. The players stand inside all
-of it; the rain and the flare pass over them, never over the ball (the ball is drawn after).
+the slow drift, the lens flare, the dust and the glossy reflections. The players are drawn by the rig
+after the era's frame, so the era card clips them to the picture between the bars (`y` 52 to 548)
+and bakes the slab's sheen and the navy grade into their sheet.
 
 ### ASSETS
 
@@ -909,13 +912,13 @@ of it; the rain and the flare pass over them, never over the ball (the ball is d
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era8-suit-left` | 64 x 64, 4 cells of 32 x 32 | 32 x 32 textures | the midnight suit's front, back, belt and visor |
-| 1 | `era8-suit-right` | 64 x 64 | 32 x 32 textures | the slate suit's four |
+| 1 | `era8-suit-left` | 72 x 324, 3 x 6 frames of 24 x 54 | 40 x 90 table units, smoothed | the midnight operative's sheet, `detailed shading` |
+| 1 | `era8-suit-right` | 72 x 324 | 40 x 90 table units | the slate operative's sheet |
 | 1 | `era8-skyline` | 400 x 100 | a 400 x 100 plate, smoothed | the towers and their windows at night |
 | 1 | `era8-visor-icons` | 64 x 32, 2 cells | 20 x 20 page px | the name plates' icons |
 | 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
 
-Drawn in code instead: the rig, bevels and poses, the reflections, the rain, the searchlight, the
+Drawn in code instead: the reflections and the letterbox clip, the rain, the searchlight, the
 name plates and the typed subtitle.
 
 ---
@@ -931,10 +934,10 @@ Racing* (2001). What the era borrows:
   per pixel.
 - **Palette:** ERAS.md's era 9 black, steel and green; the players take it whole, one colour
   *(new)*.
-- **Model size:** the shared rig **armoured**: the torso 12 wide with 2 shoulder pads (boxes 6 x 8
-  x 4 on its top corners, not joints); 10 to 23 Xbox pixels tall.
-- **Animation:** heavy and weighted: every beat's angles eased with ease-out over its length, the
-  swing's contact held 2 frames longer.
+- **Figure size:** a 24 x 54 sheet frame drawn 40 x 90 table units, **armoured**: broad shoulder
+  pads, the helmet 20% of the height.
+- **Animation:** `fps` 6, heavy and weighted: the swing's middle frame, the contact, is the widest
+  pose.
 - **Interface:** *Halo*'s segmented shield bar and name tags over the players.
 
 ### SCENE
@@ -960,12 +963,16 @@ Racing* (2001). What the era borrows:
 - **How it holds the paddle:** as a deployable **energy shield**, the lead arm through it at the
   middle, the other hand on its top edge.
 - **idle:** a weapon-ready bob, 1 unit. **move:** a strafing step, legs split plus and minus 18,
-  torso level. **swing:** a melee bash, the shield arm to 80 with the contact held 0.03 s longer.
+  torso level. **swing:** a melee bash, the shield arm to 80, the contact frame the widest.
   **miss:** the armour flashes shield alarm red on its outline for 0.3 s and the torso rocks back.
-  **win:** a single fist pump to 160, held 0.5 s.
-- **Shadows and light:** the players cast hard shadows from the ball's moving light, as the
-  paddles do (0.45, hull of footprint and top corners), and the armour carries the plate tile with
-  the specular pool, so their emboss lights up as the ball passes (ERAS.md's bump map).
+  **win:** a single fist pump to 160, both frames.
+- **Shadows and light:** each player casts one hard shadow from the ball's moving light, a quad
+  40 units long from its feet away from the light in `#000000` at 0.30 (lighter than the paddles'
+  0.45, R5), and when the ball is within 160 units its frame is drawn a second time with
+  `'lighter'` at 0.35 -- the specular pool reaching the armour (ERAS.md's bump map).
+- **Sheet:** `frame` 24 x 54, `hand` (24, 40), `scale` 1.667 (table units, so the figure is about 40
+  x 90 on the table), `anchor` dz 24 (the paddle box's top), `fps` 6, the default frames: a
+  72 x 324 sheet.
 
 ### BALL
 
@@ -975,7 +982,7 @@ the paddles and every hard shadow follow it. Nothing added to its drawing.
 ### SCOREBOARD
 
 ERAS.md's shield bars (10 skewed segments each, the total beside them), kept, and its gamertags at
-`z` 60 over each paddle -- which float just over the 56-unit players' heads, as the tags of
+`z` 60 over each paddle -- which float at the players' head height, as the tags of
 *Halo*'s multiplayer did. Added: a **motion-tracker dot** 12 page pixels across in the HUD band's
 centre, a green ring with a green-glow dot at the ball's `x` along its width.
 
@@ -983,15 +990,14 @@ centre, a green ring with a green-glow dot at the ball's `x` along its width.
 
 - **A point scored:** ERAS.md's shield-alarm flash and recharge on the conceding bar; the beacons
   turn shield-alarm red for 1 s; the players play win and miss.
-- **Match point:** this is the era where match point first happens (the point that reaches era
-  10). The beacons stay red, the gamertags' borders pulse green glow once a second, and the steam
+- **Match point:** the beacons stay red, the gamertags' borders pulse green glow once a second, and the steam
   vents blow continuously.
 
 ### TREATMENT
 
 ERAS.md's **bump-mapped metal** with the moving specular pool, the **hard dynamic shadows** and
-the **green glow** -- the players' armour takes the same plate tile and pool, and their outlines
-are not stroked with `shadowBlur` (the era's two blurs stay the paddles').
+the **green glow** -- the players' sheet carries the plate's emboss baked in, the pool's glint is
+the second pass above, and their outlines are not stroked with `shadowBlur` (the era's two blurs stay the paddles').
 
 ### ASSETS
 
@@ -999,13 +1005,13 @@ are not stroked with `shadowBlur` (the era's two blurs stay the paddles').
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era9-armour-left` | 64 x 64, 4 cells of 32 x 32 | 32 x 32 textures | the marine's chest, back, helmet and pads |
-| 1 | `era9-armour-right` | 64 x 64 | 32 x 32 textures | the cyborg's four |
+| 1 | `era9-armour-left` | 72 x 324, 3 x 6 frames of 24 x 54 | 40 x 90 table units | the marine's sheet, `detailed shading`, the plate emboss drawn in |
+| 1 | `era9-armour-right` | 72 x 324 | 40 x 90 table units | the cyborg's sheet |
 | 1 | `era9-hangar` | 400 x 80 | a 400 x 80 plate | the hangar wall between the ribs |
 | 1 | `era9-beacon` | 32 x 64 | 32 x 64 | the beacon post's face |
 | 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
 
-The landed `tex3d-court-metal` stays the table's. Drawn in code instead: the rig and its pads,
+The landed `tex3d-court-metal` stays the table's. Drawn in code instead: the players' shadows and glint pass,
 the ribs, the rotating wedge, the steam, the tracker and every flash.
 
 ---
@@ -1021,10 +1027,10 @@ borrows:
 - **How much is on screen:** HD detail everywhere, every post-process effect at once, a ruined
   world behind the action.
 - **Palette:** ERAS.md's era 10 umber, mud, concrete, ash and blade green, through the grade.
-- **Model size:** the shared rig **bulked**: torso 14 wide, shoulder pads 8 x 10 x 5, the head
-  9 (small on the big body), 27 to 36 Xbox 360 pixels tall -- the first era with room for detail.
-- **Animation:** eased with follow-through: the arms lag the torso 0.08 s and settle with one
-  overshoot; the move beat carries a 1-unit side sway.
+- **Figure size:** a 32 x 66 sheet frame drawn 44 x 90 table units, **bulked**: huge pads and a
+  small head (15% of the height) -- the first era with room for detail.
+- **Animation:** `fps` 8, follow-through drawn into the frames: the arms a beat behind the torso,
+  the up and down rows carrying a side sway.
 - **Interface:** the Blades, gamerpics and the achievement toast.
 
 ### SCENE
@@ -1051,9 +1057,12 @@ borrows:
 - **idle:** a heavy breath, the pads rising 1 unit every 2 s. **move:** a roadie run, torso forward
   25, legs plus and minus 20. **swing:** a mantle-and-shove, the torso up over the paddle's top
   edge to 80 and back. **miss:** a flinch, the head down 30 and the arms up to shield it.
-  **win:** a slow fist to the chest, then up to 160, held 0.8 s.
-- **Rim lights:** each player's outline gets a 1.5-pixel HDR-sun rim at 0.6, restored after the
-  grade the way the paddles' inks are, and the rim is drawn into the bloom buffer too, so it glows.
+  **win:** a slow fist to the chest, then up to 160, the two frames.
+- **Rim lights:** each player's sun side carries a 1-pixel HDR-sun rim at 0.6, drawn into the
+  sheet, and one `'lighter'` pass of the frame at 0.25 over it gives the glow.
+- **Sheet:** `frame` 32 x 66, `hand` (32, 48), `scale` 1.36 (table units, so the figure is about 40
+  x 90 on the table), `anchor` dz 24 (the paddle box's top), `fps` 8, the default frames: a
+  96 x 396 sheet.
 
 ### BALL
 
@@ -1079,22 +1088,23 @@ helmet in blade green, the right's in ash -- with a 1-pixel blade-silver frame.
 
 ERAS.md's **bloom and grain** and all the rest: HD crispness, multi-scale bloom, the
 brown-and-grey grade, the vignette, film grain, motion blur on the ball and depth of field on the
-far end. The players are graded and grained like the slab; only their rim lights, like the
-paddles' inks, are restored after the grade.
+far end. The players are drawn by the rig after the era's frame, so their sheet is generated
+pre-graded (brown and grey, the `#c9b89a` tint) and the era card lays the frame's grain tile over
+them at 0.12.
 
 ### ASSETS
 
 **Budget:** 7 of 12 generations. Pixel art at this resolution is the wrong look, so every image
-is a texture drawn with smoothing, never a sprite shown at its own size.
+is generated `highly detailed` and drawn with smoothing on, never shown at its own pixel size.
 
 | Gens | Name | pixflux size | In game at | What it is |
 | --- | --- | --- | --- | --- |
-| 1 | `era10-armour-left` | 64 x 64, 4 cells of 32 x 32 | 32 x 32 textures, smoothed | the green-trim soldier's chest, pads, back and helmet |
-| 1 | `era10-armour-right` | 64 x 64 | 32 x 32 textures | the grey-trim soldier's four |
+| 1 | `era10-armour-left` | 96 x 396, 3 x 6 frames of 32 x 66 | 44 x 90 table units, smoothed | the green-trim soldier's sheet |
+| 1 | `era10-armour-right` | 96 x 396 | 44 x 90 table units | the grey-trim soldier's sheet |
 | 1 | `era10-ruin` | 400 x 120 | a 400 x 120 plate in the DOF buffer | the broken columns' faces |
 | 1 | `era10-banner` | 64 x 96 | 60 x 90 units | the torn banner, an original emblem, no real logo |
 | 1 | `era10-gamerpics` | 64 x 32, 2 cells of 32 x 32 | 24 x 24 page px | the two gamerpics |
 | 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
 
-Drawn in code instead: the rig, pads and every pose, the rim lights, the ash, the banner's ripple,
+Drawn in code instead: the rim-light glow pass, the grain over the players, the ash, the banner's ripple,
 the gamerpic frames and the toast's new text.
