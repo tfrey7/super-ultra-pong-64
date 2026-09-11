@@ -3969,7 +3969,7 @@
     {
       "name": "era1-left-0",
       "file": "era1-left-0.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #b55328, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -3992,17 +3992,17 @@
         "height": 168
       },
       "bytes": 447,
-      "sha256": "95455b4f2e48d5aea4e2b490f73859b93b5f125f1f41b403bd2d229ef7b3deb4",
+      "sha256": "b148c454e35aaba64c7db31b63bc5b62cef7f66b5c5bd9115467edee6ebd71b2",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #b55328, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-1",
       "file": "era1-left-1.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d2a44a, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4025,17 +4025,17 @@
         "height": 168
       },
       "bytes": 447,
-      "sha256": "7d77f55e86401fdbd26d97a28707061ca7ded565ce8885e529f70cd0325451b4",
+      "sha256": "2f4f66dce332b6738a6a0f547a2a341b9cd17b9302dd99d3d72238a5aaa4c184",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d2a44a, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-2",
       "file": "era1-left-2.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d2d240, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4057,18 +4057,18 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 448,
-      "sha256": "24ff7ab6902520074348e716773fc05b3ec6737ab270c5b1f3ade0cc6f12c718",
+      "bytes": 446,
+      "sha256": "b0f8e54208a761550166ed70c6b4dc03785fe9180e4674404b66f0641af4ba4b",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d2d240, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-3",
       "file": "era1-left-3.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #5cba5c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4090,18 +4090,18 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 447,
-      "sha256": "f1dd33bc7311db6a323db30efee6851dd3125e8e3dfb56b2f594f41dd3a49f12",
+      "bytes": 445,
+      "sha256": "a84e4ba460e02a4b4469fcba8b3a7fa418eee17e82993a4cf8e8839a819de2f6",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #5cba5c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-4",
       "file": "era1-left-4.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #54b899, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4124,17 +4124,17 @@
         "height": 168
       },
       "bytes": 447,
-      "sha256": "549e36cc6bb235d8bcc2142479b835955aefe4b673169112bb2cced7c4c037ff",
+      "sha256": "912f54dd12432d802ea9b7d4bcb100211f686eb41c01d8dd4b2e2833a9a24452",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #54b899, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-5",
       "file": "era1-left-5.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #548ad2, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4157,17 +4157,17 @@
         "height": 168
       },
       "bytes": 447,
-      "sha256": "35fe72de898ad26cab2f74ae67a0cd3fb609b25f42abe2bf661f9fe6c0f79204",
+      "sha256": "11f16656cd16111eda1f70a85a75d575947cf8c3b8a5c9c2a3d8c8af72b5c127",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #548ad2, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-6",
       "file": "era1-left-6.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #7f5cd5, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4190,17 +4190,17 @@
         "height": 168
       },
       "bytes": 447,
-      "sha256": "1a405fba1f3fabb67ad4bb66b78a7bbceef59cd9aa0f8857478b54d1674155b3",
+      "sha256": "fbd6f214b6e0b5227e7daefe51a5a66d65fad89c42312c26adf9ef2c18b85e9f",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #7f5cd5, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-7",
       "file": "era1-left-7.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #a459d0, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4223,17 +4223,17 @@
         "height": 168
       },
       "bytes": 447,
-      "sha256": "7195d5d39f5e2c68f9f540d8aeb1ce5816d64a23904b635e3e5a178d3d7c47d3",
+      "sha256": "293a87fc5fb15ca580e16c3620234a234662767bf9852f5698642057ad8e1c0b",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #a459d0, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-8",
       "file": "era1-left-8.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c659b3, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4256,17 +4256,17 @@
         "height": 168
       },
       "bytes": 447,
-      "sha256": "e762507546318936e9e929c96d02fb40770c186ce1bf222d4cb8fa21757b7bb9",
+      "sha256": "95805a24c8581bf995fba57a439d5461c7e772b043eb7d8b2e5322398d270c92",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c659b3, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-9",
       "file": "era1-left-9.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c84848, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4289,17 +4289,17 @@
         "height": 168
       },
       "bytes": 445,
-      "sha256": "5880cec48a941864dc36daf4b837301eff43ad87b1690f4d3ddf41f026c729e5",
+      "sha256": "56cc3f2cb1ebae55c10918098b186c0b4d73722586a3f6a285e13c7db0770c25",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c84848, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-10",
       "file": "era1-left-10.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #e39759, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4322,17 +4322,17 @@
         "height": 168
       },
       "bytes": 447,
-      "sha256": "12f998366b4dcc6d6d38422ce6e533ab6e34b92c110d952dbe346c6e8aad7412",
+      "sha256": "f92d9f7c1ad3a5d538fbca0ed0e421994dd10e795cb837cd332676f647d9c1e0",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #e39759, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-left-11",
       "file": "era1-left-11.png",
-      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #84c8fc, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4354,18 +4354,18 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 448,
-      "sha256": "51734c9dd3a5ad5d1325f6d400beb860aad3c613f2888f62affbf05a8679904e",
+      "bytes": 446,
+      "sha256": "0f8aed22b6658a33c30342ea8948fbc8b0b423c5f465d2af8b8c783f770c1864",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #84c8fc, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-0",
       "file": "era1-right-0.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #b55328, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4388,17 +4388,17 @@
         "height": 168
       },
       "bytes": 422,
-      "sha256": "2e3edbb80c6915152e5b4970583cf3cae50ef7072ee39bd97028b96616e25166",
+      "sha256": "f0d64dada27a8e43ebc5fde7ced7393d97b78070ec62ff112f7ce185ce3ac155",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #b55328, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-1",
       "file": "era1-right-1.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d2a44a, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4421,17 +4421,17 @@
         "height": 168
       },
       "bytes": 422,
-      "sha256": "e14737a66a7198dc772810473d58142d24df1546ff3a0a3a00e0957262e9197e",
+      "sha256": "f78bd660c37ccc9371581d22156a23696bf07a361e290f00af771780971a209f",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d2a44a, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-2",
       "file": "era1-right-2.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d2d240, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4453,18 +4453,18 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 423,
-      "sha256": "444281fb048b5c93aa97b9d2e2ff06d072d1ab0b950b004d5a33ee2a80f6efc8",
+      "bytes": 421,
+      "sha256": "48110f3aff9b8cc862dc27e14d02c399001cfc517e6ea961c09281202584d2c5",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d2d240, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-3",
       "file": "era1-right-3.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #5cba5c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4486,18 +4486,18 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 422,
-      "sha256": "021c24402db7a96b72842476340abca362a5caca270944ae99e8c41efd3cae2b",
+      "bytes": 420,
+      "sha256": "aeac09435118b6344d89ce5fb2ad7c5926bb157c3489da57503a4eb2a2fad0e1",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #5cba5c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-4",
       "file": "era1-right-4.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #54b899, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4520,17 +4520,17 @@
         "height": 168
       },
       "bytes": 422,
-      "sha256": "54c3c6a1072877456567cd06418ad6925bd475e56e01be3dc81675ec5fa13784",
+      "sha256": "8c91b424c25e760fe0ef04ab393cd03a39a531b2a5d2aada521ad5218233fe47",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #54b899, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-5",
       "file": "era1-right-5.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #548ad2, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4553,17 +4553,17 @@
         "height": 168
       },
       "bytes": 422,
-      "sha256": "fc28f637019bf30683ce330847946562b8a2813965905a296bbad4c12364288e",
+      "sha256": "f82d1c1b077f207c4ffbcbad02a956cf930c95b152fe7e895b15bcb176eed186",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #548ad2, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-6",
       "file": "era1-right-6.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #7f5cd5, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4586,17 +4586,17 @@
         "height": 168
       },
       "bytes": 422,
-      "sha256": "3d020cfa3bbdd62aa98bd77c638c1094d595b73c73ace851b51f06fa47ac81a7",
+      "sha256": "a097251fc330a9725136785f12ab9d6fa384ebe4db2b4307956ffaca374c04c6",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #7f5cd5, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-7",
       "file": "era1-right-7.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #a459d0, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4619,17 +4619,17 @@
         "height": 168
       },
       "bytes": 422,
-      "sha256": "c4006d5a19a65873ac3ee103c11e654332916e7cd1d69cdf4d13e1496981468c",
+      "sha256": "21528234d8fc02c34bc1e3470be44d20cd3bf097f105edec1a13cbabc3addfe5",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #a459d0, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-8",
       "file": "era1-right-8.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c659b3, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4652,17 +4652,17 @@
         "height": 168
       },
       "bytes": 422,
-      "sha256": "e28d20eacf24be0a0854962c720a947bd0b68a37b1591964f3df8f6dd7a47098",
+      "sha256": "a611be27ce3d0cb80db854fd8d2c825c6a1c9384d48eaa44feb24514eac5808d",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c659b3, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-9",
       "file": "era1-right-9.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c84848, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4685,17 +4685,17 @@
         "height": 168
       },
       "bytes": 420,
-      "sha256": "d910825146a77d19c08f712733dcc14c33edd1aef92179585bef2e16c39c7166",
+      "sha256": "b42bedcc8b49620eca2284d43141c930dceb15f1d48e0b21c0155b0e0ab6d5af",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c84848, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-10",
       "file": "era1-right-10.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #e39759, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4718,17 +4718,17 @@
         "height": 168
       },
       "bytes": 422,
-      "sha256": "a1f36bd979f937a0191edf55d61c9bd1aa8f3914d9a311e9f90c5862518605e0",
+      "sha256": "dc93685c92c48e03fa63ae3f76c511264c9873a5f2d8d936c709fd7233840c4a",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #e39759, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
     {
       "name": "era1-right-11",
       "file": "era1-right-11.png",
-      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "prompt": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #84c8fc, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
       "size": {
         "width": 18,
         "height": 168
@@ -4750,11 +4750,11 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 423,
-      "sha256": "953c127157f83be49ec12948ad25466f9ad5787db5f01ba83db8dbc5822361da",
+      "bytes": 422,
+      "sha256": "5119ed064643482bef605a220b0cdb1c228e0fc55fa4d164e882f2a5de52a8fc",
       "endpoint": "none",
       "request": {
-        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #84c8fc, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
         "seed": 0
       }
     },
