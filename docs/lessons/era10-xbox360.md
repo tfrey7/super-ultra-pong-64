@@ -100,3 +100,74 @@ last, after every post pass.
    `advanceEra`'s call.
 5. Measure on a machine with a GPU. In the playtest's software Chrome this era reads 4 times over
    budget, by design (bootstrap, *Traps*).
+
+## LESSONS
+
+*Item 1234, the AAA pass: two armoured soldiers hold the paddles, the plaza is a bombed-out city
+at sunset, and the score blades carry gamerpics. A rally, as the playtest filmed it:
+[rally-era10.png](../shots/item-1234/rally-era10.png).*
+
+**What sold the flagship look here.**
+
+- **The treatment does most of the work, and the players have to wear it too.** The character
+  rig draws after the era's frame, so its figures would have come out clean and saturated
+  over a graded, grained, bloomed picture. The fix was to bake the era's treatment into the sheet
+  offline (`assets/pixellab/era10-derive.mjs`): colour drained 45 %, multiplied toward the
+  `#c9b89a` tint, a 1-pixel HDR-sun rim on the side facing the ball with a soft glow inside
+  it, and seeded grain at 0.12. Then the soldiers sat in the picture instead of on it.
+- **Draw HD art at twice its size, pre-smoothed.** The rig draws every sheet with smoothing off,
+  which is right for eras 1 to 4 and wrong for 2005. Scaling the sheet up 2x with bilinear
+  filtering offline (a 96 x 132 frame for the bible's 32 x 66) makes the unsmoothed draw read
+  smooth, without a change to the shared rig.
+- **One plate behind the far wall, softened by the depth of field, is enough of a world.** The
+  backdrop band on this camera is only about 106 units tall, so a single 400 x 120 ruin plate
+  drawn into the depth-of-field buffer, with the banner rippling on a column and 40 ash flakes
+  drifting over everything, reads as a ruined city without competing with the ball.
+- **Gamerpics are the players' own heads.** Cutting each soldier's helmet out of his sheet
+  (0 generations) ties the HUD to the figures on the table, which a separately generated icon
+  did not.
+
+**What did not work.**
+
+- **Flat sprites read as sprites on a 3D table, and Tim ruled them out** (23:47 EDT on
+  2026-09-10: *"btw if you are trying to do sprites in the 3d eras uh...that is not gonna look AAA
+  here dude"*). Even graded, rimmed, grained and pre-smoothed, a billboard soldier on a
+  perspective slab looks pasted on. It does not turn with the table, catch the sun or sit in the
+  depth of field. The soldiers on this page are **stand-ins** until this era's model card swaps in
+  polygon players made in Blender (item 1248's renderer). A one-era HD game starts from models,
+  not sheets. The concept carries over: who the two soldiers are, their trims, and the gamerpics
+  cut from their heads.
+- **pixflux does not draw sprite sheets to a grid.** Asked for 3 x 6 frames of 32 x 66, it
+  drew front-facing soldiers two to a row with irregular band heights. One sheet had a
+  fireball on a frame and the other a magenta visor. The poses barely differ from row to row
+  (only the raised-fist frames are really new). So the derive script finds each figure by
+  its opaque rows and columns, and makes the beats itself by tilting and lifting a figure
+  about its feet: lean 9-11 degrees into the travel for the run, 14 degrees and 9 up for the
+  shove, 9 back and 4 down for the flinch. The bible's cover pose (a shoulder braced against
+  the paddle) was never drawn: no generation offered a side view.
+- **Two gamerpic generations looked like one famous franchise helmet** (green, gold visor),
+  even with a negative prompt naming it. ERAS.md rule 1.9 forbids trademark shapes, so both were
+  dropped for the head crops.
+- **Five generations fired in parallel lost two manifest entries.** `tools/pixellab.mjs` rewrites
+  `manifest.json` whole, so parallel runs overwrite each other's entries. The two images had to be
+  asked for again, which cost 2 generations. Run generations one at a time.
+- **A tiled plate repeats its sun.** The ruin plate was first tiled across the width, which put two
+  suns in the sky. It is drawn once, twice as wide, so its sun sits under the HDR sun at x 560.
+- **The rig threw under `node --test` once an era had a sheet** (no `Image` to load with). The
+  rig's sheet loader now falls back to the placeholder instead, and the test that pinned "no era
+  has a sheet" skips an era whose card brought its art.
+
+**The cost.** 8 of the 12 generations (the two sheets, the ruin twice, the banner, the gamerpics
+three times) and 0 for everything derived. The frame time on the playtest's GPU-less Chrome did
+not move: in the twelve-hit rally, 82.9 ms a frame with the soldiers and the plaza against 89.9 ms
+on master, run minutes apart on the same busy machine. That is the software-canvas cost card
+1216 owns, not this pass.
+
+**What a one-era game would copy.**
+
+1. `era10-derive.mjs` whole: find the figures, pose the beats, bake the grade, rim and grain,
+   and upscale 2x. Point it at any generated character sheet.
+2. Treat the HUD as part of the cast: gamerpics from the players, the toast for moments, and
+   MATCH POINT over 100G - FINISH IT as a held toast with the vignette tightened from 250 to 220.
+3. For anything moving on its own behind the play (ash, the banner, the sun's bloom breathing
+   plus and minus 5 % every 6 s), use a few dozen seeded fills a frame. Never loop over pixels.

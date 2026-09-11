@@ -77,7 +77,7 @@
   // and ball below are drawn instead.
   // BEGIN pixellab embeds (written by assets/pixellab/era2-nes-quantize.mjs)
   var ART = {
-    court: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAACUCAYAAADWFGYSAAAEmElEQVR42u3dbXLaMBAA0Bwtx+hROAK3ptNMYMA1xpa0+vL7sZPphAqj1UOyLW++vq7X2674/nPb/dojEdXuiMesj/trV/K0qy8A0a4+BsRA1seASJ4+BkTy9DEgkqePAWnaroEMCCCAAAIIIIAAAggggAACyFRA7gNNiNkiG4hOFGdH0myZIkTLAESI2kBMyWKWJVUYkOv1drlcfsI3kRglfsZrEpCj6swmYrB4fKGnjN+UGST82vpZ74OMdq9ikHHwWO3UWmIBAshQ42BrBXRaIKPemQYEEEAAAcQSCxBAAAEEEEAAAcQ5CCCAmEEAAQQQQAABBBBAAAEEEECcpAMCiBkEEEDMIIAAAgggtrsDAogZxDkIIIAAAggggFhiATInEEUFRE5p0HAgOVVNCn6ArTJC96oUa+WGlr97ec2iTFFuPJePef73u+PbPLZF+aTlzz1lbN71ydaVnLVjOPpeL++7yN+nz7zVZsjMlFuVp4sZxBLLEiuq3SmWWIAAAojkAQKI5AECCCCAAAIIIIBMDMSddEAAAQQQQAABBBBAAAEEEEAAAQQQQFzmBQQQQAABBBBAAAEEEEAAAUQfAwKIPgYEEEAAAeQaX7QAEECGTN6eBJWCAkijqiZnKR1TMnkpx5X7WaKBjDIGRqtqsiyhUyyx9zajkKS0WeJYUtuI6oPcL6Ot/7M1Liyx8oGs/mwFJOKcpSWQ52MIBOIcpBaQiEE60ho9EigggHQJ5EjbkZ8dkMZAcpYUa8kcdWD2cBxrucjJESAFv0VSvrVbAql1M7Hmsay1cxTI3pwCktBJR5MASF9AjuQDkAZASt7kOxuQd20A0tlJ+pFEtAKSc8IacZ+jByBHcwEIIMvXr/41VkAACQdS+rhLDsitgdcrkJT7IICYQU4DxAwCSIslVthWFkAAmeIkvafNlYC4D+Iyb/37IC87dAFxJx2QDzuBAelkL1aLzYqz7cUquVnRXiy7eQGxm9cDU2d7HiT1PggggDR5os8ThYBkAenpmfRZHrmt9Ez6+EBUNak7UFu978xVTSLL/vy7pp0bpdr5r91eazalXhbtuezP70bLovkrMC527yHrteyPomaVZkCF4yY9B5k9ebUCEECKnMwCAogZBBBAAAFEHwMCiD4GxDkIIKMBeVROlzxAALHEAgQQQAABxDkIIIAAAggggFhi6WNAzCCAAAIIIIAAAggggAACCCCAAAIIIIC4zAsIIDYrAgJI5aomxYEIUaNgxZBVTRZRtOTPm5I0Oe/1XPJobxthn/FDe8sSTcvXr7WxNy/PX5RhZZucgwQvKyyxxl1iAQIIIIAAAggggAACCCCAAAIIIIAAAggggAACCCC2mgACCCCAAGKJBQgggAACiCUWIIAAAggglliAAGIGAQQQQAABBBBLLEAAAQQQQAABZNiqJqqRiCGro1StaiLEaFFliSXELLNJcSBCzDSbACJEDSBCnLW86W5pQpyx9u/U2zZGO2Z93F+7kqddfQGIdvUxIAayPgZE8vQxIJKnjwGRPH0MiOQBAojkAQKI5GkXEMnTrr4ARLv6Yl/8BW1UJHoKiQEGAAAAAElFTkSuQmCC',
+    court: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAACUCAYAAADWFGYSAAAClUlEQVR42u3cu40EIRRFQUIjDEJ6WYPwMcBA4lMG3u5odK5qui1SiqhTJ5c6/bcrZ9fn3vqdNT7rcwEBBBBAANEYEEA0BgQQjQEBRGNAjAcIIMYDBBDjAQIIIIAAAggggAACCCCAAKIxIIBoDAggGgNiPEAAMR4ggBgPkHeA9H9wHGd8PEE8QTxBvGIBojEggGgMCCAaAwKIxoAYDxBAjAcIIMYDBBBAAAEEEEAAAQQQQAABRGNAANEYEEA0BsR4gABiPEAAMR4ggBgPEEAAAQQQQAABBBBANHarieO41cQTRGOvWIBoDIjxAAHEeIAAYjxAADEeIIAAAggggAACCCCAaAwIIBoDAojGgACiMSDGAwQQ4wECiPEAAQQQQAABBBBAAAFEY0AA0RgQQDQGBBCN3WriOG418evmCeIVy3iAAGI8QAABBBBAAAEEEEAA0RgQQDQGBBCNAQFEY0CMBwggxgMEEOMBAggggAACCCCAAAIIIIAAojEggGgMCCAaA2I8QAAxHiCAGA8QQIwHyEdAXO3iOK798QTR2CsWIBoDAojGgACiMSDGAwQQ4wECiPEAAcR4gAACCCCAAAIIIIAAojEggGgMCCAaA2I8QAAxHiCAGA8QQIwHCCCAAAIIIIAAAgggGgMCiMZuNXEct5p4gmjsFct4gABiPEAAMR4ggBgPEEAAAQQQQAABBBBANAYEEI0BAURjQADRGBDjAQKI8QABxHiAAAIIIIAAAggggAACCCCAaAwIIBoDAojGgBgPELeaOI5bTfy6eYJ4xTIeIIAAAggggAACCCCAaAwIIBoDAojGgACiMSDGAwQQ4wECiPEAAQQQQAABBBBAAAEEEEAA0RgQQDQGBBCNATEeIId+bgMq/s0Ib+NXTAAAAABJRU5ErkJggg==',
     ball: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAR0lEQVR42mNgoBTs2bPnPzLGq/jPnz//0TFOTdgUwzRgaAIJ4NIA01RTU/OfKA0wG+isAVtwImMMxfg04VQMAyAFyJjilAAAljgGtJaN/cEAAAAASUVORK5CYII='
   };
   // END pixellab embeds
@@ -162,6 +162,62 @@
     ctx.fillStyle = MORTAR;
     for (v = TILE - PX; v < w; v += TILE) ctx.fillRect(v, 0, PX, h);
     for (v = TILE - PX; v < h; v += TILE) ctx.fillRect(0, v, w, PX);
+  }
+
+  // ------------------------------------------------------ the tennis lines (item 1259)
+  // Tennis's court markings, in whole NES pixels (a column is 800/256 field
+  // units, a row 600/240), mirror-true about the net: the net column spans 128
+  // and a column c mirrors to 255 - c. A baseline at each end just in front of
+  // the paddles, so the players stand behind it as they do in a rally; the
+  // doubles sidelines along the top and bottom walls, under the crowd; the
+  // singles sidelines inside them (8.23 m of a 10.97 m court, as the real
+  // thing); a service line on each side of the net (6.40 m of an 11.89 m half);
+  // the centre service line from each service line to the net, and the centre
+  // mark on each baseline. The court is squashed end to end, as every
+  // side-view tennis game's was. One ink, $10: light enough to read as paint
+  // on the teal floor, darker than the ball's white core so the ball stays the
+  // brightest thing on the court. Play is untouched: the net is the game's
+  // dotted centre line, the paddles are the hit zones.
+  var COURT_LINE = NES[0x10];
+  var LINES = {
+    base: [18, 237],            // baseline columns
+    service: [69, 186],         // service line columns
+    doubles: [38, 233],         // doubles sideline rows (top, bottom)
+    singles: [62, 209],         // singles sideline rows
+    centre: 135,                // the centre service line's row
+    mark: 3                     // the baseline's centre mark, in columns
+  };
+
+  /** The court's markings, as field rectangles [x, y, w, h]. */
+  function tennisLines() {
+    var nx = NATIVE.x, ny = NATIVE.y, L = LINES, out = [], i;
+    var colX = function (c) { return c * nx; };
+    var rowY = function (r) { return r * ny; };
+    var left = colX(L.base[0]), right = colX(L.base[1] + 1);
+    var top = rowY(L.doubles[0]), bottom = rowY(L.doubles[1] + 1);
+    for (i = 0; i < 2; i++) {
+      out.push([left, rowY(L.doubles[i]), right - left, ny]);                    // doubles sideline
+      out.push([left, rowY(L.singles[i]), right - left, ny]);                    // singles sideline
+      out.push([colX(L.base[i]), top, nx, bottom - top]);                        // baseline
+      out.push([colX(L.service[i]), rowY(L.singles[0]), nx,                      // service line
+        rowY(L.singles[1] + 1) - rowY(L.singles[0])]);
+    }
+    var net = colX(128);
+    out.push([colX(L.service[0] + 1), rowY(L.centre), net - colX(L.service[0] + 1), ny]);   // centre service lines
+    out.push([net, rowY(L.centre), colX(L.service[1]) - net, ny]);
+    out.push([colX(L.base[0] + 1), rowY(L.centre), L.mark * nx, ny]);                       // centre marks
+    out.push([colX(L.base[1] - L.mark), rowY(L.centre), L.mark * nx, ny]);
+    return out;
+  }
+  var TENNIS_LINES = null;      // built on first use: NATIVE is set further down
+
+  function drawLines(ctx) {
+    var lines = TENNIS_LINES || (TENNIS_LINES = tennisLines());
+    ctx.fillStyle = COURT_LINE;
+    for (var i = 0; i < lines.length; i++) {
+      var r = lines[i];
+      ctx.fillRect(r[0], r[1], r[2], r[3]);
+    }
   }
 
   function drawBorder(ctx, state) {
@@ -483,6 +539,7 @@
     var match = isMatchPoint(state);
 
     drawCourt(ctx, state);
+    drawLines(ctx);
     drawBorder(ctx, state);
     drawNet(ctx, state);
     drawCrowd(ctx, state, point, match);
@@ -651,6 +708,8 @@
     name: '1985 NES',
     nesPalette: NES,
     font: FONT,
+    courtLine: COURT_LINE,
+    tennisLines: function () { return TENNIS_LINES || (TENNIS_LINES = tennisLines()); },
     spriteInks: spriteInks,
     paddleInk: function (state, side) {
       return spriteInks(state, side).body;

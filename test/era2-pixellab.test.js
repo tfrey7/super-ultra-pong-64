@@ -102,7 +102,7 @@ test('every pixel is an NES colour, at NES resolution, and the court never out-s
   for (let i = 3; i < ball.rgba.length; i += 4) assert.ok(ball.rgba[i] === 0 || ball.rgba[i] === 255, 'the ball is crisp: opaque or clear');
 });
 
-test('the court carries no mark that reads as a number: no light-grey box by either goal, no halfway line of its own (item 1191)', async () => {
+test('the court is a tennis floor: its floor ink and whole tile-grid lines, no pitch marking left (items 1191, 1259)', async () => {
   const q = await quantizer();
   const court = q.decodePng(fs.readFileSync(path.join(ASSETS, 'era2-court.png')));
   const ink = (x, y) => {
@@ -110,22 +110,72 @@ test('the court carries no mark that reads as a number: no light-grey box by eit
     return '#' + [0, 1, 2].map((k) => court.rgba[i + k].toString(16).padStart(2, '0')).join('');
   };
   const counts = q.inkCounts(court);
-  const floor = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
-  // The generator's two boxes were the only ink lighter than the grey court lines.
-  for (const c of Object.keys(counts)) assert.ok(q.luma(c) < 0.5, `${c} (luma ${q.luma(c).toFixed(2)}) is a light mark on the court`);
-  for (const r of q.PAINT_OUT) {
-    for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
-      assert.strictEqual(ink(x, y), floor, `court pixel ${x},${y} beside the goal is plain floor`);
-    }
+  const inks = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  // Two inks: the floor and its grid. The generator's grey dashes along the
+  // pitch lines (#787878) and the boxes that read as a 3 are gone with the rest.
+  assert.strictEqual(inks.length, 2, `two inks, floor and grid (${JSON.stringify(counts)})`);
+  const [floor, grid] = inks;
+  assert.ok(q.luma(grid) < q.luma(floor), 'the grid is the darker ink');
+  // Every grid pixel lies on a line that crosses the whole court: a column dark
+  // top to bottom or a row dark side to side. A penalty box, an arc, the centre
+  // circle, a goal box or the pitch's double border would each leave a dark
+  // pixel on neither.
+  const fullCol = [], fullRow = [];
+  for (let x = 0; x < court.width; x++) {
+    let all = true;
+    for (let y = 0; y < court.height && all; y++) all = ink(x, y) === grid;
+    if (all) fullCol.push(x);
   }
-  // Inside the pitch the halfway column keeps only the pixels where another line crosses it.
-  const { x, y0, y1 } = q.HALFWAY;
-  let run = 0, longest = 0;
-  for (let y = y0; y <= y1; y++) {
-    run = ink(x, y) === floor || ink(x, y) === '#787878' ? 0 : run + 1;
-    longest = Math.max(longest, run);
+  for (let y = 0; y < court.height; y++) {
+    let all = true;
+    for (let x = 0; x < court.width && all; x++) all = ink(x, y) === grid;
+    if (all) fullRow.push(y);
   }
-  assert.ok(longest <= 4, `the pitch's halfway line is gone (longest dark run down column ${x}: ${longest})`);
+  for (let y = 0; y < court.height; y++) for (let x = 0; x < court.width; x++) {
+    if (ink(x, y) === grid) assert.ok(fullCol.includes(x) || fullRow.includes(y), `court pixel ${x},${y} is a mark off the tile grid`);
+  }
+  // The grid is regular, about 22 court pixels each way, and leaves the net's column clear.
+  const gaps = (a) => a.slice(1).map((v, i) => v - a[i]);
+  assert.ok(fullCol.length >= 6 && fullRow.length >= 5, `a grid both ways (${fullCol} / ${fullRow})`);
+  for (const g of gaps(fullRow)) assert.ok(g >= 21 && g <= 23, `rows ${fullRow} are one tile apart`);
+  for (const g of gaps(fullCol)) assert.ok((g >= 21 && g <= 23) || (g >= 43 && g <= 45), `columns ${fullCol} are one tile apart, two across the net`);
+  for (const x of fullCol) assert.ok(Math.abs(x - 99.5) > 3, `no grid column under the net (column ${x}) to read as a halfway line`);
+});
+
+test('the tennis lines: two baselines, doubles and singles sidelines, service lines and the centre service line, in one grey no brighter than the ball', async () => {
+  const q = await quantizer();
+  const look = R.eraLook(2);
+  const g = midRally();
+  const calls = frame(g);
+  const lineInk = look.courtLine;
+  assert.strictEqual(lineInk, look.nesPalette[0x10], 'the lines are NES $10');
+  assert.ok(q.luma(lineInk) < q.luma(look.nesPalette[0x30]), 'darker than the ball\'s $30 core');
+  const lines = look.tennisLines();
+  const drawn = calls.filter((c) => c[0] === lineInk);
+  for (const r of lines) assert.ok(drawn.some((c) => c[1] === r[0] && c[2] === r[1] && c[3] === r[2] && c[4] === r[3]), `line ${r} is drawn`);
+  // Above the court, under everything else: straight after the court's picture.
+  const at = calls.findIndex((c) => c[0] === 'image:court');
+  assert.deepStrictEqual(calls.slice(at + 1, at + 1 + lines.length).map((c) => c.slice(1)), lines.map((r) => r.slice()),
+    'the lines go down right after the court, before the border, the net, the crowd and the band');
+  const vertical = lines.filter((r) => r[3] > r[2]), horizontal = lines.filter((r) => r[2] > r[3]);
+  const xs = [...new Set(vertical.map((r) => r[0]))].sort((a, b) => a - b);
+  // Baselines outside both service lines, just in front of the paddles, which stand behind them.
+  assert.strictEqual(xs.length, 4, `two baselines and two service lines (${xs})`);
+  assert.ok(xs[0] > g.left.x + g.left.w && xs[3] + vertical[0][2] < g.right.x, 'each baseline in front of its paddle');
+  assert.ok(xs[1] < 400 && xs[2] > 400, 'a service line each side of the net');
+  // Mirror-true about the net.
+  for (const r of lines) {
+    const mx = 800 - r[0] - r[2];
+    assert.ok(lines.some((o) => Math.abs(o[0] - mx) < 1e-9 && o[1] === r[1] && Math.abs(o[2] - r[2]) < 1e-9), `line ${r} has its mirror across the net`);
+  }
+  // Doubles sidelines along the top and bottom walls, below the crowd; singles inside them.
+  const ys = [...new Set(horizontal.filter((r) => r[2] > 400).map((r) => r[1]))].sort((a, b) => a - b);
+  assert.strictEqual(ys.length, 4, `doubles and singles sidelines (${ys})`);
+  assert.ok(ys[0] >= 84 && ys[3] < 596, 'between the crowd and the bottom wall');
+  // The centre service line runs from each service line to the net, halfway between the singles lines.
+  const centre = horizontal.filter((r) => r[2] < 400 && r[2] > 100);
+  assert.strictEqual(centre.length, 2, 'a centre service line each side');
+  for (const r of centre) assert.ok(Math.abs(r[1] - (ys[1] + ys[2]) / 2) < 5, 'halfway between the singles sidelines');
 });
 
 test('with the art decoded, the court and the ball are one drawImage each: court first, ball exactly on its box and last', () => {

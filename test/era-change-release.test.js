@@ -180,7 +180,10 @@ test('a reverb is built once per arrangement, not at every change into it', () =
   for (let e = 0; e <= 10; e++) walk.push(e);
   for (let e = 9; e >= 0; e--) walk.push(e);
   for (let pass = 0; pass < 2; pass++) for (const e of walk) playRung(bench, sound, music, e, true);
+  // An arrangement's own reverb, and (item 1241) its era's period hall: each is one impulse.
   const reverbs = new Set(PongMusic.ARRANGEMENTS.filter((a) => a && a.effects && a.effects.reverb).map((a) => a.effects.reverb));
-  assert.ok(buffers <= reverbs.size + 1,
-    `${buffers} buffers made over ${walk.length * 2} changes; ${reverbs.size} reverbs (and the noise) exist`);
+  const halls = new Set(PongMusic.ARRANGEMENTS.filter((a) => a && a.chain && a.chain.hall).map((a) => a.chain.hall));
+  assert.ok(halls.size > 0, 'some era has a period hall (item 1241), so this counts it');
+  assert.ok(buffers <= reverbs.size + halls.size + 1,
+    `${buffers} buffers made over ${walk.length * 2} changes; ${reverbs.size} reverbs, ${halls.size} period halls (and the noise) exist`);
 });

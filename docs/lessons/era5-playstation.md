@@ -100,3 +100,61 @@ Look file: [src/eras/era5-playstation.js](../../src/eras/era5-playstation.js). C
 4. Delete the other era files, `src/display-crt.js`, `src/erachange.js`, `src/signboards.js`,
    `src/match.js`, and `advanceEra`'s call.
 5. Judge speed on a machine with a GPU. The playtest's software Chrome reads slow for every 3D era.
+
+## LESSONS
+
+What item 1228 learned making this rung "a AAA game of 1994 that happens to be Pong" (docs/ART.md,
+era 5): *Tekken* and *Toshinden* on a *Ridge Racer* night. Frames of the result, off the real page:
+[a rally](../shots/item-1228/rally.png), [a point](../shots/item-1228/point.png),
+[match point](../shots/item-1228/final-round.png).
+
+**What sold the flagship look**
+
+- **The fight HUD did more than any single effect.** Two long yellow health bars from the score
+  outward, a tenth gone for every point the other side has taken, `P1` and `CPU` under them, a red
+  damage chunk that shrinks over 0.4 s where the bar just drained, `POINT` in yellow with a red drop
+  shadow for 0.8 s, and `FINAL ROUND` held at match point. It turns the frame from "a tilted table"
+  into "a 1995 fighting game". All of it is the block font and `fillRect` into the same 320 x 240
+  buffer as the table, so it is exactly as chunky.
+- **A city over the far rail.** Ten flat-shaded boxes (a dark front, a lit roof, a darker side
+  facing the centre) with 24 windows in accent yellow at 0.5 that switch one at a time every 0.7 s,
+  and two accent-blue searchlight beams at 0.18 sweeping +-25 degrees on a 5 s period. Drawn through
+  the same snapping, wobbling camera as the table, so the skyline pops between chunks with it. At
+  match point both beams swing down onto the table's centre line and stop.
+- Everything new is drawn in code: no generation was spent on the arena or the HUD, and the bible's
+  `era5-windows` and `era5-hud-text` images were not needed.
+
+**What did not work**
+
+- **Flat sprites read as sprites on a 3D table, and Tim ruled them out** (23:47 EDT 2026-09-10:
+  *"if you are trying to do sprites in the 3d eras uh...that is not gonna look AAA here dude"*). A
+  pixel fighter standing on a perspective table is a cardboard cut-out: it does not foreshorten,
+  does not take the table's light and does not wobble with the vertices. The two fighters at the
+  paddles are a stand-in until this era's polygon-model card (item 1248's renderer) replaces them.
+- **pixflux does not draw to a grid.** Asked for a 3 x 6 sheet of 20 x 45 frames, it drew about
+  thirty red fighters of 13-17 x 23 pixels in ten loose rows (some black-haired, some blond) and
+  fifteen blue ones in two uneven columns. `assets/pixellab/era5-fighters-cut.mjs` finds each figure
+  and packs it one to a frame, which is how the stand-in cost no third generation.
+- **The bible's skyline was out of shot.** It asked for boxes 60 to 200 units tall at y -60 to -120.
+  Under this camera only the top 100 screen units lie behind the far wall, and a 200-unit roof at
+  y -90 projects to screen y -69, off the top of the frame. The city is 30 to 90 tall at y -20 to
+  -50 here, and the searchlights rise from street level behind their buildings so there is enough
+  beam to see. **Measure a backdrop with `T.project` before you size it.**
+- **A killed run lost a manifest entry.** The first attempt was ended by the account's usage limit
+  after it wrote the left fighter's image but before it wrote that image's manifest entry. The entry
+  was rebuilt from the right-hand one and is marked so.
+- **Nothing cost frame time.** The arena, the HUD and the fighters together read the same as
+  master, back to back on the same machine, in the playtest's software Chrome: 23.4 and 22.7 ms
+  against 22.5 ms, each the mean of four one-second readings
+  (`node docs/measure/item1228/era5ab.mjs`, results beside it). Both trees split the same way, two
+  legs at 16.7 ms and two near 29 ms, so that split is the page's or the machine's, not the dressing.
+
+**What a one-era PlayStation game would copy**
+
+- The fight HUD as it is (`hud`, `barFractions`, `pointMoment`, `chunkOf`, `hudCall` in the era
+  file): the damage chunk and the round call are the cheapest "this is 1995" there is.
+- The skyline recipe: a seeded row of boxes, three flat faces each, windows switched by a
+  staggered counter so exactly one flips per beat, beams as single translucent triangles. All of it
+  goes into the low-resolution buffer, never over it.
+- Real polygon fighters, not sprites. Keep the two concepts: the left player in a red gi with a
+  black belt, the right in a blue sleeveless top and grey trousers.
