@@ -931,6 +931,218 @@
         "shading": "medium shading",
         "detail": "low detail"
       }
+    },
+    {
+      "name": "era9-armour-left",
+      "file": "era9-armour-left.png",
+      "prompt": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90101,
+      "date": "2026-09-11T03:34:40.245Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 13.3,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 24206,
+      "sha256": "0a43bff00e2f8d378bd525b50c389b12383739a090cd19ed0583d3ea2c3f491a",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 90101,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      }
+    },
+    {
+      "name": "era9-armour-right",
+      "file": "era9-armour-right.png",
+      "prompt": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one tall steel cyborg robot seen from the side facing right, polished steel armour plates, a single glowing red eye slit in the head, embossed metal panels, holding a glowing energy shield in the right hand. row 1 idle stance two frames; row 2 strafing step leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, middle frame widest; row 5 hit recoil rocked back one frame; row 6 fist raised in victory two frames. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90102,
+      "date": "2026-09-11T03:34:58.212Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 17.2,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 20502,
+      "sha256": "fca712ffd816924ffbdedf18f6160bde38d43642c3cb157ac6b2f1c40141f289",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one tall steel cyborg robot seen from the side facing right, polished steel armour plates, a single glowing red eye slit in the head, embossed metal panels, holding a glowing energy shield in the right hand. row 1 idle stance two frames; row 2 strafing step leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, middle frame widest; row 5 hit recoil rocked back one frame; row 6 fist raised in victory two frames. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 90102,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      }
+    },
+    {
+      "name": "era9-hangar",
+      "file": "era9-hangar.png",
+      "prompt": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+      "size": {
+        "width": 400,
+        "height": 80
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90103,
+      "date": "2026-09-11T03:35:13.605Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 5,
+      "seconds": 14.7,
+      "pixels": {
+        "width": 400,
+        "height": 80
+      },
+      "bytes": 40185,
+      "sha256": "875de8cc475ef3dae1d4b7a8b514c311a2c39a0281353cd9e2c05dbf9f90052c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+        "image_size": {
+          "width": 400,
+          "height": 80
+        },
+        "seed": 90103,
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "era9-beacon",
+      "file": "era9-beacon.png",
+      "prompt": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90104,
+      "date": "2026-09-11T03:35:29.965Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 15.7,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 1626,
+      "sha256": "d9dbd34ac01c9bc6d99ea849173768ea0e01c0841eb34f10fd201b5c9ba5b040",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 90104,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "era9-armour-right-row",
+      "file": "era9-armour-right-row.png",
+      "prompt": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 54
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90105,
+      "date": "2026-09-11T03:37:06.596Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 12,
+      "pixels": {
+        "width": 72,
+        "height": 54
+      },
+      "bytes": 2947,
+      "sha256": "59e6756b9f4726c4974ba8c5c6ead8b44b81ffa6238d3700a34f8403a710f98c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 54
+        },
+        "seed": 90105,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      }
     }
   ]
 }
