@@ -80,10 +80,18 @@ test('tiles turn just ahead of the ring, nearest the miss first, and land as the
   const d = Math.hypot(cx - origin.x, cy - origin.y);
   assert.strictEqual(swap.flipPhase(...far, origin, d - swap.lead - swap.jitter - 1), 0, 'still flat ahead of the lead');
   assert.strictEqual(swap.flipPhase(...far, origin, d + swap.jitter + 1), 1, 'flat on the new era once the ring is there');
-  // Neighbours at the same distance do not all turn together: the scatter makes it one by one.
+  // The tiles in the band ahead of the ring are all at different points of their turn:
+  // the scatter makes it one by one, not a ring of identical tiles.
   const phases = new Set();
-  for (let row = 0; row < 15; row++) phases.add(swap.flipPhase(10, row, { x: 400, y: 300 }, 300).toFixed(3));
-  assert.ok(phases.size > 5, `${phases.size} different phases along one column`);
+  let band = 0;
+  for (let row = 0; row < 15; row++) {
+    for (let col = 0; col < 20; col++) {
+      const f = swap.flipPhase(col, row, origin, 300);
+      if (f > 0 && f < 1) { band += 1; phases.add(f.toFixed(3)); }
+    }
+  }
+  assert.ok(band > 20, `${band} tiles turning at once`);
+  assert.ok(phases.size > band * 0.8, `${phases.size} different phases among ${band} turning tiles`);
 });
 
 test('the picture rolls during the wipe and settles square as it ends', () => {
@@ -96,8 +104,12 @@ test('the change into era 2 blinks black for exactly one frame, then draws turni
   const g = atariGame();
   concede(g, 200);
   assert.strictEqual(g.era, 2);
-  const blackFill = (calls) => calls.some((c) => c[0] === '#000000' && c[1] === 0 && c[2] === 0 &&
-    c[3] === g.width && c[4] === g.height);
+  // The blink is the frame's LAST word: a whole-field black fill with nothing over it
+  // (the Atari frame's own black background is drawn first and covered).
+  const blackFill = (calls) => {
+    const c = calls[calls.length - 1];
+    return !!c && c[0] === '#000000' && c[1] === 0 && c[2] === 0 && c[3] === g.width && c[4] === g.height;
+  };
   assert.ok(blackFill(frame(g)), 'the first frame of the ring is the power-off blink');
   let blinks = 0;
   let turning = 0;
