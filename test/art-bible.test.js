@@ -170,3 +170,115 @@ for (let era = 1; era <= 10; era++) {
     assert.match(a, /drawn in code/i, `era ${era} says what is drawn in code instead`);
   });
 }
+
+/*
+ * Reference games (item 1286): the bible ends with the real games each era is
+ * built in the manner of, the add-one / change-one ladder as one list, and one
+ * entry per era with its picks, numbers and sources. The ten era cards that
+ * follow cite the section by its name, and each era's lessons page opens THE
+ * MACHINE with its line, so the ladder, the entries and the pages must agree.
+ */
+const LESSON_PAGES = {
+  1: 'era1-atari2600', 2: 'era2-nes', 3: 'era3-genesis', 4: 'era4-snes', 5: 'era5-playstation',
+  6: 'era6-n64', 7: 'era7-dreamcast', 8: 'era8-ps2', 9: 'era9-xbox', 10: 'era10-xbox360'
+};
+const squash = (s) => s.replace(/\s+/g, ' ').trim();
+
+/** The Reference games section: from its heading to the next level-2 heading, or the end. */
+function referenceSection() {
+  const at = ART.search(/^## Reference games$/m);
+  assert.ok(at >= 0, 'docs/ART.md has a "## Reference games" section');
+  const stop = ART.slice(at + 1).search(/^## /m);
+  return stop >= 0 ? ART.slice(at, at + 1 + stop) : ART.slice(at);
+}
+
+/** The ladder list: era -> { machine, games: [names], added, changed }. */
+function referenceLadder() {
+  const out = {};
+  for (const l of referenceSection().split(/\r?\n/)) {
+    const m = /^- \*\*Era (\d+)\*\*, (.+)$/.exec(l);
+    if (!m) continue;
+    const c = m[2].split(' | ').map((s) => s.trim());
+    assert.strictEqual(c.length, 4, `ladder row for era ${m[1]} has machine, reference, added and changed`);
+    const games = [...c[1].matchAll(/\*([^*]+)\*/g)].map((g) => g[1]);
+    out[Number(m[1])] = { machine: c[0], games, added: c[2], changed: c[3] };
+  }
+  return out;
+}
+
+/** The era entries: era -> the text under its "### Era N reference:" heading. */
+function referenceEntries() {
+  const out = {};
+  const parts = referenceSection().split(/^### /m).slice(1);
+  for (const p of parts) {
+    const m = /^Era (\d+) reference: /.exec(p);
+    assert.ok(m, `every entry heading in Reference games reads "Era N reference: ...", not "${p.split('\n')[0]}"`);
+    assert.ok(!(m[1] in out), `era ${m[1]} has one reference entry`);
+    out[Number(m[1])] = p;
+  }
+  return out;
+}
+
+test('the bible ends with Reference games, after the era 10 page', () => {
+  const at = ART.search(/^## Reference games$/m);
+  assert.ok(at >= 0, 'docs/ART.md has a "## Reference games" section');
+  assert.ok(at > ART.search(/^## Era 10: /m), 'Reference games comes after the era 10 page');
+  const intro = referenceSection().split(/^- \*\*Era 0\*\*/m)[0];
+  assert.match(intro, /in the manner of/, 'the intro says every era is built in the manner of its games');
+  assert.match(intro, /never copies/i, 'the intro says style, never copies');
+  assert.match(intro, /Era 0 is Pong itself/, 'the intro says era 0 is Pong itself');
+});
+
+test('the add-one / change-one ladder lists all eleven eras, each with its games, addition and change', () => {
+  const l = referenceLadder();
+  assert.deepStrictEqual(Object.keys(l).map(Number), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  for (let era = 1; era <= 10; era++) {
+    assert.ok(l[era].games.length >= 1 && l[era].games.length <= 2, `era ${era} is modelled on one or two games`);
+    assert.match(l[era].added, /^Added: \S/, `era ${era}'s ladder row names its addition`);
+    assert.match(l[era].changed, /^Changed: \S/, `era ${era}'s ladder row names its change`);
+  }
+  assert.match(l[0].changed, /^Changed: nothing\.$/, 'era 0 changes nothing: it is where the ladder starts');
+});
+
+test('Reference games has one entry for every era from 0 to 10, in order', () => {
+  const heads = [...referenceSection().matchAll(/^### Era (\d+) reference: /gm)].map((m) => Number(m[1]));
+  assert.deepStrictEqual(heads, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  assert.match(referenceEntries()[0], /Pong itself/, 'era 0\'s pick is Pong itself');
+});
+
+for (let era = 1; era <= 10; era++) {
+  test(`era ${era}'s reference entry carries its pick, addition, change, numbers, exclusions and sources`, () => {
+    const e = referenceEntries()[era];
+    const l = referenceLadder()[era];
+    for (const field of ['Pick', 'Why', 'Take', 'Not']) {
+      assert.match(e, new RegExp(`^- \\*\\*${field}:\\*\\* \\S`, 'm'), `era ${era}'s entry has a ${field}: line`);
+    }
+    const added = /^- \*\*Added:\*\* ([\s\S]+?)(?=^- \*\*)/m.exec(e);
+    const changed = /^- \*\*Changed:\*\* ([\s\S]+?)(?=^- \*\*)/m.exec(e);
+    assert.ok(added, `era ${era}'s entry has an Added: line`);
+    assert.ok(changed, `era ${era}'s entry has a Changed: line`);
+    assert.strictEqual(squash(added[1]).replace(/\.$/, ''), l.added.replace(/^Added: /, '').replace(/\.$/, ''),
+      `era ${era}'s Added: line says what its ladder row says`);
+    assert.strictEqual(squash(changed[1]).replace(/\.$/, ''), l.changed.replace(/^Changed: /, '').replace(/\.$/, ''),
+      `era ${era}'s Changed: line says what its ladder row says`);
+    const sources = e.slice(e.search(/^- \*\*Sources:\*\*/m));
+    assert.match(sources, /^\s+- https?:\/\/\S+$/m, `era ${era}'s entry lists at least one http source`);
+    for (const g of l.games) {
+      const bare = g.replace(/ \(.*\)$/, '');
+      assert.ok(squash(e).includes(bare), `era ${era}'s entry names ${bare}, its ladder reference`);
+    }
+  });
+
+  test(`era ${era}'s lessons page opens THE MACHINE with its reference games, addition and change`, () => {
+    const name = LESSON_PAGES[era];
+    const doc = fs.readFileSync(path.join(ROOT, 'docs', 'lessons', `${name}.md`), 'utf8');
+    const m = /^## THE MACHINE\r?\n\r?\n(- \*\*Reference games?\*\*[\s\S]*?)(?=\r?\n- |\r?\n\r?\n)/m.exec(doc);
+    assert.ok(m, `${name}.md's first line under THE MACHINE is its "- **Reference game(s)**" line`);
+    const line = squash(m[1]);
+    const l = referenceLadder()[era];
+    for (const g of l.games) assert.ok(line.includes(`*${g}*`), `${name}.md names ${g}`);
+    assert.ok(line.includes(l.added), `${name}.md carries the ladder's "${l.added}"`);
+    assert.ok(line.includes(l.changed), `${name}.md carries the ladder's "${l.changed}"`);
+    assert.ok(line.includes('../ART.md#reference-games'), `${name}.md links the bible's Reference games`);
+  });
+}
