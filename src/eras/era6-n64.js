@@ -79,13 +79,18 @@
     { x: -40, y: 150, pennant: PAL.toyBlue, out: -1 },
     { x: 840, y: 150, pennant: PAL.toyGreen, out: 1 }
   ];
-  var POLE = { height: 90, width: 3, pennant: { w: 30, h: 20 }, swing: 6, rate: 1.5 };
-  var BUTTERFLIES = { loop: 30, period: 8, wing: 4, flap: 14, depth: -60,
-                      at: [[190, -44, 0], [430, -58, 2.7], [630, -40, 5.3]] };
+  // fogged at their depth like the rails, but capped (as the paddles are) so the set dressing still
+  // reads: at y 150 the full fog is 0.9, and the first browser look showed bare lines and no cloth.
+  var POLE = { height: 90, width: 4, pennant: { w: 30, h: 20 }, swing: 6, rate: 1.5, fogCap: 0.45 };
+  // Over the pale wall the world ends in, drawn after it and fogged to 0.4: under it, at the hills'
+  // own depth, the first browser look lost them entirely.
+  var BUTTERFLIES = { loop: 30, period: 8, wing: 4, flap: 14, fog: 0.4,
+                      at: [[190, -74, 0], [430, -86, 2.7], [630, -70, 5.3]] };
   // The power meter: a round pie of 8 slices, one lit per rally hit, reset at
   // the serve (it reads state.rally). The bible puts it UNDER each score; this
   // camera's far edge is at y 102, so under the score (which ends at y 80) it
-  // would cross R8's line at 96. It sits beside each score, on its outer side.
+  // would cross R8's line at 96. It sits beside each score, on its inner side (the outer side of the
+  // right-hand score is where the computer's name is written).
   var METER = { r: 14, slices: 8, outline: 2, beside: 22, lit: PAL.toyYellow, unlit: PAL.toyBlue, unlitAlpha: 0.6 };
   // A point: 5 toy-yellow stars pop from the scorer's paddle and arc up and out.
   var STARS = { n: 5, size: 8, life: 0.6, speed: 230, gravity: 420, spread: 120 };
@@ -289,10 +294,12 @@
   /** The two flagpoles and their pennants, fogged at their depth; the tip waves. */
   function flagpoles(target, T, cam, t) {
     var P = POLE, w = 2 * Math.PI * P.rate;
+    var fog = Math.min(P.fogCap, T.fogAmount(POLES[0].y, FOG));
+    function fogged(ink) { return T.mix(ink, FOG.colour, fog); }
     for (var i = 0; i < POLES.length; i++) {
       var pole = POLES[i];
       var foot = T.project(cam, pole.x, pole.y, 0), top = T.project(cam, pole.x, pole.y, P.height);
-      target.strokeStyle = T.fogColour(PAL.toyYellow, pole.y, FOG);
+      target.strokeStyle = fogged(PAL.toyYellow);
       target.lineWidth = Math.max(1, P.width * top.scale);
       target.lineCap = 'round';
       target.beginPath();
@@ -300,7 +307,7 @@
       target.lineTo(top.x, top.y);
       target.stroke();
       // the knob on top
-      target.fillStyle = T.fogColour(T.shade(PAL.toyYellow, 0.3), pole.y, FOG);
+      target.fillStyle = fogged(T.shade(PAL.toyYellow, 0.3));
       target.beginPath();
       target.arc(top.x, top.y, Math.max(1, 2.5 * top.scale), 0, Math.PI * 2);
       target.fill();
@@ -312,7 +319,7 @@
                           P.height - 1 - P.pennant.h * 0.3);
       var tip = T.project(cam, pole.x + pole.out * P.pennant.w, pole.y + P.swing * wave,
                           P.height - 1 - P.pennant.h * 0.5 + 2 * Math.cos(t * w + i * 1.3));
-      target.fillStyle = T.fogColour(pole.pennant, pole.y, FOG);
+      target.fillStyle = fogged(pole.pennant);
       target.beginPath();
       target.moveTo(hi.x, hi.y);
       target.quadraticCurveTo(mid.x, mid.y, tip.x, tip.y);
@@ -320,7 +327,7 @@
       target.closePath();
       target.fill();
       // a lighter fold where the cloth turns toward the sun
-      target.fillStyle = T.fogColour(T.shade(pole.pennant, 0.3), pole.y, FOG);
+      target.fillStyle = fogged(T.shade(pole.pennant, 0.3));
       target.beginPath();
       target.moveTo(hi.x, hi.y);
       target.quadraticCurveTo(mid.x, mid.y, tip.x, tip.y);
@@ -333,7 +340,7 @@
   /** Three toy-yellow butterflies circling a 60-unit loop over the far hills every 8 s, fogged. */
   function butterflies(target, T, farY, t) {
     var B = BUTTERFLIES;
-    target.fillStyle = T.fogColour(PAL.toyYellow, B.depth, FOG);
+    target.fillStyle = T.mix(PAL.toyYellow, FOG.colour, B.fog);
     for (var i = 0; i < B.at.length; i++) {
       var a = 2 * Math.PI * t / B.period + B.at[i][2];
       var x = B.at[i][0] + B.loop * Math.cos(a), y = farY + B.at[i][1] + B.loop * 0.4 * Math.sin(a);
@@ -416,7 +423,6 @@
       target.fill();
       target.restore();
     }
-    butterflies(target, T, farY, state.time);
 
     // the world ends in a pale wall: fully fogged from d = 0.85, before the far rail
     var wall = target.createLinearGradient(0, farY - 60, 0, farY);
@@ -424,6 +430,7 @@
     wall.addColorStop(1, T.rgba(PAL.fog, FOG.max));
     target.fillStyle = wall;
     target.fillRect(0, farY - 60, W, 60);
+    butterflies(target, T, farY, state.time);
 
     // the ground beside the table, fogged along its depth
     var ground = target.createLinearGradient(0, farY, 0, nearY);
@@ -516,9 +523,9 @@
       }
       ctx.fillStyle = PAL.hudFill;
       P.drawText(ctx, text, at, HUD.top, HUD.cell, HUD.gap);
-      // the power meter, on the score's outer side (item 1230)
+      // the power meter, on the score's inner side (item 1230)
       var half = (text.length * 3 * HUD.cell + (text.length - 1) * HUD.gap) / 2;
-      powerMeter(ctx, at + (s ? 1 : -1) * (half + METER.beside), HUD.top + 2.5 * HUD.cell,
+      powerMeter(ctx, at - (s ? 1 : -1) * (half + METER.beside), HUD.top + 2.5 * HUD.cell,
                  state.rally || 0, isMatchPoint(state) ? state.time * MATCH.spin * 2 * Math.PI : 0);
     }
   }

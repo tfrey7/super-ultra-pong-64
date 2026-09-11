@@ -103,7 +103,7 @@
     // (capped at 0.35, as the era caps its paddles). Sheets derived by
     // assets/pixellab/era6-n64-sheets.py, embedded in src/textures3d.js and handed to the sprite
     // loader by src/eras/era6-n64.js.
-    6:  { skin: '#e8b890', body: '#283080', scale: 2, res: 3, round: true,
+    6:  { skin: '#e8b890', body: '#283080', scale: 2.6, res: 3, round: true,
           sheets: { left: 'era6-penguin', right: 'era6-frog' },
           frame: { w: 32, h: 44 }, hand: { x: 29, y: 28 }, anchor: { dx: 0, dy: 0, dz: 24 },
           fps: 6, smooth: true, fogCap: 0.35 },
