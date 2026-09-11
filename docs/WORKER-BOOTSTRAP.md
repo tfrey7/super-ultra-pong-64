@@ -108,13 +108,16 @@ the farthest corner from where the ball went out, and a check that once the ring
 canvas matches the new era drawn offscreen more closely than the old one -- or, when the two eras
 draw the very same frame (a `like: N` stand-in), matches the new era exactly.
 The changes alternate sides (item 1174): a change out of an even era (0 to 1, 2 to 3, ...) starts its ring at the left edge, a real miss past the player, and a change out of an odd era (1 to 2, 3 to 4, ...) starts it at the right edge, the player's own point put just past the computer's paddle -- and a check names the edge each ring came from.
+At every rung it also **times one second of ordinary play** on the page's own frame clock (item 1192), with the computer's paddle held on the ball so no point goes in mid-reading, and prints one check per era with its mean, p95 and max frame: an era whose mean is over 18.5 ms (the same line the ring check uses) FAILs, because the ring check alone lets an era that is already slow pass by comparing the ring with it.
 `--ladder` runs only that walk (about a minute for all eleven rungs); `--scoring` runs only the
 rally and the scoring check (about fifteen seconds a run); `--reference` also copies its eleven era
 frames and ten change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
 `index.html?era=N` (N is 0 to 10) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
 plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
-it cannot find a browser, and `--port <n>` if 9333 is busy; every launch gets a fresh Chrome profile
+it cannot find a browser, and `--port <n>` if 9333 is busy -- the playtest refuses a port that is
+already listening, in one line with exit code 2, and never drives a page it did not open (item 1215);
+every launch gets a fresh Chrome profile
 that is deleted when Chrome exits, so two playtests on two ports can run at once. Use it for any change to
 `src/render.js`, `src/input.js`, `src/main.js` or `index.html`; `node --test` alone is enough for a
 change confined to the rules.
@@ -213,7 +216,11 @@ his emulator — never touch either.**
   which is why the era-look loader and scenes live in `tools/eralooks.js`.
 - **The computer paddle is deliberately beatable** — it only chases once the ball heads its way,
   aims slightly off centre, and cannot match a really steep shot. If a change makes it perfect,
-  that is a regression in the game even when every test passes.
+  that is a regression in the game even when every test passes. Since item 1209 each era has its
+  own opponent in `src/opponents.js` (a row per rung: reaction, speed, aim, name, stepping,
+  reading ahead), and `test/opponents.test.js` holds every era between 30 and 65 percent of
+  tracking sessions scoring -- `node tools/beatability-sample.mjs --eras` prints the table. A test
+  that wants two eras to play identically (a look-only check) passes `cpuProfiles: false`.
 - **Fleet CI cannot run this repo yet** (item 1130). Every flourish card ran `node --test` by hand
   and said so in its note; do the same rather than waiting on a CI run that never starts.
 - **A flourish draws, and nothing else.** The hook is called from the renderer every frame of the
@@ -244,9 +251,23 @@ his emulator — never touch either.**
   in a `finally`. The playtest and every capture script under `docs/` already do. What it cannot
   cover is the script itself being killed outright (Task Manager, `taskkill /F`): nothing runs
   then, and that one folder stays.
+- **Two playtests on one `--port` used to drive each other's game** (item 1215). A Chrome that
+  cannot bind its debugging port starts anyway, with none, and the harness then attached to the
+  Chrome that held the number: on 2026-09-10 item 1181's run on 9341 spent a minute clicking item
+  1205's page and reported 16/21 checks that measured the wrong game. Since item 1215 the playtest
+  checks the port before it launches anything -- `playtest: port N is already in use ... pick another
+  with --port <n>`, exit 2 -- and after launch attaches only to its own checkout's `index.html`. On
+  that line, pick another port and run again; it is not a failed check. A capture script of your own
+  should do the same: `portTakenWhy(port)` and `pickOwnPage(targets, url)` in `tools/chrome.mjs`.
 - **Proof paths in a report must survive the landing.** The integrator deletes your worktree, so
   a picture cited at `G:/Claude Stuff/super-ultra-pong-64-<name>/...` is a dead link the moment the
   branch lands (item 1138). Cite the path the file will have in the main checkout.
+- **A debugging port another run's Chrome already holds hands you THAT run's page.** Item 1196
+  ran the full playtest on `--port 9347` while another worker was on it: the first checks read
+  a page already in play at 3-4 with its sound unlocked ("phase is playing"), and the DevTools
+  connection dropped (code 1006) when the other run finished -- 2 of 6, none of it the game.
+  The same command on a port nobody was using passed 44/44. A playtest that fails its opening
+  title-screen checks with a score already on the board is this; move to another `--port`.
 - **The ladder walk's "new era draws afterwards" check leaves out the name card's band.** It
   compares the live canvas with each era drawn offscreen, and the card covers the middle 180 rows
   of both until the serve; a look that draws something important only there would pass unseen.
@@ -280,6 +301,12 @@ his emulator — never touch either.**
   ladder walk's pixel comparison passed with era 3's pixellab court and ball on the canvas
   ("0 of 336000 pixels differ from era 3 drawn offscreen"). A page you open by hand off disk still
   taints its canvas; nothing in the game reads pixels back, so only the harness cares.
+  Item 1187's six 3D eras carry their textures as data: URIs (`src/textures3d.js`, written by
+  `assets/pixellab/tex3d-embed.mjs`) the way era 2 does, so those never taint even by hand.
+- **The playtest names a page exception by its own message now.** Until item 1187 a throw inside
+  an evaluated expression came back as the single word `Uncaught`; one climb on that card stopped
+  so while filming a change and could not be reproduced on the next two. The message and the page's
+  stack are printed in full since then, so a repeat says what it was.
 - **The pixellab balance lags the bill.** `node tools/pixellab.mjs` reads the subscription's
   generations left before and after a generation; on item 1177's test image the call was billed
   1 generation, the count read 9953 both times, and a `balance` run about two minutes later read
@@ -295,6 +322,14 @@ his emulator — never touch either.**
   worked example). `index.html?display=off` draws straight onto the page as before, and the
   playtest's pixel check reads the native frame through `PongDisplay.canvas()` and draws its
   comparisons through `PongDisplay.render()`.
+
+- **Six "holds full frame rate in ordinary play" FAILs, eras 5 to 10, are card 1216's, not yours**
+  (until 1216 lands). The playtest's Chrome runs `--disable-gpu`, so every canvas is drawn on the
+  CPU, and there the display layer's per-frame work puts the 3D eras at 18.8 to 26.3 ms a frame and
+  the Xbox 360 at 64.6 ms (item 1192, idle machine, master 1c8c0c3). With `?display=off` eras 5-9
+  hold 16.7 ms, and with the GPU allowed every era runs at 4.2 ms:
+  `node docs/measure/item1192/eraspeed.mjs` re-takes all four setups in about two minutes. A FAIL
+  on eras 0 to 4, or one far above those numbers, is new and is yours to look at.
 
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.

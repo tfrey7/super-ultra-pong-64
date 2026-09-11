@@ -159,6 +159,18 @@ An existing name is refused unless `--force`. Sizes are 16 to 400 a side with an
 result by name through `src/sprites.js`; it is loaded before the era files, so `root.PongSprites`
 is always there.
 
+**The 3D eras' textures** (item 1187) are five pixellab tiles, `assets/pixellab/tex3d-*.png`: a
+wood-grained court, a steel tread-plate court, paddle rubber, a ball skin and a riveted rail trim.
+`node assets/pixellab/tex3d-embed.mjs` writes them into `src/textures3d.js` as data: URIs, which
+keeps the canvas of a page opened off disk readable, the way era 2 embeds its art. The shared table draws
+them: an era hands `texture: { name, alpha, blend, period, strip, fade, smooth }` to `table()` for the
+court (`trim:` for the rails), and to `box()` and `ball()` for the paddles and the ball. The texture
+is laid **over** what the era painted, through a blend mode, so each era's palette and treatment
+stay in charge. The court is cut into horizontal screen strips, each an affine copy of one band of
+the flat texture (the PlayStation's own trick), built once per camera and canvas size and then
+drawn as one image a frame. Headless, or before a tile decodes, nothing is drawn and the era's plain
+surface stands.
+
 `step` takes a **delta time in seconds** and never assumes 60fps; long frames are
 cut into substeps so a fast ball cannot pass through a paddle. Randomness goes
 through `state.rng`, so a test can pin it down.

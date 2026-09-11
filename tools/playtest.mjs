@@ -21,7 +21,7 @@ import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { launchChrome } from './chrome.mjs';
+import { launchChrome, portTakenWhy, portTakenLine, pickOwnPage } from './chrome.mjs';
 import { CdpConnection, DroppedConnection } from './cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -51,7 +51,8 @@ const ERA = arg('era', '');
 // --no-audio takes AudioContext away from the page before it loads, the way a
 // browser with no audio device would, and checks the game still plays silently.
 const NO_AUDIO = process.argv.includes('--no-audio');
-// --ladder runs only the walk up the era ladder (section 8), about 30 seconds.
+// --ladder runs only the walk up the era ladder (section 8), about a minute: a
+// frame and a second of timed ordinary play at every rung, and every era change.
 const LADDER_ONLY = process.argv.includes('--ladder');
 // --scoring runs only the rally and the scoring check (section 6), about ten
 // seconds -- the quick way to ask "can the player still score?" many times.
@@ -79,7 +80,12 @@ class Session extends CdpConnection {
     const r = await this.send('Runtime.evaluate', {
       expression, returnByValue: true, awaitPromise: true
     });
-    if (r.exceptionDetails) throw new Error(r.exceptionDetails.text);
+    // The exception's own description carries the message and the page's stack;
+    // the bare text is only ever "Uncaught" (item 1187 lost a climb to that).
+    if (r.exceptionDetails) {
+      const e = r.exceptionDetails;
+      throw new Error((e.exception && e.exception.description) || e.text);
+    }
     return r.result.value;
   }
   mouseTo(x, y) {
@@ -110,13 +116,24 @@ class Session extends CdpConnection {
   }
 }
 
-async function targetUrl() {
+/** The port's endpoint is not our Chrome's: stop before touching anything on it (item 1215). */
+class ForeignPage extends Error {}
+
+// Attach only to the page this checkout asked for. The port was free a moment ago
+// (main() checks), but another worker's Chrome can still take it in between, and
+// then our Chrome runs with no port at all while the endpoint answers with theirs.
+async function targetUrl(asked) {
   for (let i = 0; i < 60; i++) {
+    let list = null;
     try {
-      const list = await fetch(`http://127.0.0.1:${PORT}/json/list`).then((r) => r.json());
-      const page = list.find((t) => t.type === 'page' && t.webSocketDebuggerUrl);
-      if (page) return page.webSocketDebuggerUrl;
+      list = await fetch(`http://127.0.0.1:${PORT}/json/list`).then((r) => r.json());
     } catch { /* chrome is still coming up */ }
+    const { own, foreign } = pickOwnPage(list, asked);
+    if (own) return own.webSocketDebuggerUrl;
+    if (foreign) {
+      throw new ForeignPage(`playtest: port ${PORT} is serving a page that is not this checkout's ` +
+        `(${foreign.url}), so another Chrome holds it; pick another with --port <n> -- nothing on it was touched`);
+    }
     await sleep(250);
   }
   throw new Error('Chrome never opened a debuggable page');
@@ -148,6 +165,40 @@ const geometry = (s) => s.eval(`(() => {
   const b = document.getElementById('field').getBoundingClientRect();
   return { top: b.top, left: b.left, width: b.width, height: b.height };
 })()`);
+
+// ------------------------------------------------------------- frame timing
+// Full frame rate is a 60 Hz frame, 16.7 ms, with a little room for the timer's
+// jitter: an era, or a ring, whose mean frame is longer than this is not keeping
+// up. One line for both checks, so they can never disagree about what "full" is.
+const FULL_RATE_MS = 18.5;
+/** Mean, p95 and max of a list of frame intervals, in ms. */
+function intervalStats(d) {
+  const sorted = d.slice().sort((a, b) => a - b);
+  const total = sorted.reduce((a, b) => a + b, 0);
+  return { frames: sorted.length, total, mean: total / Math.max(1, sorted.length),
+    p95: sorted[Math.floor(sorted.length * 0.95)] || 0, max: sorted[sorted.length - 1] || 0 };
+}
+const fmtMs = (v) => v.toFixed(1) + ' ms';
+
+/**
+ * Time ordinary play at one era on the page's own requestAnimationFrame clock:
+ * the gap between every two frames that are both ordinary play at `era` -- the
+ * game playing, the serve over, no era change ringing -- until those gaps add up
+ * to `ms`, or three times that has passed. A frame that is not ordinary (a point
+ * went in and a ring started) breaks the chain rather than counting, so a slow
+ * ring can never be read as a slow era, nor a fast one hide it (item 1192).
+ */
+const ordinaryPlayTiming = (s, era, ms) => s.eval(`new Promise((done) => {
+  const d = []; let last = null, kept = 0; const t0 = performance.now();
+  function tick(now) {
+    const g = window.__pong, m = window.PongRender.eraChangeMoment(g);
+    const ordinary = g.phase === 'playing' && g.era === ${era} && g.serveDelay <= 0 && !(m && m.wiping);
+    if (ordinary && last !== null) { d.push(now - last); kept += now - last; }
+    last = ordinary ? now : null;
+    if (kept < ${ms} && now - t0 < ${ms * 3}) requestAnimationFrame(tick); else done(d);
+  }
+  requestAnimationFrame(tick);
+})`);
 
 // ----------------------------------------------------------- the era ladder
 /** Play on for up to `ms`, the paddle aimed at aim(g), until done(g) says so. */
@@ -299,10 +350,29 @@ async function walkLadder(s, baseUrl) {
   const frames = [];
   const moves = [];
   const changes = [];
+  const speeds = [];
   for (let rung = 0; rung < eras.length; rung++) {
     // Wait out the serve pause -- the era change lives inside it -- then let
     // the ball get clear of the centre before the picture.
     await playUntil(s, geo, 4000, track, (g) => g.serveDelay <= 0);
+    // One second of ordinary play at this era, timed while the hand keeps
+    // returning the ball, so an era too slow to hold full frame rate is caught
+    // on its own and not only when its ring is slower still (item 1192).
+    // The computer's paddle is held on the ball meanwhile: a slow era is exactly
+    // where the computer misses, and a point inside the reading would move the
+    // machine up a rung the walk has not photographed yet. Where a paddle stands
+    // changes nothing about what a frame costs to draw.
+    let timed = false;
+    const timing = ordinaryPlayTiming(s, rung, 1000).finally(() => { timed = true; });
+    const until = Date.now() + 3500;
+    while (!timed && Date.now() < until) {
+      const gt = await state(s);
+      await s.mouseTo(geo.left + geo.width / 2, geo.top + (track(gt) / gt.height) * geo.height);
+      await s.eval(`(() => { const g = window.__pong, r = g.right;
+        r.y = Math.max(0, Math.min(g.height - r.h, g.ball.y + 6 - r.h / 2)); return r.y; })()`);
+      await sleep(30);
+    }
+    speeds.push({ rung, ...intervalStats(await timing) });
     const g = await playUntil(s, geo, 500, track);
     const file = await s.shot('ladder-' + ERA_NAMES[rung], clip);
     frames.push({ rung, era: g.era, file });
@@ -328,7 +398,17 @@ async function walkLadder(s, baseUrl) {
   check('each era is on screen when its frame is taken',
     frames.every((f) => f.era === f.rung),
     frames.map((f) => `frame ${f.rung}: era ${f.era}`).join('; '));
-  const said = (m) => (m.scored ? `era ${m.from} -> ${m.to} at ${m.score}` : 'no point within 15 s');
+  // One line per era: its ordinary-play frame time, and a FAIL over the line.
+  // The ring check further down compares a ring against the era it left, which
+  // an era already too slow passes by being slow; this one asks each era alone.
+  for (const f of speeds) {
+    check(`era ${f.rung}, the ${eras[f.rung]}, holds full frame rate in ordinary play`,
+      f.total >= 900 && f.mean <= FULL_RATE_MS,
+      `${f.frames} frames over ${(f.total / 1000).toFixed(2)} s: mean ${fmtMs(f.mean)}, ` +
+      `p95 ${fmtMs(f.p95)}, max ${fmtMs(f.max)} (line: mean ${FULL_RATE_MS} ms)` +
+      (f.total < 900 ? '; under a second of ordinary play was seen at this era' : ''));
+  }
+  const said =(m) => (m.scored ? `era ${m.from} -> ${m.to} at ${m.score}` : 'no point within 15 s');
   for (let i = 0; i < eras.length - 1; i++) {
     const m = moves[i];
     check(`point ${i + 1} moves the machine up one era, to the ${eras[i + 1]}`,
@@ -379,6 +459,15 @@ function summarise(shots) {
 }
 
 async function main() {
+  // Refuse a port that is already listening, before Chrome is even started: a
+  // Chrome that cannot bind it runs on without one, and the endpoint on that
+  // number belongs to whoever holds it (item 1215).
+  const taken = await portTakenWhy(PORT);
+  if (taken) {
+    console.error(portTakenLine(PORT, taken));
+    process.exitCode = 2;
+    return;
+  }
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
   const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') +
     // ?era=N alone opens straight into play (item 1207); title=on keeps the
@@ -405,7 +494,7 @@ async function main() {
 
   let ws;
   try {
-    ws = new WebSocket(await targetUrl());
+    ws = new WebSocket(await targetUrl(url));
     await new Promise((res, rej) => {
       ws.addEventListener('open', res);
       ws.addEventListener('error', rej);
@@ -610,11 +699,8 @@ async function main() {
     const frameStats = (stamps) => {
       const d = [];
       for (let i = 1; i < stamps.length; i++) d.push(stamps[i] - stamps[i - 1]);
-      d.sort((a, b) => a - b);
-      const mean = d.reduce((a, b) => a + b, 0) / Math.max(1, d.length);
-      return { frames: d.length, mean, p95: d[Math.floor(d.length * 0.95)] || 0, max: d[d.length - 1] || 0 };
+      return intervalStats(d);
     };
-    const fmtMs = (v) => v.toFixed(1) + ' ms';
 
     await s.mouseTo(midX, toClientY(540));
     const baseline = frameStats((await frameTiming(1000)).stamps);
@@ -632,7 +718,7 @@ async function main() {
     const travel = ringYs.length ? Math.max(...ringYs) - Math.min(...ringYs) : 0;
     const toEra = await s.eval('window.__pong.era');
     check('an era change plays its ring at full frame rate',
-      during.frames >= 40 && during.mean <= Math.max(baseline.mean * 1.25, 18.5),
+      during.frames >= 40 && during.mean <= Math.max(baseline.mean * 1.25, FULL_RATE_MS),
       `era ${fromEra} to ${toEra}: ${during.frames} ring frames, mean ${fmtMs(during.mean)}, ` +
       `p95 ${fmtMs(during.p95)}, max ${fmtMs(during.max)}; ordinary play just before: ` +
       `mean ${fmtMs(baseline.mean)}, p95 ${fmtMs(baseline.p95)}, max ${fmtMs(baseline.max)}`);
@@ -663,6 +749,12 @@ async function main() {
     summarise([titleShot, firstFrameShot,
       ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots]);
   } catch (e) {
+    if (e instanceof ForeignPage) {
+      // Not a failed check: no check ran. One line, and a non-zero exit.
+      console.error(e.message);
+      process.exitCode = 2;
+      return;
+    }
     // A run that stops part way is a FAIL with its summary, never a quiet exit:
     // Chrome's connection dropping (tools/cdp.mjs) is the case this was built for
     // (item 1182). The finally below still closes Chrome and deletes its profile.

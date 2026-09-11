@@ -317,7 +317,7 @@ test('era 8 plays exactly like era 1: drawing it every frame changes nothing abo
   fx().reset();
   const seeded = () => { let s = 7; return () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; };
   const play = (era, drawEachFrame) => {
-    const g = Pong.createGame({ rng: seeded(), phase: 'playing', era, rules: { eraChangePause: 0 } });
+    const g = Pong.createGame({ rng: seeded(), phase: 'playing', era, rules: { eraChangePause: 0, cpuProfiles: false } });
     const trail = [];
     let hits = 0;
     // The run climbs past era 8 into rungs other cards build (item 1186: the Xbox's

@@ -1,0 +1,325 @@
+{
+ "label": "scratch",
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1164",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "when": "2026-09-11T00:51:09.917Z",
+ "results": [
+  {
+   "run": 1,
+   "leg": "era 4 flourish on",
+   "port": 9461,
+   "baseline": {
+    "frames": 191,
+    "meanMs": 7.44,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 629.1
+   },
+   "baselineLong": [
+    {
+     "ms": 629.1,
+     "sinceLoadMs": 3279,
+     "busyBefore": 632.2,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 0.2
+     }
+    }
+   ],
+   "ring": {
+    "frames": 346,
+    "meanMs": 4.55,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 120.9
+   },
+   "longFrames": [
+    {
+     "ms": 120.9,
+     "sinceLoadMs": 3929,
+     "rawBefore": 0.005533333333333464,
+     "rawAfter": 0.03886666666666668,
+     "busyBefore": 2.3,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.6
+     },
+     "busyAfter": 3.1,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.4
+     }
+    },
+    {
+     "ms": 20.8,
+     "sinceLoadMs": 4154,
+     "rawBefore": 0.10833333333333428,
+     "rawAfter": 0.1222000000000006,
+     "busyBefore": 2.1,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.6
+     },
+     "busyAfter": 2.7,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 2.1
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 1,
+   "leg": "plain ring",
+   "port": 9462,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.2,
+    "maxMs": 4.3
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 350,
+    "meanMs": 4.49,
+    "medianMs": 4.2,
+    "p95Ms": 4.2,
+    "maxMs": 116.6
+   },
+   "longFrames": [
+    {
+     "ms": 116.6,
+     "sinceLoadMs": 3493,
+     "rawBefore": 0.005599999999999976,
+     "rawAfter": 0.03893333333333319,
+     "busyBefore": 1.8,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.6
+     },
+     "busyAfter": 3.5,
+     "partsAfter": {
+      "step": 0.1,
+      "sound": 0,
+      "draw": 1.5
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 2,
+   "leg": "era 4 flourish on",
+   "port": 9463,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.7
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 346,
+    "meanMs": 4.56,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 125
+   },
+   "longFrames": [
+    {
+     "ms": 125,
+     "sinceLoadMs": 3496,
+     "rawBefore": 0.005533333333333168,
+     "rawAfter": 0.03886666666666638,
+     "busyBefore": 2.6,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.5
+     },
+     "busyAfter": 2.3,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.5
+     }
+    },
+    {
+     "ms": 20.9,
+     "sinceLoadMs": 3725,
+     "rawBefore": 0.10833333333333339,
+     "rawAfter": 0.12226666666666682,
+     "busyBefore": 2.3,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.5
+     },
+     "busyAfter": 2.2,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.4
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 2,
+   "leg": "plain ring",
+   "port": 9464,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 350,
+    "meanMs": 4.45,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 104.1
+   },
+   "longFrames": [
+    {
+     "ms": 104.1,
+     "sinceLoadMs": 3498,
+     "rawBefore": 0.005600000000000271,
+     "rawAfter": 0.038933333333333486,
+     "busyBefore": 2,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.5
+     },
+     "busyAfter": 3,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.3
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 3,
+   "leg": "era 4 flourish on",
+   "port": 9465,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 346,
+    "meanMs": 4.59,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 133.3
+   },
+   "longFrames": [
+    {
+     "ms": 133.3,
+     "sinceLoadMs": 3500,
+     "rawBefore": 0.005533333333333168,
+     "rawAfter": 0.03886666666666638,
+     "busyBefore": 3.1,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 2.3
+     },
+     "busyAfter": 4.5,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.7
+     }
+    },
+    {
+     "ms": 16.7,
+     "sinceLoadMs": 3738,
+     "rawBefore": 0.10833333333333368,
+     "rawAfter": 0.11946666666666712,
+     "busyBefore": 2.7,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.9
+     },
+     "busyAfter": 4.2,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.2
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 3,
+   "leg": "plain ring",
+   "port": 9466,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 350,
+    "meanMs": 4.49,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 116.7
+   },
+   "longFrames": [
+    {
+     "ms": 116.7,
+     "sinceLoadMs": 3495,
+     "rawBefore": 0.005599999999999976,
+     "rawAfter": 0.03893333333333319,
+     "busyBefore": 1.9,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.6
+     },
+     "busyAfter": 4.3,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.4
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  }
+ ]
+}

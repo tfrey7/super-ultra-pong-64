@@ -207,8 +207,10 @@
    */
   function draw(ctx, state, opts) {
     var look = eraLook(state.era);
-    if (typeof look.draw === 'function') return look.draw(ctx, state, opts, api);
-    drawBase(ctx, state, opts);
+    var out = typeof look.draw === 'function' ? look.draw(ctx, state, opts, api) : drawBase(ctx, state, opts);
+    // The opponent's name under its score, in the era's lettering (item 1209).
+    if (root.PongOpponents) root.PongOpponents.drawName(ctx, state, api, opts);
+    return out;
   }
 
   /**
