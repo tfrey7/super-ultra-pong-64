@@ -177,8 +177,13 @@ test('the sound ladder has a rung for every era the rules know', () => {
 test('a rung above the VOICES rows keeps its voice on its look, and one with no voice yet plays the top row', () => {
   const path = require('node:path');
   const { R } = require('../tools/eralooks.js').loadRenderer(path.join(__dirname, '..'));
-  assert.deepStrictEqual(waves(6, 'paddle'), waves(4, 'paddle'), 'a placeholder rung borrows the Super Nintendo');
-  assert.deepStrictEqual(PongSound.echoFor(6), PongSound.echoFor(4));
+  // A placeholder rung is `like: 5`, so it plays the voice of the look it borrows.
+  assert.deepStrictEqual(waves(6, 'paddle'), waves(5, 'paddle'), 'a placeholder rung borrows the look it is like');
+  assert.deepStrictEqual(PongSound.echoFor(6), PongSound.echoFor(5));
+  // A rung whose look has no voice at all plays the Super Nintendo's row and echo.
+  R.registerEra(Object.assign({}, R.eraLook(9), { era: 9, voice: undefined }));
+  assert.deepStrictEqual(waves(9, 'paddle'), waves(4, 'paddle'), 'a voiceless rung borrows the Super Nintendo');
+  assert.deepStrictEqual(PongSound.echoFor(9), PongSound.echoFor(4));
   const voice = { paddle: [{ wave: 'sine', freq: 659, dur: 0.1, gain: 0.2 }], effects: { echo: { time: 0.12, feedback: 0.25, mix: 0.2 } } };
   R.registerEra(Object.assign({}, R.eraLook(7), { era: 7, voice }));
   assert.deepStrictEqual(PongSound.voicesFor(7, 'paddle'), voice.paddle);
