@@ -33,7 +33,7 @@ const alive = (pid) => {
 
 function run(label, how, port) {
   const code = `import { launchChrome } from ${JSON.stringify(HELPER)};
-    const c = launchChrome(${JSON.stringify(CHROME)}, ['--headless=new', '--disable-gpu', '--mute-audio',
+    const c = await launchChrome(${JSON.stringify(CHROME)}, ['--headless=new', '--disable-gpu', '--mute-audio',
       '--remote-debugging-port=${port}', '--no-first-run', '--no-default-browser-check', 'about:blank'], { name: 'abort' });
     console.log(JSON.stringify({ profile: c.profile, pid: c.pid }));
     let up = false;
