@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Era signboards: the contact sheet</title>
+<!--
+  The five signboards side by side (item 1183), each drawn by the real
+  src/signboards.js over its own era's field, as the ring leaves them:
+  on the left at the page's full 800 x 600, on the right the same card
+  squeezed down to the machine's own screen and blown back up block for
+  block -- which is what "legible at its era's resolution" means.
+  Open off disk, or shoot it:
+    py -3.10 "G:/Claude Stuff/fleet-console/scripts/shot.py"
+       "file:///<repo>/tools/signboards-sheet.html" docs/shots/signboards/contact-sheet.png
+  ?t=0.6 draws them at another moment (the blinking words go off).
+-->
+<style>
+  body { margin: 0; padding: 16px; background: #15151c; color: #d8d8e0;
+         font: 13px/1.4 system-ui, sans-serif; }
+  h1 { font-size: 16px; margin: 0 0 12px; }
+  .row { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .row b { width: 170px; }
+  canvas { image-rendering: pixelated; border: 1px solid #333; background: #000; }
+</style>
+</head>
+<body>
+  <h1>Era signboards, 1972 to 1991: at full size, and at the machine's own resolution</h1>
+  <div id="sheet"></div>
+  <script src="../src/game.js"></script>
+  <script src="../src/sprites.js"></script>
+  <script src="../src/render.js"></script>
+  <script src="../src/table3d.js"></script>
+  <script src="../src/eras/era0-arcade.js"></script>
+  <script src="../src/eras/era1-atari2600.js"></script>
+  <script src="../src/eras/era2-nes.js"></script>
+  <script src="../src/eras/era3-genesis.js"></script>
+  <script src="../src/eras/era4-snes.js"></script>
+  <script src="../src/signboards.js"></script>
+  <script src="../src/erachange.js"></script>
+  <script>
+    (function () {
+      var R = window.PongRender, S = R.SIGNBOARD;
+      var q = /[?&]t=([0-9.]+)/.exec(location.search);
+      var t = q ? Number(q[1]) : 0.1;
+      var sheet = document.getElementById('sheet');
+      for (var era = 0; era <= 4; era++) {
+        var g = Pong.createGame({ rng: function () { return 0.3; }, phase: 'playing', era: era });
+        var full = document.createElement('canvas');
+        full.width = g.width; full.height = g.height;
+        var fx = full.getContext('2d');
+        R.draw(fx, g, {});
+        var k = R.drawSignboard(fx, g, { era: era, text: R.eraCardText(era), t: t }, R.eraCardStyle(era));
+        var r = k.rect, pad = 24;
+        var cx = Math.max(0, r.x - pad), cy = Math.max(0, r.y - pad);
+        var cw = Math.min(g.width - cx, r.w + 2 * pad), ch = Math.min(g.height - cy, r.h + 2 * pad);
+
+        var big = document.createElement('canvas');
+        big.width = cw; big.height = ch;
+        big.getContext('2d').drawImage(full, cx, cy, cw, ch, 0, 0, cw, ch);
+
+        // Down to the machine's own pixels, then back up block for block.
+        var res = S.resolution[era];
+        var sx = res.w / g.width, sy = res.h / g.height;
+        var tiny = document.createElement('canvas');
+        tiny.width = Math.max(1, Math.round(cw * sx)); tiny.height = Math.max(1, Math.round(ch * sy));
+        var tx = tiny.getContext('2d');
+        tx.imageSmoothingEnabled = true;
+        tx.drawImage(full, cx, cy, cw, ch, 0, 0, tiny.width, tiny.height);
+        var low = document.createElement('canvas');
+        low.width = cw; low.height = ch;
+        var lx = low.getContext('2d');
+        lx.imageSmoothingEnabled = false;
+        lx.drawImage(tiny, 0, 0, tiny.width, tiny.height, 0, 0, cw, ch);
+
+        var row = document.createElement('div');
+        row.className = 'row';
+        var label = document.createElement('b');
+        label.textContent = 'Era ' + era + ': ' + R.eraCardText(era) + '  (' + res.w + ' x ' + res.h + ')';
+        row.appendChild(label);
+        row.appendChild(big);
+        row.appendChild(low);
+        sheet.appendChild(row);
+      }
+    })();
+  </script>
+</body>
+</html>
