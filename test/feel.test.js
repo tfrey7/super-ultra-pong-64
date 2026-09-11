@@ -151,8 +151,15 @@ test('the title screen passes straight through: the attract rally and the blink 
   assert.ok(Math.abs(g.time - FRAME) < 1e-12);
 });
 
-test('match point: on the rung before the Xbox 360, a ball the keeper cannot reach slows to a third', () => {
-  const g = playing(9);
+/** Ten points in (10-0), so the next point is the eleventh: match point (item 1211). */
+function matchPoint(era) {
+  const g = playing(era);
+  g.score.left = 10;
+  return g;
+}
+
+test('match point: at ten points in, a ball the keeper cannot reach slows to a third', () => {
+  const g = matchPoint(9);
   assert.ok(Feel.isMatchPoint(g));
   assert.ok(!Feel.isMatchPoint(playing(8)));
   g.left.y = 0;                               // the player stands at the top
@@ -162,14 +169,14 @@ test('match point: on the rung before the Xbox 360, a ball the keeper cannot rea
   assert.ok(Feel.moment(g).slow, 'slow motion is on');
   assert.ok(Math.abs((x0 - g.ball.x) - 400 * FRAME / 3) < 1e-6, 'the ball moved a third as far');
   // Far from the line, or a ball the keeper stands in front of: full speed.
-  const h = playing(9);
+  const h = matchPoint(9);
   h.ball.x = 600; h.ball.y = 300; h.ball.vx = -400; h.ball.vy = 0;
   Feel.step(h, FRAME, hold);
   assert.strictEqual(Feel.moment(h).slow, false);
 });
 
 test('slow motion lasts about 0.8 s on screen and ends when the ball crosses', () => {
-  const g = playing(9);
+  const g = matchPoint(9);
   g.left.y = 0;
   g.ball.x = 300; g.ball.y = 500; g.ball.vx = -400; g.ball.vy = 0;
   let slowFrames = 0;

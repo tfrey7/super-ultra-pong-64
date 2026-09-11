@@ -27,7 +27,7 @@ import { writeFileSync, existsSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
@@ -59,8 +59,8 @@ const CATEGORIES = [
 
 async function leg(n) {
   const PORT = port++;
-  const chrome = launchChrome(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`,
-    '--mute-audio', '--no-first-run', '--window-size=1000,760', 'about:blank'], { name: 'item1203' });
+  const chrome = await launchChrome(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`,
+    '--mute-audio', '--no-first-run', '--window-size=1000,760', 'about:blank'], { name: 'item1203' }).catch(refusePortTaken);
   let ws;
   try {
     let wsUrl = null;
