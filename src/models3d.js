@@ -580,6 +580,7 @@
     MODES: MODES,
     DIR: DIR,
     SLAB_Z: SLAB_Z,
+    KEY: KEY,
     SWING_S: SWING_S,
     REACT_S: REACT_S,
     parse: parse,
