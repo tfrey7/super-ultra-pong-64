@@ -81,8 +81,9 @@ audio taken away, to prove the game still plays silently. Pass
 Last of all it **walks one match up the whole ladder**: a fresh machine on era
 0, then it lets a point through for each rung, checks that every point moved the
 machine up exactly one era, photographs each era in play once its change moment
-has cleared, and scores one more at the top to prove the ladder stops on the
-Super Nintendo. `--ladder` runs only that walk, in about half a minute:
+has cleared, films each of the ten era changes mid-ring, and scores one more at
+the top to prove the ladder stops on the Xbox 360. `--ladder` runs only that
+walk, in about a minute:
 
 ```bash
 node tools/playtest.mjs --ladder              # just the walk up the ladder
@@ -96,11 +97,11 @@ check passes every run -- the computer itself stays exactly as beatable as it
 was, and `node tools/beatability-sample.mjs` is how to measure that.
 
 Every run rewrites the screenshots it drops in `docs/shots/playtest/` —
-`ladder-era0-arcade.png` to `ladder-era4-snes.png` among them. Those are ignored
+`ladder-era0-arcade.png` to `ladder-era10-xbox360.png` among them. Those are ignored
 output, not source: the directory is gitignored, nobody needs to check them
 afterwards and there is nothing to restore, so a playtest leaves `git status`
-empty. The tracked reference frames are the five in `docs/shots/eras/`, one per
-era, plus the older `docs/shots/bootstrap/era-zero.png`. Only `--reference`
+empty. The tracked reference frames are the twenty-one in `docs/shots/eras/`, one per
+era and one per era change, plus the older `docs/shots/bootstrap/era-zero.png`. Only `--reference`
 writes to `docs/shots/eras/`: if you deliberately change how an era looks,
 re-take them that way and commit them on purpose, in their own commit.
 
