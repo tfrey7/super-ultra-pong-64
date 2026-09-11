@@ -49,6 +49,10 @@
  *   scale    field units per sheet pixel -- on the 3D eras, table units, so
  *            the figure then shrinks and grows with the table's depth
  *   fps      how fast idle/up/down/win cycle their frames
+ *   clip     { y0, y1 } (item 1249): both players are drawn only between these
+ *            two heights, in field units, across the whole width -- a
+ *            letterboxed era's picture between its bars, so a figure never
+ *            pokes into a bar. null (the default) clips nothing
  *   skin, body   the placeholder's colours; its shirt wears the paddle's ink
  *
  * A sheet is cut into its frames once, when it has loaded: each frame is a
@@ -87,6 +91,7 @@
     fps: 6,
     res: 1,             // placeholder sheet pixels per grid cell
     round: false,       // placeholder head drawn round (the 3D eras)
+    clip: null,         // { y0, y1 }: draw the players only inside this band (field units)
     skin: '#e0b090',
     body: '#303040'
   };
@@ -101,21 +106,62 @@
     3:  { sheets: { left: 'era3-p1', right: 'era3-p2' }, frame: { w: 20, h: 25 },
           hand: { x: 20, y: 13 }, scale: 3.2, fps: 10,
           skin: '#eeaa88', body: '#222266', res: 1 },
-    4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
+    // Super Nintendo (item 1227): two hover pilots, built from one pixellab pose
+    // each by assets/pixellab/era4-players-build.mjs. The glove is on the frame's
+    // right edge, so the figure stands wholly behind its paddle; at 1.2 a frame
+    // is 38 x 121 field units, the pad's back rim just past the wall. miss has
+    // two frames (the pad there and gone), so at fps 12 the conceding pad blinks.
+    4:  { skin: '#f8c8a0', body: '#384878', res: 2,
+          sheets: { left: 'era4-players-left', right: 'era4-players-right' },
+          frame: { w: 32, h: 101 }, hand: { x: 32, y: 41 }, scale: 1.2, fps: 12,
+          frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
-    6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
-    7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
+    // Nintendo 64 (item 1230, docs/ART.md Era 6): the penguin holds the player's paddle and the
+    // frog the computer's, chunky toy mascots drawn smoothed and fogged at their paddle's depth
+    // (capped at 0.35, as the era caps its paddles). Sheets derived by
+    // assets/pixellab/era6-n64-sheets.py, embedded in src/textures3d.js and handed to the sprite
+    // loader by src/eras/era6-n64.js. A STAND-IN: Tim ruled sprite players out for the 3D eras
+    // ("that is not gonna look AAA here dude"); polygon models of these two replace this block.
+    6:  { skin: '#e8b890', body: '#283080', scale: 2.6, res: 3, round: true,
+          sheets: { left: 'era6-penguin', right: 'era6-frog' },
+          frame: { w: 32, h: 44 }, hand: { x: 29, y: 28 }, anchor: { dx: 0, dy: 0, dz: 24 },
+          fps: 6, smooth: true, fogCap: 0.35 },
+    // Dreamcast (item 1231): two Jet Set Radio-manner skaters, cut from pixflux by
+    // assets/pixellab/era7-skater-cut.py; each figure about 68 px tall, so 1.3 table
+    // units a pixel stands it about 90 tall, the hand on the paddle box's top (dz 24).
+    // A STAND-IN: Tim ruled flat sprites out of the 3D eras (23:47 EDT 2026-09-10);
+    // this era's polygon-model card (item 1248's renderer) swaps these sheets out.
+    7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 1.3, res: 3, round: true,
+          sheets: { left: 'era7-skater-left-sheet', right: 'era7-skater-right-sheet' },
+          frame: { w: 44, h: 84 }, hand: { x: 44, y: 66 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 10 },
     // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
     // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
     // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
     // fps 3, not the bible's 8: the rig has one rate for idle, move and win,
-    // and at 8 a two-frame breath reads as a flicker.
+    // and at 8 a two-frame breath reads as a flicker. The players are clipped
+    // to the picture between the era's 52-pixel letterbox bars (item 1249).
     8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
           sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
           frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
-          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3 },
-    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
-    10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3, clip: { y0: 52, y1: 548 } },
+    // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
+    // cyborg, cut from pixellab by assets/pixellab/era9-derive.mjs; the hand on
+    // the shield at the paddle box's top (dz 24), 90 table units tall. A
+    // STAND-IN: Tim ruled sprite players out for the 3D eras (23:47 EDT,
+    // 2026-09-10); the polygon-model card swaps this block's sheets out.
+    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 1.667, res: 4, round: true,
+          sheets: { left: 'era9-armour-left', right: 'era9-armour-right' },
+          frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6 },
+    // Xbox 360 (item 1234, docs/ART.md era 10): two heavy soldiers, pixellab
+    // sheets reposed, graded, rimmed and grained offline by
+    // assets/pixellab/era10-derive.mjs at twice the bible's 32 x 66 (a 96 x 132
+    // frame holding a 48 x 66 figure cell), so the rig's unsmoothed draw of a
+    // pre-smoothed sheet reads HD. 0.68 table units a sheet pixel is the
+    // bible's 1.36 at that doubling: about 90 units tall on the table.
+    10: { skin: '#e2b294', body: '#2a2e36', res: 4, round: true,
+          sheets: { left: 'era10-soldier-left', right: 'era10-soldier-right' },
+          frame: { w: 96, h: 132 }, hand: { x: 84, y: 84 }, scale: 0.68,
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8 }
   };
 
   var FIRST_3D = 5;
@@ -367,17 +413,21 @@
    * A loaded pixellab sheet, cut into its frames: { image, rects } where
    * rects[beat][i] is that frame's source rectangle. Null until it has loaded
    * (the placeholder draws meanwhile), and null for good if it failed.
+   *
+   * Null too when the loader cannot make an image at all -- under node --test
+   * there is no Image, and the default loader's `new Image()` throws: that is
+   * "not loaded", and the placeholder draws (items 1225 and 1249 each found
+   * it, from eras 2 and 8). Nothing is remembered about that, so a loader installed later (a
+   * test's stand-in) is asked afresh on the next frame.
    */
   var cut = {};
   function sheetFrames(cfg, sprites) {
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
-    // Headless there is no Image to load into, and the loader throws: that is
-    // "not loaded", and the placeholder draws (item 1225, the first real sheet).
     var image;
     try { image = S.load(cfg.sheet); } catch (e) { return null; }
-    if (!S.ready(cfg.sheet)) return null;
+    if (!image || !S.ready(cfg.sheet)) return null;
     var rects = {};
     for (var row = 0; row < BEATS.length; row++) {
       var list = rects[BEATS[row]] = [];
@@ -392,6 +442,53 @@
   // -------------------------------------------------------------- drawing
   var enabled = !(root.location && /[?&]characters=off\b/.test(String(root.location.search || '')));
 
+  /**
+   * The fog over a 3D figure (item 1230): { colour, amount } -- the era look's
+   * own fog at its paddle's depth, capped at the block's `fogCap` the way the
+   * era caps its paddles -- or null when the block asks for none.
+   */
+  function fogOf(state, sideName, cfg, R, T) {
+    if (!cfg.is3d || !(cfg.fogCap > 0) || !T || typeof T.fogAmount !== 'function') return null;
+    var look = R && typeof R.eraLook === 'function' ? R.eraLook(cfg.era) : null;
+    var fog = look && look.fog;
+    if (!fog || !fog.colour) return null;
+    var p = state[sideName];
+    var amount = Math.min(cfg.fogCap, T.fogAmount(p.y + p.h, fog));
+    return amount > 0 ? { colour: fog.colour, amount: amount } : null;
+  }
+
+  var tints = {};   // frame size -> one offscreen canvas a fogged figure is drawn through
+
+  /** One frame of a sheet with the fog laid over the figure only ('source-atop' on its own copy). */
+  function drawFogged(ctx, image, s, box, fog, smooth) {
+    var key = s.w + 'x' + s.h;
+    var t = tints[key];
+    if (t === undefined) {
+      t = null;
+      if (hasDocument()) {
+        var canvas = document.createElement('canvas');
+        canvas.width = s.w; canvas.height = s.h;
+        var c = canvas.getContext && canvas.getContext('2d');
+        if (c) t = { canvas: canvas, ctx: c };
+      }
+      tints[key] = t;
+    }
+    if (!t) { ctx.drawImage(image, s.x, s.y, s.w, s.h, box.x, box.y, box.w, box.h); return; }
+    var c2 = t.ctx;
+    c2.globalCompositeOperation = 'source-over';
+    c2.globalAlpha = 1;
+    c2.clearRect(0, 0, s.w, s.h);
+    c2.drawImage(image, s.x, s.y, s.w, s.h, 0, 0, s.w, s.h);
+    c2.globalCompositeOperation = 'source-atop';
+    c2.globalAlpha = fog.amount;
+    c2.fillStyle = fog.colour;
+    c2.fillRect(0, 0, s.w, s.h);
+    c2.globalCompositeOperation = 'source-over';
+    c2.globalAlpha = 1;
+    ctx.imageSmoothingEnabled = !!smooth;
+    ctx.drawImage(t.canvas, 0, 0, s.w, s.h, box.x, box.y, box.w, box.h);
+  }
+
   /** One player, onto ctx, in its era's config. */
   function drawPlayer(ctx, state, sideName, cfg, mem, R, cam, T) {
     var p = state[sideName];
@@ -403,11 +500,13 @@
     ctx.translate(a.x, a.y);
     if (a.mirror < 0) ctx.scale(-1, 1);
     var smooth = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = !!cfg.smooth;   // a block may ask for its sheet smoothed (item 1230)
     var sheet = sheetFrames(cfg);
     if (sheet && sheet.rects[pose.beat] && sheet.rects[pose.beat][pose.frame]) {
       var s = sheet.rects[pose.beat][pose.frame];
-      ctx.drawImage(sheet.image, s.x, s.y, s.w, s.h, box.x, box.y, box.w, box.h);
+      var fog = fogOf(state, sideName, cfg, R, T);
+      if (fog) drawFogged(ctx, sheet.image, s, box, fog, cfg.smooth);
+      else ctx.drawImage(sheet.image, s.x, s.y, s.w, s.h, box.x, box.y, box.w, box.h);
     } else {
       var ink = R && typeof R.paddleInk === 'function' ? R.paddleInk(state, sideName) : null;
       var ph = placeholderSheet(cfg, ink);
@@ -448,8 +547,29 @@
     var order = state.left.y <= state.right.y ? ['left', 'right'] : ['right', 'left'];
     // Each side in its own config: they differ only in the sheet it wears.
     var sides = { left: cfg, right: configFor(era, 'right') };
-    for (var i = 0; i < order.length; i++) drawPlayer(ctx, state, order[i], sides[order[i]], mem, R, cam, T);
+    var band = clipBand(cfg.clip);
+    var clipped = band && typeof ctx.clip === 'function' && typeof ctx.rect === 'function' &&
+                  typeof ctx.beginPath === 'function';
+    if (clipped) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, band.y0, state.width || 800, band.y1 - band.y0);
+      ctx.clip();
+    }
+    try {
+      for (var i = 0; i < order.length; i++) drawPlayer(ctx, state, order[i], sides[order[i]], mem, R, cam, T);
+    } finally {
+      if (clipped) ctx.restore();
+    }
     return true;
+  }
+
+  /** An era's clip as { y0, y1 } with y0 above y1, or null for none (or one that makes no sense). */
+  function clipBand(clip) {
+    if (!clip) return null;
+    var y0 = Number(clip.y0), y1 = Number(clip.y1);
+    if (!isFinite(y0) || !isFinite(y1) || y1 <= y0) return null;
+    return { y0: y0, y1: y1 };
   }
 
   // Wrap the renderer's draw once, so every frame anything draws has the players.
@@ -483,6 +603,7 @@
     cameraFor: cameraFor,
     drawPose: drawPose,
     drawPlayers: drawPlayers,
+    clipBand: clipBand,
     install: install,
     get enabled() { return enabled; },
     set enabled(v) { enabled = !!v; }

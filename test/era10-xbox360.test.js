@@ -313,3 +313,41 @@ test('era 10 plays exactly like era 1: drawing it every frame changes nothing ab
   const [, , , , , , left, right] = one[one.length - 1];
   assert.ok(left + right >= 2, `the run crossed serves (score ${left}-${right})`);
 });
+
+test('item 1234: the plaza, the gamerpics and match point -- MATCH POINT over 100G - FINISH IT, the vignette tightened to 220', () => {
+  const saved = globalThis.Pong;
+  globalThis.Pong = Pong;
+  try {
+    // Ten points in (five each): the next point ends the match.
+    const g = rally({ time: 40 });
+    g.score.left = 5;
+    g.score.right = 5;
+    assert.ok(Pong.isMatchPoint(g), 'the rules call 5-5 match point');
+    // Arrive (WELCOME TO HD), then play on in 0.25 s frames until that toast has gone.
+    for (let t = 40; t <= 43; t += 0.25) { g.time = t; frame(g, { canvas: true }); }
+    const ops = frame(g, { canvas: true });
+    const texts = ops.filter((o) => o.op === 'fillText').map((o) => o.text);
+    assert.ok(texts.includes('MATCH POINT'), 'the toast is titled MATCH POINT: ' + texts.join(' | '));
+    assert.ok(texts.includes('100G - FINISH IT'), 'over 100G - FINISH IT');
+    const vig = ops.find((o) => o.op === 'fillRect' && o.fill && o.fill.kind === 'radial' && o.fill.args[0] === 400);
+    assert.strictEqual(vig.fill.args[2], 220, 'the vignette clear radius tightens to 220');
+
+    // Not match point: the ordinary vignette, no MATCH POINT.
+    g.score.left = 2;
+    g.score.right = 1;
+    const plain = frame(g, { canvas: true });
+    assert.ok(!plain.some((o) => o.op === 'fillText' && o.text === 'MATCH POINT'));
+    assert.strictEqual(plain.find((o) => o.op === 'fillRect' && o.fill && o.fill.kind === 'radial' && o.fill.args[0] === 400).fill.args[2], 250);
+
+    // Forty ash flakes, 1 or 2 units, at 0.3 of the ash colour; two gamerpic frames in blade silver.
+    const ash = plain.filter((o) => o.op === 'fillRect' && o.fill === 'rgba(168,162,150,0.3)');
+    assert.strictEqual(ash.length, 40, 'forty flakes');
+    assert.ok(ash.every((o) => o.rect[2] >= 1 && o.rect[2] <= 2));
+    const pics = plain.filter((o) => o.op === 'stroke' && o.stroke === '#d9dcd6' && o.pts.length === 2 &&
+      Math.round(o.pts[1][0] - o.pts[0][0]) === 25);
+    assert.strictEqual(pics.length, 2, 'one framed gamerpic on each score blade');
+    assert.ok(pics.every((o) => o.pts[1][1] < farY() - 6), 'inside the HUD band (R8)');
+  } finally {
+    globalThis.Pong = saved;
+  }
+});

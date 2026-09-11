@@ -583,27 +583,10 @@
     }
   }
 
-  // The players are drawn by src/characters.js AFTER this era's frame, over
-  // the letterbox. The bible clips them to the picture between the bars; the
-  // rig is not this card's to change, so once the rig has wrapped the
-  // renderer's draw, era 8 wraps it once more, outermost, and lays its bars
-  // and their text again over whatever the players drew. Every caller asks
-  // PongRender.draw by name each frame, so the next frame on has it.
-  var barsOver = false;
-  function layBarsOverPlayers(P) {
-    if (barsOver || !P || !P.__characters || typeof P.draw !== 'function') return;
-    barsOver = true;
-    var inner = P.draw;
-    P.draw = function (ctx, state, opts) {
-      var out = inner.apply(this, arguments);
-      if (ctx && state && Math.floor(state.era) === 8 && !(opts && opts.ink) && P.table3d && state.score) {
-        ctx.save();
-        letterbox(ctx, state, P);
-        ctx.restore();
-      }
-      return out;
-    };
-  }
+  // The players are drawn by src/characters.js AFTER this era's frame, so over
+  // the letterbox. The bible clips them to the picture between the bars, and
+  // the rig does that itself: era 8's block there carries clip { y0: 52,
+  // y1: 548 } (item 1249, which replaced this era's own outermost wrapper).
 
   function draw(ctx, state, opts, api) {
     var P = api || R;
@@ -644,7 +627,6 @@
     // 8. the letterbox over everything, the score as its subtitle
     letterbox(ctx, state, P);
     ctx.restore();
-    layBarsOverPlayers(P);
   }
 
   // ------------------------------------------------------------ the arrival

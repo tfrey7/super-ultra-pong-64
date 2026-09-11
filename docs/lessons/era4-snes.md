@@ -91,3 +91,63 @@ Look file: [src/eras/era4-snes.js](../../src/eras/era4-snes.js).
    tilt arrival with it), `src/signboards.js`, `src/match.js`, and `advanceEra`'s call.
 5. `node --test` (`test/era4-snes.test.js`, `test/era4-mode7.test.js`, `test/era4-sprites.test.js`),
    then `node tools/playtest.mjs --era 4`.
+
+## LESSONS
+
+*Item 1227, the AAA pass: era 4 drawn as a 1991 flagship (F-Zero's track under a Pilotwings sky,
+Super Mario World's sprites) that happens to be Pong. Picture:
+[era4-rally.png](../shots/item-1227/era4-rally.png).*
+
+**What sold the flagship look here**
+
+- **Two characters with real personalities, not stand-ins.** A red and a blue hover pilot, each on
+  a jet pad, standing behind their paddle with the glove on its outer edge. Big, round, saturated
+  Super Mario World shading reads as 1991 even after the display samples the figure down to about
+  12 x 38 Super Nintendo pixels.
+- **Things that move on their own, at different rates.** Two balloons drift at 3 and 2 field units
+  a second (the far one smaller), the floor slides at 14, the high stars twinkle and the pylons
+  blink in turn. Three layers moving at three speeds is what 16-bit parallax *feels* like, even
+  with a camera that never moves.
+- **F-Zero's interface, not a generic panel.** Two small see-through boxes with a 1-pixel light
+  edge, a helmet icon beside each, and a power bar that fills with the rally and flashes when full.
+  The see-through fill is the colour math the machine was famous for.
+- **Colour math on the ball**: a soft added-light halo 1.6 times the orb, under its core, so it
+  glows without ever losing R1.
+- **Moments made of what is already on screen**: the pylons all light for half a second after a
+  point, the conceding pad blinks, and at match point the track runs at double speed, the bars
+  pulse and the balloons fly streamers.
+
+**What did not work**
+
+- **Asking pixflux for a whole six-row sprite sheet in one image.** The bible marked it untried;
+  it came back as one column of tiny identical figures (`era4-players-left-sheet.png`, kept in the
+  manifest as the record). **A single full-body pose per character works on the first try**, and
+  every beat was cut from it offline (`assets/pixellab/era4-players-build.mjs`): a 1-pixel bob,
+  a lift and a drop for the moves, a squeeze-flip-squeeze for the spin, a dimmed dip for the miss,
+  arms drawn on for the win, and the jet flame drawn in code on every frame. 0 generations for all
+  of that.
+- **Asking for a victory pose** ("both arms raised high above the head, jumping") at the same size
+  and seed style gave two smaller figures with their arms down. Drawing two raised arms *behind*
+  the figure, so only the part above the helmet shows, did the job instead. Drawing them over the
+  figure put stripes across the helmet.
+- **7 of 12 generations spent, 5 of them used.** Balance 9,900 of 10,000 before the pass, 9,896
+  after.
+- **A test that pins "only era N wears a sheet" goes stale the moment another era brings art**, and
+  the rig threw under `node --test` (there is no `Image` there) instead of falling back to its
+  placeholder. Both are fixed in this pass; a sibling era card would have hit both.
+- **A made canvas outlives "not decoded yet".** The dusk-lit balloon is cached on a canvas; it must
+  still ask whether its picture is decoded before it is drawn, or a page drawn before the art
+  arrives shows a cached copy from another state.
+
+**What a one-era Super Nintendo game would copy**
+
+- `assets/pixellab/era4-players-build.mjs`: one generated pose in, a six-beat sheet out, snapped
+  to 15-bit colour and capped under the ball's brightness. Point it at any side-view character.
+- The rig block in `src/characters.js` (`ERAS[4]`): `sheets: { left, right }`, frame 32 x 101,
+  hand on the frame's right edge (32, 41), scale 1.2, fps 12, and **two** miss frames, so the
+  conceding pad blinks without any extra code.
+- `drawPanel`, `drawBalloons` and `drawPylons` in `src/eras/era4-snes.js`: the F-Zero HUD, the
+  drifting set dressing and the blinking lights, each a handful of `fillRect` and `drawImage`
+  calls with no pixel loop.
+- The rule that kept it readable: everything behind play is lit for dusk (a 50% navy wash over the
+  balloons), and only the ball, the paddles and the HUD edge are near white.
