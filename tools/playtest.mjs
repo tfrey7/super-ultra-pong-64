@@ -4,7 +4,9 @@
  * page: that it opens on a title screen with the ball held still, that a click
  * and a keypress each start it, that the mouse moves the paddle, that the keys
  * move the paddle, that rallies happen, that a miss scores, and that the serve
- * comes back to centre.
+ * comes back to centre. Last, it walks one match up the whole era ladder --
+ * a point per rung, a screenshot of each era in play, and one more point to
+ * prove it stops at the top.
  *
  * No dependencies: it launches Chrome with a debugging port and drives it over
  * the DevTools protocol using Node's built-in WebSocket client (Node 22+).
