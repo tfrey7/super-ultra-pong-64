@@ -140,10 +140,8 @@
     '8': ['011110', '110011', '110011', '011110', '110011', '110011', '011110'],
     '9': ['011110', '110011', '110011', '011111', '000011', '000011', '011110']
   };
-  var FONT_CELL = 6;
-  var FONT_GAP = 6;
-  var SCORE_TOP = 32;
-  var SCORE_OFFSET = 110;
+  // (Until item 1225 the score was drawn in this font at six units a pixel in
+  // mid-court; it lives in the status band now, in the band's smaller letters.)
 
   // ------------------------------------------------------------ the court
   function drawCourt(ctx, state) {
@@ -263,38 +261,214 @@
     ctx.fillRect(ox + c, oy + 3 * c, 2 * c, c);
   }
 
-  // ------------------------------------------------------------ the score
-  function scoreWidth(text) {
-    return text.length * 6 * FONT_CELL + (text.length - 1) * FONT_GAP;
+  // ------------------------------------------------------ the match (item 1225)
+  // The art bible's era 2 page (docs/ART.md): not a Pong of 1985 but Nintendo's
+  // Tennis of 1985 that happens to be Pong. A floodlit night court with a crowd
+  // in the stands along the top, an umpire on his high chair at the net, the
+  // players holding the paddles (src/characters.js, the NES block), a tennis
+  // ball with its seam and its shadow, and Tennis's black status band -- P1 and
+  // CPU, the rally count, the umpire's call after a point. All of it fillRect.
+  var NATIVE = { x: 800 / 256, y: 600 / 240 };  // one NES pixel, in field units
+  var BAND = { top: PX, h: 40 };                // two tile rows under the border
+  var CROWD = { top: BAND.top + BAND.h, rows: 2, cols: 32, tw: 25, th: 20 };
+  var CROWD_INKS = [NES[0x0C], NES[0x1C], NES[0x2D]];   // under the 0.35 line
+  var CROWD_BEAT = 16 / 60;     // the patterns rotate every 16 frames
+  var CROWD_BEAT_POINT = 4 / 60;  // and every 4 for a second after a point
+  var CALL_S = 1;               // the umpire's call stays up this long
+  var CALLS = ['GAME', 'FIFTEEN', 'THIRTY', 'FORTY'];
+  var TEXT_CELL = 3;            // the band's letters: one cell a native pixel
+  var SKIN_DARK = NES[0x07];    // the umpire, in the floodlights' shadow
+
+  // 5 x 7 capitals for the band, in the same two-state rows as FONT.
+  var LETTERS = {
+    A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+    C: ['01111', '10000', '10000', '10000', '10000', '10000', '01111'],
+    E: ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+    F: ['11111', '10000', '10000', '11110', '10000', '10000', '10000'],
+    G: ['01111', '10000', '10000', '10011', '10001', '10001', '01111'],
+    H: ['10001', '10001', '10001', '11111', '10001', '10001', '10001'],
+    I: ['11111', '00100', '00100', '00100', '00100', '00100', '11111'],
+    L: ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+    M: ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
+    N: ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+    O: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+    P: ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
+    R: ['11110', '10001', '10001', '11110', '10100', '10010', '10001'],
+    T: ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+    U: ['10001', '10001', '10001', '10001', '10001', '10001', '01110'],
+    Y: ['10001', '10001', '01010', '00100', '00100', '00100', '00100'],
+    '0': ['01110', '10011', '10101', '10101', '10101', '11001', '01110'],
+    '1': ['00100', '01100', '00100', '00100', '00100', '00100', '01110'],
+    '2': ['01110', '10001', '00001', '00110', '01000', '10000', '11111'],
+    '3': ['11110', '00001', '00001', '01110', '00001', '00001', '11110'],
+    '4': ['00011', '00101', '01001', '10001', '11111', '00001', '00001'],
+    '5': ['11111', '10000', '11110', '00001', '00001', '10001', '01110'],
+    '6': ['01110', '10000', '11110', '10001', '10001', '10001', '01110'],
+    '7': ['11111', '00001', '00010', '00100', '00100', '00100', '00100'],
+    '8': ['01110', '10001', '10001', '01110', '10001', '10001', '01110'],
+    '9': ['01110', '10001', '10001', '01111', '00001', '00001', '01110']
+  };
+
+  function textWidth(text, cell) {
+    return text.length * 6 * cell - cell;
   }
 
-  /** One pass of a number: each lit run of a row is one rectangle. */
-  function paintNumber(ctx, text, left, top) {
+  /** One pass of band text: each lit run of a row is one rectangle. */
+  function paintText(ctx, text, left, top, cell) {
     for (var i = 0; i < text.length; i++) {
-      var rows = FONT[text[i]];
-      var gx = left + i * (6 * FONT_CELL + FONT_GAP);
+      var rows = LETTERS[text[i]];
       if (!rows) continue;
+      var gx = left + i * 6 * cell;
       for (var r = 0; r < rows.length; r++) {
         var row = rows[r];
         for (var c = 0; c < row.length; c++) {
           if (row[c] !== '1') continue;
           var run = c;
           while (run < row.length && row[run] === '1') run++;
-          ctx.fillRect(gx + c * FONT_CELL, top + r * FONT_CELL, (run - c) * FONT_CELL, FONT_CELL);
+          ctx.fillRect(gx + c * cell, top + r * cell, (run - c) * cell, cell);
           c = run;
         }
       }
     }
   }
 
-  /** A score in its paddle's lit colour, over a black drop shadow. */
-  function drawScore(ctx, value, centreX, ink) {
-    var text = String(value);
-    var left = Math.round(centreX - scoreWidth(text) / 2);
+  /** Band text in an ink over the era's black drop shadow, one cell down and right. */
+  function bandText(ctx, text, left, ink) {
+    var top = BAND.top + Math.round((BAND.h - 7 * TEXT_CELL) / 2);
     ctx.fillStyle = MORTAR;
-    paintNumber(ctx, text, left + FONT_CELL, SCORE_TOP + FONT_CELL);
+    paintText(ctx, text, left + TEXT_CELL, top + TEXT_CELL, TEXT_CELL);
     ctx.fillStyle = ink;
-    paintNumber(ctx, text, left, SCORE_TOP);
+    paintText(ctx, text, left, top, TEXT_CELL);
+  }
+
+  /**
+   * The last point, as the players' rig remembers it: { side, age } or null.
+   * The rig keeps one memory per game (src/characters.js), so the band, the
+   * crowd and the players all agree on when the point was.
+   */
+  function lastPoint(state) {
+    var C = root.PongCharacters;
+    if (!C || typeof C.memoryOf !== 'function' || !state.score) return null;
+    var mem = C.memoryOf(state);
+    var t = state.time || 0;
+    var sides = ['left', 'right'];
+    for (var i = 0; i < 2; i++) {
+      var s = mem[sides[i]];
+      if (s && s.held === 'win') return { side: sides[i], age: t - s.since };
+    }
+    return null;
+  }
+
+  function isMatchPoint(state) {
+    var P = root.Pong;
+    return !!(P && typeof P.isMatchPoint === 'function' && P.isMatchPoint(state));
+  }
+
+  /** Tennis's status band: P1 and CPU with their scores, the rally or the umpire's call. */
+  function drawBand(ctx, state, left, right, point, match) {
+    var w = state.width, t = state.time || 0;
+    ctx.fillStyle = MORTAR;
+    ctx.fillRect(PX, BAND.top, w - 2 * PX, BAND.h);
+    // the bordered HUD: a grey rule along its foot
+    ctx.fillStyle = LINE_SHADE;
+    ctx.fillRect(PX, BAND.top + BAND.h - PX, w - 2 * PX, PX);
+
+    var cw = 6 * TEXT_CELL;
+    bandText(ctx, 'P1', 28, left.body);
+    bandText(ctx, String(state.score.left), 28 + 3 * cw + cw, LINE);
+    var rs = String(state.score.right);
+    var rx = w - 28 - textWidth(rs, TEXT_CELL);
+    bandText(ctx, rs, rx, LINE);
+    bandText(ctx, 'CPU', rx - cw - textWidth('CPU', TEXT_CELL) - cw, right.body);
+
+    var centre, ink = LINE_SHADE;
+    if (point && point.age >= 0 && point.age < CALL_S) {
+      centre = CALLS[(state.score[point.side] || 0) % 4];
+      ink = LINE;
+    } else if (match) {
+      if (Math.floor(t * 2) % 2) return;         // 0.5 s on, 0.5 s off
+      centre = 'MATCH POINT';
+      ink = NES[0x16];
+    } else {
+      var n = Math.min(99, state.rally || 0);
+      centre = 'RALLY ' + (n < 10 ? '0' : '') + n;
+    }
+    bandText(ctx, centre, Math.round(w / 2 - textWidth(centre, TEXT_CELL) / 2), ink);
+  }
+
+  /**
+   * The crowd: 32 tiles by 2 rows under the band, each a spectator in one of
+   * three patterns (sitting, leaning, arms up) that rotate along the stand --
+   * every 16 frames, every 4 for a second after a point, and held on the
+   * brightest (arms up) at match point. Three dark inks, under the 0.35 line.
+   */
+  function drawCrowd(ctx, state, point, match) {
+    var t = state.time || 0;
+    var beat = point && point.age >= 0 && point.age < CALL_S ? CROWD_BEAT_POINT : CROWD_BEAT;
+    var step = Math.floor(t / beat);
+    var nx = NATIVE.x, ny = NATIVE.y;
+    ctx.fillStyle = NES[0x0F];
+    ctx.fillRect(PX, CROWD.top, state.width - 2 * PX, CROWD.rows * CROWD.th);
+    for (var row = 0; row < CROWD.rows; row++) {
+      for (var col = 0; col < CROWD.cols; col++) {
+        var pat = match ? 2 : (col * 2 + row + step) % 3;
+        var x = col * CROWD.tw, y = CROWD.top + row * CROWD.th;
+        var lift = pat === 2 ? -ny : 0;
+        // shoulders, then the head, in the tile's own ink (row back is darker)
+        ctx.fillStyle = CROWD_INKS[(col + row) % 2];
+        ctx.fillRect(x + 1.5 * nx, y + 5 * ny + lift, 5 * nx, 3 * ny - lift);
+        ctx.fillStyle = CROWD_INKS[pat === 2 ? 2 : 1];
+        ctx.fillRect(x + (2.5 + (pat === 1 ? 1 : 0)) * nx, y + 2 * ny + lift, 3 * nx, 3 * ny);
+        if (pat === 2) {                                // arms up
+          ctx.fillStyle = CROWD_INKS[2];
+          ctx.fillRect(x + 1 * nx, y + 1 * ny, nx, 4 * ny);
+          ctx.fillRect(x + 6 * nx, y + 1 * ny, nx, 4 * ny);
+        }
+      }
+    }
+  }
+
+  /**
+   * The umpire's high chair at the net, 2 x 3 tiles, and the umpire on it,
+   * 2 x 2 tiles, his head turned one pixel toward where the ball is going.
+   */
+  function drawUmpire(ctx, state) {
+    var nx = NATIVE.x, ny = NATIVE.y;
+    var cx = state.width / 2;
+    var top = CROWD.top + ny;
+    var look = state.ball && state.ball.vx < 0 ? -1 : 1;
+    // the chair: two legs down to the court and a seat, dark grey over black
+    ctx.fillStyle = MORTAR;
+    ctx.fillRect(cx - 8 * nx, top + 8 * ny, 16 * nx, 2 * ny);
+    ctx.fillStyle = POST;
+    ctx.fillRect(cx - 7 * nx, top + 8 * ny, 14 * nx, ny);
+    ctx.fillRect(cx - 7 * nx, top + 9 * ny, nx, 14 * ny);
+    ctx.fillRect(cx + 6 * nx, top + 9 * ny, nx, 14 * ny);
+    ctx.fillRect(cx - 7 * nx, top + 16 * ny, 14 * nx, ny);
+    // the umpire: a navy blazer, a dark face, a white cap brim no brighter than the lines
+    ctx.fillStyle = NES[0x02];
+    ctx.fillRect(cx - 5 * nx, top + 2 * ny, 10 * nx, 6 * ny);
+    ctx.fillStyle = SKIN_DARK;
+    ctx.fillRect(cx - 3 * nx + look * nx, top - 4 * ny, 6 * nx, 6 * ny);
+    ctx.fillStyle = NES[0x2D];
+    ctx.fillRect(cx - 3 * nx + look * nx, top - 5 * ny, 6 * nx, 2 * ny);
+    ctx.fillRect(cx + (look > 0 ? 3 : -5) * nx + look * nx, top - 4 * ny, 2 * nx, ny);
+  }
+
+  /** The tennis ball's shadow, as Tennis drew it: 4 x 2 black, 3 pixels below. */
+  function drawBallShadow(ctx, state) {
+    if (state.serveDelay > 0) return;
+    var b = state.ball;
+    ctx.fillStyle = MORTAR;
+    ctx.fillRect(Math.round(b.x), Math.round(b.y + b.size + 3 * NATIVE.y), b.size, 2 * NATIVE.y);
+  }
+
+  /** The seam: one pale-yellow NES pixel on the ball's lit side. */
+  function drawSeam(ctx, state) {
+    if (state.serveDelay > 0) return;
+    var b = state.ball;
+    ctx.fillStyle = NES[0x38];
+    ctx.fillRect(Math.round(b.x + b.size / 4), Math.round(b.y + b.size / 4), Math.round(NATIVE.x), Math.round(NATIVE.y));
   }
 
   // ------------------------------------------------------------ the frame
@@ -305,16 +479,20 @@
 
     var left = spriteInks(state, 'left');
     var right = spriteInks(state, 'right');
-    var mid = state.width / 2;
+    var point = lastPoint(state);
+    var match = isMatchPoint(state);
 
     drawCourt(ctx, state);
     drawBorder(ctx, state);
     drawNet(ctx, state);
-    drawScore(ctx, state.score.left, mid - SCORE_OFFSET, left.body);
-    drawScore(ctx, state.score.right, mid + SCORE_OFFSET, right.body);
+    drawCrowd(ctx, state, point, match);
+    drawUmpire(ctx, state);
+    drawBand(ctx, state, left, right, point, match);
     drawPaddle(ctx, state.left, left);
     drawPaddle(ctx, state.right, right);
+    drawBallShadow(ctx, state);
     drawBall(ctx, state);
+    drawSeam(ctx, state);
   }
 
   // ------------------------------------------------------------ the arrival

@@ -933,6 +933,984 @@
       }
     },
     {
+      "name": "era8-suit-left",
+      "file": "era8-suit-left.png",
+      "prompt": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a midnight navy sneaking suit with a tactical belt and a glowing amber orange visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 8001,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 8,
+      "seconds": 26.1,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 21890,
+      "sha256": "8739202a91fa07b9b2efe9904724d315bb228e7d85a0a6bafb53ce2aab1f40ec",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a midnight navy sneaking suit with a tactical belt and a glowing amber orange visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 8001,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "note": "entry rebuilt by item 1232: three generations ran in parallel and the tool's manifest writes raced, keeping only the last; prompt, seed, request and bill are as sent and billed"
+    },
+    {
+      "name": "era8-suit-right",
+      "file": "era8-suit-right.png",
+      "prompt": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a slate grey sneaking suit with a tactical belt and a glowing light blue visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 8002,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 8,
+      "seconds": 61.8,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 13946,
+      "sha256": "fc25e235a20b0b01585db1135db76bfce0fff30e0c93463ef931476fc01b6bae",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a slate grey sneaking suit with a tactical belt and a glowing light blue visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 8002,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era8-sheet-left",
+      "file": "era8-sheet-left.png",
+      "prompt": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a midnight navy sneaking suit with a tactical belt and a glowing amber orange visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 8001,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "seconds": 0,
+      "pixels": {
+        "width": 120,
+        "height": 504
+      },
+      "bytes": 16687,
+      "sha256": "39152c69753176d0cd4a1f1589feda968c86322992a88a71a4b5090b86464456",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a midnight navy sneaking suit with a tactical belt and a glowing amber orange visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 8001,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era8-suit-left.png",
+      "note": "derived by assets/pixellab/era8-sheets.mjs: the figures re-cut into the rig's 3 x 6 sheet of 40 x 84 frames and graded (0 generations)"
+    },
+    {
+      "name": "era8-sheet-right",
+      "file": "era8-sheet-right.png",
+      "prompt": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a slate grey sneaking suit with a tactical belt and a glowing light blue visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 8002,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "seconds": 0,
+      "pixels": {
+        "width": 120,
+        "height": 504
+      },
+      "bytes": 13543,
+      "sha256": "30411a74aeabb5b1064515ec9af32a0871fca8e0f173608e0377e87d9ce5a9a6",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a slate grey sneaking suit with a tactical belt and a glowing light blue visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 8002,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era8-suit-right.png",
+      "note": "derived by assets/pixellab/era8-sheets.mjs: the figures re-cut into the rig's 3 x 6 sheet of 40 x 84 frames and graded (0 generations)"
+    },
+    {
+      "name": "tex3d-era8-skyline",
+      "file": "tex3d-era8-skyline.png",
+      "prompt": "night city skyline seen from a skyscraper rooftop helipad, eight dark slate grey skyscraper towers of different heights in silhouette against a deep navy sky, scattered small amber lit windows, light rain, cinematic moody, pixel art",
+      "size": {
+        "width": 400,
+        "height": 100
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 8003,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "seconds": 0,
+      "pixels": {
+        "width": 400,
+        "height": 100
+      },
+      "bytes": 29778,
+      "sha256": "0143a3e3df79b56421ad01e3d7a3b0ff95ca84f45a7504c73cc79d7e968c7345",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "night city skyline seen from a skyscraper rooftop helipad, eight dark slate grey skyscraper towers of different heights in silhouette against a deep navy sky, scattered small amber lit windows, light rain, cinematic moody, pixel art",
+        "image_size": {
+          "width": 400,
+          "height": 100
+        },
+        "seed": 8003,
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "derivedFrom": "era8-skyline.png",
+      "note": "a byte-for-byte copy of era8-skyline.png under the name assets/pixellab/tex3d-embed.mjs embeds (0 generations; the bill is era8-skyline's)"
+    },
+    {
+      "name": "era8-skyline",
+      "file": "era8-skyline.png",
+      "prompt": "night city skyline seen from a skyscraper rooftop helipad, eight dark slate grey skyscraper towers of different heights in silhouette against a deep navy sky, scattered small amber lit windows, light rain, cinematic moody, pixel art",
+      "size": {
+        "width": 400,
+        "height": 100
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 8003,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 8,
+      "seconds": 16.9,
+      "pixels": {
+        "width": 400,
+        "height": 100
+      },
+      "bytes": 29778,
+      "sha256": "0143a3e3df79b56421ad01e3d7a3b0ff95ca84f45a7504c73cc79d7e968c7345",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "night city skyline seen from a skyscraper rooftop helipad, eight dark slate grey skyscraper towers of different heights in silhouette against a deep navy sky, scattered small amber lit windows, light rain, cinematic moody, pixel art",
+        "image_size": {
+          "width": 400,
+          "height": 100
+        },
+        "seed": 8003,
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "note": "entry rebuilt by item 1232: three generations ran in parallel and the tool's manifest writes raced, keeping only the last; prompt, seed, request and bill are as sent and billed"
+    },
+    {
+      "name": "era2-players-left",
+      "file": "era2-players-left.png",
+      "prompt": "NES 8-bit sprite sheet of a tennis player boy, side view facing right, red headband, white shirt and white shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "seed": 12251,
+      "date": "2026-09-11T03:22:11.121Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 19.8,
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 343,
+      "sha256": "c2416c48a6b372eadce1c2cb67ed67de6a08135bd99e03c3fd54acade667ea8b",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite sheet of a tennis player boy, side view facing right, red headband, white shirt and white shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+        "image_size": {
+          "width": 30,
+          "height": 264
+        },
+        "seed": 12251,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "verdict": "rejected: the 30 x 264 sprite sheet came back almost empty (a dozen stray pixels down a clear strip); pixflux does not draw a 3 x 6 sheet from a row-by-row prompt",
+      "card": "item 1225"
+    },
+    {
+      "name": "era2-players-right",
+      "file": "era2-players-right.png",
+      "prompt": "NES 8-bit sprite sheet of a rival tennis player, side view facing right, blue cap, green shirt, dark shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "seed": 12252,
+      "date": "2026-09-11T03:22:26.218Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 14.5,
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 499,
+      "sha256": "6ba2c57d9adecce1687056102a705ae66cfef6aef7cf9072b3d0801324767344",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite sheet of a rival tennis player, side view facing right, blue cap, green shirt, dark shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+        "image_size": {
+          "width": 30,
+          "height": 264
+        },
+        "seed": 12252,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "verdict": "rejected: the same as era2-players-left -- a near-empty strip",
+      "card": "item 1225"
+    },
+    {
+      "name": "era2-sheet-left",
+      "file": "era2-sheet-left.png",
+      "prompt": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12253,
+      "date": "2026-09-11T03:23:42.867Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "era2-player-left-pose.png",
+      "derivedBy": "node assets/pixellab/era2-players-sheet.mjs",
+      "how": "drawn pixel by pixel in the script from the art bible's era 2 silhouette (head 8 x 9, torso 8 x 14, legs 3 x 16, back-edge outline, hand at 10,22) in NES inks, the pose image as the reference for who the character is; six rows (idle, up, down, swing, miss, win) of 3 frames of 10 x 44",
+      "card": "item 1225",
+      "verdict": "worn by the player on era 2 (src/characters.js, the NES block's sheets.left)",
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 870,
+      "sha256": "4ffc5907cf8d40030280e5364f9026e68b123f2aa09e75c2d53f4e62ee159038",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12253,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era2-sheet-right",
+      "file": "era2-sheet-right.png",
+      "prompt": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12254,
+      "date": "2026-09-11T03:24:06.548Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "era2-player-right-pose.png",
+      "derivedBy": "node assets/pixellab/era2-players-sheet.mjs",
+      "how": "drawn pixel by pixel in the script from the art bible's era 2 silhouette (head 8 x 9, torso 8 x 14, legs 3 x 16, back-edge outline, hand at 10,22) in NES inks, the pose image as the reference for who the character is; six rows (idle, up, down, swing, miss, win) of 3 frames of 10 x 44",
+      "card": "item 1225",
+      "verdict": "worn by the computer on era 2 (src/characters.js, the NES block's sheets.right)",
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 879,
+      "sha256": "74a3985417508b362bc756f1f0da991488eb376c5d540adc873e848f48cc81a2",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12254,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era2-player-left-pose",
+      "file": "era2-player-left-pose.png",
+      "prompt": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12253,
+      "date": "2026-09-11T03:23:42.867Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 27.7,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 2250,
+      "sha256": "c03b53887e6321903b3b0fc920fa790cfbb1c365792fff9663068d7a924d528d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12253,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "verdict": "reference only: a good 32 x 64 standing pose, but 28 pixels wide with the fists out and the room behind a paddle is 10; its headband, colours and big head are what era2-sheet-left.png is drawn to",
+      "card": "item 1225"
+    },
+    {
+      "name": "era2-player-right-pose",
+      "file": "era2-player-right-pose.png",
+      "prompt": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12254,
+      "date": "2026-09-11T03:24:06.548Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 21.5,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 2414,
+      "sha256": "bb9643dd7f9636e6cb9955e85c5908ce6a59cdbc0117454313e979a5f4d3d1a5",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12254,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "verdict": "reference only: as era2-player-left-pose, for the rival in the blue cap; era2-sheet-right.png is drawn to it",
+      "card": "item 1225"
+    },
+    {
+      "name": "era3-players-left",
+      "file": "era3-players-left.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226001,
+      "date": "2026-09-11T03:23:35.447Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 6,
+      "seconds": 74.8,
+      "pixels": {
+        "width": 36,
+        "height": 312
+      },
+      "bytes": 7083,
+      "sha256": "f3017e0247d16fc92f43fd6eae655bbf77bf9c09777137269a8288c22214b4c3",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226001,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era3-players-right",
+      "file": "era3-players-right.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226002,
+      "date": "2026-09-11T03:23:56.033Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 17.6,
+      "pixels": {
+        "width": 36,
+        "height": 312
+      },
+      "bytes": 5593,
+      "sha256": "b695bee5b8e73eb3324ce069afe7765fe689b6527c2a3d2ff0a83dc9fc900749",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226002,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era3-arena-wall",
+      "file": "era3-arena-wall.png",
+      "prompt": "16-bit Sega Genesis background tile strip, a castle arena wall of big grey stone blocks at night, dark mortar lines, moss in the cracks, lit warm orange from below by torchlight, side view, seamless horizontal, Golden Axe style, saturated colours",
+      "size": {
+        "width": 320,
+        "height": 48
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side"
+      },
+      "seed": 1226003,
+      "date": "2026-09-11T03:37:12.650Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 14.8,
+      "pixels": {
+        "width": 320,
+        "height": 48
+      },
+      "bytes": 5637,
+      "sha256": "03e89750e37f4e8591ea868863a9b33f9cf09b58495cd99e80f20221e822bb24",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis background tile strip, a castle arena wall of big grey stone blocks at night, dark mortar lines, moss in the cracks, lit warm orange from below by torchlight, side view, seamless horizontal, Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 320,
+          "height": 48
+        },
+        "seed": 1226003,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "5ad72dd69b3a3ac5c355147c3500038ea9fb8557100a62a265cfd1f04f253f12"
+      }
+    },
+    {
+      "name": "era3-torch",
+      "file": "era3-torch.png",
+      "prompt": "16-bit Sega Genesis sprite strip, 3 frames side by side of the same wall torch, iron bracket, burning flame in orange yellow and red, each frame the flame a different shape, Golden Axe style",
+      "size": {
+        "width": 48,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "no_background": true
+      },
+      "seed": 1226004,
+      "date": "2026-09-11T03:38:05.302Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 51.9,
+      "pixels": {
+        "width": 48,
+        "height": 32
+      },
+      "bytes": 615,
+      "sha256": "abe24e0021ae3a2cca73fac313e5bec7e40e0949245377e9d465a657035a76dd",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite strip, 3 frames side by side of the same wall torch, iron bracket, burning flame in orange yellow and red, each frame the flame a different shape, Golden Axe style",
+        "image_size": {
+          "width": 48,
+          "height": 32
+        },
+        "seed": 1226004,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "no_background": true
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "cf732f7ace6f400dd62495fd444facd27a15ab4df266e2d43de2afc61ae7e958"
+      }
+    },
+    {
+      "name": "era3-portraits",
+      "file": "era3-portraits.png",
+      "prompt": "16-bit Sega Genesis status bar portraits, two face portraits side by side: left a barbarian warrior with a horned helmet and a beard, right an armoured knight in a steel helm with a red crest, front view, Golden Axe style, saturated colours",
+      "size": {
+        "width": 64,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "seed": 1226005,
+      "date": "2026-09-11T03:38:17.939Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 12,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 1111,
+      "sha256": "48caee2dfa3055c73a366d3e028cb493299a2ab44df12c918654ded8460b3446",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis status bar portraits, two face portraits side by side: left a barbarian warrior with a horned helmet and a beard, right an armoured knight in a steel helm with a red crest, front view, Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 64,
+          "height": 32
+        },
+        "seed": 1226005,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "a240a73792990527c34a387ea0c0df7c8ade53c0aae569c4b6ae56a93ec00f54"
+      }
+    },
+    {
+      "name": "era3-panel",
+      "file": "era3-panel.png",
+      "prompt": "16-bit Sega Genesis game status panel, a long carved grey stone slab frame with bevelled edges and rivets, dark recessed middle, Golden Axe interface style",
+      "size": {
+        "width": 320,
+        "height": 32
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "seed": 1226006,
+      "date": "2026-09-11T03:38:37.450Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 18.7,
+      "pixels": {
+        "width": 320,
+        "height": 32
+      },
+      "bytes": 1598,
+      "sha256": "6ae4c698861972bcb7393561009a1329014261b712d47a8b1b8e997363081291",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis game status panel, a long carved grey stone slab frame with bevelled edges and rivets, dark recessed middle, Golden Axe interface style",
+        "image_size": {
+          "width": 320,
+          "height": 32
+        },
+        "seed": 1226006,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "729a429c0755526c823712d8775e62b2217cb892086791fcf52e61c50732f2b6"
+      }
+    },
+    {
+      "name": "era3-p1",
+      "file": "era3-p1.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226001,
+      "date": "2026-09-11T03:23:35.447Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 6,
+      "seconds": 74.8,
+      "pixels": {
+        "width": 60,
+        "height": 150
+      },
+      "bytes": 2335,
+      "sha256": "d199947e6104b5ff430c7e201d3373a2993f012d0b7ece5abe8aa5e8ce130928",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226001,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era3-players-left.png",
+      "derivedBy": "node assets/pixellab/era3-players-cut.mjs",
+      "how": "the 11 figures pixflux stacked in one column, packed in order into a 3 x 6 sheet of 20 x 25 frames (idle 2, up 2, down 2, swing 3 with the first repeated, miss 1, win 2), feet down and shield edge right, snapped to 3 bits a channel",
+      "card": "item 1226",
+      "verdict": "worn by era 3's players (src/characters.js)"
+    },
+    {
+      "name": "era3-p2",
+      "file": "era3-p2.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226002,
+      "date": "2026-09-11T03:23:56.033Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 2,
+      "seconds": 17.6,
+      "pixels": {
+        "width": 60,
+        "height": 150
+      },
+      "bytes": 1727,
+      "sha256": "1d250569365096d4fba4af3209d04ee38bdfaeb0de7589981d94f6e6f22cb5e8",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226002,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era3-players-right.png",
+      "derivedBy": "node assets/pixellab/era3-players-cut.mjs",
+      "how": "the 11 figures pixflux stacked in one column, packed in order into a 3 x 6 sheet of 20 x 25 frames (idle 2, up 2, down 2, swing 3 with the first repeated, miss 1, win 2), feet down and shield edge right, snapped to 3 bits a channel",
+      "card": "item 1226",
+      "verdict": "worn by era 3's players (src/characters.js)"
+    },
+    {
       "name": "tex3d-era6-penguin",
       "file": "tex3d-era6-penguin.png",
       "prompt": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-penguin-raw2 (the stand) and era6-penguin-win-raw (the jump for joy); their prompts and seeds are their own entries",
