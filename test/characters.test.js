@@ -26,7 +26,13 @@ function recorder() {
   const ctx = new Proxy({ calls }, {
     get(t, k) {
       if (k in t) return t[k];
-      return (...args) => { calls.push([k, args]); };
+      return (...args) => {
+        calls.push([k, args]);
+        // A gradient or pattern the era asks for: one that takes colour stops.
+        if (typeof k === 'string' && /^create/.test(k)) return { addColorStop() {} };
+        if (k === 'measureText') return { width: 0 };
+        return undefined;
+      };
     },
     set(t, k, v) { t[k] = v; return true; }
   });
@@ -220,14 +226,11 @@ test('era 0 and the dimmed attract frame draw no players', () => {
 });
 
 test('every era from 1 up draws both players, the right one mirrored, and writes no state', () => {
-  // An era card's sheet is not decoded yet here (there is no Image under
-  // node), so an era with art draws its placeholder -- as a page does until
-  // the PNG has loaded (item 1232, the first era block to name sheets).
-  const fake = fakeSprites();
-  try { everyEraDrawsBoth(); } finally { fake.restore(); }
-});
-
-function everyEraDrawsBoth() {
+  // The real loader, and no Image under node: an era whose block names a
+  // sheet (era 8's `sheets`, item 1232) draws its placeholder rather than
+  // throwing -- as a page does until the PNG has loaded (item 1249).
+  assert.strictEqual(typeof globalThis.Image, 'undefined', 'node has no Image');
+  assert.strictEqual(globalThis.PongSprites, Sprites, 'the real loader, no stand-in');
   for (let e = 1; e <= 10; e++) {
     const g = playing(e);
     g.events = [{ type: 'paddle', side: 'left', era: e, time: g.time }];
@@ -239,7 +242,96 @@ function everyEraDrawsBoth() {
     assert.strictEqual(mirrors.length, 1, 'era ' + e + ': one mirrored player');
     assert.ok(ctx.calls.some(([k]) => k === 'fillRect'), 'era ' + e + ' drew its placeholder');
   }
-}
+});
+
+test('headless, a block naming `sheet` or `sheets` draws the placeholder on both sides and never throws', () => {
+  // The default loader's makeImage is `new Image()`, which throws under node.
+  assert.throws(() => Sprites.create().load('test-headless-probe'), /Image/, 'the real loader cannot make an image here');
+  const saved = C.ERAS[3];
+  try {
+    for (const block of [
+      { sheet: 'test-headless-one', frame: { w: 20, h: 40 }, hand: { x: 20, y: 20 }, scale: 2 },
+      { sheets: { left: 'test-headless-l', right: 'test-headless-r' }, frame: { w: 20, h: 40 }, hand: { x: 20, y: 20 }, scale: 2 }
+    ]) {
+      C.ERAS[3] = block;
+      const g = playing(3);
+      const ctx = recorder();
+      assert.doesNotThrow(() => C.drawPlayers(ctx, g, null, R), Object.keys(block)[0]);
+      assert.ok(!ctx.calls.some(([k]) => k === 'drawImage'), 'no sheet image drawn');
+      // Both players are the placeholder pose: each draws its torso in its paddle's ink.
+      const inks = ctx.calls.filter(([k]) => k === 'fillRect').length;
+      assert.ok(inks > 0, 'the placeholder is drawn');
+      assert.strictEqual(ctx.calls.filter(([k, a]) => k === 'scale' && a[0] === -1).length, 1, 'both sides drawn, one mirrored');
+      assert.strictEqual(ctx.calls.filter(([k]) => k === 'save').length, ctx.calls.filter(([k]) => k === 'restore').length,
+        'every save restored, even with the loader failing');
+      // And through the page's own wrapper too, which must not need its try/catch for this.
+      assert.doesNotThrow(() => R.draw(recorder(), g));
+    }
+  } finally {
+    C.ERAS[3] = saved;
+  }
+});
+
+test('clip: { y0, y1 } draws both players inside that band, and an era without one clips nothing', () => {
+  const saved = C.ERAS[4];
+  try {
+    assert.strictEqual(C.configFor(4).clip, null, 'no clip by default');
+    let ctx = recorder();
+    C.drawPlayers(ctx, playing(4), null, R);
+    assert.ok(!ctx.calls.some(([k]) => k === 'clip'), 'an era with no clip never clips');
+
+    C.ERAS[4] = Object.assign({}, saved, { clip: { y0: 52, y1: 548 } });
+    assert.deepStrictEqual(C.configFor(4, 'right').clip, { y0: 52, y1: 548 }, 'both sides carry it');
+    const g = playing(4);
+    ctx = recorder();
+    C.drawPlayers(ctx, g, null, R);
+    const calls = ctx.calls;
+    const at = (k) => calls.findIndex(([n]) => n === k);
+    const clipAt = at('clip');
+    assert.ok(clipAt > 0, 'the players are clipped');
+    assert.strictEqual(calls.filter(([k]) => k === 'clip').length, 1, 'one clip for both players');
+    const rect = calls.slice(0, clipAt).reverse().find(([k]) => k === 'rect');
+    assert.deepStrictEqual(rect[1], [0, 52, g.width, 496], 'the band: the whole width, y 52 to 548');
+    assert.strictEqual(calls[0][0], 'save', 'the clip is inside its own save');
+    // Every figure is drawn after the clip, and the clip's save is the last restored.
+    const drawn = calls.map(([k], i) => (k === 'fillRect' || k === 'drawImage' ? i : -1)).filter((i) => i >= 0);
+    assert.ok(drawn.length > 0 && drawn.every((i) => i > clipAt), 'nothing of a player is drawn outside the clip');
+    assert.strictEqual(calls[calls.length - 1][0], 'restore', 'the clip is lifted when the players are done');
+    assert.strictEqual(calls.filter(([k]) => k === 'save').length, calls.filter(([k]) => k === 'restore').length);
+
+    // A band that makes no sense clips nothing rather than hiding the players.
+    assert.strictEqual(C.clipBand({ y0: 300, y1: 100 }), null);
+    assert.strictEqual(C.clipBand({ y0: 'a', y1: 5 }), null);
+    assert.deepStrictEqual(C.clipBand({ y0: '10', y1: 20 }), { y0: 10, y1: 20 });
+
+    // A stand-in canvas that knows no clip() (the era tests' own) still gets its players.
+    const plain = recorder();
+    plain.clip = undefined;
+    assert.strictEqual(C.drawPlayers(plain, playing(4), null, R), true);
+    assert.ok(plain.calls.some(([k]) => k === 'fillRect'), 'drawn, unclipped');
+  } finally {
+    C.ERAS[4] = saved;
+  }
+});
+
+test('era 8 keeps its players between its letterbox bars, through the rig and not a wrapper of its own', () => {
+  const bar = R.eraLook(8).fx.BAR;
+  const g = playing(8);
+  assert.deepStrictEqual(C.configFor(8).clip, { y0: bar, y1: g.height - bar });
+  // Through the renderer: the bars are drawn, then the players clipped to the picture between them.
+  const ctx = recorder();
+  R.draw(ctx, g);
+  const calls = ctx.calls;
+  const topBar = calls.findIndex(([k, a]) => k === 'fillRect' && a.join() === [0, 0, g.width, bar].join());
+  const clipAt = calls.findIndex(([k]) => k === 'clip');
+  assert.ok(topBar >= 0, 'the letterbox is drawn');
+  assert.ok(clipAt > topBar, 'the players are clipped, after the bars');
+  const rect = calls.slice(0, clipAt).reverse().find(([k]) => k === 'rect');
+  assert.deepStrictEqual(rect[1], [0, bar, g.width, g.height - 2 * bar]);
+  // Nothing lays the bars a second time over the players any more.
+  const bars = calls.filter(([k, a]) => k === 'fillRect' && a.join() === [0, 0, g.width, bar].join());
+  assert.strictEqual(bars.length, 1, 'the top bar is drawn once a frame');
+});
 
 test('through the renderer: PongRender.draw draws the era, then the players over it', () => {
   const g = playing(2);
@@ -375,7 +467,8 @@ test('a block with only `sheet` still serves both sides, as before sheets existe
     C.ERAS[2] = { sheet: 'test-one-player', sheets: { right: 'test-rival' } };
     assert.strictEqual(C.configFor(2, 'left').sheet, 'test-one-player');
     assert.strictEqual(C.configFor(2, 'right').sheet, 'test-rival');
-    // And no sheet anywhere is the placeholder on both sides, exactly as now.
+    // And no sheet anywhere is the placeholder on both sides, exactly as now --
+    // for every era whose own block still brings no art (the era cards fill theirs in).
     for (let e = 1; e <= 10; e++) {
       if (e === 2) continue;
       if (C.ERAS[e].sheet || C.ERAS[e].sheets) continue;   // an era card's own art (item 1232 on)

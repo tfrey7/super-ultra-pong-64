@@ -123,9 +123,11 @@ art bible's era 8 page, [docs/ART.md](../ART.md)).
 - **The bible's rain colour was invisible.** Slate at 0.25 on a slate slab cannot be seen, so the
   rain is HUD ink at 0.18.
 - **The players are drawn after the era, so over the letterbox.** The rig
-  (`src/characters.js`) draws them after the era's frame. The era wraps the renderer's draw once
-  more, outermost, and lays its bars again over them. Without that, a far player's head pokes
-  into the black bar.
+  (`src/characters.js`) draws them after the era's frame. Without a clip, a far player's head
+  pokes into the black bar. Item 1232 first fixed it by wrapping the renderer's draw once more
+  and laying the bars again over the players. Item 1249 moved the fix into the rig: the era's
+  block there carries `clip: { y0: 52, y1: 548 }`, and the rig draws both players only between
+  those heights. Any letterboxed era can do the same.
 - **One animation rate for every beat.** The rig cycles idle, move and win at one `fps`. The
   bible's 8 turned a two-frame breath into a flicker, so the era runs at 3.
 
