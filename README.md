@@ -8,11 +8,13 @@ as the session goes on the game grows up through the eras around it: colour,
 sound, sprites, physics, whatever each later era brings. Evoland, but for Pong.
 
 **Every point either side scores moves the machine up one era**, from the 1972
-arcade machine to the Super Nintendo (see *The era ladder* below): black and
+arcade machine to the 2005 Xbox 360 (see *The era ladder* below): black and
 white, the Atari's turn to colour, the NES's 8-bit sprites, the Genesis's 16-bit
-shading and the Super Nintendo's Mode 7 floor, each with its own sound -- and
-each arriving as a ring that spreads the new machine across the field from the
-spot where the ball went out, followed by its name card.
+shading and the Super Nintendo's Mode 7 floor, then the table tilts into 3D for
+the PlayStation, the Nintendo 64, the Dreamcast, the PlayStation 2, the Xbox and
+the Xbox 360, each with its own sound -- and each arriving as a ring that
+spreads the new machine across the field from the spot where the ball went out,
+followed by its name card.
 
 ## Play it
 
@@ -79,8 +81,9 @@ audio taken away, to prove the game still plays silently. Pass
 Last of all it **walks one match up the whole ladder**: a fresh machine on era
 0, then it lets a point through for each rung, checks that every point moved the
 machine up exactly one era, photographs each era in play once its change moment
-has cleared, and scores one more at the top to prove the ladder stops on the
-Super Nintendo. `--ladder` runs only that walk, in about half a minute:
+has cleared, films each of the ten era changes mid-ring, and scores one more at
+the top to prove the ladder stops on the Xbox 360. `--ladder` runs only that
+walk, in about a minute:
 
 ```bash
 node tools/playtest.mjs --ladder              # just the walk up the ladder
@@ -94,11 +97,11 @@ check passes every run -- the computer itself stays exactly as beatable as it
 was, and `node tools/beatability-sample.mjs` is how to measure that.
 
 Every run rewrites the screenshots it drops in `docs/shots/playtest/` —
-`ladder-era0-arcade.png` to `ladder-era4-snes.png` among them. Those are ignored
+`ladder-era0-arcade.png` to `ladder-era10-xbox360.png` among them. Those are ignored
 output, not source: the directory is gitignored, nobody needs to check them
 afterwards and there is nothing to restore, so a playtest leaves `git status`
-empty. The tracked reference frames are the five in `docs/shots/eras/`, one per
-era, plus the older `docs/shots/bootstrap/era-zero.png`. Only `--reference`
+empty. The tracked reference frames are the twenty-one in `docs/shots/eras/`, one per
+era and one per era change, plus the older `docs/shots/bootstrap/era-zero.png`. Only `--reference`
 writes to `docs/shots/eras/`: if you deliberately change how an era looks,
 re-take them that way and commit them on purpose, in their own commit.
 
@@ -155,9 +158,23 @@ through `state.rng`, so a test can pin it down.
 
 A match starts on the 1972 machine. **Every point either side scores moves it
 up one era** -- it does not matter who scored, only that a point was scored --
-so the fourth point of a match lands on the Super Nintendo, and it stops there:
-a fifth point, or a fiftieth, leaves it on the top rung. A reload starts a fresh
-match back on era 0. All five rungs are built:
+so the tenth point of a match lands on the Xbox 360, and it stops there: an
+eleventh point, or a fiftieth, leaves it on the top rung. A reload starts a fresh
+match back on era 0. All eleven rungs are built.
+
+### The story, 1972 to 2005
+
+- **1972, arcade Pong:** black and white, two bars, a square ball and a blip -- where it all starts.
+- **1977, Atari 2600:** the turn to colour; each side gets its own.
+- **1985, NES:** 8-bit sprites, the NES palette and chiptune.
+- **1989, Sega Genesis:** 16-bit shading, parallax and a bright FM bell.
+- **1991, Super Nintendo:** a Mode 7 floor, rich sprites and chords with an echo.
+- **1994, Sony PlayStation:** the table tilts into 3D, and it wobbles -- snapped polygons, swimming textures, dithered chunky pixels.
+- **1996, Nintendo 64:** soft blurred textures, heavy fog, round toybox shapes and rumble.
+- **1999, Sega Dreamcast:** crisp cel shading, thick ink outlines, a graffiti score and the modem's screech.
+- **2000, PlayStation 2:** letterbox bars, sparks, a glow trail, a lens flare and taiko drums.
+- **2001, Xbox:** bump-mapped metal, hard moving shadows, gamertags and green light.
+- **2005, Xbox 360:** bloom, a brown grade, film grain, motion blur, the blades and an achievement -- the top of the ladder.
 
 | Era | Machine | Look | Voice | Reference frame |
 | --- | --- | --- | --- | --- |
@@ -166,20 +183,19 @@ match back on era 0. All five rungs are built:
 | 2 | 1985 NES | 8-bit sprites, the NES palette and a pixel score | square and triangle chiptune | [`era2-nes.png`](docs/shots/eras/era2-nes.png) |
 | 3 | 1989 Sega Genesis | 16-bit shading, parallax and a trail behind the ball | a bright FM bell | [`era3-genesis.png`](docs/shots/eras/era3-genesis.png) |
 | 4 | 1991 Super Nintendo | a Mode 7 floor and rich sprites | layered chords with a short echo | [`era4-snes.png`](docs/shots/eras/era4-snes.png) |
-| 5 | 1994 Sony PlayStation | planned: wobbling snapped polygons, swimming affine textures, dithered 320x240 | plucky CD notes in a room reverb | not built yet |
-| 6 | 1996 Nintendo 64 | planned: blurred textures, heavy fog, round toybox shapes, rumble shake | muffled, springy samples | not built yet |
-| 7 | 1999 Sega Dreamcast | planned: crisp cel shading, thick ink outlines, graffiti score, speed lines | punchy synth-funk, the modem | not built yet |
-| 8 | 2000 PlayStation 2 | planned: letterbox, sparks, glow trail, lens flare, slow camera drift | taiko, orchestral pads, a big hit | not built yet |
-| 9 | 2001 Xbox | planned: bump-mapped metal, hard moving shadows, gamertags, shield-bar score | sub-heavy metallic clangs | not built yet |
-| 10 | 2005 Xbox 360 | planned: bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked | big clean hits, the achievement blip | not built yet |
+| 5 | 1994 Sony PlayStation | wobbling snapped polygons, swimming affine textures, dithered 320x240 | plucky CD notes in a room reverb | [`era5-playstation.png`](docs/shots/eras/era5-playstation.png) |
+| 6 | 1996 Nintendo 64 | blurred textures, heavy fog, round toybox shapes, rumble shake | muffled, springy samples | [`era6-n64.png`](docs/shots/eras/era6-n64.png) |
+| 7 | 1999 Sega Dreamcast | crisp cel shading, thick ink outlines, graffiti score, speed lines | punchy synth-funk, the modem | [`era7-dreamcast.png`](docs/shots/eras/era7-dreamcast.png) |
+| 8 | 2000 PlayStation 2 | letterbox, sparks, glow trail, lens flare, slow camera drift | taiko, orchestral pads, a big hit | [`era8-ps2.png`](docs/shots/eras/era8-ps2.png) |
+| 9 | 2001 Xbox | bump-mapped metal, hard moving shadows, gamertags, shield-bar score | sub-heavy metallic clangs | [`era9-xbox.png`](docs/shots/eras/era9-xbox.png) |
+| 10 | 2005 Xbox 360 | bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked | big clean hits, the achievement blip | [`era10-xbox360.png`](docs/shots/eras/era10-xbox360.png) |
 
 The reference frames in `docs/shots/eras/` are each era in play, taken by the
 playtest as it walks one match up the ladder (see *Run the tests*).
 
 Eras 5 to 10 are specified in **`docs/ERAS.md`**, the era bible: every rung's name
 card, palette, camera on the shared 3D table, the look to exaggerate, its sounds
-and its arrival flourish, plus the readability rules that keep it playable. They
-join the ladder when their cards land; until then it stops on the Super Nintendo.
+and its arrival flourish, plus the readability rules that keep it playable.
 
 The rules (`Pong.ERAS` in `src/game.js`) carry only the number: `state.era`,
 and `state.eraChangedAt`, the game time it last moved, for a transition to read.
@@ -193,9 +209,9 @@ new file, one `<script>` line in `index.html`, and one entry in `Pong.ERAS`.
 
 **Open the page at any era** with a query, so you can look at one machine
 without playing up to it: `index.html?era=0` is the arcade machine (the same as
-no query), `?era=2` the NES, `?era=4` the Super Nintendo. Anything above 4 opens
-on 4, and anything that is not a number opens on 0. The match still starts on
-the title screen, its score at 0-0, and climbs from that era -- so `?era=3` is
+no query), `?era=2` the NES, `?era=10` the Xbox 360. Anything above 10 opens
+on 10, and anything that is not a number opens on 0. The match still starts on
+the title screen, its score at 0-0, and climbs from that era -- so `?era=9` is
 one point from the top -- and a reload comes back to the era in the address.
 The playtest takes `--era 3` for the same thing, and `--ladder` walks the whole
 ladder from era 0 instead.
@@ -252,3 +268,12 @@ and the new era is what draws once it has gone):
 | Atari 2600 to NES | the picture blinks once and turns over in tiles ahead of the ring like a cartridge reset, to the NES power-on chime | [`change-era1-to-era2.png`](docs/shots/eras/change-era1-to-era2.png) |
 | NES to Genesis | the old picture cracks on the ring's edge into shards that spin and fly off, to a bassy FM sting | [`change-era2-to-era3.png`](docs/shots/eras/change-era2-to-era3.png) |
 | Genesis to Super Nintendo | the field tilts back into a Mode 7 plane and sweeps flat under the new era, its name card spinning in, to an orchestral hit | [`change-era3-to-era4.png`](docs/shots/eras/change-era3-to-era4.png) |
+| Super Nintendo to PlayStation | the flat world shatters into snapped polygons at the point, the ring's edge is a wobbling many-sided shape over a dithered band, and the table pops in like a model loading, to the shimmering swell and the deep tone | [`change-era4-to-era5.png`](docs/shots/eras/change-era4-to-era5.png) |
+| PlayStation to Nintendo 64 | fog rises at the point, the old picture melts soft at the ring while toy balls ride its edge, fog pours over the far end and a cube spins once above the card | [`change-era5-to-era6.png`](docs/shots/eras/change-era5-to-era6.png) |
+| Nintendo 64 to Dreamcast | a white page and a bouncing orange dot, an ink line leading the ring so each shape is inked before its colour arrives, a swirl on the edge, then a comic-panel snap, to the modem | [`change-era6-to-era7.png`](docs/shots/eras/change-era6-to-era7.png) |
+| Dreamcast to PlayStation 2 | the letterbox bars slam in and the colour drains through the ring, boot towers rise on its edge with sparks and dust, and the lens flare sweeps home | [`change-era7-to-era8.png`](docs/shots/eras/change-era7-to-era8.png) |
+| PlayStation 2 to Xbox | a green orb swells at the point, glowing tendrils reach the ring's edge, and the light snaps on so every hard shadow swings across the table | [`change-era8-to-era9.png`](docs/shots/eras/change-era8-to-era9.png) |
+| Xbox to Xbox 360 | a white-out at the point, the dashboard blades sweep with the ring under bloom and grain, the HUD blades slide in and the Top of the Ladder achievement pops | [`change-era9-to-era10.png`](docs/shots/eras/change-era9-to-era10.png) |
+
+From the PlayStation on, each arriving machine also shows its own signboard in
+the name card (item 1184).

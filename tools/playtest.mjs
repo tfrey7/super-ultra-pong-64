@@ -56,8 +56,9 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 // --scoring runs only the rally and the scoring check (section 6), about ten
 // seconds -- the quick way to ask "can the player still score?" many times.
 const SCORING_ONLY = process.argv.includes('--scoring');
-// --reference also copies the five era frames the walk takes, and the four
-// frames it catches mid-change (change-era0-to-era1.png to change-era3-to-era4.png),
+// --reference also copies the eleven era frames the walk takes (era0-arcade.png to
+// era10-xbox360.png), and the ten frames it catches mid-change (change-era0-to-era1.png
+// to change-era9-to-era10.png),
 // into the TRACKED docs/shots/eras/, the reference pictures a reader opens. Off by default,
 // because every walk's frames differ and a plain playtest must leave git clean.
 const REFERENCE = process.argv.includes('--reference');
@@ -241,17 +242,23 @@ async function filmChange(s, clip, from) {
       const c = document.createElement('canvas'); c.width = w; c.height = h;
       drawAs(era)(c.getContext('2d')); return pix(c); };
     const L = pix(live), N = render(${from + 1}), O = render(${from});
-    let asNew = 0, asOld = 0, counted = 0;
+    let asNew = 0, asOld = 0, apart = 0, counted = 0;
     for (let y = 0; y < h; y++) {
       if (y >= h / 2 - band && y < h / 2 + band) continue;
       for (let x = 0; x < w; x++) {
         const i = (y * w + x) * 4; counted++;
         if (L[i] !== N[i] || L[i + 1] !== N[i + 1] || L[i + 2] !== N[i + 2]) asNew++;
         if (L[i] !== O[i] || L[i + 1] !== O[i + 1] || L[i + 2] !== O[i + 2]) asOld++;
+        if (N[i] !== O[i] || N[i + 1] !== O[i + 1] || N[i + 2] !== O[i + 2]) apart++;
       }
     }
     const m = R.eraChangeMoment(g);
-    done({ era: g.era, ring: !!(m && m.wiping), asNew: asNew, asOld: asOld, counted: counted });
+    // A rung that borrows its neighbour's whole look (a like: N stand-in with no
+    // draw of its own) draws the very same frame as the era it replaces, so
+    // "closer to the new era than the old" cannot hold; when the two offscreen
+    // frames are identical the live canvas only has to match the new era
+    // exactly (items 1145-1150, 1179).
+    done({ era: g.era, ring: !!(m && m.wiping), asNew: asNew, asOld: asOld, counted: counted, same: apart === 0 });
   })))`);
   return out;
 }
@@ -342,13 +349,14 @@ async function walkLadder(s, baseUrl) {
   for (const c of changes) {
     const e = c.end, d = c.drawn;
     const reached = !!e && e.radius >= e.corner;
-    const newDraws = d.era === c.from + 1 && !d.ring && d.asNew < d.asOld;
+    const newDraws = d.era === c.from + 1 && !d.ring && (d.same ? d.asNew === 0 : d.asNew < d.asOld);
     check(`the change to the ${eras[c.from + 1]} ran from the ${sideOf(c)} edge: the ring reached the far corner and the new era draws afterwards`,
       !!c.file && reached && newDraws,
       (e ? `ring from ${e.origin.x.toFixed(0)},${e.origin.y.toFixed(0)} ended at radius ` +
         `${e.radius.toFixed(0)}, far corner ${e.corner.toFixed(0)}` : 'the ring was never seen to finish') +
       `; afterwards on era ${d.era}, ${d.asNew} of ${d.counted} pixels differ from era ${c.from + 1} ` +
-      `drawn offscreen, ${d.asOld} from era ${c.from}`);
+      `drawn offscreen, ${d.asOld} from era ${c.from}` +
+      (d.same ? ' (the two rungs draw the same frame, so only an exact match with the new era is asked)' : ''));
   }
 
   if (REFERENCE) {
@@ -362,7 +370,7 @@ async function walkLadder(s, baseUrl) {
 function summarise(shots) {
   console.log('\nscreenshots:');
   for (const f of shots) console.log('  ' + f);
-  if (REFERENCE) console.log(`the five era frames and the four mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
+  if (REFERENCE) console.log(`the era frames and the mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
   process.exitCode = failed.length ? 1 : 0;
@@ -378,7 +386,12 @@ async function main() {
   const chrome = launchChrome(CHROME, [
     // --mute-audio: the audio graph still runs and is still checked, but a
     // playtest never beeps through the speakers of the machine it runs on.
+    // --allow-file-access-from-files: the page is opened off disk, where Chrome
+    // counts every image as another origin, so one drawImage of the pixel art
+    // in assets/pixellab/ taints the canvas and the ladder walk's getImageData
+    // throws. With it, a file:// page may read back its own files (item 1179).
     '--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
+    '--allow-file-access-from-files',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
     '--no-first-run', '--no-default-browser-check',
     url
