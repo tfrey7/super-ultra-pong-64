@@ -405,6 +405,15 @@ Item 1203 traced 100-117 ms of shader compiles there, for era looks nothing had 
   `--timing` times the ring with no trace (tracing slows every frame), `--from-load` records from
   before the page loads (the warm-up's own work), and `--skia` names each GPU program built.
 - **Commit one or two representative traces, not one per leg**: each is 1-2 MB gzipped.
+- **The screen overlays draw on the PAGE canvas, where the ring's warm-up never reaches** (item
+  1239). The Super Nintendo's S-video tube was first drawn the frame the first ring passed the
+  centre (raw 0.50, when the display switches to the arriving era), and its multiply blend's GPU
+  program cost a 16.7-41.8 ms frame on 8 of 8 fresh pages. `PongDisplay.warmOverlays`, called once
+  by `src/main.js` before the first `present()`, draws every row's overlay on a page-sized layer and
+  copies it: 0 of 16 legs after. A new overlay kind, or a new blend mode or alpha in one, is warmed
+  for free as long as it is a row's `overlay`; a draw that `present()` makes outside the overlay is
+  not. A/B a long frame with `--pre "PongDisplay.row(N).overlay='none'"` on
+  `docs/measure/item-1239/trace.mjs` before chasing it.
 - **A flourish that draws something no ring has drawn before brings a hitch back** as a GPU
   program built mid-ring (item 1218: the Super Nintendo tilt's first turned strip, 13-25 ms at raw
   0.12 on 15 of 20 cold legs). A/B with the flourish off first -- item 1218's copy of the recorder,

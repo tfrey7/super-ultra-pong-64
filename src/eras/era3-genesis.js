@@ -231,10 +231,11 @@
     ctx.fillRect(b.x + q, b.y + q, q, q);
   }
 
-  // Bigger blocks than the stock 14, bevelled: a lit edge along the top of
-  // every stroke, and a SOLID drop shadow in the ink's own deep shade -- a
-  // translucent black one vanishes into the night sky.
-  var SCORE = { cell: 16, gap: 12, top: 36, offset: 110, shadow: 6, bevel: 3 };
+  // Bevelled block digits: a lit edge along the top of every stroke, and a
+  // SOLID drop shadow in the ink's own deep shade -- a translucent black one
+  // vanishes into the night sky. Item 1226 set them into the stone panel
+  // (16 native lines, 43 field units), so they are 7-unit blocks now, 35 tall.
+  var SCORE = { cell: 7, gap: 5, top: 3, offset: 110, shadow: 3, bevel: 2 };
 
   function drawScore(ctx, state, side, centreX) {
     var text = String(state.score[side]);
@@ -302,19 +303,238 @@
   // over the top quarter and a '+' near the foot. The brief allows one retry,
   // so the stepped palette gradient below is the Genesis paddle.
 
+  // ------------------------------------------ the arena (item 1226, docs/ART.md)
+  // A torch-lit stone arena at night. The near plane is an arena wall under a
+  // Golden Axe stone panel; four torches with pennants ride the wall. Each
+  // piece is a pixellab image (snapped to the 512 colours) drawn with
+  // drawImage once decoded, and a fillRect stand-in until then -- and always
+  // under node --test.
+  var ARENA = {
+    panelH: 43,                 // 16 native lines of 2.68 units
+    wallH: 96,                  // the wall band under it (36 native lines)
+    torchX: [100, 300, 500, 700],
+    torch: { w: 20, h: 40, dy: 22, frameS: 0.1 },
+    portrait: { size: 40, leftX: 20, rightX: 740, frame: '#b6b6db', hot: '#ffdb00' },
+    pots: { n: 5, w: 10, h: 16, gap: 4, empty: '#242449', full: '#2449ff', lid: '#b6b6db' },
+    flash: { ink: '#ff0000', s: 0.3, blinks: 3 },
+    flareS: 0.2,
+    flames: ['#ff9200', '#ffdb00', '#db2400']
+  };
+  ART.wall = 'era3-arena-wall';
+  ART.torch = 'era3-torch';
+  ART.portraits = 'era3-portraits';
+  ART.panel = 'era3-panel';
+
+  /** A decoded image by name, or null (and its load started). */
+  function image(S, name) {
+    if (!S) return null;
+    if (S.ready(name)) return S.load(name);
+    S.load(name);
+    return null;
+  }
+
+  // The moment a point was scored, as this era saw it: kept per game on the
+  // score object (the ring's and the display's copies share it), read off
+  // state.events -- which the ring's first frame of this era still carries.
+  var moments = typeof WeakMap === 'function' ? new WeakMap() : null;
+
+  function momentOf(state) {
+    var key = state.score;
+    var m = (moments && key && moments.get(key)) || { at: -Infinity, loser: null, time: 0 };
+    if ((state.time || 0) < m.time) m = { at: -Infinity, loser: null, time: 0 };
+    var evs = state.events || [];
+    for (var i = 0; i < evs.length; i++) {
+      var ev = evs[i];
+      if (ev && ev.type === 'score' && ev.time > m.at && (ev.side === 'left' || ev.side === 'right')) {
+        m = { at: ev.time, loser: ev.side === 'left' ? 'right' : 'left', time: m.time };
+      }
+    }
+    m.time = state.time || 0;
+    if (moments && key && typeof key === 'object') moments.set(key, m);
+    return m;
+  }
+
+  function matchPoint(state) {
+    var P = root.Pong;
+    try { return !!(P && typeof P.isMatchPoint === 'function' && P.isMatchPoint(state)); } catch (e) { return false; }
+  }
+
+  /** The wall band: the generated stone tiled along the near plane's scroll, or blocks. */
+  function drawWall(ctx, state, S, scroll) {
+    var w = state.width;
+    var top = ARENA.panelH;
+    var h = ARENA.wallH;
+    var off = ((scroll % w) + w) % w;
+    var img = image(S, ART.wall);
+    if (img) {
+      var smooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
+      // Only the top 36 rows, one a native line of the 96-unit band; the rows
+      // under them are a bright floor edge that would compete with the ball.
+      ctx.drawImage(img, 0, 0, 320, 36, Math.floor(-off), top, w, h);
+      ctx.drawImage(img, 0, 0, 320, 36, Math.floor(w - off), top, w, h);
+      ctx.imageSmoothingEnabled = smooth;
+      return;
+    }
+    ctx.fillStyle = '#242449';
+    ctx.fillRect(0, top, w, h);
+    var bw = 40, bh = 24;
+    for (var row = 0; row * bh < h; row++) {
+      var shift = (row % 2) * bw / 2;
+      ctx.fillStyle = '#000024';                       // mortar course
+      ctx.fillRect(0, top + row * bh, w, 2);
+      for (var x = -((off + shift) % bw); x < w; x += bw) {
+        ctx.fillRect(Math.floor(x), top + row * bh, 2, Math.min(bh, h - row * bh));
+        ctx.fillStyle = '#49496d';                     // each block's lit top
+        ctx.fillRect(Math.floor(x) + 2, top + row * bh + 2, bw - 4, 2);
+        ctx.fillStyle = '#000024';
+      }
+    }
+    ctx.fillStyle = '#000024';
+    ctx.fillRect(0, top + h - 3, w, 3);
+  }
+
+  /** One torch and its pennant at x, flame frame f (0-2), pennant frame pf. */
+  function drawTorch(ctx, S, x, f, pf, pennant, tall) {
+    var T = ARENA.torch;
+    var top = ARENA.panelH + T.dy - (tall ? 6 : 0);
+    var h = T.h + (tall ? 6 : 0);
+    // the pennant, hung from the bracket: a stepped triangle, 2 frames
+    ctx.fillStyle = pennant;
+    var px = x + T.w / 2 + 2;
+    var py = ARENA.panelH + T.dy + 20;
+    for (var k = 0; k < 4; k++) {
+      var len = 16 - k * 4 + (pf ? (k % 2 ? 2 : -2) : 0);
+      ctx.fillRect(px, py + k * 4, Math.max(2, len), 4);
+    }
+    var img = image(S, ART.torch);
+    if (img) {
+      var smooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, f * 16, 0, 16, 32, Math.floor(x - T.w / 2), top, T.w, h);
+      ctx.imageSmoothingEnabled = smooth;
+      return;
+    }
+    ctx.fillStyle = '#492400';                         // the iron bracket
+    ctx.fillRect(x - 3, ARENA.panelH + T.dy + 18, 6, 22);
+    var fl = [10, 14, 12][f] + (tall ? 6 : 0);
+    ctx.fillStyle = ARENA.flames[2];
+    ctx.fillRect(x - 6, ARENA.panelH + T.dy + 18 - fl, 12, fl);
+    ctx.fillStyle = ARENA.flames[0];
+    ctx.fillRect(x - 4, ARENA.panelH + T.dy + 18 - fl + 3, 8, fl - 3);
+    ctx.fillStyle = ARENA.flames[1];
+    ctx.fillRect(x - 2, ARENA.panelH + T.dy + 18 - fl + 6, 4, fl - 7);
+  }
+
+  function drawTorches(ctx, state, S, scroll, m, hot) {
+    var t = state.time || 0;
+    var rate = hot ? 2 : 1;                              // match point: double speed
+    var flare = t - m.at >= 0 && t - m.at < ARENA.flareS;
+    var w = state.width;
+    for (var i = 0; i < ARENA.torchX.length; i++) {
+      var x = (((ARENA.torchX[i] - scroll) % w) + w) % w;
+      var f = flare ? 1 : (Math.floor(t * rate / ARENA.torch.frameS) + i) % 3;
+      var pf = Math.floor(t * rate * 4 + i) % 2;
+      var pennant = onPalette(paddleInk(state, i < 2 ? 'left' : 'right'), -2);
+      drawTorch(ctx, S, x, f, pf, pennant, flare);
+    }
+  }
+
+  /** The stone panel across the top: the generated slab's clean right half, mirrored. */
+  function drawPanel(ctx, state, S, hot) {
+    var w = state.width;
+    var h = ARENA.panelH;
+    var img = image(S, ART.panel);
+    if (img) {
+      // The generation's left half carries a stray golden axe; the right half
+      // is clean stone, so it is drawn twice, the left copy mirrored.
+      var smooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, 164, 0, 156, 32, w / 2, 0, w / 2, h);
+      ctx.save();
+      ctx.translate(w / 2, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(img, 164, 0, 156, 32, 0, 0, w / 2, h);
+      ctx.restore();
+      ctx.imageSmoothingEnabled = smooth;
+    } else {
+      ctx.fillStyle = '#494949';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#929292';
+      ctx.fillRect(0, 0, w, 3);
+      ctx.fillStyle = '#242424';
+      ctx.fillRect(0, h - 4, w, 4);
+      ctx.fillStyle = '#6d6d6d';
+      for (var x = 12; x < w; x += 64) ctx.fillRect(x, h / 2 - 2, 4, 4);   // rivets
+    }
+    // The frame: a 1-native-pixel edge, gold while match point holds.
+    ctx.fillStyle = hot ? ARENA.portrait.hot : '#000024';
+    ctx.fillRect(0, h - 2, w, 2);
+    if (hot) { ctx.fillRect(0, 0, w, 2); ctx.fillRect(0, 0, 2, h); ctx.fillRect(w - 2, 0, 2, h); }
+  }
+
+  /** A player's portrait, its frame, and the magic pots under it. */
+  function drawPortrait(ctx, state, S, side, m) {
+    var P = ARENA.portrait;
+    var x = side === 'left' ? P.leftX : P.rightX;
+    var y = 2;
+    var s = P.size - 4;
+    ctx.fillStyle = P.frame;
+    ctx.fillRect(x - 2, y - 1, s + 4, s + 3);
+    var img = image(S, ART.portraits);
+    if (img) {
+      var smooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, side === 'left' ? 0 : 32, 0, 32, 32, x, y, s, s);
+      ctx.imageSmoothingEnabled = smooth;
+    } else {
+      ctx.fillStyle = '#000024';
+      ctx.fillRect(x, y, s, s);
+      ctx.fillStyle = side === 'left' ? '#b66d49' : '#6d6d92';          // face or visor
+      ctx.fillRect(x + 8, y + 10, s - 16, s - 12);
+      ctx.fillStyle = side === 'left' ? '#b6b6b6' : '#924924';          // helmet or crest
+      ctx.fillRect(x + 6, y + 4, s - 12, 6);
+    }
+    // The conceding portrait flashes red three times over 0.3 s.
+    var age = (state.time || 0) - m.at;
+    if (m.loser === side && age >= 0 && age < ARENA.flash.s &&
+        Math.floor(age / (ARENA.flash.s / (ARENA.flash.blinks * 2))) % 2 === 0) {
+      ctx.fillStyle = 'rgba(255,0,0,0.6)';
+      ctx.fillRect(x, y, s, s);
+    }
+    // Golden Axe's magic pots: one filled per 2 hits of this rally.
+    var pots = ARENA.pots;
+    var full = Math.min(pots.n, Math.floor((state.rally || 0) / 2));
+    var span = pots.n * pots.w + (pots.n - 1) * pots.gap;
+    var px = side === 'left' ? x + P.size + 6 : x - 6 - span;
+    for (var k = 0; k < pots.n; k++) {
+      var kx = px + k * (pots.w + pots.gap);
+      ctx.fillStyle = pots.lid;
+      ctx.fillRect(kx + 2, 10, pots.w - 4, 3);
+      ctx.fillStyle = k < full ? pots.full : pots.empty;
+      ctx.fillRect(kx, 13, pots.w, pots.h);
+    }
+  }
+
   function draw(ctx, state, opts) {
     if (opts && opts.ink) return R.drawBase(ctx, state, opts);
     var p = planes(state.time);
     var S = art();
+    var m = momentOf(state);
+    var hot = matchPoint(state);
 
     if (!(S && drawCourt(ctx, state, S, p.far))) {
       drawSky(ctx, state);
       drawStars(ctx, state, p.far);
       drawRidge(ctx, state, p.far, 150, 70, 0.4, '#242449', '#49496d');
     }
-    drawRidge(ctx, state, p.near, 70, 40, 2.7, '#000024', '#242449');
+    drawWall(ctx, state, S, p.near);
+    drawTorches(ctx, state, S, p.near, m, hot);
 
     drawCentreLine(ctx, state);
+    drawPanel(ctx, state, S, hot);
+    drawPortrait(ctx, state, S, 'left', m);
+    drawPortrait(ctx, state, S, 'right', m);
     drawScore(ctx, state, 'left', state.width / 2 - SCORE.offset);
     drawScore(ctx, state, 'right', state.width / 2 + SCORE.offset);
 
@@ -606,6 +826,9 @@
     onPalette: onPalette,
     LEVELS: LEVELS,
     SCORE: SCORE,
+    ARENA: ARENA,
+    ART: ART,
+    momentOf: momentOf,
     TRAIL: TRAIL,
     TRAIL_INK: TRAIL_INK,
     SHADOW: SHADOW
