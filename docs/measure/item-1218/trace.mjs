@@ -49,7 +49,8 @@ const FROM_LOAD = process.argv.includes('--from-load');
 // page's own rAF clock, long = over 3x the median frame across the ring, the
 // same rule as item 1164's firstring.mjs.
 const TIMING = process.argv.includes('--timing');
-const AT_RAW = process.argv.includes('--at-raw') ? Number(arg('--at-raw', 0.12)) : null;
+const NO_FLOURISH = process.argv.includes('--no-flourish');
+const AT_RAW =process.argv.includes('--at-raw') ? Number(arg('--at-raw', 0.12)) : null;
 let port = Number(arg('--port', 9391));
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
@@ -113,6 +114,9 @@ async function leg(n) {
     if (FROM_LOAD && !TIMING) await send('Tracing.start', { transferMode: 'ReportEvents', traceConfig });
     await send('Page.navigate', { url });
     await sleep(900);
+    // --no-flourish (item 1218): the arriving era's flourish taken off its look, so
+    // the ring plays plain -- the A/B that says whether a frame is the flourish's.
+    if (NO_FLOURISH) await evalJs(`(() => { const l = window.PongRender.eraLook(4); if (l) l.flourish = null; return !!l; })()`);
     await send('Input.dispatchKeyEvent', { type: 'keyDown', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
     await send('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
     await sleep(1500);
@@ -265,6 +269,6 @@ for (let r = 0; r < RUNS; r++) {
     `point at ${res.window.pointAtMs}, ring at ${res.window.ringFirstFrameAtMs}, sounds at ${JSON.stringify(res.window.soundsAtMs)}; page ${JSON.stringify(res.page)}`);
   for (const t of res.threads.slice(0, 8)) console.log(`   ${t.busyMs.toFixed(1).padStart(6)} ms  ${t.thread}  <- ${t.heaviestNames.slice(0, 5).map((x) => `${x.name} ${x.ms}`).join(', ')}`);
 }
-const out = { label: LABEL, noAudio: NO_AUDIO, control: CONTROL, timing: TIMING, fromLoad: FROM_LOAD, root: ROOT, chrome: CHROME, when: new Date().toISOString(), categories: CATEGORIES, results };
+const out = { label: LABEL, noFlourish: NO_FLOURISH, atRaw: AT_RAW, noAudio: NO_AUDIO, control: CONTROL, timing: TIMING, fromLoad: FROM_LOAD, root: ROOT, chrome: CHROME, when: new Date().toISOString(), categories: CATEGORIES, results };
 writeFileSync(path.join(HERE, `${LABEL}.json`), JSON.stringify(out, null, 1) + '\n');
 console.log('wrote', path.join(HERE, `${LABEL}.json`));
