@@ -140,11 +140,16 @@
     // tools/spritegen.mjs, not pixellab -- assets/spritegen/era3-barbarian.json
     // and era3-knight.json, posed from parts by
     // assets/spritegen/era3-players-compose.mjs and built into assets/pixellab/
-    // where the loader looks. Item 1226's 20 x 25 frame, hand and scale kept
-    // (3.2, not the bible's 2.6 for 12 x 52: 80 units tall, one paddle), so the
-    // figure holds the bat where it did.
+    // where the loader looks. Item 1226's 20 x 25 frame and hand kept, so the
+    // fist is still on the bat's handle at the paddle's outer face.
+    // Scale 1.6 (item 1300), not item 1226's 3.2: the figure stands between the
+    // wall and its bat, and that strip is paddleInset, 32 units. Every one of the
+    // twelve frames of both sheets fills all 20 columns, so 32 / 20 = 1.6 is the
+    // largest scale that shows the whole figure with the grip kept; at 3.2 each
+    // figure was 64 wide and hung half off the screen. 40 units tall, about half
+    // a paddle -- a full-size figure wants a narrower frame (see the lessons page).
     3:  { sheets: { left: 'era3-barbarian', right: 'era3-knight' }, frame: { w: 20, h: 25 },
-          hand: { x: 20, y: 13 }, scale: 3.2, fps: 10,
+          hand: { x: 20, y: 13 }, scale: 1.6, fps: 10,
           skin: '#eeaa88', body: '#222266', res: 1 },
     // Super Nintendo (item 1281): two hover pilots drawn as text grids with
     // tools/spritegen.mjs, not pixellab -- assets/spritegen/era4-pilot-red.json
