@@ -1,0 +1,70 @@
+{
+ "url": "file:///G:/Claude%20Stuff/super-ultra-pong-64-item-1140/index.html?era=3",
+ "baseline": {
+  "frames": 240,
+  "meanMs": 4.17,
+  "p95Ms": 4.3,
+  "maxMs": 4.3
+ },
+ "ringFrames": {
+  "frames": 340,
+  "meanMs": 4.61,
+  "p95Ms": 4.3,
+  "maxMs": 120.8
+ },
+ "hitches": [
+  {
+   "ms": 120.8,
+   "rawBefore": 0.005599999999999976,
+   "rawAfter": 0.03893333333333319
+  },
+  {
+   "ms": 20.9,
+   "rawBefore": 0.3306000000000025,
+   "rawAfter": 0.34453333333333597
+  }
+ ],
+ "afterRing": {
+  "era": 4,
+  "raw": 1,
+  "wiping": false,
+  "cardUp": true,
+  "held": false,
+  "box": "#403070"
+ },
+ "shots": [
+  {
+   "name": "mode7-tilt",
+   "file": "G:\\Claude Stuff\\super-ultra-pong-64-item-1140\\docs\\shots\\item-1140\\mode7-tilt.png",
+   "asked": 0.34,
+   "rawBefore": 0.34446666666666914,
+   "heldBefore": true,
+   "cardUp": false
+  },
+  {
+   "name": "mode7-card-spin",
+   "file": "G:\\Claude Stuff\\super-ultra-pong-64-item-1140\\docs\\shots\\item-1140\\mode7-card-spin.png",
+   "asked": 0.74,
+   "rawBefore": 0.7500000000000053,
+   "heldBefore": true,
+   "cardUp": true
+  },
+  {
+   "name": "mode7-landed",
+   "file": "G:\\Claude Stuff\\super-ultra-pong-64-item-1140\\docs\\shots\\item-1140\\mode7-landed.png",
+   "asked": 0.97,
+   "rawBefore": 0.9722000000000227,
+   "heldBefore": false,
+   "cardUp": true
+  }
+ ],
+ "settled": {
+  "era": 4,
+  "raw": null,
+  "wiping": false,
+  "cardUp": false,
+  "held": false,
+  "box": "#403070"
+ },
+ "errors": []
+}
