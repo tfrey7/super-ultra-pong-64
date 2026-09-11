@@ -277,6 +277,16 @@ his emulator — never touch either.**
   9952. Trust the call's own `cost` in the manifest, not `generationsUsed` (which records 0 for
   that image), for what one image costs.
 
+- **An era's `ctx.canvas` is not the page's canvas, and not always 800 x 600** (item 1198). The
+  display (`src/display.js`) hands eras 0-4 a field-sized offscreen canvas, sampled down to the
+  machine's pixels afterwards, and eras 5-10 the native one itself (320 x 240 and up) with a
+  scale transform, so field units still work. Code that copies `ctx.canvas` with a bare
+  `drawImage(canvas, 0, 0)`, or refuses a canvas that is not 800 x 600, breaks on the 3D eras:
+  copy it with the full source and destination rectangles instead (era 1's arrival roll is the
+  worked example). `index.html?display=off` draws straight onto the page as before, and the
+  playtest's pixel check reads the native frame through `PongDisplay.canvas()` and draws its
+  comparisons through `PongDisplay.render()`.
+
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
 
