@@ -199,6 +199,33 @@
   var MAX_PER_FRAME = 4;   // a pathological frame never schedules a pile of notes
 
   /**
+   * The smash (item 1208): the era's own paddle notes, made heavier -- each one
+   * held twice as long and struck harder, with the same wave an octave below
+   * under it, falling in pitch. Built from the voice it is handed, so every
+   * era's smash is in that era's voice and a new era gets one for nothing.
+   */
+  function smashOf(voices) {
+    var out = [];
+    for (var i = 0; i < voices.length; i++) {
+      var v = voices[i];
+      var hard = {};
+      for (var k in v) hard[k] = v[k];
+      hard.dur = v.dur * 2;
+      hard.gain = Math.min(0.45, v.gain * 1.5);
+      out.push(hard);
+      if (v.wave === 'noise') continue;
+      var low = {};
+      for (var j in v) low[j] = v[j];
+      low.freq = v.freq / 2;
+      low.slideTo = v.freq / 4;
+      low.dur = v.dur * 3;
+      low.gain = Math.min(0.4, v.gain * 1.2);
+      out.push(low);
+    }
+    return out;
+  }
+
+  /**
    * opts.AudioContext overrides the browser's constructor -- a test hands in a
    * recorder; null means "there is no audio here". Left out, the page's own
    * AudioContext (or webkitAudioContext) is used if it has one.
@@ -300,6 +327,7 @@
       var type = ev.type;
       if (type === 'score' && eraRose(ev, state) && voicesFor(ev.era, 'boot').length) type = 'boot';
       var voices = voicesFor(ev.era, type);
+      if (type === 'paddle' && ev.smash) voices = smashOf(voices);   // item 1208
       if (!voices.length) return false;
       try {
         var echo = echoFor(ev.era);
@@ -313,7 +341,8 @@
           era: clampEra(ev.era),
           type: type,
           waves: voices.map(function (v) { return v.fm ? 'fm' : v.wave; }),
-          echo: !!echo
+          echo: !!echo,
+          smash: !!(type === 'paddle' && ev.smash)
         };
         return true;
       } catch (e) {
@@ -385,6 +414,7 @@
     VOICES: VOICES,
     voicesFor: voicesFor,
     echoFor: echoFor,
+    smashOf: smashOf,
     createPlayer: createPlayer
   };
 });
