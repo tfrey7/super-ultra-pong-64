@@ -25,6 +25,8 @@ const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > 0
 const LABEL = arg('--label', 'run');
 const RUNS = Number(arg('--runs', 3));
 const PROBE = process.argv.includes('--probe');
+// --control: no point is forced; times ordinary play over the same window instead.
+const CONTROL = process.argv.includes('--control');
 let port = Number(arg('--port', 9361));
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
@@ -103,6 +105,19 @@ async function leg(plain) {
 
     const baseRun = await timing(1000);
     const baseline = stats(deltas(baseRun.stamps));
+    if (CONTROL) {
+      // The control: the same schedule with NO point forced -- ordinary play
+      // through the window the ring would have filled.
+      const more = await timing(1700);
+      const d = deltas(more.stamps);
+      const med = stats(d).medianMs;
+      const long = [];
+      for (let k = 1; k < more.stamps.length; k++) {
+        const ms = more.stamps[k] - more.stamps[k - 1];
+        if (ms > 3 * med) long.push({ ms: +ms.toFixed(1), sinceLoadMs: Math.round(more.stamps[k - 1]), busyBefore: +(more.busy[k - 1] || 0).toFixed(1) });
+      }
+      return { leg: 'control, no point', port: PORT, baseline, baselineLong: [], ring: stats(d), longFrames: long.map((f) => ({ ...f, rawAfter: null })), eraAfter: await evalJs('window.__pong.era'), errors };
+    }
     if (plain) await evalJs('(() => { delete window.PongRender.eraLook(4).flourish; return 1; })()');
     await evalJs(`(() => { const g = window.__pong; g.era = 3; g.startEra = 0;
       g.serveDelay = 0; g.ball.x = -8; g.ball.y = 150; g.ball.vx = -600; g.ball.vy = 0; return g.era; })()`);
@@ -110,20 +125,21 @@ async function leg(plain) {
     // Every frame interval that touches the ring: the one INTO its first frame counts.
     const ring = [];
     for (let k = 1; k < run.stamps.length; k++) {
-      if (run.ring[k] || run.ring[k - 1]) ring.push({ ms: run.stamps[k] - run.stamps[k - 1], rawBefore: run.raws[k - 1], rawAfter: run.raws[k],
+      if (run.ring[k] || run.ring[k - 1]) ring.push({ ms: run.stamps[k] - run.stamps[k - 1], at: run.stamps[k - 1], rawBefore: run.raws[k - 1], rawAfter: run.raws[k],
         busyBefore: run.busy[k - 1], partsBefore: run.parts[k - 1], busyAfter: run.busy[k], partsAfter: run.parts[k] });
     }
     const r1 = (v) => (typeof v === 'number' ? +v.toFixed(1) : v);
     const r1parts = (p) => (p ? { step: r1(p.step), sound: r1(p.sound), draw: r1(p.draw) } : p);
     const ringStats = stats(ring.map((f) => f.ms));
     const longFrames = ring.filter((f) => f.ms > 3 * ringStats.medianMs)
-      .map((f) => ({ ms: +f.ms.toFixed(1), rawBefore: f.rawBefore, rawAfter: f.rawAfter,
+      .map((f) => ({ ms: +f.ms.toFixed(1), sinceLoadMs: Math.round(f.at), rawBefore: f.rawBefore, rawAfter: f.rawAfter,
         busyBefore: r1(f.busyBefore), partsBefore: r1parts(f.partsBefore), busyAfter: r1(f.busyAfter), partsAfter: r1parts(f.partsAfter) }));
     // Long frames in ordinary play before the point, with the same breakdown.
     const baselineLong = [];
     for (let k = 1; k < baseRun.stamps.length; k++) {
       const ms = baseRun.stamps[k] - baseRun.stamps[k - 1];
-      if (ms > 3 * baseline.medianMs) baselineLong.push({ ms: +ms.toFixed(1), busyBefore: r1(baseRun.busy[k - 1]), partsBefore: r1parts(baseRun.parts[k - 1]) });
+      if (ms > 3 * baseline.medianMs) baselineLong.push({ ms: +ms.toFixed(1), sinceLoadMs: Math.round(baseRun.stamps[k - 1]),
+        busyBefore: r1(baseRun.busy[k - 1]), partsBefore: r1parts(baseRun.parts[k - 1]) });
     }
     const era = await evalJs('window.__pong.era');
     return { leg: plain ? 'plain ring' : 'era 4 flourish on', port: PORT, baseline, baselineLong, ring: ringStats, longFrames, eraAfter: era, errors };
@@ -136,7 +152,7 @@ async function leg(plain) {
 
 const results = [];
 for (let r = 0; r < RUNS; r++) {
-  for (const plain of [false, true]) {
+  for (const plain of (CONTROL ? [false] : [false, true])) {
     const res = await leg(plain);
     results.push({ run: r + 1, ...res });
     console.log(`run ${r + 1} ${res.leg.padEnd(18)} ring ${res.ring.frames} frames, median ${res.ring.medianMs} ms, ` +
