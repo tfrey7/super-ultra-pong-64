@@ -373,7 +373,9 @@ function summarise(shots) {
 async function main() {
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
   const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') +
-    (ERA ? '?era=' + encodeURIComponent(ERA) : '');
+    // ?era=N alone opens straight into play (item 1207); title=on keeps the
+    // cabinet so the title checks below still have a title to check.
+    (ERA ? '?era=' + encodeURIComponent(ERA) + '&title=on' : '');
   // The profile is a fresh folder under the temp directory, deleted when Chrome
   // exits -- on success, on an error and on Ctrl+C (tools/chrome.mjs, item 1169) --
   // so two playtests on two ports never share one and none is left behind.
@@ -442,6 +444,12 @@ async function main() {
       `score ${t1.score.left}-${t1.score.right}`);
     // Catch the invitation lit rather than mid-blink: a title shot without it
     // shows the reader a screen that never says how to start.
+    // ...and past the cabinet's power-on warm-up (item 1207), so the shot is
+    // the attract screen and not the tube still opening.
+    for (let i = 0; i < 40; i++) {
+      if (await s.eval('!window.__pongCabinet || window.__pongCabinet.stage(window.__pong) === "attract"')) break;
+      await sleep(60);
+    }
     for (let i = 0; i < 40; i++) {
       if (await s.eval('window.PongRender.promptLit(window.__pong)')) break;
       await sleep(60);
@@ -476,7 +484,8 @@ async function main() {
       'pressed the space bar on the title screen');
     // Far enough past the serve pause that the ball is on its way: a shot
     // taken on the very first frame is an empty field, which proves nothing.
-    await sleep(1200);
+    // The coin moment (CREDIT 1, PLAYER 1 READY) holds the first serve too.
+    await sleep(1200 + 1000 * (await s.eval('window.PongAttract ? window.PongAttract.COIN_HOLD : 0')));
     const firstFrameShot = await s.shot('first-frame');
 
     // 3. The loop is running at all.
