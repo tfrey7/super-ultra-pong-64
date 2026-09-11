@@ -79,12 +79,12 @@
   var DOF = { farY: 90, alpha: 0.6 };  // d 0.85 to 1 is field y 0 to 90
   var PADDLE = { z: 24, light: { top: 0.3, near: -0.05, side: -0.45 } };
   // The plaza (docs/ART.md era 10, item 1234). The ruin plate is the pixellab
-  // columns, 400 x 120 at one field unit a pixel, tiled so its own sun sits
-  // under the HDR sun at x 560; the banner hangs off the second column and
+  // columns, 400 x 120, drawn once at 800 x 120 so its own sun sits under the
+  // HDR sun at x 560 (tiled, it showed two suns); the banner hangs off the second column and
   // ripples; the ash drifts down and gusts sideways for half a second on a
   // point; the sun's bloom breathes. The ruin and banner go through the
   // depth-of-field buffer with the rest of the scenery, so they are soft.
-  var RUIN = { w: 400, h: 120, sunX: 245, alpha: 0.92, columns: 6 };
+  var RUIN = { w: 800, h: 120, sunX: 490, alpha: 0.92, columns: 6 };   // drawn once, twice as wide: one sun, under the HDR sun
   var BANNER = { x: 85, top: 22, w: 40, h: 60, slices: 6, ripple: 4, hz: 0.8 };
   var ASH = { n: 40, alpha: 0.3, min: 8, max: 20, gust: 60, gustS: 0.5 };
   var BREATHE = { amount: 0.05, period: 6 };
@@ -282,7 +282,7 @@
     if (img) {
       c.save();
       c.globalAlpha = RUIN.alpha;
-      for (var x = 560 - RUIN.sunX - RUIN.w; x < 800; x += RUIN.w) c.drawImage(img, x, top, RUIN.w, RUIN.h);
+      c.drawImage(img, 560 - RUIN.sunX, top, RUIN.w, RUIN.h);
       c.restore();
       return;
     }
