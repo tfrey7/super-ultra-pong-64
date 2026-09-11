@@ -136,7 +136,13 @@ test('with the art decoded, the court and the ball are one drawImage each: court
   assert.deepStrictEqual(court, [['image:court', 0, 4, 800, 592]], '200x148 at 4 units a pixel, centred under the border');
   assert.deepStrictEqual(ball, [['image:ball', Math.round(g.ball.x), Math.round(g.ball.y), g.ball.size, g.ball.size]]);
   assert.strictEqual(calls.findIndex((c) => c[0] === 'image:court'), 1, 'the court goes down straight after its base fill');
-  assert.deepStrictEqual(calls[calls.length - 1], ball[0], 'nothing is drawn over the ball');
+  // Nothing is drawn over the ball but its own seam: one pale-yellow NES pixel
+  // inside its box (item 1225, the tennis ball).
+  assert.deepStrictEqual(calls[calls.length - 2], ball[0], 'the ball is drawn last but for its seam');
+  const seam = calls[calls.length - 1];
+  assert.strictEqual(seam[0], R.eraLook(2).nesPalette[0x38], 'the seam is $38');
+  assert.ok(seam[1] >= g.ball.x && seam[2] >= g.ball.y && seam[1] + seam[3] <= g.ball.x + g.ball.size + 1 &&
+    seam[2] + seam[4] <= g.ball.y + g.ball.size + 1, 'inside the ball');
   const mortar = calls.filter(([i, , , w, h]) => i === '#000000' && (w === 800 || h === 600));
   assert.strictEqual(mortar.length, 0, 'the hand-drawn tiles give way to the generated court');
 });
