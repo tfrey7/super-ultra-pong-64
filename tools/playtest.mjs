@@ -4,7 +4,9 @@
  * page: that it opens on a title screen with the ball held still, that a click
  * and a keypress each start it, that the mouse moves the paddle, that the keys
  * move the paddle, that rallies happen, that a miss scores, and that the serve
- * comes back to centre.
+ * comes back to centre. Last, it walks one match up the whole era ladder --
+ * a point per rung, a screenshot of each era in play, and one more point to
+ * prove it stops at the top.
  *
  * No dependencies: it launches Chrome with a debugging port and drives it over
  * the DevTools protocol using Node's built-in WebSocket client (Node 22+).
@@ -16,7 +18,7 @@
  * part of the game: nothing in src/ knows it exists.
  */
 import { spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
@@ -43,6 +45,15 @@ const ERA = arg('era', '');
 // --no-audio takes AudioContext away from the page before it loads, the way a
 // browser with no audio device would, and checks the game still plays silently.
 const NO_AUDIO = process.argv.includes('--no-audio');
+// --ladder runs only the walk up the era ladder (section 8), about 30 seconds.
+const LADDER_ONLY = process.argv.includes('--ladder');
+// --reference also copies the five era frames the walk takes into the TRACKED
+// docs/shots/eras/, the reference pictures a reader opens. Off by default,
+// because every walk's frames differ and a plain playtest must leave git clean.
+const REFERENCE = process.argv.includes('--reference');
+const ERA_SHOTS = path.join(ROOT, 'docs', 'shots', 'eras');
+// One name per rung, the same as that era's file in src/eras/.
+const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes'];
 const CHROME = arg('chrome', CHROMES.find((p) => existsSync(p)));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -89,8 +100,9 @@ class Session {
       type, code, key, windowsVirtualKeyCode: vk, nativeVirtualKeyCode: vk
     });
   }
-  async shot(name) {
-    const r = await this.send('Page.captureScreenshot', { format: 'png' });
+  async shot(name, clip) {
+    const r = await this.send('Page.captureScreenshot',
+      clip ? { format: 'png', clip: { ...clip, scale: 1 } } : { format: 'png' });
     mkdirSync(SHOTS, { recursive: true });
     const file = path.join(SHOTS, name + '.png');
     writeFileSync(file, Buffer.from(r.data, 'base64'));
@@ -118,7 +130,7 @@ function check(name, ok, detail) {
 }
 
 const state = (s) => s.eval(`(() => { const g = window.__pong; return {
-  phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally,
+  phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally, era: g.era,
   score: { left: g.score.left, right: g.score.right },
   ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy },
   leftY: g.left.y, rightY: g.right.y, h: g.left.h, height: g.height, width: g.width
@@ -136,6 +148,96 @@ const geometry = (s) => s.eval(`(() => {
   const b = document.getElementById('field').getBoundingClientRect();
   return { top: b.top, left: b.left, width: b.width, height: b.height };
 })()`);
+
+// ----------------------------------------------------------- the era ladder
+/** Play on for up to `ms`, the paddle aimed at aim(g), until done(g) says so. */
+async function playUntil(s, geo, ms, aim, done) {
+  const deadline = Date.now() + ms;
+  let g = await state(s);
+  while (Date.now() < deadline) {
+    if (done && done(g)) return g;
+    await s.mouseTo(geo.left + geo.width / 2, geo.top + (aim(g) / g.height) * geo.height);
+    await sleep(45);
+    g = await state(s);
+  }
+  return g;
+}
+
+/**
+ * 8. Drive one match up the whole ladder the way a player meets it: a fresh
+ * machine on era 0, then one point per rung. Each era is photographed, cropped
+ * to the field, once its change moment has cleared and the ball is in play; a
+ * last point at the top proves the ladder stops there.
+ */
+async function walkLadder(s, baseUrl) {
+  // Always from a fresh era-0 machine, whatever --era opened the page at.
+  await s.send('Page.navigate', { url: baseUrl });
+  await sleep(900);
+  const geo = await geometry(s);
+  const clip = { x: geo.left, y: geo.top, width: geo.width, height: geo.height };
+  const eras = await s.eval('window.Pong.ERAS.map((e) => e.year + " " + e.machine)');
+  const points = (g) => g.score.left + g.score.right;
+  const track = (g) => g.ball.y + 6;
+  // Stand at the edge away from the ball so it goes past -- but stop choosing
+  // once it is close, or the paddle sweeps across its path at the last moment.
+  let edge = 30;
+  const dodge = (g) => {
+    if (g.ball.x > g.width * 0.35) edge = g.ball.y < g.height / 2 ? g.height - 30 : 30;
+    return edge;
+  };
+
+  await s.key('keyDown', 'Space', ' ', 32);
+  await s.key('keyUp', 'Space', ' ', 32);
+  await sleep(150);
+  const g0 = await state(s);
+  check('the ladder walk starts a fresh match on era 0',
+    g0.phase === 'playing' && g0.era === 0 && points(g0) === 0,
+    `phase ${g0.phase}, era ${g0.era}, score ${g0.score.left}-${g0.score.right}`);
+
+  const frames = [];
+  const moves = [];
+  for (let rung = 0; rung < eras.length; rung++) {
+    // Wait out the serve pause -- the era change lives inside it -- then let
+    // the ball get clear of the centre before the picture.
+    await playUntil(s, geo, 4000, track, (g) => g.serveDelay <= 0);
+    const g = await playUntil(s, geo, 500, track);
+    const file = await s.shot('ladder-' + ERA_NAMES[rung], clip);
+    frames.push({ rung, era: g.era, file });
+    // One point either way moves the machine; letting the ball past is quickest.
+    const before = points(g);
+    const after = await playUntil(s, geo, 15000, dodge, (x) => points(x) > before);
+    moves.push({ from: g.era, to: after.era, scored: points(after) > before,
+      score: `${after.score.left}-${after.score.right}` });
+  }
+
+  check('each era is on screen when its frame is taken',
+    frames.every((f) => f.era === f.rung),
+    frames.map((f) => `frame ${f.rung}: era ${f.era}`).join('; '));
+  const said = (m) => (m.scored ? `era ${m.from} -> ${m.to} at ${m.score}` : 'no point within 15 s');
+  for (let i = 0; i < eras.length - 1; i++) {
+    const m = moves[i];
+    check(`point ${i + 1} moves the machine up one era, to the ${eras[i + 1]}`,
+      m.scored && m.from === i && m.to === i + 1, said(m));
+  }
+  const top = moves[eras.length - 1];
+  check(`and the ladder stops at the top: another point leaves it on the ${eras[eras.length - 1]}`,
+    top.scored && top.from === eras.length - 1 && top.to === eras.length - 1, said(top));
+
+  if (REFERENCE) {
+    mkdirSync(ERA_SHOTS, { recursive: true });
+    for (const f of frames) copyFileSync(f.file, path.join(ERA_SHOTS, ERA_NAMES[f.rung] + '.png'));
+  }
+  return frames.map((f) => f.file);
+}
+
+function summarise(shots) {
+  console.log('\nscreenshots:');
+  for (const f of shots) console.log('  ' + f);
+  if (REFERENCE) console.log(`the five era frames were also copied to ${ERA_SHOTS} (tracked)`);
+  const failed = results.filter((r) => !r.ok);
+  console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
+  process.exitCode = failed.length ? 1 : 0;
+}
 
 async function main() {
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
@@ -172,6 +274,7 @@ async function main() {
       await s.reload();
     }
     await sleep(400);
+    if (LADDER_ONLY) return summarise(await walkLadder(s, url.split('?')[0]));
 
     const geo = await geometry(s);
     const g0 = await state(s);
@@ -317,18 +420,79 @@ async function main() {
     check('and the next serve restarts from the centre', sawCentreServe,
       sawCentreServe ? 'ball re-centred' : 'did not observe the reset');
 
+    // 7b. An era change, forced: one point from the player's side at a known
+    // height, then the ring must play at full frame rate while the hand keeps
+    // moving the paddle. Frame timing is the page's own rAF clock, taken over
+    // ordinary play first and then over the ring.
+    const forcePoint = () => s.eval(`(() => { const g = window.__pong; const P = window.Pong;
+      if (g.era >= P.TOP_ERA) g.era = P.TOP_ERA - 1;   // room to climb one more rung
+      g.startEra = 0;
+      g.serveDelay = 0; g.ball.x = -8; g.ball.y = 150; g.ball.vx = -600; g.ball.vy = 0;
+      return g.era; })()`);
+    const frameTiming = (ms) => s.eval(`new Promise((done) => {
+      const stamps = [], ys = [], ring = []; const t0 = performance.now();
+      function tick(now) {
+        const g = window.__pong; const m = window.PongRender.eraChangeMoment(g);
+        stamps.push(now); ys.push(g.left.y); ring.push(!!(m && m.wiping));
+        if (now - t0 < ${ms}) requestAnimationFrame(tick); else done({ stamps, ys, ring });
+      }
+      requestAnimationFrame(tick);
+    })`);
+    const frameStats = (stamps) => {
+      const d = [];
+      for (let i = 1; i < stamps.length; i++) d.push(stamps[i] - stamps[i - 1]);
+      d.sort((a, b) => a - b);
+      const mean = d.reduce((a, b) => a + b, 0) / Math.max(1, d.length);
+      return { frames: d.length, mean, p95: d[Math.floor(d.length * 0.95)] || 0, max: d[d.length - 1] || 0 };
+    };
+    const fmtMs = (v) => v.toFixed(1) + ' ms';
+
+    await s.mouseTo(midX, toClientY(540));
+    const baseline = frameStats((await frameTiming(1000)).stamps);
+    const fromEra = await forcePoint();
+    await sleep(30);
+    const timing = frameTiming(1450);
+    for (let i = 0; i < 26; i++) {
+      await s.mouseTo(midX, toClientY(i % 2 ? 500 : 110));
+      await sleep(50);
+    }
+    const ringRun = await timing;
+    const ringStamps = ringRun.stamps.filter((_, i) => ringRun.ring[i]);
+    const during = frameStats(ringStamps);
+    const ringYs = ringRun.ys.filter((_, i) => ringRun.ring[i]);
+    const travel = ringYs.length ? Math.max(...ringYs) - Math.min(...ringYs) : 0;
+    const toEra = await s.eval('window.__pong.era');
+    check('an era change plays its ring at full frame rate',
+      during.frames >= 40 && during.mean <= Math.max(baseline.mean * 1.25, 18.5),
+      `era ${fromEra} to ${toEra}: ${during.frames} ring frames, mean ${fmtMs(during.mean)}, ` +
+      `p95 ${fmtMs(during.p95)}, max ${fmtMs(during.max)}; ordinary play just before: ` +
+      `mean ${fmtMs(baseline.mean)}, p95 ${fmtMs(baseline.p95)}, max ${fmtMs(baseline.max)}`);
+    check('and the paddle stays in the player\'s hands while it plays', travel > 150,
+      `the paddle travelled ${travel.toFixed(0)} field units during the ring`);
+
+    // The picture: a second forced point, captured with the ring about half way.
+    await sleep(600);
+    await s.mouseTo(midX, toClientY(430));
+    const shotFrom = await forcePoint();
+    let wipeAt = null;
+    for (let i = 0; i < 150 && wipeAt === null; i++) {
+      const p = await s.eval('(() => { const m = window.PongRender.eraChangeMoment(window.__pong); ' +
+        'return m && m.wiping ? m.p : null; })()');
+      if (p !== null && p >= 0.4) wipeAt = p;
+      else await sleep(8);
+    }
+    const wipeShot = await s.shot('era-wipe');
+    console.log(`      mid-wipe shot: era ${shotFrom} to ${shotFrom + 1}, eased progress ` +
+      `${wipeAt === null ? 'not caught' : wipeAt.toFixed(2)} when the capture was asked for`);
+
     await s.mouseTo(midX, toClientY(gm2.ball.y + 6));
     await sleep(500);
     const scoreShot = await s.shot('scoreboard');
-    console.log('\nscreenshots:');
-    console.log('  ' + titleShot);
-    console.log('  ' + firstFrameShot);
-    if (shotTaken) console.log('  ' + path.join(SHOTS, 'rally.png'));
-    console.log('  ' + scoreShot);
 
-    const failed = results.filter((r) => !r.ok);
-    console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
-    process.exitCode = failed.length ? 1 : 0;
+    // 8. One whole match up the ladder, era by era.
+    const ladderShots = await walkLadder(s, url.split('?')[0]);
+    summarise([titleShot, firstFrameShot,
+      ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots]);
   } finally {
     try { ws && ws.close(); } catch { /* already gone */ }
     chrome.kill();

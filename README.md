@@ -6,9 +6,11 @@ as the session goes on the game grows up through the eras around it: colour,
 sound, sprites, physics, whatever each later era brings. Evoland, but for Pong.
 
 **Every point either side scores moves the machine up one era**, from the 1972
-arcade machine to the Super Nintendo (see *The era ladder* below). Today eras 0
-and 1 are built — black and white, then the Atari turn to colour — and eras 2 to
-4 are placeholders that draw era 1 until their own cards land.
+arcade machine to the Super Nintendo (see *The era ladder* below): black and
+white, the Atari's turn to colour, the NES's 8-bit sprites, the Genesis's 16-bit
+shading and the Super Nintendo's Mode 7 floor, each with its own sound -- and
+each arriving as a ring that spreads the new machine across the field from the
+spot where the ball went out, followed by its name card.
 
 ## Play it
 
@@ -72,13 +74,25 @@ beep through your speakers. `--no-audio` runs the same checks with the browser's
 audio taken away, to prove the game still plays silently. Pass
 `--chrome "<path to chrome.exe>"` if it cannot find a browser on its own.
 
-Every run rewrites the screenshots it drops in `docs/shots/playtest/`. Those are
-ignored output, not source: the directory is gitignored, nobody needs to check
-them afterwards and there is nothing to restore, so a playtest leaves `git
-status` empty. The one tracked reference frame is
-`docs/shots/bootstrap/era-zero.png` — the picture of era zero a reader opens. If
-you deliberately change how era zero looks, update that file on purpose, in its
-own commit.
+Last of all it **walks one match up the whole ladder**: a fresh machine on era
+0, then it lets a point through for each rung, checks that every point moved the
+machine up exactly one era, photographs each era in play once its change moment
+has cleared, and scores one more at the top to prove the ladder stops on the
+Super Nintendo. `--ladder` runs only that walk, in about half a minute:
+
+```bash
+node tools/playtest.mjs --ladder              # just the walk up the ladder
+node tools/playtest.mjs --ladder --reference  # and re-take the tracked era frames
+```
+
+Every run rewrites the screenshots it drops in `docs/shots/playtest/` —
+`ladder-era0-arcade.png` to `ladder-era4-snes.png` among them. Those are ignored
+output, not source: the directory is gitignored, nobody needs to check them
+afterwards and there is nothing to restore, so a playtest leaves `git status`
+empty. The tracked reference frames are the five in `docs/shots/eras/`, one per
+era, plus the older `docs/shots/bootstrap/era-zero.png`. Only `--reference`
+writes to `docs/shots/eras/`: if you deliberately change how an era looks,
+re-take them that way and commit them on purpose, in their own commit.
 
 ## Working on it as a fleet agent
 
@@ -108,26 +122,33 @@ through `state.rng`, so a test can pin it down.
 
 ## The era ladder
 
-Every point either side scores moves the machine up one era, and it stops at
-the top:
+A match starts on the 1972 machine. **Every point either side scores moves it
+up one era** -- it does not matter who scored, only that a point was scored --
+so the fourth point of a match lands on the Super Nintendo, and it stops there:
+a fifth point, or a fiftieth, leaves it on the top rung. A reload starts a fresh
+match back on era 0. All five rungs are built:
 
-| Era | Machine | Look today |
-| --- | --- | --- |
-| 0 | 1972 arcade Pong | black and white |
-| 1 | 1977 Atari 2600 | the turn to colour: each paddle and its score in its own colour |
-| 2 | 1985 NES | placeholder, draws era 1 |
-| 3 | 1989 Sega Genesis | placeholder, draws era 1 |
-| 4 | 1991 Super Nintendo | placeholder, draws era 1 |
-| 5 | 1994 Sony PlayStation | planned: wobbling snapped polygons, swimming affine textures, dithered 320x240 |
-| 6 | 1996 Nintendo 64 | planned: blurred textures, heavy fog, round toybox shapes, rumble shake |
-| 7 | 1999 Sega Dreamcast | planned: crisp cel shading, thick ink outlines, graffiti score, speed lines |
-| 8 | 2000 PlayStation 2 | planned: letterbox, sparks, glow trail, lens flare, slow camera drift |
-| 9 | 2001 Xbox | planned: bump-mapped metal, hard moving shadows, gamertags, shield-bar score |
-| 10 | 2005 Xbox 360 | planned: bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked |
+| Era | Machine | Look | Voice | Reference frame |
+| --- | --- | --- | --- | --- |
+| 0 | 1972 arcade Pong | black and white: two white bars, a square ball, a dashed centre line | a bare square-wave blip | [`era0-arcade.png`](docs/shots/eras/era0-arcade.png) |
+| 1 | 1977 Atari 2600 | the turn to colour: each paddle and its score in its own colour | the same blip | [`era1-atari2600.png`](docs/shots/eras/era1-atari2600.png) |
+| 2 | 1985 NES | 8-bit sprites, the NES palette and a pixel score | square and triangle chiptune | [`era2-nes.png`](docs/shots/eras/era2-nes.png) |
+| 3 | 1989 Sega Genesis | 16-bit shading, parallax and a trail behind the ball | a bright FM bell | [`era3-genesis.png`](docs/shots/eras/era3-genesis.png) |
+| 4 | 1991 Super Nintendo | a Mode 7 floor and rich sprites | layered chords with a short echo | [`era4-snes.png`](docs/shots/eras/era4-snes.png) |
+| 5 | 1994 Sony PlayStation | planned: wobbling snapped polygons, swimming affine textures, dithered 320x240 | plucky CD notes in a room reverb | not built yet |
+| 6 | 1996 Nintendo 64 | planned: blurred textures, heavy fog, round toybox shapes, rumble shake | muffled, springy samples | not built yet |
+| 7 | 1999 Sega Dreamcast | planned: crisp cel shading, thick ink outlines, graffiti score, speed lines | punchy synth-funk, the modem | not built yet |
+| 8 | 2000 PlayStation 2 | planned: letterbox, sparks, glow trail, lens flare, slow camera drift | taiko, orchestral pads, a big hit | not built yet |
+| 9 | 2001 Xbox | planned: bump-mapped metal, hard moving shadows, gamertags, shield-bar score | sub-heavy metallic clangs | not built yet |
+| 10 | 2005 Xbox 360 | planned: bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked | big clean hits, the achievement blip | not built yet |
+
+The reference frames in `docs/shots/eras/` are each era in play, taken by the
+playtest as it walks one match up the ladder (see *Run the tests*).
 
 Eras 5 to 10 are specified in **`docs/ERAS.md`**, the era bible: every rung's name
 card, palette, camera on the shared 3D table, the look to exaggerate, its sounds
-and its arrival flourish, plus the readability rules that keep it playable.
+and its arrival flourish, plus the readability rules that keep it playable. They
+join the ladder when their cards land; until then it stops on the Super Nintendo.
 
 The rules (`Pong.ERAS` in `src/game.js`) carry only the number: `state.era`,
 and `state.eraChangedAt`, the game time it last moved, for a transition to read.
@@ -139,17 +160,32 @@ give `draw(ctx, state, opts, PongRender)` to take over the whole frame
 (`PongRender.drawBase` is the stock frame to paint over). A brand-new rung is one
 new file, one `<script>` line in `index.html`, and one entry in `Pong.ERAS`.
 
-**Open the page at any era** with a query: `index.html?era=3`. The playtest
-takes `--era 3` for the same thing.
+**Open the page at any era** with a query, so you can look at one machine
+without playing up to it: `index.html?era=0` is the arcade machine (the same as
+no query), `?era=2` the NES, `?era=4` the Super Nintendo. Anything above 4 opens
+on 4, and anything that is not a number opens on 0. The match still starts on
+the title screen, its score at 0-0, and climbs from that era -- so `?era=3` is
+one point from the top -- and a reload comes back to the era in the address.
+The playtest takes `--era 3` for the same thing, and `--ladder` walks the whole
+ladder from era 0 instead.
 
-**The change is a moment.** When a point moves the machine up a rung the field
-flashes, a band of the new machine's colours wipes across it, and a name card
-comes up -- `ERA 2`, then `1985 · NES`, year and machine read from `Pong.ERAS` --
-in that machine's own style: the Atari's paddle colours, the NES's double-framed
-black dialog box, the Genesis's blue window, the Super Nintendo's purple window
-with its four buttons. It is drawn by `src/erachange.js` over the finished
-frame and lives entirely inside the serve pause the point already started
-(`rules.serveDelay`, 0.9 s), so it is gone the frame the ball launches and the
-serve is never held back. A game opened at a later era, or a point at the top of
-the ladder, shows nothing. An era file can restyle its own card by giving its
-look a `card` object with the same fields as `STYLES` in that file.
+**The change is a moment.** When a point moves the machine up a rung, the new
+machine spreads across the field from the spot where the ball went out
+(`state.missAt`): a ring grows from there over 1.5 s, eased, and inside it the
+new era's renderer draws the field while outside it the old era's keeps drawing
+-- the same live state in both, so nothing disappears and the paddles stay in
+the player's hands. Once the ring has passed the centre a name card comes up --
+`ERA 2`, then `1985 · NES`, year and machine read from `Pong.ERAS` -- in that
+machine's own style: the Atari's paddle colours, the NES's double-framed black
+dialog box, the Genesis's blue window, the Super Nintendo's purple window with
+its four buttons. It is all `src/erachange.js`: two offscreen canvases, one per
+era, composited through a circular clip, then the ring's glowing edge. The rules
+stretch the serve pause after an era-change point only (`rules.eraChangePause`,
+1.8 s, against the plain 0.9 s), so the ring always finishes inside it and the
+whole moment is gone the frame the ball launches. The title screen's demo rally
+plays its ring too, dimmed and without a card. A game opened at a later era, or a
+point at the top of the ladder, shows nothing. An era file can restyle its own
+card with a `card` object (the fields of `STYLES` in that file), and give its
+arrival its own look with a `flourish(ctx, p, origin, fromEra, toEra, info)`
+hook, drawn over the ring's edge every frame of the ring that brings it in --
+the header of `src/erachange.js` is the contract.

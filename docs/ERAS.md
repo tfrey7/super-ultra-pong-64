@@ -282,7 +282,7 @@ R.registerEra({
   card: { ... },                   // the name card's style: the STYLES fields in src/erachange.js
   voice: { ... },                  // section 3
   draw: function (ctx, state, opts, api) { ... },
-  flourish: function (ctx, p, origin, fromEra, toEra, api) { ... }   // section 4; a later card
+  flourish: function (ctx, p, origin, fromEra, toEra, info) { ... }  // section 4; a later card
 });
 ```
 
@@ -322,21 +322,22 @@ play.
 
 ## 4. The arrival flourish, on the ring-wipe engine
 
-Card 1136 builds the engine. When a point moves the machine up, the new era spreads from the spot
-where the ball left the field as a growing circle: inside it the new era draws, outside it the
-old, both drawing the same live state, over about 1.5 seconds inside a serve pause stretched to
-fit. The name card comes up once the ring passes the centre. **Each era may give its look a
-`flourish` function**, called every frame of the transition and drawn over the ring's edge:
+Card 1136 has landed the engine (`src/erachange.js`). When a point moves the machine up, the new
+era spreads from the spot where the ball left the field (`state.missAt`) as a growing circle:
+inside it the new era draws, outside it the old, both drawing the same live state, over 1.5 seconds
+inside the serve pause the rules stretch to `rules.eraChangePause` (1.8 s) on an era-change point.
+The name card comes up once the ring passes the centre. **Each era may give its look a `flourish`
+function**, called every frame of the ring that brings that era in, over the ring's edge:
 
 ```js
-flourish(ctx, p, origin, fromEra, toEra, api)
+flourish(ctx, p, origin, fromEra, toEra, info)
 //  p        eased progress, 0 to 1
 //  origin   { x, y }: where the ball left the field, in canvas units
-//  the ring's radius at p is R(p) = p * (distance from origin to the farthest canvas corner)
+//  info     { radius, t, duration, ... }: info.radius is the ring's radius this frame, written R(p) below
 ```
 
-If 1136 lands a different argument order or name, **1136's header comment wins**. The storyboards
-below are keyed on `p` and survive a rename.
+**The header comment of `src/erachange.js` is the contract** and wins over this section if they
+ever disagree. The storyboards below are keyed on `p` and `R(p)` and survive a rename.
 
 **Every storyboard is three beats**, on the same clock:
 
