@@ -28,6 +28,9 @@
  *     bleed light;
  *   - the fringes are the native frame multiplied by red and by blue in two
  *     native-sized canvases and added one native pixel to the left and right;
+ *   - both of those land on a native-sized COPY of the picture, and the page
+ *     gets that copy with one plain drawImage (item 1240), so the only blend
+ *     over the page's own pixels is the shade's one multiply;
  *   - the RF shimmer is one gradient band; its snow a pre-drawn noise tile.
  * The era files are never touched: this only draws over what they drew, and
  * the playtest's pixel checks read the native picture from before it.
@@ -83,7 +86,15 @@
 
   // The rows: which kind of screen each 2D machine was seen on, how strongly,
   // and how many scanlines its picture had (the arcade's tall blocks were two
-  // scanlines each; every other machine drew one line per native row).
+  // scanlines each; every other machine drew one line per native row). A row
+  // may also set its own `glow`, in place of its kind's.
+  //
+  // The Genesis lost its glow in item 1201, when the fringes and glow were
+  // still blended over the page: four page-sized blends tipped it past a frame
+  // in the playtest's software-drawn Chrome (18.18 ms against 16.66 off). Since
+  // item 1240 they blend on the native picture, and with the glow back the
+  // Genesis and both its rings hold 16.67 ms (docs/measure/item1201/
+  // overlaycost-1240-genesisglow.json), so it has its glow again.
   var USE = [
     { era: 0, overlay: 'crt-mono',      strength: 1,    lines: 240 },
     { era: 1, overlay: 'crt-rf',        strength: 1,    lines: 192 },
@@ -278,7 +289,8 @@
       if (!native || !rect || rect.w < 2 || rect.h < 2) return;
       var st = row.strength == null ? 1 : row.strength;
       if (st <= 0) return;
-      var nx = rect.w / native.width;          // page px per native px
+      var W = native.width, H = native.height;
+      var glow = row.glow != null ? row.glow : k.glow;
 
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -286,30 +298,53 @@
       ctx.rect(rect.x, rect.y, rect.w, rect.h);
       ctx.clip();
 
-      // Colour fringes: red a pixel left, blue a pixel right.
-      if (k.fringe > 0) {
-        var red = tinted('red', native, '#ff3010');
-        var blue = tinted('blue', native, '#1040ff');
-        if (red && blue) {
-          var off = k.fringePx * nx;
-          ctx.globalCompositeOperation = 'lighter';
-          ctx.globalAlpha = k.fringe * st;
-          ctx.imageSmoothingEnabled = true;
-          ctx.drawImage(red, rect.x - off, rect.y, rect.w, rect.h);
-          ctx.drawImage(blue, rect.x + off, rect.y, rect.w, rect.h);
-        }
-      }
+      // Fringes and glow are blended on a copy of the NATIVE picture (256 x
+      // 240 for the NES), never on the page (item 1240, after item 1200's TV
+      // screens): three 'lighter' blends over the page's half a million
+      // pixels tipped the Genesis and its rings past a frame in the
+      // playtest's software-drawn Chrome. The finished copy goes onto the page
+      // with one plain, hard-edged drawImage over the plain picture.
+      var post = (k.fringe > 0 || glow > 0) ? canvasOf(W, H, work.post) : null;
+      if (post) {
+        work.post = post;
+        var x = post.getContext('2d');
+        x.setTransform(1, 0, 0, 1, 0, 0);
+        x.globalAlpha = 1;
+        x.globalCompositeOperation = 'copy';
+        x.imageSmoothingEnabled = false;
+        x.drawImage(native, 0, 0, W, H, 0, 0, W, H);
 
-      // Glow: the bright shapes bleed light into the dark around them.
-      if (k.glow > 0) {
-        var g = shrunk(native, k.glowShrink);
-        if (g) {
-          var grow = nx * 1.5;
-          ctx.globalCompositeOperation = 'lighter';
-          ctx.globalAlpha = k.glow * st;
-          ctx.imageSmoothingEnabled = true;
-          ctx.drawImage(g, rect.x - grow, rect.y - grow, rect.w + grow * 2, rect.h + grow * 2);
+        // Colour fringes: red a native pixel left, blue a native pixel right.
+        if (k.fringe > 0) {
+          var red = tinted('red', native, '#ff3010');
+          var blue = tinted('blue', native, '#1040ff');
+          if (red && blue) {
+            x.globalCompositeOperation = 'lighter';
+            x.globalAlpha = k.fringe * st;
+            x.imageSmoothingEnabled = true;
+            x.drawImage(red, 0, 0, W, H, -k.fringePx, 0, W, H);
+            x.drawImage(blue, 0, 0, W, H, k.fringePx, 0, W, H);
+          }
         }
+
+        // Glow: the bright shapes bleed light into the dark around them.
+        if (glow > 0) {
+          var g = shrunk(native, k.glowShrink);
+          if (g) {
+            var grow = 1.5;                    // native px
+            x.globalCompositeOperation = 'lighter';
+            x.globalAlpha = glow * st;
+            x.imageSmoothingEnabled = true;
+            x.drawImage(g, 0, 0, g.width, g.height, -grow, -grow, W + grow * 2, H + grow * 2);
+          }
+        }
+        x.globalAlpha = 1;
+        x.globalCompositeOperation = 'source-over';
+
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 1;
+        ctx.imageSmoothingEnabled = !!row.smooth;
+        ctx.drawImage(post, 0, 0, W, H, rect.x, rect.y, rect.w, rect.h);
       }
 
       // RF: a slow band of brightness rolling down the tube, and snow.
@@ -361,9 +396,10 @@
     r.overlay = u.overlay;
     r.strength = u.strength;
     r.lines = u.lines;
+    if (u.glow != null) r.glow = u.glow;
   });
 
-  D.CRT = { KINDS: KINDS, USE: USE };
+  D.CRT = { KINDS: KINDS, USE: USE, work: work };
 
   if (typeof module === 'object' && module.exports) module.exports = D.CRT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

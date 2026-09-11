@@ -67,6 +67,30 @@
     ]
   };
   var PADDLE = { z: 24, reflection: 0.18, light: { top: 0.3, near: 0, side: -0.45 } };
+
+  // ----------------------------------------- the AAA arena (item 1232, ART.md era 8)
+  // A helipad on a skyscraper roof at night, in the rain. The bible put the
+  // skyline at world y -100 to -200 with towers 120 to 300 tall; through this
+  // camera that lands 160 to 500 pixels ABOVE the canvas (the flare light's
+  // fault again), so the pixellab plate is laid in screen space instead: behind
+  // the table, filling the band between the top bar and the far rail (screen
+  // y 52 to 92) and the two wedges beside the table, sliding at half the
+  // camera's sideways drift so it reads as far away.
+  var SKY = { tile: 'era8-skyline', x: -20, y: 0, w: 840, h: 210, parallax: 0.5 };
+  // Rain: the bible's 50 streaks, 12 pixels, 10 degrees, 900 a second, seeded
+  // and wrapping. Its slate at 0.25 cannot be seen on a slate slab, so the
+  // streaks are HUD ink at 0.18 (under the ball's luminance at any opacity
+  // that counts, R1). Match point doubles them.
+  var RAIN = { count: 50, matchPoint: 100, length: 12, slant: 10, speed: 900, ink: C.hud, alpha: 0.18, width: 1 };
+  // A searchlight from behind the towers: a thin triangle in flare blue at
+  // 0.08, its foot hidden by the table, sweeping once every 9 s.
+  var SEARCH = { x: 560, y: 120, length: 640, half: 4, swing: 38, period: 9, alpha: 0.08 };
+  // The codec name plates in the bottom bar, the typed POINT line and the
+  // players' reflections in the slab.
+  var PLATES = { w: 140, h: 28, xs: [40, 620], cell: 3, gap: 2, icon: 20,
+    names: ['P1', 'CPU'], visors: ['#ffb347', '#9fc4ff'], visorAlpha: 0.8 };
+  var TYPE = { every: 0.03, hold: 1, arrive: 0.8 };
+  var FIGURE = { reflection: 0.18 };
   // The pixellab tiles (item 1187), laid over the era's own fills through the
   // shared table: brushed tread plate under the glossy slab, smooth-filtered
   // and faded toward the far end so the glow, the reflections and the
@@ -121,7 +145,8 @@
   })();
 
   // ------------------------------------------------- private memory, fixed size
-  var mem = { seen: false, time: 0, rally: 0, next: 0, sparks: [], trail: [], trailTime: -1 };
+  var mem = { seen: false, time: 0, rally: 0, next: 0, sparks: [], trail: [], trailTime: -1,
+    total: 0, pointAt: -Infinity, pointSide: null };
   for (var s0 = 0; s0 < SPARK.pool; s0++) mem.sparks.push({ born: -Infinity, x: 0, y: 0, vx: 0, vy: 0 });
 
   /** Forget every spark and trail point (a new game, a test). */
@@ -132,8 +157,13 @@
     mem.next = 0;
     mem.trail.length = 0;
     mem.trailTime = -1;
+    mem.total = 0;
+    mem.pointAt = -Infinity;
+    mem.pointSide = null;
     for (var i = 0; i < mem.sparks.length; i++) mem.sparks[i].born = -Infinity;
   }
+
+  function scoreTotal(state) { return (state.score.left || 0) + (state.score.right || 0); }
 
   /** A burst of sparks from the ball's screen point, fanned away from the paddle it left. */
   function spawnBurst(state, at) {
@@ -160,11 +190,38 @@
       reset();
       mem.seen = true;
       mem.rally = state.rally || 0;
+      mem.total = scoreTotal(state);
+      // Arriving on a point (ART.md shared rule 4): the point that brought the
+      // machine here is typed over the era's first 0.8 s.
+      var since = t - (state.eraChangedAt || 0);
+      if (state.eraChangedAt > 0 && since >= 0 && since < TYPE.arrive && mem.total > 0) {
+        mem.pointAt = state.eraChangedAt;
+        mem.pointSide = state.score.left >= state.score.right ? 'left' : 'right';
+        for (var e = 0; state.events && e < state.events.length; e++) {
+          if (state.events[e].type === 'score') mem.pointSide = state.events[e].side;
+        }
+      }
     }
     mem.time = t;
     var rally = state.rally || 0;
     if (rally > mem.rally) spawnBurst(state, T.ballScreen(cam, state));
     mem.rally = rally;
+    // A point scored while this era is on screen (the departing side of the
+    // ring): the sparks burst a second time where the ball went out, and the
+    // subtitle types who took it.
+    var total = scoreTotal(state);
+    if (total > mem.total) {
+      mem.pointSide = 'left';
+      for (var k = 0; state.events && k < state.events.length; k++) {
+        if (state.events[k].type === 'score') mem.pointSide = state.events[k].side;
+      }
+      if (!state.events || !state.events.some(function (ev) { return ev.type === 'score'; })) {
+        mem.pointSide = state.ball.x > state.width / 2 ? 'left' : 'right';
+      }
+      mem.pointAt = t;
+      spawnBurst(state, T.ballScreen(cam, state));
+    }
+    mem.total = total;
 
     if (state.serveDelay > 0) {
       mem.trail.length = 0;
@@ -220,6 +277,109 @@
     haze.addColorStop(1, rgba(C.amber, 0));
     ctx.fillStyle = haze;
     ctx.fillRect(0, 0, state.width, state.height);
+    searchlight(ctx, state.time || 0);
+    skyline(ctx, cam);
+  }
+
+  // The pixellab plate, decoded once from its data: URI (never tainting the
+  // canvas). Headless there is no Image, and the sky stays the gradient.
+  var skyImage = null;
+  function skyReady() {
+    if (!skyImage) {
+      var tiles = root.PongTextures3D && root.PongTextures3D.TILES;
+      if (!tiles || !tiles[SKY.tile] || typeof root.Image !== 'function') return false;
+      skyImage = new root.Image();
+      skyImage.src = tiles[SKY.tile];
+    }
+    return !!(skyImage.complete && skyImage.naturalWidth > 0);
+  }
+
+  function skyline(ctx, cam) {
+    if (!skyReady()) return;
+    var shift = (cam && cam.panX ? cam.panX : 0) * SKY.parallax;
+    var smooth = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(skyImage, SKY.x - shift, SKY.y, SKY.w, SKY.h);
+    ctx.imageSmoothingEnabled = smooth;
+  }
+
+  /** The searchlight's beam: a thin triangle from behind the towers, swinging on a 9 s period. */
+  function searchlight(ctx, t) {
+    var a = (-90 + SEARCH.swing * Math.sin(2 * Math.PI * t / SEARCH.period)) * Math.PI / 180;
+    var h = SEARCH.half * Math.PI / 180;
+    ctx.beginPath();
+    ctx.moveTo(SEARCH.x, SEARCH.y);
+    ctx.lineTo(SEARCH.x + Math.cos(a - h) * SEARCH.length, SEARCH.y + Math.sin(a - h) * SEARCH.length);
+    ctx.lineTo(SEARCH.x + Math.cos(a + h) * SEARCH.length, SEARCH.y + Math.sin(a + h) * SEARCH.length);
+    ctx.closePath();
+    ctx.fillStyle = rgba(C.flare, SEARCH.alpha);
+    ctx.fill();
+  }
+
+  // The rain's streaks, seeded: where each starts and how fast it runs.
+  var DROPS = (function () {
+    var rnd = lcg(2001);
+    var out = [];
+    for (var i = 0; i < RAIN.matchPoint; i++) out.push({ x: rnd() * 900, y: rnd() * 600, speed: 0.8 + rnd() * 0.4 });
+    return out;
+  })();
+
+  /** Rain over the whole set: one path of short slanted lines, one stroke. Wraps; a pure function of t. */
+  function rain(ctx, state, t) {
+    var n = isMatchPoint(state) ? RAIN.matchPoint : RAIN.count;
+    var s = RAIN.slant * Math.PI / 180;
+    var dx = Math.sin(s) * RAIN.length, dy = Math.cos(s) * RAIN.length;
+    ctx.beginPath();
+    for (var i = 0; i < n; i++) {
+      var d = DROPS[i];
+      var fall = RAIN.speed * d.speed * t;
+      var y = ((d.y + fall) % 620 + 620) % 620 - 10;
+      var x = ((d.x - fall * Math.tan(s)) % 900 + 900) % 900 - 50;
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - dx, y - dy);
+    }
+    ctx.globalAlpha = RAIN.alpha;
+    ctx.strokeStyle = RAIN.ink;
+    ctx.lineWidth = RAIN.width;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  function isMatchPoint(state) {
+    var P = root.Pong;
+    try { return !!(P && typeof P.isMatchPoint === 'function' && P.isMatchPoint(state)); } catch (e) { return false; }
+  }
+
+  /**
+   * Each player mirrored in the glossy slab, as the paddles are: the rig's
+   * own frame, flipped about the figure's feet, at 0.18, before the paddles.
+   * Only once the sheet has decoded -- headless, or before it loads, nothing.
+   */
+  function playerReflections(ctx, state, T, cam) {
+    var PC = root.PongCharacters, S = root.PongSprites;
+    if (!PC || !S || !PC.enabled || typeof root.Image !== 'function') return;
+    var mem8 = PC.memoryOf(state);
+    for (var i = 0; i < 2; i++) {
+      var side = i ? 'right' : 'left';
+      var cfg = PC.configFor(8, side);
+      if (!cfg || !cfg.sheet || !S.ready(cfg.sheet)) { if (cfg && cfg.sheet) S.load(cfg.sheet); continue; }
+      var p = state[side];
+      var pose = PC.beatOf(mem8[side], state.time || 0, p.vy || 0, cfg);
+      var a = PC.anchorOf(state, side, cfg, cam, T);
+      var box = PC.frameBox(a, cfg);
+      var row = PC.BEATS.indexOf(pose.beat);
+      var feet = box.y + box.h;
+      ctx.save();
+      ctx.translate(a.x, a.y + 2 * feet);
+      ctx.scale(a.mirror, -1);
+      ctx.globalAlpha = FIGURE.reflection;
+      var smooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(S.load(cfg.sheet), pose.frame * cfg.frame.w, row * cfg.frame.h, cfg.frame.w, cfg.frame.h,
+                    box.x, box.y, box.w, box.h);
+      ctx.imageSmoothingEnabled = smooth;
+      ctx.restore();
+    }
   }
 
   /** The mood: the slab's corners sink into navy. On the table, so under the paddles (R4). */
@@ -346,14 +506,103 @@
     ctx.fillStyle = C.letterbox;
     ctx.fillRect(0, 0, state.width, BAR);
     ctx.fillRect(0, state.height - BAR, state.width, BAR);
-    // The score as a subtitle in the top bar.
+    // The top bar's subtitle: a point being typed, MATCH POINT, or the score.
     var mid = state.width / 2;
+    var t = state.time || 0;
+    var line = subtitleAt(state, t);
     ctx.globalAlpha = SUBTITLE.alpha;
-    ctx.fillStyle = C.hud;
-    P.drawText(ctx, String(state.score.left), mid - SUBTITLE.offset, SUBTITLE.top, SUBTITLE.cell, SUBTITLE.gap);
-    P.drawText(ctx, String(state.score.right), mid + SUBTITLE.offset, SUBTITLE.top, SUBTITLE.cell, SUBTITLE.gap);
-    ctx.fillRect(mid - 7, SUBTITLE.top + 2 * SUBTITLE.cell, 14, SUBTITLE.cell);
+    if (line) {
+      ctx.fillStyle = line.ink;
+      typeText(ctx, P, line.text, line.shown, mid, SUBTITLE.top, SUBTITLE.cell, SUBTITLE.gap);
+    } else {
+      ctx.fillStyle = C.hud;
+      P.drawText(ctx, String(state.score.left), mid - SUBTITLE.offset, SUBTITLE.top, SUBTITLE.cell, SUBTITLE.gap);
+      P.drawText(ctx, String(state.score.right), mid + SUBTITLE.offset, SUBTITLE.top, SUBTITLE.cell, SUBTITLE.gap);
+      ctx.fillRect(mid - 7, SUBTITLE.top + 2 * SUBTITLE.cell, 14, SUBTITLE.cell);
+    }
     ctx.globalAlpha = 1;
+    namePlates(ctx, state, P);
+  }
+
+  /**
+   * What the top bar says at t, or null for the score: `POINT: P1` typed one
+   * letter every 0.03 s and held a second after a point, or MATCH POINT in
+   * amber light. (The block font has no dash, so the bible's `POINT - P1`
+   * is set with a colon.)
+   */
+  function subtitleAt(state, t) {
+    if (mem.pointSide) {
+      var text = 'POINT: ' + (mem.pointSide === 'left' ? PLATES.names[0] : PLATES.names[1]);
+      var age = t - mem.pointAt;
+      if (age >= 0 && age < text.length * TYPE.every + TYPE.hold) {
+        return { text: text, shown: Math.min(text.length, Math.floor(age / TYPE.every) + 1), ink: C.hud };
+      }
+    }
+    if (isMatchPoint(state)) return { text: 'MATCH POINT', shown: 11, ink: C.amber };
+    return null;
+  }
+
+  /** The first `shown` letters of text, laid where the whole line will sit, centred on mid. */
+  function typeText(ctx, P, text, shown, mid, top, cell, gap) {
+    var widths = [];
+    var total = 0;
+    for (var i = 0; i < text.length; i++) {
+      var ch = text[i];
+      widths.push((ch === ' ' ? 2 : 'MNW'.indexOf(ch) >= 0 ? 5 : 3) * cell);
+      total += widths[i] + (i ? gap : 0);
+    }
+    var x = mid - total / 2;
+    for (var j = 0; j < shown; j++) {
+      if (text[j] !== ' ') P.drawText(ctx, text[j], x + widths[j] / 2, top, cell, gap);
+      x += widths[j] + gap;
+    }
+  }
+
+  /** Two codec name plates in the bottom bar: a dark plate, a slate edge, a visor icon and the name. */
+  function namePlates(ctx, state, P) {
+    var y = state.height - BAR + (BAR - PLATES.h) / 2;
+    for (var i = 0; i < 2; i++) {
+      var x = PLATES.xs[i];
+      ctx.fillStyle = C.slate;
+      ctx.fillRect(x, y, PLATES.w, PLATES.h);
+      ctx.fillStyle = C.navy;
+      ctx.fillRect(x + 1, y + 1, PLATES.w - 2, PLATES.h - 2);
+      // The visor icon: a slate helmet, the visor across it in the player's colour.
+      var ix = x + 6, iy = y + (PLATES.h - PLATES.icon) / 2;
+      ctx.fillStyle = C.sheen;
+      ctx.fillRect(ix + 3, iy + 1, PLATES.icon - 6, PLATES.icon - 2);
+      ctx.fillStyle = C.midnight;
+      ctx.fillRect(ix + 5, iy + 11, PLATES.icon - 10, PLATES.icon - 13);
+      ctx.globalAlpha = PLATES.visorAlpha;
+      ctx.fillStyle = PLATES.visors[i];
+      ctx.fillRect(ix + 2, iy + 6, PLATES.icon - 4, 4);
+      ctx.globalAlpha = SUBTITLE.alpha;
+      ctx.fillStyle = C.hud;
+      P.drawText(ctx, PLATES.names[i], x + 34 + (PLATES.w - 40) / 2, y + (PLATES.h - 5 * PLATES.cell) / 2, PLATES.cell, PLATES.gap);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // The players are drawn by src/characters.js AFTER this era's frame, over
+  // the letterbox. The bible clips them to the picture between the bars; the
+  // rig is not this card's to change, so once the rig has wrapped the
+  // renderer's draw, era 8 wraps it once more, outermost, and lays its bars
+  // and their text again over whatever the players drew. Every caller asks
+  // PongRender.draw by name each frame, so the next frame on has it.
+  var barsOver = false;
+  function layBarsOverPlayers(P) {
+    if (barsOver || !P || !P.__characters || typeof P.draw !== 'function') return;
+    barsOver = true;
+    var inner = P.draw;
+    P.draw = function (ctx, state, opts) {
+      var out = inner.apply(this, arguments);
+      if (ctx && state && Math.floor(state.era) === 8 && !(opts && opts.ink) && P.table3d && state.score) {
+        ctx.save();
+        letterbox(ctx, state, P);
+        ctx.restore();
+      }
+      return out;
+    };
   }
 
   function draw(ctx, state, opts, api) {
@@ -376,6 +625,7 @@
     // 3. on the table: the mood, the mirrored paddles, the dust in the air
     vignette(ctx, state, T, cam);
     reflections(ctx, state, T, cam, P);
+    playerReflections(ctx, state, T, cam);
     dust(ctx, t);
     // 4. paddles, far one first, in their earned colours (R4)
     var sides = paddleOrder(state);
@@ -386,13 +636,15 @@
     // 5. behind the ball: the glow trail and halo, the sparks
     trail(ctx, state, T, cam);
     sparks(ctx, T, t);
-    // 6. post: the lens flare
+    // 6. post: the lens flare, and the rain over the whole set
     flare(ctx, T, cam);
+    rain(ctx, state, t);
     // 7. the ball, crisp and white over every glow; hidden in the serve pause
     if (state.serveDelay <= 0) T.ball(ctx, cam, state.ball, { fill: C.core, texture: TEXTURE.ball });
     // 8. the letterbox over everything, the score as its subtitle
     letterbox(ctx, state, P);
     ctx.restore();
+    layBarsOverPlayers(P);
   }
 
   // ------------------------------------------------------------ the arrival
