@@ -55,7 +55,9 @@
   var BALL_SHADOW = 1.9;
   var POOL = { radius: 160, alpha: 0.35, tileAlpha: 0.6 };
   var TAGS = { left: 'PONG SLAYER', right: 'CPU 2001' };
-  var TAG = { w: 104, h: 22, z: 60, cell: 2, gap: 2, alpha: 0.85 };
+  // z 60 was head height before the players (item 1233): a 90-unit player's
+  // head is at about 100, so the tag floats at 118, over it, as Halo's did.
+  var TAG = { w: 104, h: 22, z: 118, cell: 2, gap: 2, alpha: 0.85 };
   var SHIELD = { segments: 10, w: 16, h: 12, gap: 3, skew: -0.3, top: 30, margin: 44,
                  cell: 5, digitGap: 4, alarm: 0.3, recharge: 0.5 };
 
@@ -383,6 +385,317 @@
     return tiles;
   }
 
+  // ------------------------------------------------------------ the hangar
+  // The AAA pass (item 1233, docs/ART.md era 9): a starship hangar deck around
+  // the table -- a ribbed wall behind the far rail, two rotating beacons past
+  // the end rails, steam from two vents -- and the players' hard shadows. The
+  // two pixellab pictures come from src/textures3d.js as data: URIs, so they
+  // never taint the canvas; until one decodes (and always under node --test)
+  // its place is drawn in plain steel.
+  var HANGAR = { y: -60, x0: 0, x1: 800, z: 160, ribs: 6, ribW: 12, ribX0: 50, ribX1: 750, shade: 0.45 };
+  var BEACONS = [{ x: -30, y: 60 }, { x: 830, y: 60 }];
+  var BEACON = { z: 60, period: 2, wedge: 0.9, reach: 70, alarm: 1 };
+  var STEAM = { ribs: [1, 4], every: 3, life: 1, puffs: 5, rise: 40, alpha: 0.3 };
+  var PLAYER_SHADOW = { length: 40, width: 22, alpha: 0.30, back: 20 };
+  var GLINT = { near: 160, alpha: 0.35, flash: 0.3 };
+  var TRACKER = { size: 12, y: 36 };
+
+  var images = {};
+  /** An embedded picture by its textures3d key, or null until it has decoded. */
+  function picture(key) {
+    var entry = images[key];
+    if (!entry) {
+      var uri = root.PongTextures3D && root.PongTextures3D.TILES && root.PongTextures3D.TILES[key];
+      entry = images[key] = { img: null };
+      if (uri && typeof root.Image === 'function') {
+        try { entry.img = new root.Image(); entry.img.src = uri; } catch (e) { entry.img = null; }
+      }
+    }
+    var img = entry.img;
+    return img && img.complete && img.naturalWidth > 0 ? img : null;
+  }
+
+  /** When the last point landed, in state.time (the shield memory's newest hit). */
+  function lastPointAt() {
+    return Math.max(memory.hitAt.left, memory.hitAt.right);
+  }
+
+  /** Whether the beacons burn alarm red: a second after a point, and all through match point. */
+  function beaconsRed(state) {
+    var P = root.Pong;
+    if (P && typeof P.isMatchPoint === 'function') {
+      try { if (P.isMatchPoint(state)) return true; } catch (e) { /* not a full game state */ }
+    }
+    var age = state.time - lastPointAt();
+    return age >= 0 && age < BEACON.alarm;
+  }
+
+  function matchPoint(state) {
+    var P = root.Pong;
+    try { return !!(P && typeof P.isMatchPoint === 'function' && P.isMatchPoint(state)); } catch (e) { return false; }
+  }
+
+  /** The rib x positions: 6, evenly from 50 to 750. */
+  function ribXs() {
+    var out = [];
+    for (var i = 0; i < HANGAR.ribs; i++) out.push(HANGAR.ribX0 + (HANGAR.ribX1 - HANGAR.ribX0) * i / (HANGAR.ribs - 1));
+    return out;
+  }
+
+  /** The ribbed wall behind the far rail: the pixellab plate, dimmed so it never competes with the ball. */
+  function drawHangar(ctx, cam, T, L) {
+    var a = T.project(cam, HANGAR.x0, HANGAR.y, HANGAR.z), b = T.project(cam, HANGAR.x1, HANGAR.y, 0);
+    var x = a.x, y = a.y, w = b.x - a.x, h = b.y - a.y;
+    if (!(w > 0 && h > 0)) return;
+    var img = picture('era9-hangar');
+    ctx.save();
+    if (img) {
+      var smooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, x, y, w, h);
+      ctx.imageSmoothingEnabled = smooth;
+    } else {
+      ctx.fillStyle = C.gunmetal;
+      ctx.fillRect(x, y, w, h);
+    }
+    // The wall sits in the dark: black over it, lifted where the light is.
+    var lx = T.project(cam, L.x, HANGAR.y, 0).x;
+    var g = ctx.createLinearGradient(x, 0, x + w, 0);
+    var k = Math.max(0, Math.min(1, (lx - x) / w));
+    g.addColorStop(0, T.rgba(C.black, 0.72));
+    g.addColorStop(Math.max(0, k - 0.25), T.rgba(C.black, 0.7));
+    g.addColorStop(k, T.rgba(C.black, HANGAR.shade));
+    g.addColorStop(Math.min(1, k + 0.25), T.rgba(C.black, 0.7));
+    g.addColorStop(1, T.rgba(C.black, 0.72));
+    ctx.fillStyle = g;
+    ctx.fillRect(x, y, w, h);
+    ctx.restore();
+    // The six steel ribs, boxes 12 x 12 x 160 standing out of the wall.
+    var xs = ribXs();
+    for (var i = 0; i < xs.length; i++) {
+      T.box(ctx, cam, { x: xs[i] - HANGAR.ribW / 2, y: HANGAR.y, w: HANGAR.ribW, h: HANGAR.ribW }, 0, HANGAR.z, {
+        outline: false,
+        fill: function (face, pts) {
+          if (face === 'top') return C.steel;
+          var span = screenSpan(pts);
+          var rg = ctx.createLinearGradient(0, span.top, 0, span.bottom);
+          rg.addColorStop(0, C.steel);
+          rg.addColorStop(1, C.embossDark);
+          return rg;
+        }
+      });
+    }
+  }
+
+  /** Steam from the feet of ribs 2 and 5: a puff every 3 s, continuous at match point. */
+  function drawSteam(ctx, cam, T, state) {
+    var xs = ribXs(), t = state.time || 0, always = matchPoint(state);
+    ctx.save();
+    for (var v = 0; v < STEAM.ribs.length; v++) {
+      var phase = always ? (t + v * 0.37) % STEAM.life : (t + v * 1.5) % STEAM.every;
+      if (phase >= STEAM.life) continue;
+      var u = phase / STEAM.life;
+      for (var k = 0; k < STEAM.puffs; k++) {
+        var lag = k * 0.12, uu = u - lag;
+        if (uu <= 0) continue;
+        var wx = xs[STEAM.ribs[v]] + Math.sin(k * 2.1 + t) * 6, wz = 8 + STEAM.rise * uu;
+        var p = T.project(cam, wx, HANGAR.y + 14, wz);
+        ctx.globalAlpha = STEAM.alpha * (1 - uu);
+        ctx.fillStyle = C.steelLight;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(0.5, (5 + 9 * uu) * p.scale), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
+  /** The two beacon posts past the end rails, each with its green wedge sweeping round every 2 s. */
+  function drawBeacons(ctx, cam, T, state) {
+    var img = picture('era9-beacon'), red = beaconsRed(state), t = state.time || 0;
+    for (var i = 0; i < BEACONS.length; i++) {
+      var B = BEACONS[i];
+      var foot = T.project(cam, B.x, B.y, 0), top = T.project(cam, B.x, B.y, BEACON.z);
+      var h = foot.y - top.y, w = h / 2;
+      if (!(h > 1)) continue;
+      if (img) {
+        var smooth = ctx.imageSmoothingEnabled;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, foot.x - w / 2, top.y, w, h);
+        ctx.imageSmoothingEnabled = smooth;
+      } else {
+        ctx.fillStyle = C.steel;
+        ctx.fillRect(foot.x - w / 6, top.y, w / 3, h);
+      }
+      // The lamp is the top fifth of the post; the wedge sweeps round it on the deck's plane.
+      var lampY = top.y + h * 0.18, reach = BEACON.reach * top.scale;
+      var ang = (t / BEACON.period) * Math.PI * 2 + i * Math.PI;
+      var colour = red ? C.alarm : C.glow;
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.translate(foot.x, lampY);
+      ctx.scale(1, 0.35);
+      var g = ctx.createRadialGradient(0, 0, 0, 0, 0, reach);
+      g.addColorStop(0, T.rgba(colour, 0.45));
+      g.addColorStop(1, T.rgba(colour, 0));
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, reach, ang - BEACON.wedge / 2, ang + BEACON.wedge / 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+      // When red, the lamp itself burns red over the picture's green glass.
+      if (red) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = T.rgba(C.alarm, 0.55);
+        ctx.beginPath();
+        ctx.arc(foot.x, lampY, Math.max(1, w * 0.4), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+  }
+
+  /** Where a player's feet are on the table: behind the paddle's outer face, at its middle. */
+  function playerFoot(state, side) {
+    var p = state[side], mirror = side === 'right' ? -1 : 1;
+    var outer = mirror > 0 ? p.x : p.x + p.w;
+    return { x: outer - mirror * PLAYER_SHADOW.back, y: p.y + p.h / 2 };
+  }
+
+  /** Each player's hard shadow: a quad 40 units long from its feet, away from the light, at 0.30 (R5). */
+  function drawPlayerShadows(ctx, cam, T, L, state) {
+    if (!(root.PongCharacters && root.PongCharacters.enabled)) return;
+    var sides = ['left', 'right'];
+    for (var i = 0; i < sides.length; i++) {
+      var f = playerFoot(state, sides[i]);
+      var dx = f.x - L.x, dy = f.y - L.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
+      dx /= len; dy /= len;
+      var px = -dy, py = dx, hw = PLAYER_SHADOW.width / 2, tw = hw * 0.6, Lh = PLAYER_SHADOW.length;
+      T.quad(ctx, cam, [
+        [f.x + px * hw, f.y + py * hw, 0], [f.x + dx * Lh + px * tw, f.y + dy * Lh + py * tw, 0],
+        [f.x + dx * Lh - px * tw, f.y + dy * Lh - py * tw, 0], [f.x - px * hw, f.y - py * hw, 0]
+      ], { fill: '#000000', alpha: PLAYER_SHADOW.alpha, outline: false });
+    }
+  }
+
+  /** The motion tracker: a green ring in the HUD band's centre, a glowing dot at the ball's x. */
+  function drawTracker(ctx, T, state) {
+    var r = TRACKER.size / 2, cx = state.width / 2, cy = TRACKER.y;
+    ctx.save();
+    ctx.strokeStyle = C.green;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+    var bx = (state.ball.x + state.ball.size / 2) / state.width;
+    var dxp = cx - r + TRACKER.size * Math.max(0, Math.min(1, bx));
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = C.glow;
+    ctx.beginPath();
+    ctx.arc(dxp, cy, 1.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // --------------------------------------------- over the players (the rig's)
+  // The rig (src/characters.js) draws each player as one drawImage after this
+  // era's frame. Two things the bible asks of era 9 need to land ON the
+  // players: the specular glint when the ball is within 160 units (the frame
+  // drawn a second time with 'lighter' at 0.35), and the miss beat's alarm-red
+  // outline for its first 0.3 s. So once the rig has hooked the renderer, this
+  // era hooks it once more, outside it, and draws those over era 9 frames only.
+  var over = { installed: false, flash: null };
+
+  function hookOver() {
+    if (over.installed || !R || !R.__characters || !root.PongCharacters) return;
+    var inner = R.draw;
+    R.draw = function (ctx, state, opts) {
+      var out = inner.apply(this, arguments);
+      if (state && Math.floor(state.era) === 9 && !(opts && opts.ink)) {
+        try { drawOverPlayers(ctx, state); } catch (e) { /* a glint never stops the game */ }
+      }
+      return out;
+    };
+    over.installed = true;
+  }
+
+  /** One player's current frame: { img, sx, sy, sw, sh, a, box } or null until its sheet has decoded. */
+  function playerFrame(state, side) {
+    var PC = root.PongCharacters, S = root.PongSprites, T = R.table3d;
+    if (!PC || !PC.enabled || !S || !T || typeof root.Image !== 'function') return null;
+    var cfg = PC.configFor(9, side);
+    if (!cfg || !cfg.sheet || !S.ready(cfg.sheet)) return null;
+    var mem = PC.memoryOf(state);
+    var pose = PC.beatOf(mem[side], state.time || 0, state[side].vy || 0, cfg);
+    var cam = PC.cameraFor(state, R.eraLook(9), T);
+    var a = PC.anchorOf(state, side, cfg, cam, T);
+    var row = PC.BEATS.indexOf(pose.beat);
+    return { img: S.load(cfg.sheet), sx: pose.frame * cfg.frame.w, sy: row * cfg.frame.h,
+             sw: cfg.frame.w, sh: cfg.frame.h, a: a, box: PC.frameBox(a, cfg), mem: mem[side] };
+  }
+
+  function blit(ctx, f, dx, dy, img) {
+    ctx.save();
+    ctx.translate(f.a.x + dx, f.a.y + dy);
+    if (f.a.mirror < 0) ctx.scale(-1, 1);
+    var smooth = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = false;
+    if (img) ctx.drawImage(img, 0, 0, f.sw, f.sh, f.box.x, f.box.y, f.box.w, f.box.h);
+    else ctx.drawImage(f.img, f.sx, f.sy, f.sw, f.sh, f.box.x, f.box.y, f.box.w, f.box.h);
+    ctx.imageSmoothingEnabled = smooth;
+    ctx.restore();
+  }
+
+  /** The frame as a solid alarm-red silhouette, on one small offscreen canvas. */
+  function redSilhouette(f) {
+    var T = R.table3d, o = T && T.offscreen('xbox-player-flash', f.sw, f.sh);
+    if (!o) return null;
+    var c = o.ctx;
+    c.globalCompositeOperation = 'source-over';
+    c.clearRect(0, 0, f.sw, f.sh);
+    c.drawImage(f.img, f.sx, f.sy, f.sw, f.sh, 0, 0, f.sw, f.sh);
+    c.globalCompositeOperation = 'source-in';
+    c.fillStyle = C.alarm;
+    c.fillRect(0, 0, f.sw, f.sh);
+    c.globalCompositeOperation = 'source-over';
+    return o.canvas;
+  }
+
+  function drawOverPlayers(ctx, state) {
+    var sides = ['left', 'right'], b = state.ball;
+    for (var i = 0; i < sides.length; i++) {
+      var f = playerFrame(state, sides[i]);
+      if (!f) continue;
+      ctx.save();
+      // The miss: the armour's outline flashes alarm red for 0.3 s -- a red
+      // silhouette one sheet pixel out on four sides, the figure again on top.
+      var m = f.mem, age = m && m.held === 'miss' ? (state.time || 0) - m.since : -1;
+      if (age >= 0 && age < GLINT.flash && Math.floor(age * 20) % 2 === 0) {
+        var red = redSilhouette(f), px = f.a.scale;
+        if (red) {
+          ctx.globalAlpha = 0.9;
+          blit(ctx, f, -px, 0, red); blit(ctx, f, px, 0, red);
+          blit(ctx, f, 0, -px, red); blit(ctx, f, 0, px, red);
+          ctx.globalAlpha = 1;
+          blit(ctx, f, 0, 0, null);
+        }
+      }
+      // The glint: the ball's light reaching the armour.
+      var foot = playerFoot(state, sides[i]);
+      var dx = b.x + b.size / 2 - foot.x, dy = b.y + b.size / 2 - foot.y;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      if (state.serveDelay <= 0 && d < GLINT.near) {
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = GLINT.alpha * (1 - d / GLINT.near);
+        blit(ctx, f, 0, 0, null);
+      }
+      ctx.restore();
+    }
+  }
+
   // ---------------------------------------------------------------- drawing
   var cached = { spec: null, cam: null };
   function cameraFor(T, spec) {
@@ -635,6 +948,16 @@
     ctx.strokeStyle = C.green;
     ctx.lineWidth = 1;
     ctx.stroke();
+    // Match point: the border pulses green glow once a second (docs/ART.md era 9, MOMENTS).
+    if (matchPoint(state)) {
+      var pulse = 0.5 + 0.5 * Math.cos(((state.time || 0) % 1) * Math.PI * 2);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = T.rgba(C.glow, 0.8 * pulse * fade);
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.restore();
+    }
     ctx.fillStyle = C.tagText;
     var O = root.PongOpponents;   // the opponent's taunt, for a moment after its point (item 1209)
     P.drawText(ctx, O ? O.tagText(state, side, TAGS[side]) : TAGS[side], x + TAG.w / 2, y + (TAG.h - 5 * TAG.cell) / 2, TAG.cell, TAG.gap);
@@ -691,17 +1014,22 @@
     var L = arrivalLight(state, arrival);
     var tile = tilesFor(T, ctx);
     remember(state);
+    hookOver();                                        // the players' glint and miss flash, over the rig
 
     ctx.save();
     ctx.globalAlpha = 1;
 
-    // 1. backdrop, 2. the metal table
+    // 1. backdrop and the hangar behind the far rail, 2. the metal table
     drawBackdrop(ctx, cam, T, state);
+    drawHangar(ctx, cam, T, L);
+    drawSteam(ctx, cam, T, state);
     T.table(ctx, cam, tableStyle(ctx, cam, T, L, tile));
+    drawBeacons(ctx, cam, T, state);
 
     // 3. on the table: the specular pool, then the hard shadows over it
     drawSpecular(ctx, cam, T, L, tile);
     drawCastShadows(ctx, cam, T, L, state);
+    drawPlayerShadows(ctx, cam, T, L, state);
 
     // 4. paddles, the far one (smaller rect.y + rect.h) first
     var sides = ['left', 'right'];
@@ -727,6 +1055,9 @@
     }
     var tags = tagFade(arrival);
     for (var s = 0; s < sides.length; s++) drawGamertag(ctx, cam, T, P, state, sides[s], tags);
+
+    // the HUD band's motion tracker, before the ball so the ball stays the last fill
+    drawTracker(ctx, T, state);
 
     // 7. the ball, last of everything on the table; hidden in the serve pause
     if (live) T.ball(ctx, cam, state.ball, { fill: C.ball, texture: TEXTURE.ball });

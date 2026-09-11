@@ -86,3 +86,66 @@ Look file: [src/eras/era7-dreamcast.js](../../src/eras/era7-dreamcast.js). Chapt
 4. Delete the other era files, `src/display-crt.js`, `src/erachange.js`, `src/signboards.js`,
    `src/match.js`, and `advanceEra`'s call.
 5. Check a two-digit score before shipping (see WHAT DID NOT WORK).
+
+## LESSONS: the AAA pass (item 1231)
+
+Tim's direction for this pass: the era should look like *a AAA game of 1999 that happens to be
+Pong*, with characters holding the paddles. The target was *Jet Set Radio* on a *Soulcalibur*
+arcade table. Rally frame: [rally-era7.png](../shots/item-1231/rally-era7.png).
+
+**What sold the 1999 flagship look here**
+
+- **A place, not a backdrop.** A rooftop skate spot at sunset: three flat poster billboards on
+  ink legs along the skyline (a disc, a bolt and stripes, original graphics with no logo), a
+  water tower behind the city, twelve window lights switching on their own seeded periods, and
+  a blimp crossing the sky at 12 units a second. Every piece is flat poster colour with an ink
+  line and no gradient, so it reads as the same cel-shaded world as the table. All of it is
+  drawn in code, for 0 generations.
+- **A HUD that is part of the world.** The graffiti numbers were already there. Beside them now:
+  `P1` and `CPU` spray tags in the score's own block font with the same skew, three spray-can
+  icons that fill one per three rally hits, a magenta paint splat behind the scorer's number on a
+  point, and the blimp's side panel flashing the new score for a second. At match point the sky
+  bands swap (magenta on top) and the tags blink. Graffiti tags and a blimp scoreboard cost
+  almost nothing and say "1999 street game" faster than anything on the table.
+- **It is free.** The whole dressing A/B'd against master in the playtest's own Chrome
+  (`docs/measure/item-1231/era7ab.mjs`): era 7 holds 16.67 ms whenever the machine is free, as
+  before. The slow readings (32-36 ms) are machine load, and master's era 7 shows them too.
+
+**What did not work**
+
+- **Flat sprites read as sprites on a 3D table, and were ruled out** (Tim, 23:47 EDT
+  2026-09-10: *"if you are trying to do sprites in the 3d eras uh...that is not gonna look AAA
+  here dude"*). The two skaters stand at the paddles as stand-ins until this era's
+  polygon-model card replaces them (item 1248's renderer). A billboard figure on a perspective
+  table looks like a paper cut-out however good its pixels are. A 3D era's players have to be
+  models.
+- **pixflux does not make sprite sheets.** Asked for 3 x 6 frames of 24 x 54, it drew a 2 x 4
+  grid of bigger figures (about 36 x 81), with two ghosted frames. One single-row re-roll per
+  side (108 x 80) got the action poses, but drawn about a quarter smaller than the standing ones.
+  `assets/pixellab/era7-skater-cut.py` finds each figure as a cluster of pixels, scales the
+  action row to the standing height and lays out the rig's six rows. It works, but the scaled
+  frames are chunkier than the standing ones. Ask for **one figure per image** if sprites are
+  ever wanted again.
+- **pixflux refuses odd sizes.** 108 x 81 came back HTTP 422 ("divisible by 2"), with nothing
+  billed.
+- **Two generations at once lose manifest entries.** Each run of `tools/pixellab.mjs gen` rewrites
+  `manifest.json`, so two running side by side each dropped the other's entry. Two had to be
+  rebuilt from the printed seeds. Generate one image at a time in a checkout.
+- **The bible's placement for the tags crossed R8.** Under the numbers would reach below y 76,
+  the far edge's line, so the tags sit beside them. They go on the inside, because the outside of
+  the right number is where the opponent's name plate sits.
+- **The camera leaves almost no sky** (about 70 of 600 units). Anything tall behind the skyline
+  (the water tower) is cut by the top of the frame, so keep set dressing under 100 units.
+
+**What a one-era Dreamcast game would copy**
+
+1. The rooftop: `SCENE`, `WINDOWS`, `blimpX` and the poster, tower and window drawing in
+   `src/eras/era7-dreamcast.js`. All flat fills and `T.quad`/`T.box` calls, ready to move to
+   any flat-shaded 3D scene.
+2. The HUD kit: `tagCells`, `tagCentre`, `drawCans`, `splatShape` and the points memory
+   (`notePoints`), which reads only the score and time and never writes the state.
+3. The rule that made it cohere: **one outline colour, flat fills, and every new colour taken
+   from the era's poster palette.** The only colour this pass added is the empty-can purple.
+4. Real models for the players, not sprites (see above). The stand-in's concept (an orange
+   skater in headphones against a blue one in a beanie, both on yellow skates) is the brief
+   for them.
