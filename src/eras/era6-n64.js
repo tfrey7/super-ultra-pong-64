@@ -318,7 +318,7 @@
   // the half-resolution world so the blur takes them too, and the court's
   // grain fades into the fog before the far end, as the cartridge's did.
   var TEXTURE = {
-    court: { name: 'court-grain', alpha: 0.4, blend: 'soft-light', period: 120, strip: 1, fade: 0.85, smooth: true },
+    court: { name: 'court-grain', alpha: 0.55, blend: 'overlay', period: 120, strip: 1, fade: 0.85, smooth: true },
     trim: { name: 'trim', alpha: 0.35, blend: 'soft-light', period: 30, smooth: true },
     paddle: { name: 'paddle', alpha: 0.3, blend: 'soft-light', period: 20, smooth: true },
     ball: { name: 'ball', alpha: 0.35, blend: 'soft-light', period: 12, smooth: true }
