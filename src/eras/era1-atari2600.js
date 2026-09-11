@@ -198,7 +198,7 @@
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
     ctx.fillStyle = g;
-    var steps = [0.42, 0.24, 0.1];
+    var steps = [0.62, 0.36, 0.16];
     var start = r - BAND * 0.4;
     var each = BLEED / steps.length;
     for (var k = 0; k < steps.length; k++) {
@@ -297,18 +297,21 @@
     var r = info.radius;
     var w = info.width;
     var h = info.height;
-    if (!(r > 1)) return;
     if (info.dim) {
       // Behind the title: just the scanline band, in the demo's dim ink, silent.
-      scanBand(ctx, o, r, info.t, w, h, info.dim);
+      if (r > 1) scanBand(ctx, o, r, info.t, w, h, info.dim);
       return;
     }
     playSting(info.state);
-    var s = clamp01(p / SETTLED_AT);
-    rollAndFringe(ctx, o, r, s, w, h);
-    warmingLines(ctx, o, r, p, w, h);
-    colourBleed(ctx, o, r, info.t);
-    scanBand(ctx, o, r, info.t, w, h, null);
+    // The eased ring is barely a point for its first frames -- exactly when the
+    // power-on line belongs -- so only the ring's own layers wait for it to open.
+    if (r > 1) {
+      var s = clamp01(p / SETTLED_AT);
+      rollAndFringe(ctx, o, r, s, w, h);
+      warmingLines(ctx, o, r, p, w, h);
+      colourBleed(ctx, o, r, info.t);
+      scanBand(ctx, o, r, info.t, w, h, null);
+    }
     powerOnLine(ctx, o, info.t, w);
   }
 

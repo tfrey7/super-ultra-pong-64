@@ -1,0 +1,64 @@
+{
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1137",
+ "url": "file:///G:/Claude%20Stuff/super-ultra-pong-64-item-1137/index.html",
+ "chromePid": 29056,
+ "ordinaryPlay": {
+  "frames": 240,
+  "meanMs": 4.2,
+  "p95Ms": 4.3,
+  "maxMs": 4.4,
+  "worstFrameIndex": 213,
+  "firstDeltasMs": [
+   4.1,
+   4.2,
+   4.1,
+   4.2,
+   4.2
+  ]
+ },
+ "firstRing": {
+  "frames": 304,
+  "meanMs": 5.3,
+  "p95Ms": 4.3,
+  "maxMs": 141.6,
+  "worstFrameIndex": 23,
+  "firstDeltasMs": [
+   4.2,
+   4.2,
+   4.2,
+   12.4,
+   4.2
+  ]
+ },
+ "secondRing": {
+  "frames": 361,
+  "meanMs": 4.2,
+  "p95Ms": 4.3,
+  "maxMs": 4.3,
+  "worstFrameIndex": 9,
+  "firstDeltasMs": [
+   4.2,
+   4.2,
+   4.2,
+   4.1,
+   4.2
+  ]
+ },
+ "after": {
+  "era": 1,
+  "played": 5,
+  "errors": 0,
+  "last": {
+   "era": 1,
+   "type": "sting",
+   "waves": [
+    "fm",
+    "square",
+    "fm"
+   ],
+   "echo": false
+  },
+  "audio": "running",
+  "stingVoices": 3
+ }
+}
