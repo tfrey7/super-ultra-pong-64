@@ -62,6 +62,49 @@
   var PX = 4;                   // one sprite pixel, in field units
   var TILE = 40;                // one floor tile (10 sprite pixels)
 
+  // ------------------------------------------------------------ generated art
+  // The court and the ball are pixel art made with tools/pixellab.mjs (item
+  // 1178; prompts, seeds and verdicts in assets/pixellab/manifest.json), boiled
+  // down to the NES table above OFFLINE by assets/pixellab/era2-nes-quantize.mjs,
+  // which also writes the two strings below from era2-court.png and
+  // era2-ball.png. The game never loops over pixels: each is one drawImage.
+  // Embedded as data: URIs rather than drawn through PongSprites off disk: a
+  // page opened from file:// counts a file image as another origin and it
+  // taints the canvas, so every getImageData read of the frame throws; a data:
+  // image leaves it readable (measured in headless Chrome, item 1178). The
+  // paddles stay hand-drawn: both generated paddles looked wrong (manifest).
+  // Headless (no Image), or before an image has decoded, the hand-drawn court
+  // and ball below are drawn instead.
+  // BEGIN pixellab embeds (written by assets/pixellab/era2-nes-quantize.mjs)
+  var ART = {
+    court: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAACUCAYAAADWFGYSAAAE9ElEQVR42u3d223bMBQA0IzWMTpKPjKAh8puKRrAgazIMsX343xcFGmMK5nkMSmJvnl7u92+guLP36/g116JUnlHPGdt3F9enSevtgBEXm0MiIGsjQHRedoYEJ2njQHRedoYkKZ5DWRAAAEEEEAAAQQQQAABBBBApgJyH2hCzBbJQDSiWB1Js2WKEC0DECFqAzEli1mWVMWA3G5f7+/v3+GTSIwS3+M1CshVdWYTMVj8fKDHjN+YGaT4vfVVn4OM9qxikHHws9qptcQCBJChxsHZCmhZIKM+mQYEEEAAAcQSCxBAAAEEEEAAAcQ1CCCAmEEAAQQQQAABBBBAAAEEEEBcpAMCiBkEEEDMIIAAAgggtrsDAogZxDUIIIAAAggggFhiATInEEUFREpp0OJAUqqaZHwDZ2WE7lUpjsoN7X/38JpdmaLU2JaP2f787PxOz21XPmmfN6SMzbM2ObuTc3QOV4/1cNxd/716z2c5i8xMqVV5uphBLLHGXRL2fs5TLLEAAQQQnQcIIDoPEEAAkRcQQOQFZGIg/kYhIIAAAggggAACCCCAAAIIIIAAAgggbvPKCwgg8gICiLyAACIvIIAYyNoYEANZGwNiIAMCCCC38kULAAFkyM476qCjn3MdC5AGVU1WKR2Ts/POzuvs/1OPWRLIKGNgtKomL0vdxB7jnrMUkpicIecS8vvYY9eAkfO8LpRAWneJlQDk8N9WQEJfH/K6mMFY4v1v27YQENcgtYCUuLCe9bVXgQICSLcDOefMFHtMQBoDSVlSvLpLVBpI6aVQbSDP7rzF9hEgGT9FYj6JWwKpdTFd6lxC81wFEtqnUwDJcXv1SiNd7QRA+gJypT+ujqHY27wlgXx+fh5Gt0ByPuRbDcirZzSNgQSNxRZA7q+pAuTqgGgFJGWgl0DSA5CrfZEI5GF8tlxiVZ1BZgWy/xspuS/WFwSy/fBeZ4kVCyT3zYWcAzLHTZDaQGKeg1QG8vHxYYk1xQwyIpDOZ5DtmDSDTLTEKvY8xBJrkdu8s1+k97S5cjAgXd7mrb7VxHOQ4Z+DPOzQ9STdk3RAXuwEBqSTvVgtNivOthcr52ZFe7Hs5gXEbl5fmFrt+yCxz0EAAaTaJ33OO4W+Ubg4kJ6+kz7LV24rfSd97u3uqprkf35S6rgrVzUpWfbn/z3t1MiV51feXms2neHNcRu1UV2s7P2XYVwE7yHrteyPomaVZkCF4ya9Bpm980bPC4i/UQgIIGYQeQEBRF5AADGQtTEgrkEA6RrIT+V0nQcIIJZY8gICiLyAuAYBBBBAAAEEEANZGwNiBgEEEEAAAQQQQAABBBBAAJEXEEAAAcRtXnkBsVlRXkAqVzXJDkSIGgUrhqxqsousJX+elKRJOda25FFojmLv8UW+fYmm/euPcoT2y/aDsljZJtcgt7JT/4hLFkuscucHCCCAAAIIIIAAAggggAACCCCAAAIIIIAAAgggswAZdesGIIAAAggglliAAAIIIIBYYgECCCCAAGKJBQgggJhBAAEEEEAAscQCBBBAAAEEEEDGBBJR1UQ1EjFkdZSqVU2EGC2qLLGEmGU2yQ5EiJlmE0CEqAFEiFXLmwZLE2LF2r9Tb9tQhV0bp+bVefJqC0Dk1caAGMjaGBCdp40B0XnaGBCdp40B0XmAAKLzAAFE58kLiM6TV1sAIq+2CIt/P942ata2awQAAAAASUVORK5CYII=',
+    ball: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAR0lEQVR42mNgoBTs2bPnPzLGq/jPnz//0TFOTdgUwzRgaAIJ4NIA01RTU/OfKA0wG+isAVtwImMMxfg04VQMAyAFyJjilAAAljgGtJaN/cEAAAAASUVORK5CYII='
+  };
+  // END pixellab embeds
+  var art = {};
+
+  /** A piece's decoded image, or null (headless, not decoded yet, or none). */
+  function artImage(key) {
+    if (!ART[key] || typeof root.Image !== 'function') return null;
+    var img = art[key];
+    if (!img) {
+      img = art[key] = new root.Image();
+      img.src = ART[key];
+    }
+    return img.complete && img.naturalWidth > 0 ? img : null;
+  }
+
+  /** One drawImage, smoothing off, so the art stays as blocky as it was made. */
+  function blit(ctx, img, x, y, w, h) {
+    var smooth = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img, x, y, w, h);
+    ctx.imageSmoothingEnabled = smooth;
+  }
+  // Start decoding as the page loads, so the art is ready by the first frame.
+  artImage('court');
+  artImage('ball');
+
   // The rules' colour slot (era 1's palette order) -> the nearest NES hue
   // column: orange, gold, olive, grass, teal, sky, indigo, violet, magenta,
   // red, salmon, pale blue.
@@ -107,6 +150,15 @@
     var w = state.width, h = state.height, v;
     ctx.fillStyle = COURT;
     ctx.fillRect(0, 0, w, h);
+    // The generated court: 200 sprite pixels across, scaled to the width at PX
+    // and centred down the height (200x148 sits 4 units in from top and bottom,
+    // under the border).
+    var img = artImage('court');
+    if (img) {
+      var ch = w * img.naturalHeight / img.naturalWidth;
+      blit(ctx, img, 0, Math.round((h - ch) / 2), w, ch);
+      return;
+    }
     // Tiles: one sprite pixel of black mortar along each tile's right and
     // bottom edge.
     ctx.fillStyle = MORTAR;
@@ -184,6 +236,13 @@
   function drawBall(ctx, state) {
     if (state.serveDelay > 0) return;
     var b = state.ball;
+    // The generated ball: 12x12 at the canvas's own pixels, exactly over the
+    // box the rules hit-test, drawn last so nothing covers it (R1, R2).
+    var img = artImage('ball');
+    if (img) {
+      blit(ctx, img, Math.round(b.x), Math.round(b.y), b.size, b.size);
+      return;
+    }
     var c = b.size / 4;
     var ox = Math.round(b.x);
     var oy = Math.round(b.y);
