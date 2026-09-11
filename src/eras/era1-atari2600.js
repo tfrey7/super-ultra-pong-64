@@ -289,6 +289,10 @@
 
   /** The flourish hook: see the header of src/erachange.js for the contract. */
   function tvComesAlive(ctx, p, origin, fromEra, toEra, info) {
+    // Only the arrival of THIS era: the Super Nintendo borrows era 1's look
+    // (`like: 1`, for the paddle colours) and with it this hook, and the set
+    // has already come on by then.
+    if (toEra !== 1) return;
     var o = origin;
     var r = info.radius;
     var w = info.width;

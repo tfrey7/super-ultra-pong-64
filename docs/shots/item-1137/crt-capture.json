@@ -1,0 +1,70 @@
+{
+ "url": "file:///G:/Claude%20Stuff/super-ultra-pong-64-item-1137/index.html",
+ "chromePid": 40408,
+ "ordinaryPlay": {
+  "frames": 240,
+  "meanMs": 4.2,
+  "p95Ms": 4.3,
+  "maxMs": 4.3
+ },
+ "forcedFrom": 0,
+ "ring": {
+  "frames": 92,
+  "meanMs": 16.2,
+  "p95Ms": 33.4,
+  "maxMs": 662.5
+ },
+ "after": {
+  "era": 1,
+  "played": 3,
+  "errors": 0,
+  "last": {
+   "era": 1,
+   "type": "sting",
+   "waves": [
+    "fm",
+    "square",
+    "fm"
+   ],
+   "echo": false
+  },
+  "audio": "running",
+  "stingVoices": 3
+ },
+ "frozenChange": {
+  "era": 1,
+  "at": 1.187633333333334,
+  "time": 1.187633333333334
+ },
+ "frames": [
+  {
+   "file": "era0to1-t0.10-p0.00.png",
+   "t": 0.117,
+   "p": 0.002,
+   "radius": 2,
+   "cardUp": false
+  },
+  {
+   "file": "era0to1-t0.55-p0.22.png",
+   "t": 0.567,
+   "p": 0.216,
+   "radius": 206,
+   "cardUp": false
+  },
+  {
+   "file": "era0to1-t0.80-p0.62.png",
+   "t": 0.817,
+   "p": 0.622,
+   "radius": 594,
+   "cardUp": true
+  },
+  {
+   "file": "era0to1-t1.05-p0.90.png",
+   "t": 1.067,
+   "p": 0.904,
+   "radius": 863,
+   "cardUp": true
+  }
+ ],
+ "pageErrors": null
+}
