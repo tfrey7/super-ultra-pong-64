@@ -24,6 +24,10 @@ landed cards' reports. Where nothing has been learned yet, the page says so rath
 
 All eleven at their native resolution, side by side: [contact-sheet-native.png](../shots/eras/contact-sheet-native.png).
 
+The figures on the 2D eras (1 to 4) are drawn the EarthBound way: as text grids, checked against
+what the machine could draw. [sprites.md](sprites.md) covers the tool, what carried over and how long
+one sheet takes.
+
 ## The six headings every page answers
 
 The headings are fixed, and [test/lessons.test.js](../../test/lessons.test.js) fails if a page loses one or
