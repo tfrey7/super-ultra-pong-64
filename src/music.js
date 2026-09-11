@@ -251,8 +251,9 @@
    * THEME.bars steps, each a list of { part, voice, midis, len (steps), at
    * (fraction of a step), accent }. Pure data; the player books it.
    */
-  function arrange(arr, theme) {
+  function arrange(arr, theme, opts) {
     theme = theme || THEME;
+    opts = opts || {};
     var S = theme.steps, total = S * theme.bars;
     var out = [];
     for (var s = 0; s < total; s++) out.push([]);
@@ -261,13 +262,17 @@
     var chords = theme.chords.map(function (c) { return c.split('+').map(noteMidi); });
     var half = S / 2;
     var stolen = {};   // steps where a stealing drum sounds -> the part it steals
+    // The engine's own climax layers ride after the arrangement's parts, from
+    // the Atari up (item 1241): only when asked (the player asks), so the
+    // arrangement's own score stays exactly what its file says.
+    var parts = opts.lift && arr.kit ? arr.parts.concat(liftParts(arr)) : arr.parts;
 
-    function add(step, part, pi, midis, len, at, accent) {
+    function add(step, part, pi, midis, len, at, accent, voice) {
       var sh = 12 * (part.octave || 0);
       var late = arr.swing && (step % 2) ? arr.swing : 0;   // the off-16ths, played late
       out[step % total].push({
-        part: pi, voice: part.voice, midis: midis.map(function (m) { return m + sh; }),
-        len: len, at: (at || 0) + late, accent: !!accent
+        part: pi, voice: voice || part.voice, midis: midis.map(function (m) { return m + sh; }),
+        len: len, at: (at || 0) + late, accent: !!accent, from: part.from || 0
       });
     }
     function inSection(part, bar) {
@@ -279,7 +284,7 @@
       return part.pattern;
     }
 
-    arr.parts.forEach(function (part, pi) {
+    parts.forEach(function (part, pi) {
       for (var bar = 0; bar < theme.bars; bar++) {
         if (!inSection(part, bar)) continue;
         var b0 = bar * S;
@@ -337,9 +342,10 @@
           }
         } else if (part.play === 'drum') {
           var pat = parseBar(patternFor(part, bar));
+          var hits = drumVoices(part, arr);   // a kit piece may be several layers
           pat.forEach(function (e, k) {
             if (!e) return;
-            add(b0 + k, part, pi, [], 1, 0, e.accent);
+            for (var hv = 0; hv < hits.length; hv++) add(b0 + k, part, pi, [], 1, 0, e.accent, hits[hv]);
             if (part.steals) stolen[b0 + k] = part.steals;
           });
         }
@@ -352,7 +358,7 @@
     if (steps.length) {
       for (var s2 = 0; s2 < total; s2++) {
         out[s2] = out[s2].filter(function (ev) {
-          var p = arr.parts[ev.part];
+          var p = parts[ev.part];
           if (p.play === 'drum') return true;
           for (var i = 0; i < steps.length; i++) {
             if (stolen[steps[i]] !== p.play) continue;
@@ -364,7 +370,97 @@
         });
       }
     }
+    if (arr.voices > 0) limitVoices(out, parts, arr.voices);
     return out;
+  }
+
+  // ================================================ voices, kits and lifts
+  // (item 1241) The era's own hardware, read from its file in src/music/.
+
+  /** The voices a drum part plays: its own voice, or its kit piece (one voice or a list of layers). */
+  function drumVoices(part, arr) {
+    if (part.voice) return [part.voice];
+    var piece = part.hit && arr && arr.kit ? arr.kit[part.hit] : null;
+    if (!piece) return [];
+    return Array.isArray(piece) ? piece : [piece];
+  }
+
+  /**
+   * The engine's climax on top of any arrangement with a kit: a tom roll into
+   * every section from intensity 0.7, and the era's crash on every bar's
+   * downbeat from 0.9 (match point). They come last, so a full chip drops them first.
+   */
+  var LIFT = [
+    { play: 'drum', hit: 'tom', from: 0.7, lift: true,
+      pattern: '. . . . . . . . . . . . . . . .', fill: '. . . . . . . . x . x . x x X X' },
+    { play: 'drum', hit: 'crash', from: 0.9, lift: true,
+      pattern: 'X . . . . . . . . . . . . . . .' }
+  ];
+  function liftParts(arr) {
+    return LIFT.filter(function (p) { return arr.kit && arr.kit[p.hit]; });
+  }
+
+  /**
+   * How many of the chip's voices a part holds on a step: the most notes any
+   * of its events covering that step sounds. A pad counts once (a sampled
+   * chord: how the sample chips stretched their channels) and so does a kit
+   * piece however many layers it has (one sample, one channel).
+   */
+  function partLoad(ev, part) {
+    if (!part || part.rule === 'pad' || part.play === 'drum' || !ev.midis.length) return 1;
+    return ev.midis.length;
+  }
+
+  /** Per step, the voices sounding: { part index: load }, from events covering it. */
+  function loadMap(score, parts) {
+    var total = score.length, map = [];
+    for (var s = 0; s < total; s++) map.push({});
+    for (var s2 = 0; s2 < total; s2++) {
+      score[s2].forEach(function (ev) {
+        var n = partLoad(ev, parts[ev.part]);
+        var span = Math.max(1, Math.ceil(ev.len - 1e-9));
+        for (var k = 0; k < span && k < total; k++) {
+          var m = map[(s2 + k) % total];
+          m[ev.part] = Math.max(m[ev.part] || 0, n);
+        }
+      });
+    }
+    return map;
+  }
+
+  /** The most voices the score ever sounds at once. */
+  function peakVoices(score, arr) {
+    var parts = (arr && arr.parts) || [];
+    var peak = 0;
+    loadMap(score, parts).forEach(function (m) {
+      var n = 0;
+      for (var p in m) n += m[p];
+      if (n > peak) peak = n;
+    });
+    return peak;
+  }
+
+  /**
+   * The chip is full: a note that would start past `voices` is dropped, the
+   * latest-listed part first -- so the arrangement lists its parts in the
+   * order they matter. The existing loops all fit their chips and lose nothing.
+   */
+  function limitVoices(score, parts, voices) {
+    var map = loadMap(score, parts);
+    var dropped = 0;
+    for (var s = 0; s < score.length; s++) {
+      var m = map[s], used = 0, keep = {};
+      Object.keys(m).map(Number).sort(function (a, b) { return a - b; }).forEach(function (p) {
+        if (used + m[p] <= voices) { used += m[p]; keep[p] = true; }
+      });
+      score[s] = score[s].filter(function (ev) {
+        if (keep[ev.part]) return true;
+        dropped += 1;
+        return false;
+      });
+    }
+    score.dropped = dropped;
+    return dropped;
   }
 
   /** The table's own check, the one the suite runs: every problem, as sentences. */
@@ -397,7 +493,10 @@
       var tag = 'part ' + (i + 1) + ' (' + p.play + ')';
       if (!PLAYS[p.play]) bad.push(tag + ': unknown play');
       if (RULES[p.play] && !RULES[p.play][p.rule]) bad.push(tag + ': unknown rule ' + p.rule);
-      if (!p.voice || !(p.voice.gain > 0) || !p.voice.wave) bad.push(tag + ': needs a voice with a wave and a gain');
+      if (p.play === 'drum' && p.hit && !p.voice) {
+        if (!arr.kit || !arr.kit[p.hit]) bad.push(tag + ': the kit has no ' + p.hit);
+      } else if (!p.voice || !(p.voice.gain > 0) || !p.voice.wave) bad.push(tag + ': needs a voice with a wave and a gain');
+      if (p.from !== undefined && !(p.from >= 0 && p.from <= 1)) bad.push(tag + ': from is an intensity from 0 to 1');
       if (p.play === 'drum' || p.rule === 'rhythm') {
         if (p.pattern === undefined) bad.push(tag + ': needs a pattern');
         [p.pattern, p.fill, p.open].forEach(function (pat) {
@@ -407,9 +506,20 @@
         });
       }
       if (p.play === 'drum' && p.voice && p.voice.wave !== 'noise' && !(p.voice.freq > 0)) bad.push(tag + ': a pitched drum needs a freq');
+      if (p.play === 'drum' && !p.voice && !p.hit) bad.push(tag + ': a drum needs a voice or a kit hit');
       if (p.voicing && !VOICINGS[p.voicing]) bad.push(tag + ': unknown voicing ' + p.voicing);
       (p.sections || []).forEach(function (s) { if (!theme.sections[s]) bad.push(tag + ': no section ' + s); });
     });
+    Object.keys(arr.kit || {}).forEach(function (name) {
+      [].concat(arr.kit[name]).forEach(function (v) {
+        if (!v || !(v.gain > 0) || !v.wave) bad.push('kit ' + name + ': needs a voice with a wave and a gain');
+        else if (v.wave !== 'noise' && !(v.freq > 0)) bad.push('kit ' + name + ': a pitched hit needs a freq');
+      });
+    });
+    if (arr.voices !== undefined) {
+      var peak = peakVoices(arrange(Object.assign({}, arr, { voices: 0 }), theme), arr);
+      if (peak > arr.voices) bad.push('sounds ' + peak + ' voices at once, the chip has ' + arr.voices);
+    }
     if (arr.detune && arr.detune.length !== 12) bad.push('detune needs 12 offsets');
     if (arr.swing !== undefined && !(arr.swing >= 0 && arr.swing < 0.5)) bad.push('swing is a share of a step under 0.5');
     return bad;
@@ -457,8 +567,11 @@
     var pos = 0;                // THE song position, in steps: shared by every era
     var nextTime = 0;           // audio time of step `pos`
     var rally = 0;
+    var intensity = 0;          // 0..1: which `from` layers play (item 1241)
 
     var music = {
+      intensityNow: 0,          // the intensity the last update read off the game
+      limiter: null,            // { compressor, ceiling } after the master (item 1241)
       off: !!opts.off,
       unlocked: false,
       available: false,
@@ -493,7 +606,7 @@
         duck = ctx.createGain();
         duck.gain.value = 1;
         duck.connect(master);
-        master.connect(ctx.destination);
+        master.connect(limiterChain());
         music.available = true;
         resume();
       } catch (e) {
@@ -524,6 +637,121 @@
     }
     function toggleMute() { setMuted(!music.muted); return music.muted; }
 
+    // ----------------------------------------------- the output (item 1241)
+    /**
+     * The master limiter: a hard, fast compressor and then a soft ceiling that
+     * never lets a sample past CEILING, so the climax can stack every layer
+     * without the output clipping. A context with no compressor keeps the ceiling.
+     */
+    function limiterChain() {
+      var ceiling = ctx.createWaveShaper();
+      ceiling.curve = ceilingCurve();
+      ceiling.connect(ctx.destination);
+      var comp = null;
+      if (typeof ctx.createDynamicsCompressor === 'function') {
+        comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = LIMIT.threshold;
+        comp.knee.value = LIMIT.knee;
+        comp.ratio.value = LIMIT.ratio;
+        comp.attack.value = LIMIT.attack;
+        comp.release.value = LIMIT.release;
+        comp.connect(ceiling);
+      }
+      music.limiter = { compressor: comp, ceiling: ceiling };
+      return comp || ceiling;
+    }
+
+    /**
+     * An era's period production, between its arrangement's effects and its
+     * bus: `tone` (a gentle low-pass: the speaker, the cartridge), `tape`
+     * (saturation, and a short delay whose time wanders: wow and flutter),
+     * `chorus` (a swirling copy under the dry sound) and `hall` (a generated
+     * reverb; with `gate` it is the 1980s gated sound, full and then cut).
+     * Every node is kept on the track so retiring it can let go of all of them.
+     */
+    function eraChain(ch, bus, track) {
+      var made = track.fx || (track.fx = []);
+      function keep(n) { made.push(n); return n; }
+      function wander(param, rate, depth) {
+        var lfo = keep(ctx.createOscillator());
+        lfo.frequency.value = rate;
+        var dg = keep(ctx.createGain());
+        dg.gain.value = depth;
+        lfo.connect(dg);
+        dg.connect(param);
+        lfo.start(ctx.currentTime);
+        track.drones.push(lfo);
+      }
+      var input = keep(ctx.createGain());
+      var node = input;
+      if (ch.tone) {
+        var lp = keep(ctx.createBiquadFilter());
+        lp.type = 'lowpass';
+        lp.frequency.value = ch.tone;
+        lp.Q.value = 0.5;
+        node.connect(lp);
+        node = lp;
+      }
+      if (ch.tape) {
+        if (ch.tape.sat) {
+          var sat = keep(ctx.createWaveShaper());
+          sat.curve = driveCurve(Math.round(ch.tape.sat * 20) / 200);
+          node.connect(sat);
+          node = sat;
+        }
+        var tape = keep(ctx.createDelay(0.1));
+        tape.delayTime.value = 0.012;
+        if (ch.tape.wow) wander(tape.delayTime, 0.55, ch.tape.wow * 0.002);
+        if (ch.tape.flutter) wander(tape.delayTime, 7, ch.tape.flutter * 0.0004);
+        node.connect(tape);
+        node = tape;
+      }
+      if (ch.chorus) {
+        var sum = keep(ctx.createGain());
+        node.connect(sum);
+        var cd = keep(ctx.createDelay(0.1));
+        cd.delayTime.value = 0.018;
+        wander(cd.delayTime, ch.chorus.rate, ch.chorus.depth);
+        var cw = keep(ctx.createGain());
+        cw.gain.value = ch.chorus.mix;
+        node.connect(cd);
+        cd.connect(cw);
+        cw.connect(sum);
+        node = sum;
+      }
+      node.connect(bus);
+      if (ch.hall) {
+        var conv = keep(ctx.createConvolver());
+        conv.buffer = hallImpulse(ch.hall);
+        var wet = keep(ctx.createGain());
+        wet.gain.value = ch.hall.mix;
+        node.connect(conv);
+        conv.connect(wet);
+        wet.connect(bus);
+      }
+      return input;
+    }
+
+    /** A hall's impulse, built once per spec: decaying noise, or with `gate` level noise cut dead. */
+    var halls = [];
+    function hallImpulse(spec) {
+      for (var i = 0; i < halls.length; i++) if (halls[i].spec === spec) return halls[i].buffer;
+      var ir = ctx.createBuffer(2, 1, ctx.sampleRate);
+      var sr = ctx.sampleRate, len = Math.max(1, Math.floor(sr * (spec.gate || spec.seconds)));
+      ir = ctx.createBuffer(2, len, sr);
+      var seed = 11;
+      for (var ch = 0; ch < 2; ch++) {
+        var d = ir.getChannelData(ch);
+        for (var j = 0; j < len; j++) {
+          seed = (seed * 16807) % 2147483647;
+          var amp = spec.gate ? 1 - 0.25 * j / len : Math.pow(1 - j / len, spec.decay || 2);
+          d[j] = (seed / 1073741823.5 - 1) * amp;
+        }
+      }
+      halls.push({ spec: spec, buffer: ir });
+      return ir;
+    }
+
     /**
      * The whole of the per-frame work, handed the real game: follow the era,
      * duck under a paddle hit, book the next LOOKAHEAD seconds. Plays nothing
@@ -546,6 +774,8 @@
           for (var i = 0; i < evs.length; i++) if (evs[i] && evs[i].type === 'paddle') { duckNow(); break; }
         }
         rally = game.rally || 0;
+        intensity = intensityOf(game);
+        music.intensityNow = intensity;
         retireFaded();
         return book();
       } catch (e) {
@@ -583,7 +813,10 @@
       music.era = era;
       if (arr) {
         current.score = scoreOf(arr);
-        if (arr.effects) current.fxIn = effectsChain(arr.effects, bus, current);
+        // effects (the arrangement's) -> chain (the era's period production) -> bus
+        var into = arr.chain ? eraChain(arr.chain, bus, current) : bus;
+        current.fxIn = into;
+        if (arr.effects) current.fxIn = effectsChain(arr.effects, into, current);
         if (arr.drone) startDrones(current);
       }
     }
@@ -598,7 +831,7 @@
     }
 
     function scoreOf(arr) {
-      if (!arr._score || arr._scoreTheme !== theme) { arr._score = arrange(arr, theme); arr._scoreTheme = theme; }
+      if (!arr._score || arr._scoreTheme !== theme) { arr._score = arrange(arr, theme, { lift: true }); arr._scoreTheme = theme; }
       return arr._score;
     }
 
@@ -627,6 +860,7 @@
           if (!tr || !tr.score || (tr.until && nextTime > tr.until)) continue;
           var list = tr.score[pos];
           for (var n = 0; n < list.length; n++) {
+            if (list[n].from > intensity) continue;   // a layer the build has not reached yet
             note(list[n], tr.arr, nextTime + list[n].at * dt, dt, tr.fxIn);
             booked += 1;
           }
@@ -655,7 +889,8 @@
         var end = t + held + (env.s > 0 ? env.r : env.d) + 0.03;
         // osc -> drive -> filter -> envelope -> pump -> pan -> the era's bus
         var g = ctx.createGain();
-        shape(g.gain, t, held, peak / Math.sqrt(freqs.length), env);
+        if (v.bursts) burstShape(g.gain, t, peak, env, v.bursts);
+        else shape(g.gain, t, held, peak / Math.sqrt(freqs.length), env);
         var tail = g;
         if (v.pump) {
           var pg = ctx.createGain();
@@ -749,6 +984,17 @@
       }
     }
 
+    /** A hand clap: `n` quick spikes 11 ms apart, then the decay (item 1241). */
+    function burstShape(param, t, peak, env, n) {
+      param.setValueAtTime(0.0001, t);
+      for (var b = 0; b < n; b++) {
+        var bt = t + b * 0.011;
+        param.linearRampToValueAtTime(peak, bt + 0.001);
+        param.exponentialRampToValueAtTime(Math.max(0.0001, peak * 0.25), bt + 0.01);
+      }
+      param.exponentialRampToValueAtTime(0.0001, t + n * 0.011 + Math.max(0.005, env.d));
+    }
+
     function osc(v, f, cents, into, t, held, end, layers) {
       var o = ctx.createOscillator();
       var wave = v.wave === 'kick' ? 'sine' : v.wave;
@@ -757,7 +1003,9 @@
       else o.type = wave;
       o.detune.value = cents;
       o.frequency.setValueAtTime(f, t);
-      if (v.wave === 'kick') o.frequency.exponentialRampToValueAtTime(Math.max(20, f / 4), t + 0.12);
+      // A pitched hit falls: a kick to a quarter in 0.12 s, a kit's tom or timpani as its `drop` says.
+      var drop = v.drop || (v.wave === 'kick' ? { ratio: 0.25, time: 0.12 } : null);
+      if (drop) o.frequency.exponentialRampToValueAtTime(Math.max(20, f * drop.ratio), t + Math.max(0.005, drop.time));
       var node = o;
       if (layers > 1) {
         var share = ctx.createGain();
