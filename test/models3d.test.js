@@ -225,21 +225,68 @@ test('fillFor: fog pulls a colour toward the fog, and the PlayStation dithers be
 });
 
 // --------------------------------------------------------- through the rig
-test('eras 5 to 10 name a model and a shading of their own; eras 1 to 4 keep their sprites', () => {
+test('eras 5 to 10 name a shading of their own and no model by default; eras 1 to 4 keep their sprites', () => {
   const modes = new Set();
   for (let e = 1; e <= 10; e++) {
     const c = C.configFor(e);
     if (e < 5) { assert.ok(!c.model, 'era ' + e + ' stays a sprite'); continue; }
-    assert.ok(fs.existsSync(path.join(MODELS, c.model + '.json')), 'era ' + e + ' model file ' + c.model);
-    assert.ok(fs.existsSync(path.join(MODELS, c.model + '.js')), 'era ' + e + ' model script ' + c.model);
+    // Item 1283: no era wears the proof figure until its own model card lands.
+    for (const side of ['left', 'right']) {
+      const s = C.configFor(e, side);
+      assert.ok(!s.model && !s.figure, 'era ' + e + ' ' + side + ' names no model: ' + (s.model || s.figure));
+    }
     assert.ok(M.MODES.includes(c.shading), 'era ' + e + ' shading ' + c.shading);
     modes.add(c.shading);
   }
   assert.strictEqual(modes.size, 6, 'one mode an era');
 });
 
-test('with the models loaded, every 3D era draws both players as models and writes no state', () => {
+test('item 1283: each 3D era wears its own pair, twelve different sheets across the six', () => {
+  const sheets = new Set();
+  for (let e = 5; e <= 10; e++) {
+    const l = C.configFor(e, 'left').sheet, r = C.configFor(e, 'right').sheet;
+    assert.ok(l && r && l !== r, 'era ' + e + ' has two different figures: ' + l + ' / ' + r);
+    sheets.add(l); sheets.add(r);
+  }
+  assert.strictEqual(sheets.size, 12);
+});
+
+test('item 1283: with the proof models loaded but not asked for, every 3D era draws its stand-ins', () => {
   for (const d of ['lo', 'mid', 'hi']) M.loadFile(path.join(MODELS, 'player-proof-' + d + '.json'));
+  for (let e = 5; e <= 10; e++) {
+    const ctx = recorder();
+    assert.strictEqual(C.drawPlayers(ctx, playing(e), null, R), true, 'era ' + e);
+    assert.strictEqual(ctx.calls.filter(([k, a]) => k === 'scale' && a[0] === -1).length, 1, 'era ' + e + ': the sprite rig, one mirrored player');
+    assert.ok(ctx.calls.filter(([k]) => k === 'fill').length < 200, 'era ' + e + ': no polygon figures');
+  }
+});
+
+test('item 1283: an era block that names its own model file draws it, and only that era', () => {
+  M.loadFile(path.join(MODELS, 'player-proof-mid.json'));
+  const own = C.ERAS[7];
+  own.model = 'player-proof-mid';
+  try {
+    assert.strictEqual(C.configFor(7, 'right').model, 'player-proof-mid');
+    assert.ok(!C.configFor(8).model, 'its neighbour is untouched');
+    const ctx = recorder();
+    C.drawPlayers(ctx, playing(7), null, R);
+    assert.ok(ctx.calls.filter(([k]) => k === 'fill').length > 200, 'era 7 draws its named model');
+  } finally { delete own.model; }
+});
+
+test('with the proof model asked for (the ?model= switch), every 3D era draws both players as models and writes no state', () => {
+  for (const d of ['lo', 'mid', 'hi']) M.loadFile(path.join(MODELS, 'player-proof-' + d + '.json'));
+  C.forcedModel = 'player-proof-hi';
+  C.forcedFigure = 'player-proof-hi';
+  try {
+    for (let e = 1; e <= 10; e++) {
+      const c = C.configFor(e, 'right');
+      if (e < 5) { assert.ok(!c.model && !c.figure, 'era ' + e + ' stays a sprite'); continue; }
+      assert.strictEqual(c.model, 'player-proof-hi', 'era ' + e + ' polygon opt-in');
+      assert.strictEqual(c.figure, 'player-proof-hi', 'era ' + e + ' glTF opt-in, what item 1274\'s layer reads');
+    }
+  } finally { C.forcedFigure = null; }
+  try {
   for (let e = 5; e <= 10; e++) {
     const g = playing(e);
     g.events = [{ type: 'paddle', side: 'left', era: e, time: g.time }];
@@ -250,6 +297,7 @@ test('with the models loaded, every 3D era draws both players as models and writ
     assert.ok(!ctx.calls.some(([k]) => k === 'drawImage'), 'era ' + e + ': no sprite');
     assert.ok(ctx.calls.filter(([k]) => k === 'fill').length > 200, 'era ' + e + ': triangles for two figures');
   }
+  } finally { C.forcedModel = null; }
   // Eras 1 to 4 are untouched: the sprite path, one mirrored player.
   const ctx = recorder();
   C.drawPlayers(ctx, playing(3), null, R);
@@ -257,6 +305,8 @@ test('with the models loaded, every 3D era draws both players as models and writ
 });
 
 test('a swing moves the model: the frame after a contact differs from idle', () => {
+  C.forcedModel = 'player-proof-mid';
+  try {
   const g = playing(8);
   const draw = () => { const ctx = recorder(); C.drawPlayers(ctx, g, null, R); return ctx.calls.filter(([k]) => k === 'moveTo').map(([, a]) => a.join(',')).join(';'); };
   const idle = draw();
@@ -266,6 +316,7 @@ test('a swing moves the model: the frame after a contact differs from idle', () 
   g.time = t0 + C.SWING_S / 2;
   g.events = [];
   assert.notStrictEqual(draw(), idle, 'mid-swing pose');
+  } finally { C.forcedModel = null; }
 });
 
 test('index.html loads src/models3d.js once, before the rig, and no model code touches pixels', () => {
