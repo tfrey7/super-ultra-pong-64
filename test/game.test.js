@@ -620,15 +620,21 @@ function concede(g) {
   Pong.step(g, 0.05, {});
 }
 
-test('the ladder is named, in order, from the 1972 machine to the Super Nintendo', () => {
+test('the ladder is named, in order, from the 1972 machine to the Xbox 360', () => {
   assert.deepStrictEqual(Pong.ERAS.map((e) => [e.era, e.year, e.machine]), [
     [0, 1972, 'arcade Pong'],
     [1, 1977, 'Atari 2600'],
     [2, 1985, 'NES'],
     [3, 1989, 'Sega Genesis'],
-    [4, 1991, 'Super Nintendo']
+    [4, 1991, 'Super Nintendo'],
+    [5, 1994, 'Sony PlayStation'],
+    [6, 1996, 'Nintendo 64'],
+    [7, 1999, 'Sega Dreamcast'],
+    [8, 2000, 'PlayStation 2'],
+    [9, 2001, 'Xbox'],
+    [10, 2005, 'Xbox 360']
   ]);
-  assert.strictEqual(Pong.TOP_ERA, 4);
+  assert.strictEqual(Pong.TOP_ERA, 10);
 });
 
 test('a machine starts at era 0, and has never changed era', () => {
@@ -751,7 +757,7 @@ test('a new session starts back at the era it was opened at', () => {
 test('the page query picks the starting era, and nonsense is era 0', () => {
   assert.strictEqual(Pong.eraFromQuery('?era=3'), 3);
   assert.strictEqual(Pong.eraFromQuery('?x=1&era=1'), 1);
-  assert.strictEqual(Pong.eraFromQuery('?era=9'), Pong.TOP_ERA);
+  assert.strictEqual(Pong.eraFromQuery('?era=99'), Pong.TOP_ERA);
   assert.strictEqual(Pong.eraFromQuery('?era=-1'), 0);
   assert.strictEqual(Pong.eraFromQuery('?era=nes'), 0);
   assert.strictEqual(Pong.eraFromQuery(''), 0);

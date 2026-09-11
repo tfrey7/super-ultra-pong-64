@@ -176,10 +176,10 @@ same shape (a highlight, a clip). None of them saves or restores `ctx` state exc
 | --- | --- |
 | `T.path(ctx, cam, points)` | Begins a path through `points` (`[[x, y, z], ...]`), projected, and closes it. Does not fill. The way to clip to any table shape: `T.path(...); ctx.clip();`. |
 | `T.quad(ctx, cam, points, style)` | A filled 4-point polygon (any 3 or more points work). |
-| `T.box(ctx, cam, rect, z0, z1, style)` | A box standing on the table: footprint `rect = { x, y, w, h }` in field units, from height `z0` to `z1`. Paddles are `T.box(ctx, cam, state.left, 0, 24, style)`. It draws only the faces the camera can see, in this order: the side face that faces the eye (the right face `x + w` when `x + w < 400 + panX`, the left face `x` when `x > 400 + panX`, neither otherwise), then the near face (`y + h`), then the top. Returns `{ top, near, side }`, each an array of four projected points. |
+| `T.box(ctx, cam, rect, z0, z1, style)` | A box standing on the table: footprint `rect = { x, y, w, h }` in field units, from height `z0` to `z1`. Paddles are `T.box(ctx, cam, state.left, 0, 24, style)`. It draws only the faces the camera can see, in this order: the side face that faces the eye (the right face `x + w` when `x + w < 400 + panX`, the left face `x` when `x > 400 + panX`, neither otherwise), then the near face (`y + h`), then the top. Returns `{ top, near, side }`, each an array of four projected points; `side` is `null` when neither side face shows (as built by 1144). |
 | `T.ball(ctx, cam, ball, style)` | The ball, standing on the table. Centre `(ball.x + ball.size / 2, ball.y + ball.size / 2)`, world radius `r = ball.size * (style.radius || 0.6)`. It draws, in order: **the contact shadow** (an ellipse on the table at `z = 0` under the centre, radii `r * scale` by `r * scale * cos`, `style.shadow` default `'rgba(0,0,0,0.55)'`), then the ball as a circle of screen radius `r * scale`, centred on the projection of `z = r`. `style.fill` is a colour, or `function (sx, sy, sr) -> fillStyle` for a gradient. Returns `{ x, y, r, footX, footY }` in screen pixels. |
 | `T.ballScreen(cam, state)` | The same `{ x, y, r, footX, footY }` without drawing: a pure function of the state and the camera. Use it for trails, sparks and glows, and for 1144's purity test. |
-| `T.table(ctx, cam, style)` | The court: the surface quad `(0,0)-(800,600)` at `z = 0`, the centre line as 6-unit-wide dashes (20 on, 16 off, exactly the 2D line), the far rail as a box `(0, -18, 800, 18)` from `z` 0 to 22, and the near rail as a **flat** strip `(0, 600, 800, 10)` at `z = 0` (rule R6). Style keys are `surface`, `line`, `rail`, `railTop` and `nearLip`, each a colour or `function (ctx, cam, pts)` that fills the shape itself (textures). |
+| `T.table(ctx, cam, style)` | The court: the surface quad `(0,0)-(800,600)` at `z = 0`, the centre line as 6-unit-wide dashes (20 on, 16 off, exactly the 2D line), the far rail as a box `(0, -18, 800, 18)` from `z` 0 to 22, and the near rail as a **flat** strip `(0, 600, 800, 10)` at `z = 0` (rule R6). Style keys are `surface`, `line`, `rail`, `railTop` and `nearLip`, each a colour or `function (ctx, cam, pts)` that fills the shape itself (textures). The centre-line dashes are paint on the surface and never take the outline. |
 
 **Style keys the helpers share:**
 
@@ -187,7 +187,7 @@ same shape (a highlight, a clip). None of them saves or restores `ctx` state exc
 | --- | --- |
 | `ink` | Base colour of the shape (`'#rrggbb'`). |
 | `shade` | `'flat'` (one colour a face), `'banded'` (hard-edged bands), or `'gradient'` (a linear gradient across the face: Gouraud). Default `'flat'`. |
-| `bands` | For `'banded'`: how many bands, lit to dark, top of the face to bottom. Default 2. |
+| `bands` | For `'banded'`: how many bands, lit to dark, top of the face to bottom. Default 2. One gradient with doubled stops, so the edges are hard: two bands split 40% down the face (the cel look), more bands split evenly. |
 | `light` | `{ top, near, side }`: how far each face is lightened (+) or darkened (-) from `ink`, through `T.shade`. Default `{ top: 0.25, near: 0, side: -0.35 }`. |
 | `fill` | Overrides everything above: a colour, a gradient or pattern, or `function (face, pts) -> fillStyle`, where `face` is `'top'`, `'near'`, `'side'` or `'shape'`. |
 | `outline` | `{ width, colour }`, or `false` to switch off the camera's outline for this call (2.6). |
@@ -265,9 +265,16 @@ So the six era cards never touch the same line:
   one-line placeholders `like: 5`, each with its own `card` (so the ladder climbs to 10 and every
   card already reads right).
 - **Seven `<script>` lines** in `index.html`: `src/table3d.js`, then the six era files, before
-  `src/erachange.js`.
+  `src/erachange.js`. As built, `src/table3d.js` sits straight after `src/render.js`, before every
+  era file, and `PongRender.table3d` is a getter that finds it in the page or `require`s it under
+  node, so `tools/eralooks.js`'s loader needs no change.
 - **The sound hook** (section 3), and `TOP_ERA` in `src/sound.js` following `Pong.ERAS` rather than
-  the hard-coded 4. `src/sound.js` today clamps every era above 4 to the Super Nintendo's voice.
+  the hard-coded 4. As built, a rung above the `VOICES` rows whose look has no `voice` yet plays the
+  Super Nintendo's row and echo, so the placeholders are never silent. Of the section 3 additions,
+  1144 builds only the hook: `wave: 'noise'` notes are skipped rather than played, and `attack`,
+  `filter`, `unison`, `lfo`, `shape`, `reverb`, `bus` and the boot sting are still to build.
+- **Name cards** carry `dots: null`, so no rung above 4 inherits the Super Nintendo's four
+  buttons from `STYLES[4]` in `src/erachange.js`.
 
 An era card then **replaces its own era file and adds its own test file. Nothing else.**
 

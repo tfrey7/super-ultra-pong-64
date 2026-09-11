@@ -54,7 +54,8 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 const REFERENCE = process.argv.includes('--reference');
 const ERA_SHOTS = path.join(ROOT, 'docs', 'shots', 'eras');
 // One name per rung, the same as that era's file in src/eras/.
-const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes'];
+const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes',
+  'era5-playstation', 'era6-n64', 'era7-dreamcast', 'era8-ps2', 'era9-xbox', 'era10-xbox360'];
 const CHROME = arg('chrome', CHROMES.find((p) => existsSync(p)));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -462,7 +463,7 @@ async function main() {
         (qr.last ? `, last: ${qr.last.type} on era ${qr.last.era} (${qr.last.waves.join('+')}` +
           `${qr.last.echo ? ' + echo' : ''})` : ''));
     const voices = await s.eval(`(() => { const p = window.__pongSound; const out = [];
-      for (let era = 0; era <= 4; era++) {
+      for (let era = 0; era <= window.Pong.TOP_ERA; era++) {
         const ok = p.play({ type: 'paddle', era: era });
         out.push({ era: era, ok: ok, last: ok ? p.last : null });
       }
