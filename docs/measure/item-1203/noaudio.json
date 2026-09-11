@@ -1,0 +1,1478 @@
+{
+ "label": "noaudio",
+ "noAudio": true,
+ "control": false,
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1203",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "when": "2026-09-11T02:17:43.169Z",
+ "categories": [
+  "devtools.timeline",
+  "disabled-by-default-devtools.timeline",
+  "disabled-by-default-devtools.timeline.frame",
+  "toplevel",
+  "blink",
+  "blink.user_timing",
+  "cc",
+  "gpu",
+  "viz",
+  "audio",
+  "media",
+  "v8",
+  "loading",
+  "disabled-by-default-gpu.service",
+  "disabled-by-default-audio",
+  "disabled-by-default-cc.debug.scheduler.frames",
+  "benchmark",
+  "renderer.scheduler",
+  "mojom",
+  "ipc"
+ ],
+ "results": [
+  {
+   "n": 1,
+   "port": 9411,
+   "page": {
+    "era": 4,
+    "audio": "none",
+    "boots": 0,
+    "played": 0
+   },
+   "traceFile": "noaudio-leg1.trace.json.gz",
+   "eventsTotal": 285984,
+   "eventsCut": 40852,
+   "medianFrameMs": 4.16,
+   "longFrames": [
+    104.9,
+    18.6,
+    19.1
+   ],
+   "window": {
+    "ms": 104.9,
+    "pointAtMs": -16.3,
+    "ringFirstFrameAtMs": -7.8,
+    "soundsAtMs": []
+   },
+   "threads": [
+    {
+     "thread": "GPU Process / CrGpuMain",
+     "busyMs": 104.86,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 102.03,
+       "atMs": -6.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 1.85,
+       "atMs": 102.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.58,
+       "atMs": 104.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.2,
+       "atMs": 102.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 104.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.05,
+       "atMs": 104.2
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 104.86
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 104.84
+      },
+      {
+       "name": "Scheduler::RunTask",
+       "ms": 104.77
+      },
+      {
+       "name": "GpuChannel::ExecuteDeferredRequest",
+       "ms": 104.5
+      },
+      {
+       "name": "GPUTask",
+       "ms": 104.43
+      },
+      {
+       "name": "RendererMainThread",
+       "ms": 104.4
+      },
+      {
+       "name": "CommandBuffer::Flush",
+       "ms": 104.4
+      },
+      {
+       "name": "CommandBufferStub::OnAsyncFlush",
+       "ms": 104.4
+      },
+      {
+       "name": "CommandBufferService:PutChanged",
+       "ms": 104.39
+      },
+      {
+       "name": "RasterDecoderImpl::DoEndRasterCHROMIUM",
+       "ms": 102.77
+      },
+      {
+       "name": "RasterDecoderImpl::DoEndRasterCHROMIUM::Flush",
+       "ms": 102.69
+      },
+      {
+       "name": "RasterDecoderImpl::DoRasterCHROMIUM",
+       "ms": 1.31
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / GpuVSyncThread",
+     "busyMs": 104.81,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 4.21,
+       "atMs": 76.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.21,
+       "atMs": 84.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.2,
+       "atMs": 30.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.2,
+       "atMs": 68.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.19,
+       "atMs": 1.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.19,
+       "atMs": 9.9
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 104.81
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 104.69
+      },
+      {
+       "name": "WinVSyncProvider::GetVSyncIntervalIfAvailable",
+       "ms": 0.95
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 44.41,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 13.96,
+       "atMs": 56.7
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 8.37,
+       "atMs": 72.8
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 6.56,
+       "atMs": 86.5
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 6.3,
+       "atMs": 95.1
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 5.7,
+       "atMs": 40.3
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 1.78,
+       "atMs": 82.3
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 44.41
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 44.34
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 42.37,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 14.1,
+       "atMs": 40.3
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 13.97,
+       "atMs": 20.1
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 3.8,
+       "atMs": 72.8
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 3.16,
+       "atMs": 86.5
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 2.72,
+       "atMs": 95.1
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 2.43,
+       "atMs": 35.2
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 42.37
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 42.31
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 24.21,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 8.43,
+       "atMs": 56.7
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 6.04,
+       "atMs": 20.1
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 1.21,
+       "atMs": 1.3
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.91,
+       "atMs": 0.3
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.68,
+       "atMs": 39.5
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.63,
+       "atMs": 19.3
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 24.21
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 24.09
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 16.37,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 16.34,
+       "atMs": 1.3
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.01,
+       "atMs": 56.7
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.01,
+       "atMs": 72.8
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.01,
+       "atMs": 86.5
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 16.37
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 16.33
+      }
+     ]
+    },
+    {
+     "thread": "Browser / CacheThread_BlockFile",
+     "busyMs": 5.44,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 0.86,
+       "atMs": 34.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.76,
+       "atMs": 102.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.66,
+       "atMs": 82
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.4,
+       "atMs": 54.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.37,
+       "atMs": 93.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.36,
+       "atMs": 71.6
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 5.44
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 5.26
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / CrRendererMain",
+     "busyMs": 2.62,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 2.26,
+       "atMs": 102.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.27,
+       "atMs": -2.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.05,
+       "atMs": 57
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.3
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 2.62
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 2.53
+      },
+      {
+       "name": "ProxyMain::BeginMainFrame",
+       "ms": 2.5
+      },
+      {
+       "name": "WebFrameWidgetImpl::BeginMainFrame",
+       "ms": 2.28
+      },
+      {
+       "name": "Blink.Animate.UpdateTime",
+       "ms": 2.27
+      },
+      {
+       "name": "PageAnimator::serviceScriptedAnimations",
+       "ms": 2.26
+      },
+      {
+       "name": "FrameRequestCallbackCollection::ExecuteFrameCallbacks",
+       "ms": 2.25
+      },
+      {
+       "name": "FireAnimationFrame",
+       "ms": 2.24
+      },
+      {
+       "name": "AsyncTask Run",
+       "ms": 2.24
+      },
+      {
+       "name": "v8.callFunction",
+       "ms": 2.22
+      },
+      {
+       "name": "FunctionCall",
+       "ms": 2.21
+      },
+      {
+       "name": "RasterImplementation::RasterCHROMIUM",
+       "ms": 0.15
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / Compositor",
+     "busyMs": 1.09,
+     "topLevel": [
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.23,
+       "atMs": 102.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.17,
+       "atMs": 102.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.15,
+       "atMs": 5.3
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.1,
+       "atMs": 1.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.09,
+       "atMs": 0.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 72.3
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 0.71
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.53
+      },
+      {
+       "name": "Graphics.Pipeline",
+       "ms": 0.46
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.38
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.34
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.31
+      },
+      {
+       "name": "ExternalBeginFrameSource::OnBeginFrame",
+       "ms": 0.25
+      },
+      {
+       "name": "Scheduler::BeginFrame",
+       "ms": 0.22
+      },
+      {
+       "name": "viz::BeginFrameArgs",
+       "ms": 0.21
+      },
+      {
+       "name": "Scheduler::BeginImplFrame",
+       "ms": 0.21
+      },
+      {
+       "name": "ProxyImpl::ScheduledActionDraw",
+       "ms": 0.15
+      },
+      {
+       "name": "MainFrame.Draw",
+       "ms": 0.14
+      }
+     ]
+    },
+    {
+     "thread": "Browser / CrBrowserMain",
+     "busyMs": 1.04,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 0.08,
+       "atMs": 81.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.07,
+       "atMs": 101.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 34.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.05,
+       "atMs": 37.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.05,
+       "atMs": 54.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.05,
+       "atMs": 71
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 1.04
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.84
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.42
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.29
+      },
+      {
+       "name": "GpuHostImpl::StoreBlobToDisk",
+       "ms": 0.15
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / VizCompositorThread",
+     "busyMs": 0.76,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 0.2,
+       "atMs": 102.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.09,
+       "atMs": 1.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.09,
+       "atMs": 102.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.08,
+       "atMs": 102.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.04,
+       "atMs": 59.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.03,
+       "atMs": 5.6
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 0.76
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.61
+      },
+      {
+       "name": "Graphics.Pipeline",
+       "ms": 0.41
+      },
+      {
+       "name": "DisplayScheduler::OnBeginFrameDeadline",
+       "ms": 0.2
+      },
+      {
+       "name": "DisplayScheduler::DrawAndSwap",
+       "ms": 0.19
+      },
+      {
+       "name": "Display::DrawAndSwap",
+       "ms": 0.19
+      },
+      {
+       "name": "ExternalBeginFrameSource::OnBeginFrame",
+       "ms": 0.13
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.1
+      },
+      {
+       "name": "DirectRenderer::DrawFrame",
+       "ms": 0.08
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.07
+      },
+      {
+       "name": "DirectRenderer::DrawRenderPass",
+       "ms": 0.06
+      },
+      {
+       "name": "DisplayScheduler::BeginFrame",
+       "ms": 0.05
+      }
+     ]
+    }
+   ],
+   "otherEvents": [
+    "47x I blink Canvas2DResourceProvider::Snapshot",
+    "26x b cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "26x b cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "26x e cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "25x I disabled-by-default-devtools.timeline.frame BeginFrame",
+    "24x I disabled-by-default-devtools.timeline.frame DroppedFrame",
+    "24x e cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "21x I toplevel ThreadControllerImpl::RunTask",
+    "18x I gpu DCompPresenter::CheckPendingFrames",
+    "14x s viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "14x f viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "7x f gpu,toplevel.flow Scheduler::ScheduleTask",
+    "7x f gpu,toplevel.flow Scheduler::RunTask",
+    "7x s gpu,toplevel.flow Scheduler::RunTask",
+    "5x I toplevel BlinkScheduler_PerformMicrotaskCheckpoint",
+    "4x s gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "4x f gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "4x s gpu,toplevel.flow Scheduler::ScheduleTask",
+    "3x I gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "3x I renderer.scheduler BlinkScheduler_OnTaskCompleted",
+    "3x I viz DisplayDamageTracker::HasPendingSurfaces",
+    "3x I cc auto cc::SchedulerStateMachine::ShouldThrottleSendBeginMainFrame()::(lambda)::operator()(uint32_t) const",
+    "3x I gpu,toplevel.flow Scheduler::FinishTask",
+    "3x f gpu,toplevel.flow SyncToken::Wait",
+    "3x f gpu,toplevel.flow CommandBuffer::Flush",
+    "3x s gpu,toplevel.flow Scheduler::SequenceUnblocked",
+    "3x f gpu,toplevel.flow Scheduler::SequenceUnblocked",
+    "3x C gpu CommandBufferService::Paused",
+    "3x n cc ScheduledTasksState",
+    "3x e disabled-by-default-gpu.service RendererMainThread-0x79b400472900",
+    "2x I blink.user_timing tick",
+    "2x I devtools.timeline RequestAnimationFrame",
+    "2x I disabled-by-default-devtools.timeline UpdateCounters",
+    "2x I cc ProxyImpl::OnCanDrawStateChanged",
+    "2x I blink CanvasRenderingContext2D::FinalizeFrame",
+    "2x I viz All active surfaces ready",
+    "2x I gpu,toplevel.flow Scheduler::ScheduleTask",
+    "2x I gpu,toplevel.flow CommandBuffer::FlushComplete",
+    "2x I gpu,toplevel.flow Scheduler::SequenceUnblocked",
+    "2x I blink CanvasResourceSharedImage::Bitmap"
+   ]
+  },
+  {
+   "n": 2,
+   "port": 9412,
+   "page": {
+    "era": 4,
+    "audio": "none",
+    "boots": 0,
+    "played": 0
+   },
+   "traceFile": "noaudio-leg2.trace.json.gz",
+   "eventsTotal": 286089,
+   "eventsCut": 42536,
+   "medianFrameMs": 4.18,
+   "longFrames": [
+    102.9,
+    14.6,
+    16.1
+   ],
+   "window": {
+    "ms": 102.9,
+    "pointAtMs": -17.6,
+    "ringFirstFrameAtMs": -7.8,
+    "soundsAtMs": []
+   },
+   "threads": [
+    {
+     "thread": "GPU Process / CrGpuMain",
+     "busyMs": 102.87,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 100,
+       "atMs": -5.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 1.67,
+       "atMs": 100.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.59,
+       "atMs": 102
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.17,
+       "atMs": 102.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.16,
+       "atMs": 100.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.08,
+       "atMs": 102.8
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 102.87
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 102.84
+      },
+      {
+       "name": "Scheduler::RunTask",
+       "ms": 102.74
+      },
+      {
+       "name": "GpuChannel::ExecuteDeferredRequest",
+       "ms": 102.38
+      },
+      {
+       "name": "GPUTask",
+       "ms": 102.3
+      },
+      {
+       "name": "RendererMainThread",
+       "ms": 102.27
+      },
+      {
+       "name": "CommandBuffer::Flush",
+       "ms": 102.27
+      },
+      {
+       "name": "CommandBufferStub::OnAsyncFlush",
+       "ms": 102.27
+      },
+      {
+       "name": "CommandBufferService:PutChanged",
+       "ms": 102.25
+      },
+      {
+       "name": "RasterDecoderImpl::DoEndRasterCHROMIUM",
+       "ms": 100.54
+      },
+      {
+       "name": "RasterDecoderImpl::DoEndRasterCHROMIUM::Flush",
+       "ms": 100.47
+      },
+      {
+       "name": "RasterDecoderImpl::DoRasterCHROMIUM",
+       "ms": 1.34
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / GpuVSyncThread",
+     "busyMs": 102.8,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 4.21,
+       "atMs": 56
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.2,
+       "atMs": 43.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.18,
+       "atMs": 6
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.18,
+       "atMs": 18.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.18,
+       "atMs": 64.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.18,
+       "atMs": 76.9
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 102.8
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 102.69
+      },
+      {
+       "name": "WinVSyncProvider::GetVSyncIntervalIfAvailable",
+       "ms": 0.95
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 64.45,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 17.05,
+       "atMs": 0.9
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 13.7,
+       "atMs": 20.8
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 13.68,
+       "atMs": 57.6
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 6.06,
+       "atMs": 40.9
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 3.87,
+       "atMs": 84.4
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 2.96,
+       "atMs": 73
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 64.45
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 64.4
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 33.48,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 8.9,
+       "atMs": 57.6
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 6.92,
+       "atMs": 73
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 6.46,
+       "atMs": 92.8
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 1.98,
+       "atMs": 35.6
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 1.27,
+       "atMs": 56
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 1,
+       "atMs": 39.7
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 33.48
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 33.36
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 28.68,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 13.62,
+       "atMs": 40.9
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 6.09,
+       "atMs": 84.5
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 5.95,
+       "atMs": 20.8
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 1.77,
+       "atMs": 80.8
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 1.23,
+       "atMs": 0.9
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.01,
+       "atMs": 35.6
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 28.68
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 28.61
+      }
+     ]
+    },
+    {
+     "thread": "Browser / CacheThread_BlockFile",
+     "busyMs": 5.04,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 0.66,
+       "atMs": 80.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.64,
+       "atMs": 71.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.62,
+       "atMs": 55.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.62,
+       "atMs": 99.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.52,
+       "atMs": 35.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.41,
+       "atMs": 91.1
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 5.04
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 4.95
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / CrRendererMain",
+     "busyMs": 2.77,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 2.31,
+       "atMs": 100.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.35,
+       "atMs": -2.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.05,
+       "atMs": 53
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.02,
+       "atMs": 53.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.4
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 2.77
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 2.7
+      },
+      {
+       "name": "ProxyMain::BeginMainFrame",
+       "ms": 2.63
+      },
+      {
+       "name": "WebFrameWidgetImpl::BeginMainFrame",
+       "ms": 2.36
+      },
+      {
+       "name": "Blink.Animate.UpdateTime",
+       "ms": 2.36
+      },
+      {
+       "name": "PageAnimator::serviceScriptedAnimations",
+       "ms": 2.35
+      },
+      {
+       "name": "FrameRequestCallbackCollection::ExecuteFrameCallbacks",
+       "ms": 2.34
+      },
+      {
+       "name": "FireAnimationFrame",
+       "ms": 2.34
+      },
+      {
+       "name": "AsyncTask Run",
+       "ms": 2.33
+      },
+      {
+       "name": "v8.callFunction",
+       "ms": 2.3
+      },
+      {
+       "name": "FunctionCall",
+       "ms": 2.29
+      },
+      {
+       "name": "Commit",
+       "ms": 0.15
+      }
+     ]
+    },
+    {
+     "thread": "Browser / CrBrowserMain",
+     "busyMs": 1.11,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 0.09,
+       "atMs": 38.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.07,
+       "atMs": 54.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 34.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 71.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 80.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 83.1
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 1.11
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.95
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.46
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.32
+      },
+      {
+       "name": "GpuHostImpl::StoreBlobToDisk",
+       "ms": 0.18
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / Compositor",
+     "busyMs": 1.04,
+     "topLevel": [
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.23,
+       "atMs": 100.3
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.12,
+       "atMs": 1.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.11,
+       "atMs": 0.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.1,
+       "atMs": 100.6
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.1,
+       "atMs": 101.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.09,
+       "atMs": 5
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.53
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.52
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.46
+      },
+      {
+       "name": "Graphics.Pipeline",
+       "ms": 0.46
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.41
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.38
+      },
+      {
+       "name": "ExternalBeginFrameSource::OnBeginFrame",
+       "ms": 0.31
+      },
+      {
+       "name": "Scheduler::BeginFrame",
+       "ms": 0.29
+      },
+      {
+       "name": "viz::BeginFrameArgs",
+       "ms": 0.26
+      },
+      {
+       "name": "Scheduler::BeginImplFrame",
+       "ms": 0.25
+      },
+      {
+       "name": "ProxyImpl::ReadyToCommit",
+       "ms": 0.1
+      },
+      {
+       "name": "ProxyImpl::ScheduledActionDraw",
+       "ms": 0.09
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / VizCompositorThread",
+     "busyMs": 0.79,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 0.21,
+       "atMs": 100.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.08,
+       "atMs": 100.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.07,
+       "atMs": 102.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 1.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 101.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.05,
+       "atMs": 100.7
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 0.79
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.67
+      },
+      {
+       "name": "Graphics.Pipeline",
+       "ms": 0.55
+      },
+      {
+       "name": "DisplayScheduler::OnBeginFrameDeadline",
+       "ms": 0.28
+      },
+      {
+       "name": "DisplayScheduler::DrawAndSwap",
+       "ms": 0.28
+      },
+      {
+       "name": "Display::DrawAndSwap",
+       "ms": 0.27
+      },
+      {
+       "name": "ExternalBeginFrameSource::OnBeginFrame",
+       "ms": 0.17
+      },
+      {
+       "name": "DirectRenderer::DrawFrame",
+       "ms": 0.11
+      },
+      {
+       "name": "DirectRenderer::DrawRenderPass",
+       "ms": 0.07
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.06
+      },
+      {
+       "name": "DisplayScheduler::BeginFrame",
+       "ms": 0.05
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.04
+      }
+     ]
+    }
+   ],
+   "otherEvents": [
+    "40x I blink Canvas2DResourceProvider::Snapshot",
+    "27x b cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "27x b cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "25x I disabled-by-default-devtools.timeline.frame BeginFrame",
+    "25x e cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "25x e cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "23x I disabled-by-default-devtools.timeline.frame DroppedFrame",
+    "19x s viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "19x f viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "18x I toplevel ThreadControllerImpl::RunTask",
+    "18x I gpu DCompPresenter::CheckPendingFrames",
+    "9x f gpu,toplevel.flow Scheduler::ScheduleTask",
+    "9x f gpu,toplevel.flow Scheduler::RunTask",
+    "9x s gpu,toplevel.flow Scheduler::RunTask",
+    "6x I gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "6x I gpu,toplevel.flow Scheduler::FinishTask",
+    "5x I toplevel BlinkScheduler_PerformMicrotaskCheckpoint",
+    "4x I blink CanvasRenderingContext2D::FinalizeFrame",
+    "4x I toplevel ANGLEPlatformImpl::RunWorkerTask",
+    "4x I viz DisplayDamageTracker::HasPendingSurfaces",
+    "4x I cc auto cc::SchedulerStateMachine::ShouldThrottleSendBeginMainFrame()::(lambda)::operator()(uint32_t) const",
+    "4x s gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "4x f gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "4x s gpu,toplevel.flow Scheduler::ScheduleTask",
+    "4x C gpu CommandBufferService::Paused",
+    "4x e cc,benchmark,disabled-by-default-devtools.timeline.frame StartDrawToSwapStart",
+    "4x b cc,benchmark,disabled-by-default-devtools.timeline.frame Swap",
+    "4x e cc,benchmark,disabled-by-default-devtools.timeline.frame Swap",
+    "4x b cc,benchmark,disabled-by-default-devtools.timeline.frame SwapEndToPresentationCompositorFrame",
+    "4x e cc,benchmark,disabled-by-default-devtools.timeline.frame ReceiveCompositorFrameToStartDraw",
+    "4x b cc,benchmark,disabled-by-default-devtools.timeline.frame StartDrawToSwapStart",
+    "3x I cc AnimationHost::TickAnimations",
+    "3x I gpu,toplevel.flow Scheduler::ScheduleTask",
+    "3x I viz All active surfaces ready",
+    "3x s disabled-by-default-cc.debug.scheduler.frames viz::BeginFrameArgs",
+    "3x f disabled-by-default-cc.debug.scheduler.frames viz::BeginFrameArgs",
+    "3x s disabled-by-default-cc.debug.scheduler.frames BeginFrameArgs",
+    "3x f disabled-by-default-cc.debug.scheduler.frames BeginFrameArgs",
+    "3x f gpu,toplevel.flow SyncToken::Wait",
+    "3x f gpu,toplevel.flow CommandBuffer::Flush"
+   ]
+  }
+ ]
+}

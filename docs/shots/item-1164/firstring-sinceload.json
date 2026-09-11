@@ -1,0 +1,194 @@
+{
+ "label": "sinceload",
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1164",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "when": "2026-09-11T00:48:02.195Z",
+ "results": [
+  {
+   "run": 1,
+   "leg": "era 4 flourish on",
+   "port": 9421,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.4
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 347,
+    "meanMs": 4.49,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 104.2
+   },
+   "longFrames": [
+    {
+     "ms": 104.2,
+     "sinceLoadMs": 3505,
+     "rawBefore": 0.005600000000000271,
+     "rawAfter": 0.038933333333333486,
+     "busyBefore": 2.2,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.6
+     },
+     "busyAfter": 2.3,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.2
+     }
+    },
+    {
+     "ms": 16.6,
+     "sinceLoadMs": 3713,
+     "rawBefore": 0.10833333333333399,
+     "rawAfter": 0.11940000000000062,
+     "busyBefore": 1.7,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0.1,
+      "draw": 1.2
+     },
+     "busyAfter": 2.8,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 2
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 1,
+   "leg": "plain ring",
+   "port": 9422,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.6
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 350,
+    "meanMs": 4.44,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 100
+   },
+   "longFrames": [
+    {
+     "ms": 100,
+     "sinceLoadMs": 3493,
+     "rawBefore": 0.005533333333333464,
+     "rawAfter": 0.03886666666666668,
+     "busyBefore": 1.7,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.4
+     },
+     "busyAfter": 3.7,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.4
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 2,
+   "leg": "era 4 flourish on",
+   "port": 9423,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 349,
+    "meanMs": 4.48,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 104.3
+   },
+   "longFrames": [
+    {
+     "ms": 104.3,
+     "sinceLoadMs": 3500,
+     "rawBefore": 0.005599999999999976,
+     "rawAfter": 0.03893333333333319,
+     "busyBefore": 4.5,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 2
+     },
+     "busyAfter": 2.4,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.4
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 2,
+   "leg": "plain ring",
+   "port": 9424,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 351,
+    "meanMs": 4.44,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 100
+   },
+   "longFrames": [
+    {
+     "ms": 100,
+     "sinceLoadMs": 3523,
+     "rawBefore": 0.005533333333333464,
+     "rawAfter": 0.03886666666666668,
+     "busyBefore": 1.6,
+     "partsBefore": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.3
+     },
+     "busyAfter": 4,
+     "partsAfter": {
+      "step": 0,
+      "sound": 0,
+      "draw": 1.5
+     }
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  }
+ ]
+}
