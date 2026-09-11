@@ -121,4 +121,4 @@ const only = process.argv.includes('--setup') ? process.argv[process.argv.indexO
 const all = [];
 for (const name of only) all.push(...await measure(name, false, SETUPS[name]));
 writeFileSync(path.join(HERE, 'modelspeed.json'), JSON.stringify({ taken: new Date().toISOString(), rows: all }, null, 1) + '\n');
-console.log('wrote ' + path.join(HERE, 'eraspeed.json'));
+console.log('wrote ' + path.join(HERE, 'modelspeed.json'));
