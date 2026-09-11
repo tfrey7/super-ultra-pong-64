@@ -2,11 +2,11 @@
 //   node docs/measure/item1285/summary.cjs
 // ring  era:ringMaxFrameMs -- the arrival itself (ring and name card), era 1 is the first ring
 // long  ring frames over 50 ms, with the second into the ring they fell at
-// before = master fc17b35; after = this branch (every flourish warmed at its ring's moments);
+// before = master fc17b35; after = this branch at edaa527-63206b8 (every flourish warmed at nine\n// moments of its ring); final = the finishing commit (two earlier moments added, and the warm\n// state's eraChangedAt -1); early-raws = one climb to era 6 on the final code;
 // ab-* = before, with one thing switched off by --pre (see each file's "pre")
 const fs = require('fs');
 const p = 'docs/measure/item1285/';
-const files = fs.readdirSync(p).filter((f) => /^pace-(before|after|ab-.*)-\d\.json$/.test(f)).sort();
+const files = fs.readdirSync(p).filter((f) => /^pace-(before|after|final|early-raws|ab-.*)(-\d)?\.json$/.test(f)).sort();
 for (const f of files) {
   const d = JSON.parse(fs.readFileSync(p + f));
   const rows = d.climb.filter((x) => x.ringMaxFrameMs !== undefined);

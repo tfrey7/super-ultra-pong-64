@@ -424,7 +424,7 @@
    * away by the clear that ends the warm-up). A flourish only draws, so
    * drawing it here plays nothing and writes no state.
    */
-  var WARM_RAWS = [0.1, 0.14, 0.2, 0.3, 0.4, 0.5, 0.65, 0.8, 0.95];
+  var WARM_RAWS = [0.03, 0.06, 0.1, 0.14, 0.2, 0.3, 0.4, 0.5, 0.65, 0.8, 0.95];
   function warmFlourishes(ctx, state, top) {
     var D = root.PongDisplay && root.PongDisplay.enabled ? root.PongDisplay : null;
     var W = state.width, H = state.height;
@@ -433,7 +433,10 @@
     for (var k = 1; k <= top; k++) {
       var look = R.eraLook(k);
       if (!look || typeof look.flourish !== 'function') continue;
-      var s = Object.assign({}, state, { era: k });
+      // eraChangedAt -1: no real change ever has it, so an era's private memory of
+      // "which arrival is playing" (the PlayStation's lift, its old picture) never
+      // mistakes this for one.
+      var s = Object.assign({}, state, { era: k, eraChangedAt: -1 });
       for (var i = 0; i < WARM_RAWS.length; i++) {
         var raw = WARM_RAWS[i];
         var p = easeWipe(raw);
