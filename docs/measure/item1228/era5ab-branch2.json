@@ -1,0 +1,52 @@
+{
+ "taken": "2026-09-11T04:08:55.038Z",
+ "label": "branch2",
+ "era5MeanOfMeans": 22.74,
+ "rows": [
+  {
+   "label": "branch2",
+   "era": 4,
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8
+  },
+  {
+   "label": "branch2",
+   "era": 5,
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.8,
+   "max": 16.8
+  },
+  {
+   "label": "branch2",
+   "era": 5,
+   "frames": 61,
+   "total": 1016.5,
+   "mean": 16.66,
+   "p95": 16.7,
+   "max": 16.8
+  },
+  {
+   "label": "branch2",
+   "era": 5,
+   "frames": 35,
+   "total": 1000,
+   "mean": 28.57,
+   "p95": 33.4,
+   "max": 50
+  },
+  {
+   "label": "branch2",
+   "era": 5,
+   "frames": 35,
+   "total": 1016.6,
+   "mean": 29.05,
+   "p95": 33.4,
+   "max": 33.4
+  }
+ ]
+}
