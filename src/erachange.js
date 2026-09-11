@@ -374,12 +374,13 @@
    * layers, compiling the clip, copy and gradient work, and each era's renderer
    * drawing off-screen for the first time -- all in the serve pause, with the
    * paddle frozen. So the page's first framed draw pays that instead, before
-   * anything has been shown: every rung's ring at a spread of radii, onto the
-   * page's own canvas (a layer that is never copied anywhere is never
-   * rasterised, so it would warm nothing), then the canvas is cleared and the
-   * ordinary frame draws on a blank field. No flourish runs, no state is
-   * written, and nothing of it reaches the screen. Off-page (node --test) it
-   * does nothing at all.
+   * anything has been shown: every rung's ring at a spread of radii, composited
+   * onto a throwaway canvas that is never attached to the page, with one pixel
+   * read back so the browser really rasterises it (drawing alone only records;
+   * and composited onto the page's canvas, the clear after it let the browser
+   * throw the whole warm-up away unrasterised). The page's canvas is never
+   * touched. No flourish runs, no state is written, and nothing of it reaches
+   * the screen. Off-page (node --test) it does nothing at all.
    */
   function warmUp(ctx, state, opts) {
     warmed = true;
@@ -389,21 +390,26 @@
     var origin = { x: -8, y: state.height / 4 };
     var reach = ringReach(origin, state.width, state.height);
     var fracs = [0.04, 0.3, 0.6, 1];
-    ctx.save();
+    var scratch = document.createElement('canvas');
+    scratch.width = ctx.canvas.width || state.width;
+    scratch.height = ctx.canvas.height || state.height;
+    var sx = scratch.getContext('2d');
+    if (!sx) return;
     try {
       for (var k = 1; k <= top; k++) {
         for (var f = 0; f < fracs.length; f++) {
-          composite(ctx, state, opts,
+          composite(sx, state, opts,
             { from: k - 1, era: k, origin: origin, radius: fracs[f] * reach }, cardStyle(k));
         }
       }
+      // Recorded draws are only rasterised when something needs the pixels;
+      // one pixel read makes the browser do all of it now, not at the first ring.
+      sx.getImageData(0, 0, 1, 1);
     } catch (e) {
       // A warm-up is only ever an optimisation: never let it stop the page.
-    } finally {
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.restore();
     }
+    scratch.width = 0;
+    scratch.height = 0;
   }
 
   /**
