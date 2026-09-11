@@ -77,7 +77,7 @@ const ERAS = [
   { era: 6, name: 'Nintendo 64', tilt: 26, height: 900, fov: 39.5, screenY: 301,
     motion: [{ tilt: 28 }] },
   { era: 7, name: 'Sega Dreamcast', tilt: 22, height: 1500, fov: 23.5, screenY: 314, motion: [] },
-  { era: 8, name: 'PlayStation 2', tilt: 30, height: 1250, fov: 29, screenY: 300,
+  { era: 8, name: 'PlayStation 2', tilt: 30, height: 1250, fov: 29, screenY: 281,
     bounds: { top: 60, bottom: 540 },
     motion: [{ tilt: 31.5, panX: 10, height: 1290 }, { tilt: 28.5, panX: -10, height: 1210 },
       { tilt: 31.5, panX: -10, height: 1210 }, { tilt: 28.5, panX: 10, height: 1290 }] },

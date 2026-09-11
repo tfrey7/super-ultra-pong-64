@@ -118,6 +118,16 @@ the top:
 | 2 | 1985 NES | placeholder, draws era 1 |
 | 3 | 1989 Sega Genesis | placeholder, draws era 1 |
 | 4 | 1991 Super Nintendo | placeholder, draws era 1 |
+| 5 | 1994 Sony PlayStation | planned: wobbling snapped polygons, swimming affine textures, dithered 320x240 |
+| 6 | 1996 Nintendo 64 | planned: blurred textures, heavy fog, round toybox shapes, rumble shake |
+| 7 | 1999 Sega Dreamcast | planned: crisp cel shading, thick ink outlines, graffiti score, speed lines |
+| 8 | 2000 PlayStation 2 | planned: letterbox, sparks, glow trail, lens flare, slow camera drift |
+| 9 | 2001 Xbox | planned: bump-mapped metal, hard moving shadows, gamertags, shield-bar score |
+| 10 | 2005 Xbox 360 | planned: bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked |
+
+Eras 5 to 10 are specified in **`docs/ERAS.md`**, the era bible: every rung's name
+card, palette, camera on the shared 3D table, the look to exaggerate, its sounds
+and its arrival flourish, plus the readability rules that keep it playable.
 
 The rules (`Pong.ERAS` in `src/game.js`) carry only the number: `state.era`,
 and `state.eraChangedAt`, the game time it last moved, for a transition to read.
