@@ -239,8 +239,41 @@
     var label = 'ERA ' + k.era, lc = 5;
     ctx.fillStyle = k.ink('label');
     drawRun(ctx, label, k.mid - textWidth(label, lc, lc) / 2, r.y + 22, lc, lc, { h: 4 });
-    k.nameTop = r.y + 62;
-    nameLine(ctx, k, k.nameTop, k.ink('year'), k.ink('name'), { h: 5 });
+
+    // The name on the 2600's own grid (item 1196): every block one Atari pixel
+    // across and two of its lines down (a two-line kernel, as its games lettered
+    // their scores), one pixel between glyphs, and the whole line snapped to
+    // the machine's pixels. The rungs' 7-wide blocks are 1.4 Atari pixels, so
+    // on the 160-wide screen the 9 of 1977 read as a 5 and 2600 ran together.
+    var res = RESOLUTION[1];
+    var pw = k.state.width / res.w, ph = k.state.height / res.h;
+    var cw = pw, chh = 2 * ph, gap = pw;
+    var w = textWidth(k.text, cw, gap);
+    var left = Math.round((k.mid - w / 2) / pw) * pw;
+    k.nameTop = Math.round((r.y + 62) / ph) * ph;
+    k.nameCell = { w: cw, h: chh };
+    k.nameGap = gap;
+    k.nameLeft = left;
+    atariRun(ctx, k.year, left, k.nameTop, cw, chh, gap, 5, k.ink('year'));
+    atariRun(ctx, k.rest, left + textWidth(k.year, cw, gap) + gap, k.nameTop, cw, chh, gap, 5, k.ink('name'));
+  }
+
+  /** Block text in cw x ch cells, each lit lit rows high (a scanline under it); returns where it ended. */
+  function atariRun(ctx, text, left, top, cw, ch, gap, lit, ink) {
+    ctx.fillStyle = ink;
+    var x = left;
+    for (var i = 0; i < text.length; i++) {
+      var rows = GLYPHS[text[i]];
+      if (rows) {
+        for (var r = 0; r < rows.length; r++) {
+          for (var c = 0; c < rows[r].length; c++) {
+            if (rows[r][c] === '1') ctx.fillRect(x + c * cw, top + r * ch, cw, lit);
+          }
+        }
+      }
+      x += cells(text[i]) * cw + gap;
+    }
+    return x;
   }
 
   // ------------------------------------------------- 1985 NES
