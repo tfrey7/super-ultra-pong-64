@@ -37,13 +37,45 @@ function loadRenderer(dir) {
   return { Pong, R: globalThis.PongRender, eraScripts, html };
 }
 
-/** A canvas context that remembers every rectangle and the ink it was in. */
+/**
+ * A canvas context that remembers every rectangle and the ink it was in.
+ *
+ * Only fillRect is recorded, so the frames pinned for eras 0 and 1 are exactly
+ * what they were. The rest of the 2D context an era renderer reaches for --
+ * save/restore, transforms, paths, arcs, gradients, fill and stroke -- is
+ * accepted and ignored, so a test that draws any era (the ladder climbs to the
+ * Super Nintendo mid-match) never throws on a method the stand-in lacks.
+ * save/restore do keep the drawing state, so fillRect after a restore records
+ * the ink really in force.
+ */
 function recorder() {
   const calls = [];
+  const STATE = ['fillStyle', 'strokeStyle', 'globalAlpha', 'lineWidth', 'lineCap', 'lineJoin',
+    'font', 'textAlign', 'textBaseline', 'globalCompositeOperation', 'shadowBlur', 'shadowColor',
+    'shadowOffsetX', 'shadowOffsetY', 'filter', 'imageSmoothingEnabled'];
+  const stack = [];
+  const gradient = () => ({ addColorStop() {} });
+  const noop = () => {};
   const ctx = {
     fillStyle: '#000000',
-    fillRect(x, y, w, h) { calls.push([this.fillStyle, x, y, w, h]); }
+    strokeStyle: '#000000',
+    globalAlpha: 1,
+    lineWidth: 1,
+    fillRect(x, y, w, h) { calls.push([this.fillStyle, x, y, w, h]); },
+    save() { const s = {}; for (const k of STATE) s[k] = this[k]; stack.push(s); },
+    restore() { const s = stack.pop(); if (s) Object.assign(this, s); },
+    createLinearGradient: gradient,
+    createRadialGradient: gradient,
+    createConicGradient: gradient,
+    createPattern: () => ({}),
+    measureText: (text) => ({ width: String(text).length * 8 }),
+    getTransform: () => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }),
+    getLineDash: () => []
   };
+  for (const k of ['translate', 'scale', 'rotate', 'transform', 'setTransform', 'resetTransform',
+    'beginPath', 'closePath', 'moveTo', 'lineTo', 'quadraticCurveTo', 'bezierCurveTo', 'arc',
+    'arcTo', 'ellipse', 'rect', 'roundRect', 'fill', 'stroke', 'clip', 'strokeRect', 'clearRect',
+    'fillText', 'strokeText', 'drawImage', 'setLineDash']) ctx[k] = noop;
   return { ctx, calls };
 }
 

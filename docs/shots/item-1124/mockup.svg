@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <!-- MOCKUP for item 1124: era 4, the Super Nintendo frame. Not the game; a sketch of the target. -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b0f3c"/><stop offset="0.45" stop-color="#2d2a8a"/>
+      <stop offset="0.8" stop-color="#a4488e"/><stop offset="1" stop-color="#f59a5c"/>
+    </linearGradient>
+    <linearGradient id="fog" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f59a5c" stop-opacity="0.95"/><stop offset="1" stop-color="#1b1650" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="shadow"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+    <linearGradient id="padL" x1="0" x2="1"><stop offset="0" stop-color="#1c4a66"/><stop offset="0.3" stop-color="#9cc4ec"/><stop offset="0.55" stop-color="#4890d8"/><stop offset="1" stop-color="#2b5680"/></linearGradient>
+    <linearGradient id="padR" x1="0" x2="1"><stop offset="0" stop-color="#5a1e1e"/><stop offset="0.3" stop-color="#e49a9a"/><stop offset="0.55" stop-color="#cc4444"/><stop offset="1" stop-color="#7a2828"/></linearGradient>
+    <radialGradient id="ball" cx="0.35" cy="0.3"><stop offset="0" stop-color="#fff"/><stop offset="0.3" stop-color="#fff0a0"/><stop offset="0.75" stop-color="#f08a20"/><stop offset="1" stop-color="#8a3208"/></radialGradient>
+  </defs>
+  <rect width="800" height="150" fill="url(#sky)"/>
+  <polygon points="0,150 60,118 130,132 210,96 290,128 360,108 440,134 520,92 600,124 690,104 800,130 800,150" fill="#3a2470"/>
+  <rect y="150" width="800" height="450" fill="#1b1650"/>
+  <!-- perspective checker: rows narrow toward the horizon, columns converge on the centre -->
+  <g fill="#2e2a86">
+    <polygon points="325,600 400,600 400,558 332,558"/><polygon points="475,600 550,600 543,558 475,558"/>
+    <polygon points="175,600 250,600 263,558 196,558"/><polygon points="625,600 700,600 690,558 610,558"/>
+    <polygon points="332,558 264,558 282,522 341,522"/><polygon points="400,558 468,558 459,522 400,522"/>
+    <polygon points="536,558 604,558 577,522 518,522"/><polygon points="196,558 128,558 164,522 223,522"/>
+    <polygon points="341,522 400,522 400,470 352,470"/><polygon points="459,522 518,522 496,470 448,470"/>
+    <polygon points="223,522 282,522 304,470 256,470"/><polygon points="577,522 636,522 592,470 544,470"/>
+    <polygon points="304,470 352,470 364,410 326,410"/><polygon points="448,470 496,470 474,410 436,410"/>
+    <polygon points="364,410 400,410 400,350 372,350"/><polygon points="436,410 474,410 450,350 428,350"/>
+  </g>
+  <polygon points="397,600 403,600 401,160 399,160" fill="#aae6ff" opacity="0.7"/>
+  <rect y="150" width="800" height="150" fill="url(#fog)"/>
+  <rect y="149" width="800" height="2" fill="#ffdcaa"/>
+  <!-- translucent score panel -->
+  <rect x="214" y="22" width="372" height="106" rx="14" fill="#0e1034" fill-opacity="0.52" stroke="#d2dcff" stroke-opacity="0.7" stroke-width="2"/>
+  <text x="290" y="108" font-family="monospace" font-size="84" font-weight="bold" fill="#4890d8" text-anchor="middle">3</text>
+  <text x="510" y="108" font-family="monospace" font-size="84" font-weight="bold" fill="#cc4444" text-anchor="middle">11</text>
+  <!-- soft shadows, then the shaded sprites floating above the floor -->
+  <ellipse cx="51" cy="340" rx="16" ry="49" fill="url(#shadow)"/>
+  <ellipse cx="773" cy="470" rx="16" ry="49" fill="url(#shadow)"/>
+  <ellipse cx="428" cy="362" rx="12" ry="7" fill="url(#shadow)"/>
+  <rect x="32" y="280" width="14" height="84" rx="7" fill="url(#padL)" stroke="#123048" stroke-width="2"/>
+  <rect x="754" y="410" width="14" height="84" rx="7" fill="url(#padR)" stroke="#3a1010" stroke-width="2"/>
+  <circle cx="418" cy="346" r="7.5" fill="url(#ball)" stroke="#3c1400"/>
+  <text x="400" y="590" font-family="sans-serif" font-size="13" fill="#fff" text-anchor="middle" opacity="0.8">MOCKUP - era 4 (1991 Super Nintendo): Mode 7 floor, gradient sky, shaded sprites, soft shadows, translucent score panel</text>
+</svg>
