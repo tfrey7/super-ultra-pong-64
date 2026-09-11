@@ -37,6 +37,7 @@
  * playtest. Writes pace-<label>.json beside itself.
  */
 import { writeFileSync, existsSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
@@ -203,6 +204,8 @@ async function climb(s) {
     // Item 1264: the arrival itself (the ring and the name card, inside the serve
     // pause) is timed too, frame by frame, since the reading above starts only once
     // the serve leaves the centre. ringMaxFrameMs / ringLongFrames on the next row.
+    const tracing = TRACE_RUNG !== '' && rung === Number(TRACE_RUNG);
+    if (tracing) await startTrace(s);
     const pause = await s.eval(`new Promise((done) => {
       const g = window.__pong, r = g.right;
       g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0;
@@ -217,8 +220,85 @@ async function climb(s) {
       requestAnimationFrame(tick);
     })`);
     pauseS = pause.s; ringMax = pause.max; ringLong = pause.long;
+    if (tracing) out.trace = await endTrace(s, rung, pause);
   }
   return rows;
+}
+
+// ---------------------------------------------------------------- item 1264: --trace-rung N
+// Records the change out of rung N (N -> N+1) twice over: a Chrome performance
+// trace (DevTools' Performance panel opens it; --skia names every GPU program
+// built) and a sampling CPU profile of the page, from which the longest busy
+// stretch of the main thread -- the arrival's long frame -- is broken down by
+// function, self and inclusive.
+const TRACE_RUNG = arg('--trace-rung', '');
+const CATEGORIES = [
+  'devtools.timeline', 'disabled-by-default-devtools.timeline', 'disabled-by-default-devtools.timeline.frame',
+  'toplevel', 'blink', 'blink.user_timing', 'cc', 'gpu', 'viz', 'audio', 'webaudio', 'v8',
+  'disabled-by-default-gpu.service', 'benchmark', 'renderer.scheduler',
+  ...(process.argv.includes('--skia') ? ['skia', 'disabled-by-default-skia', 'disabled-by-default-skia.gpu',
+    'disabled-by-default-skia.shaders', 'gpu.angle', 'disabled-by-default-gpu.angle'] : [])
+];
+const traceEvents = [];
+let traceDone = null;
+function listenForTrace(sock) {
+  sock.addEventListener('message', (ev) => {
+    const m = JSON.parse(ev.data);
+    if (m.method === 'Tracing.dataCollected') for (const e of m.params.value) traceEvents.push(e);
+    else if (m.method === 'Tracing.tracingComplete' && traceDone) traceDone();
+  });
+}
+async function startTrace(s) {
+  await s.send('Profiler.enable');
+  await s.send('Profiler.setSamplingInterval', { interval: 100 });
+  await s.send('Tracing.start', { traceConfig: { includedCategories: CATEGORIES }, transferMode: 'ReportEvents' });
+  await s.send('Profiler.start');
+}
+async function endTrace(s, rung, pause) {
+  const { profile } = await s.send('Profiler.stop');
+  const done = new Promise((r) => { traceDone = r; });
+  await s.send('Tracing.end');
+  await done;
+  const file = path.join(HERE, `${LABEL}-rung${rung}.trace.json.gz`);
+  writeFileSync(file, gzipSync(JSON.stringify({ traceEvents })));
+  const busy = busiestStretch(profile);
+  console.log(`trace of the change ${rung} -> ${rung + 1}: ${file}`);
+  console.log(`  longest busy stretch of the page's main thread: ${busy.ms} ms`);
+  for (const r of busy.inclusive.slice(0, 25)) console.log(`    incl ${String(r.ms).padStart(6)} ms  self ${String(r.self).padStart(6)} ms  ${r.fn}`);
+  return { rung, ringLongFrames: pause.long, file: path.basename(file), busyMs: busy.ms, inclusive: busy.inclusive.slice(0, 40) };
+}
+/** The longest run of consecutive non-idle samples, broken down by function. */
+function busiestStretch(profile) {
+  const byId = new Map(profile.nodes.map((n) => [n.id, n]));
+  const parent = new Map();
+  for (const n of profile.nodes) for (const c of n.children || []) parent.set(c, n.id);
+  const name = (n) => `${n.callFrame.functionName || '(anonymous)'} ${n.callFrame.url ? path.basename(n.callFrame.url) + ':' + (n.callFrame.lineNumber + 1) : ''}`.trim();
+  const idle = (n) => n.callFrame.functionName === '(idle)' || n.callFrame.functionName === '(program)';
+  let best = { from: 0, to: 0, ms: 0 }, from = -1, ms = 0;
+  for (let i = 0; i < profile.samples.length; i++) {
+    const n = byId.get(profile.samples[i]);
+    const dt = (profile.timeDeltas[i + 1] || 0) / 1000;
+    if (idle(n)) { if (from >= 0 && ms > best.ms) best = { from, to: i, ms }; from = -1; ms = 0; continue; }
+    if (from < 0) from = i;
+    ms += dt;
+  }
+  if (from >= 0 && ms > best.ms) best = { from, to: profile.samples.length, ms };
+  const incl = new Map(), self = new Map();
+  for (let i = best.from; i < best.to; i++) {
+    const dt = (profile.timeDeltas[i + 1] || 0) / 1000;
+    let id = profile.samples[i];
+    const leaf = name(byId.get(id));
+    self.set(leaf, (self.get(leaf) || 0) + dt);
+    const seen = new Set();
+    while (id !== undefined) {
+      const f = name(byId.get(id));
+      if (!seen.has(f)) { seen.add(f); incl.set(f, (incl.get(f) || 0) + dt); }
+      id = parent.get(id);
+    }
+  }
+  const inclusive = [...incl.entries()].map(([fn, v]) => ({ fn, ms: +v.toFixed(1), self: +((self.get(fn) || 0)).toFixed(1) }))
+    .filter((r) => r.fn !== '(root)').sort((a, b) => b.ms - a.ms);
+  return { ms: +best.ms.toFixed(1), inclusive };
 }
 
 const flags = ['--headless=new', '--hide-scrollbars', '--mute-audio', '--allow-file-access-from-files',
@@ -242,6 +322,7 @@ try {
   ws = new WebSocket(wsUrl);
   await new Promise((res, rej) => { ws.addEventListener('open', res); ws.addEventListener('error', rej); });
   const s = new Session(ws);
+  listenForTrace(ws);
   await s.send('Page.enable');
   await s.send('Runtime.enable');
   // Counts only: how long each reverb's buffer takes to hand to a ConvolverNode (Chrome
