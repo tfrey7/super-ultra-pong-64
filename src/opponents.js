@@ -131,7 +131,8 @@
     if (incoming) {
       var here = b.y + b.size / 2;
       var there = prof.anticipate > 0 ? predictY(state) : here;
-      target = here + (there - here) * prof.anticipate + (p.aimError || 0) * aimScale;
+      target = here + (there - here) * prof.anticipate + (p.aimError || 0) * aimScale +
+        (p.spinRead || 0);   // item 1208: the spin read, filled in by the rules each step
     } else {
       target = state.height / 2;
     }

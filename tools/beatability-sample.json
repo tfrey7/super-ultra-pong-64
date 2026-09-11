@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-09-11T02:25:12.091Z",
+  "measuredAt": "2026-09-11T02:39:00.674Z",
   "runs": [
     {
       "label": "this checkout",
@@ -7,9 +7,9 @@
       "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
-      "sessionsThatScored": 167,
-      "passRate": 0.5566666666666666,
-      "pointsPerMinute": 1.6818181818181819
+      "sessionsThatScored": 216,
+      "passRate": 0.72,
+      "pointsPerMinute": 2.3909090909090907
     },
     {
       "label": "this checkout",
@@ -17,9 +17,9 @@
       "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
-      "sessionsThatScored": 244,
-      "passRate": 0.8133333333333334,
-      "pointsPerMinute": 2.845454545454545
+      "sessionsThatScored": 271,
+      "passRate": 0.9033333333333333,
+      "pointsPerMinute": 3.527272727272727
     },
     {
       "label": "this checkout",
@@ -29,9 +29,9 @@
       "windowSeconds": 45,
       "sessionsThatScored": 300,
       "passRate": 1,
-      "pointsPerMinute": 3.9911111111111106,
-      "ballsPlanned": 2117,
-      "ballsWithCertainShot": 106
+      "pointsPerMinute": 4.448888888888888,
+      "ballsPlanned": 2080,
+      "ballsWithCertainShot": 495
     }
   ]
 }

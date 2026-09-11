@@ -351,6 +351,10 @@
 
   function stepCpu(state, dt) {
     var opp = state.rules.cpuProfiles !== false && opponents();
+    // The spin read (item 1208): how far the ball's spin will carry it by the
+    // time it reaches the paddle, as much of it as cpuSpinRead allows for.
+    state.right.spinRead = state.ball.vx > 0
+      ? (state.rules.cpuSpinRead || 0) * spinBend(state, state.right.x) : 0;
     if (opp) return opp.stepCpu(state, dt);
     var p = state.right;
     var r = state.rules;
@@ -359,7 +363,7 @@
     // Chasing the ball only once it is on its way over, aiming slightly off,
     // and moving slower than a steep shot travels, is what makes it beatable.
     var target = incoming
-      ? b.y + b.size / 2 + p.aimError + (r.cpuSpinRead || 0) * spinBend(state, p.x)
+      ? b.y + b.size / 2 + p.aimError + (p.spinRead || 0)
       : state.height / 2;
     var speed = incoming ? r.cpuSpeed : r.cpuSpeed * r.cpuHomeSpeed;
     var centre = p.y + p.h / 2;
