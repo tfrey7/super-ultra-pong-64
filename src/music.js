@@ -690,6 +690,7 @@
       scheduled: 0,             // notes booked on the audio clock
       crossfades: 0,
       released: 0,              // faded arrangements let go of, every node unplugged (item 1238)
+      prepared: 0,              // pieces of the next era's reverbs made ahead, in a held serve (item 1264)
       ducks: 0,
       errors: 0,
       lastSwitch: null,         // { from, to, bar, step } of the latest era change
@@ -832,8 +833,7 @@
       }
       node.connect(bus);
       if (ch.hall) {
-        var conv = keep(ctx.createConvolver());
-        conv.buffer = hallImpulse(ch.hall);
+        var conv = keep(convolverFor(ch.hall, hallImpulse));
         var wet = keep(ctx.createGain());
         wet.gain.value = ch.hall.mix;
         node.connect(conv);
@@ -841,6 +841,78 @@
         wet.connect(bus);
       }
       return input;
+    }
+
+    /**
+     * A reverb, made AHEAD of the era change that needs it (item 1264).
+     *
+     * Handing a ConvolverNode its impulse is not free: Chrome prepares the whole
+     * impulse there and then, on the page's own thread -- 14.5 to 29 ms for one
+     * of these reverbs at 1920x1080 with the GPU on (docs/measure/item1264/).
+     * Built in switchTo, the two the Xbox 360's arrangement needs landed in the
+     * very first frame of its ring, and with the sound effects' own reverb beside
+     * them that frame took 113-125 ms. So while the name card holds the serve
+     * after one change, prepareAhead() builds the next era's impulses and
+     * convolvers, one piece per frame, and switchTo takes them from here. Only the
+     * next era's are kept, so the shelf holds two at most; a change that finds
+     * nothing ready builds its own, exactly as before.
+     */
+    var ready = [];             // { spec, node }: a convolver with its impulse set, plugged into nothing
+    function convolverFor(spec, impulse) {
+      for (var i = 0; i < ready.length; i++) {
+        if (ready[i].spec === spec) { var node = ready[i].node; ready.splice(i, 1); return node; }
+      }
+      var conv = ctx.createConvolver();
+      conv.buffer = impulse(spec);
+      return conv;
+    }
+
+    /** The reverbs an era's arrangement will ask for, each with the impulse maker it uses. */
+    function reverbsOf(arr) {
+      var out = [];
+      if (arr && arr.chain && arr.chain.hall) out.push({ spec: arr.chain.hall, impulse: hallImpulse, built: halls });
+      if (arr && arr.effects && arr.effects.reverb) out.push({ spec: arr.effects.reverb, impulse: impulseFor, built: impulses });
+      return out;
+    }
+
+    var PREPARE_AFTER_S = 1.0;  // the ring is over this long after a switch; the card holds still
+    var switchedAt = -Infinity;
+
+    /**
+     * One piece of the next era's work, if the moment is quiet: the serve is
+     * being held and the last change's ring has finished. The pieces, in order:
+     * the next arrangement's score, each impulse, each convolver -- never two in
+     * one frame, so no frame pays for more than one of them.
+     */
+    function prepareAhead(game) {
+      if (!(game.serveDelay > 0) || ctx.currentTime - switchedAt < PREPARE_AFTER_S) return false;
+      if (typeof ctx.createConvolver !== 'function' || typeof ctx.createBuffer !== 'function') return false;
+      var era = Math.max(0, Math.floor(game.era || 0)) + 1;
+      // The top rung has no next, and a finished match walks down, not up.
+      if (game.phase !== 'playing' || era >= ARRANGEMENTS.length) { ready.length = 0; return false; }
+      var arr = arrangementFor(era);
+      if (!arr) return false;
+      if (!arr._score || arr._scoreTheme !== theme) { scoreOf(arr); return true; }
+      var wanted = reverbsOf(arr);
+      // Anything left on the shelf for another era is let go of.
+      for (var k = ready.length - 1; k >= 0; k--) {
+        var keepIt = false;
+        for (var w = 0; w < wanted.length; w++) if (wanted[w].spec === ready[k].spec) keepIt = true;
+        if (!keepIt) ready.splice(k, 1);
+      }
+      for (var i = 0; i < wanted.length; i++) {
+        var r = wanted[i], have = false, j;
+        for (j = 0; j < ready.length; j++) if (ready[j].spec === r.spec) have = true;
+        if (have) continue;
+        var cached = false;
+        for (j = 0; j < r.built.length; j++) if (r.built[j].spec === r.spec) cached = true;
+        if (!cached) { r.impulse(r.spec); return true; }
+        var conv = ctx.createConvolver();
+        conv.buffer = r.impulse(r.spec);
+        ready.push({ spec: r.spec, node: conv });
+        return true;
+      }
+      return false;
     }
 
     /** A hall's impulse, built once per spec: decaying noise, or with `gate` level noise cut dead. */
@@ -887,6 +959,7 @@
         intensity = intensityOf(game);
         music.intensityNow = intensity;
         retireFaded();
+        if (prepareAhead(game)) music.prepared += 1;
         return book();
       } catch (e) {
         music.errors += 1;
@@ -909,6 +982,7 @@
      */
     function switchTo(era) {
       var t = ctx.currentTime;
+      switchedAt = t;
       var first = !current;
       if (first) nextTime = t + 0.05;
       if (current) { fadeOut(current); music.crossfades += 1; }
@@ -1258,8 +1332,7 @@
         ew.connect(bus);
       }
       if (fx.reverb) {
-        var conv = keep(ctx.createConvolver());
-        conv.buffer = impulseFor(fx.reverb);
+        var conv = keep(convolverFor(fx.reverb, impulseFor));
         var wet = keep(ctx.createGain());
         wet.gain.value = fx.reverb.mix;
         node.connect(conv);

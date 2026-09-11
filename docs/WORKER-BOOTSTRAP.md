@@ -423,6 +423,20 @@ Item 1203 traced 100-117 ms of shader compiles there, for era looks nothing had 
   for free as long as it is a row's `overlay`; a draw that `present()` makes outside the overlay is
   not. A/B a long frame with `--pre "PongDisplay.row(N).overlay='none'"` on
   `docs/measure/item-1239/trace.mjs` before chasing it.
+- **A long arrival frame can be the SOUND, not a draw** (item 1264). At 1920x1080 with the GPU
+  on, the Xbox 360's arrival had one 113-125 ms frame, its very first, and the trace found no
+  drawing in it: handing a `ConvolverNode` its impulse costs 14-29 ms per reverb on the page's own
+  thread, and the music built two there, the sound effects a third. The music now makes the next
+  era's reverbs ahead, one piece per frame while the name card holds the serve (`prepareAhead` in
+  `src/music.js`), and the frame is 54-67 ms (6 runs). `docs/measure/item1264/pace.mjs` times the
+  arrival itself (`ringMaxFrameMs`), and `--trace-rung N` records the change out of rung N; its
+  "convolver buffer sets" line names which era paid for each reverb, and `analyse-trace.mjs` beside
+  it lists the longest page and GPU tasks in the trace. **At that size the FIRST ring (era 0 to 1)
+  is the one arrival still over 100 ms** (125-133 ms on 3 of 3 runs with WebGL merged in): the page
+  thread is idle, and the GPU process spends 63-79 ms per long frame compiling programs for
+  rounded-rectangle fills (`FillRRectOp`) at raw ~0.2, ~0.5 and ~0.8, so whatever draws them is
+  not covered by `warmUp` at that size (`merged-0to1-cut.trace.json.gz`; which draw it is, is
+  not yet known).
 - **A flourish that draws something no ring has drawn before brings a hitch back** as a GPU
   program built mid-ring (item 1218: the Super Nintendo tilt's first turned strip, 13-25 ms at raw
   0.12 on 15 of 20 cold legs). A/B with the flourish off first -- item 1218's copy of the recorder,
