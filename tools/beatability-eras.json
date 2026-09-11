@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-09-11T02:39:21.516Z",
+  "measuredAt": "2026-09-11T02:42:35.129Z",
   "runs": [
     {
       "label": "this checkout",
@@ -8,9 +8,9 @@
       "trials": 300,
       "windowSeconds": 22,
       "era": 0,
-      "sessionsThatScored": 216,
-      "passRate": 0.72,
-      "pointsPerMinute": 2.4909090909090907
+      "sessionsThatScored": 175,
+      "passRate": 0.5833333333333334,
+      "pointsPerMinute": 1.6909090909090907
     },
     {
       "label": "this checkout",
@@ -19,9 +19,9 @@
       "trials": 300,
       "windowSeconds": 22,
       "era": 1,
-      "sessionsThatScored": 205,
-      "passRate": 0.6833333333333333,
-      "pointsPerMinute": 2.3363636363636364
+      "sessionsThatScored": 161,
+      "passRate": 0.5366666666666666,
+      "pointsPerMinute": 1.6454545454545455
     },
     {
       "label": "this checkout",

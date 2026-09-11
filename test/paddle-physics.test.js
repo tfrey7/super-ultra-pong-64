@@ -209,7 +209,8 @@ test('spinBend tells the computer where the spin will carry the ball', () => {
 
 test('the computer reads the spin as much as cpuSpinRead says', () => {
   function cpuMove(read) {
-    const { g } = hit({ paddleSpeed: 450, rules: { cpuSpinRead: read } });
+    // The stock computer (no era profile), which moves on the very next frame.
+    const { g } = hit({ paddleSpeed: 450, rules: { cpuSpinRead: read, cpuProfiles: false } });
     g.right.aimError = 0;
     const bend = Pong.spinBend(g, g.right.x);
     const before = g.right.y;
@@ -219,4 +220,13 @@ test('the computer reads the spin as much as cpuSpinRead says', () => {
   const blind = cpuMove(0), reading = cpuMove(1);
   assert.ok(Math.sign(reading.move - blind.move) === Math.sign(reading.bend) && reading.move !== blind.move,
     'reading the spin moves it toward where the ball will bend');
+});
+
+test('every era profile is handed the same spin read, on the paddle, each step', () => {
+  for (const read of [0, 1]) {
+    const { g } = hit({ paddleSpeed: 450, rules: { cpuSpinRead: read } });
+    Pong.step(g, 1 / 60, { pointerY: g.left.y + g.left.h / 2 });
+    if (read === 0) assert.ok(g.right.spinRead === 0, `spinRead ${g.right.spinRead}`);
+    else assert.ok(Math.abs(g.right.spinRead) > 20, `spinRead ${g.right.spinRead}`);
+  }
 });
