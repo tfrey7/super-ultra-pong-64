@@ -5,6 +5,10 @@ Look file: [src/eras/era10-xbox360.js](../../src/eras/era10-xbox360.js). Chapter
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Gears of War* (2006) + *Project Gotham Racing 3*. Added: achievements: the toast and the
+  gamerscore. Changed: HD 720p with the full post chain (bloom, depth of field, motion blur, grain,
+  grade) over everything the ladder built.
 - **Native resolution here:** 720p. The field is 4:3, so it gets the 960 x 720 middle of a
   1280 x 720 frame, and the HDTV's side bars fall outside the page's canvas. That is 9 times a
   PlayStation's pixels, and it is what every full-frame pass costs.

@@ -5,6 +5,10 @@ Look file: [src/eras/era8-ps2.js](../../src/eras/era8-ps2.js). Chapter 9 of [doc
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Metal Gear Solid 2* (E3 2000) + *Tekken Tag Tournament*. Added: weather and particles: rain,
+  dust, sparks. Changed: the film presentation: letterbox, a drifting camera, the field mirrored in
+  the slab as mirrored geometry, 512x448 interlaced.
 - **Native resolution here:** 512 x 448, scaled up soft.
 - **Framing:** cinematic letterbox bars. The table must stay inside them: the camera check uses
   bounds 60 and 540 for this era instead of the full frame.

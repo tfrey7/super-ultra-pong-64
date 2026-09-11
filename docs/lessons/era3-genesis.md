@@ -5,6 +5,9 @@ Look file: [src/eras/era3-genesis.js](../../src/eras/era3-genesis.js).
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Golden Axe* + *Altered Beast*. Added: depth: line-scrolled parallax planes behind the arena.
+  Changed: the HUD as a status bar with portraits and a meter of pots.
 - **Native resolution here:** 320 x 224, hard pixel edges.
 - **Palette:** 3 bits a channel, 512 colours. The paddles keep the colours the rules picked
   (era 1's), snapped to that palette. They are shaded by moving whole palette steps lighter and
