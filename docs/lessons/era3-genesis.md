@@ -155,3 +155,18 @@ frame, and they cost nothing measurable. The tenth hit is `docs/shots/item-1226/
   re-cut it with `era3-players-cut.mjs`. Do not plan a sheet around the grid you asked for.
 - Every picture has a `fillRect` stand-in that draws until it decodes, so the page never shows a
   hole and the headless tests can check colours on the recording canvas.
+
+### Realism rung 3: a drawn table with every marking (item 1267)
+
+- **LESSON: let the backdrop stand across the far end of the table, the way a crowd would.** The
+  blue top fills the whole play field, 0 to 600, because the walls are its side edges. Drawing it
+  after the arena wall would have hidden the torches, so it goes down first and the stone wall and
+  torches are drawn over its far end. The landed wall, torches, panel and portraits are unchanged,
+  and the table reads as standing in front of the wall.
+- A bat reads as a bat at 14 units wide once it has three stripes: black rubber on the player's
+  side, a 2-unit wood line, and the earned ink toward the net, plus a 10-unit handle. Item 1179's
+  generated baseball-bat paddle failed because its handle took a third of its length, so it
+  looked shorter than it hits. Here the handle sits outside the hit box, off the outer face, so
+  the bar keeps its full length.
+- The net replaced the dashed centre line it grew from. It is an 8-unit grey band with a 6-unit
+  drop shadow on the blue and a 10-unit post on each side edge, drawn before the ball (R1, R2).
