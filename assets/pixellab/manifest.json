@@ -4845,6 +4845,94 @@
         "description": "NES 1985, the computer: a rival in a blue cap and green shirt, blue shorts, brown hair, black sneakers with white toes, facing right (the rig mirrors him), a fist on the bat handle",
         "seed": null
       }
+    },
+    {
+      "name": "era4-pilot-red",
+      "file": "era4-pilot-red.png",
+      "prompt": "The Super Nintendo left player: an F-Zero hover pilot facing right, round red helmet with a dark visor band and a cream highlight, red racing suit with a white centre stripe and white knee pads, dark boots, standing on a small metal hover pad with a jet flame under it; the front glove on the frame's right edge where the bat's handle is, the back arm out for balance. One SNES pixel a sheet pixel. One character in every frame.",
+      "size": {
+        "width": 36,
+        "height": 252
+      },
+      "style": {
+        "tool": "tools/spritegen.mjs",
+        "era": 4,
+        "machine": "Super Nintendo",
+        "frame": {
+          "w": 12,
+          "h": 42
+        },
+        "hand": {
+          "x": 12,
+          "y": 17
+        }
+      },
+      "seed": null,
+      "date": "2026-09-11T03:22:43.007Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "assets/spritegen/era4-pilot-red.json",
+      "derivedBy": "node assets/spritegen/era4-pilots-compose.mjs",
+      "how": "drawn as a text grid, one letter a SNES pixel (the EarthBound way, not a model); lint PASS on the Super Nintendo rules; six rows (idle, up, down, swing, miss, win) of up to 3 frames of 12 x 42",
+      "card": "item 1281",
+      "verdict": "worn by the player on era 4 (src/characters.js, the Super Nintendo block's sheets.left), in place of item 1227's era4-players-left",
+      "pixels": {
+        "width": 36,
+        "height": 252
+      },
+      "bytes": 1399,
+      "sha256": "2248e1390569e8d9d1ef5598f91999b074502bcdeb59f1b7d15bb323ae09191a",
+      "endpoint": null,
+      "request": {
+        "description": "The Super Nintendo left player: an F-Zero hover pilot facing right, round red helmet with a dark visor band and a cream highlight, red racing suit with a white centre stripe and white knee pads, dark boots, standing on a small metal hover pad with a jet flame under it; the front glove on the frame's right edge where the bat's handle is, the back arm out for balance. One SNES pixel a sheet pixel. One character in every frame.",
+        "seed": null
+      }
+    },
+    {
+      "name": "era4-pilot-blue",
+      "file": "era4-pilot-blue.png",
+      "prompt": "The Super Nintendo right player (the red pilot in the second OBJ palette): an F-Zero hover pilot facing right, round blue helmet with a dark amber visor band and a cream highlight, blue racing suit with a yellow centre stripe and yellow knee pads, dark boots, standing on a small metal hover pad with a jet flame under it; the front glove on the frame's right edge where the bat's handle is, the back arm out for balance. One SNES pixel a sheet pixel. One character in every frame.",
+      "size": {
+        "width": 36,
+        "height": 252
+      },
+      "style": {
+        "tool": "tools/spritegen.mjs",
+        "era": 4,
+        "machine": "Super Nintendo",
+        "frame": {
+          "w": 12,
+          "h": 42
+        },
+        "hand": {
+          "x": 12,
+          "y": 17
+        }
+      },
+      "seed": null,
+      "date": "2026-09-11T03:23:02.185Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "assets/spritegen/era4-pilot-blue.json",
+      "derivedBy": "node assets/spritegen/era4-pilots-compose.mjs",
+      "how": "drawn as a text grid, one letter a SNES pixel (the EarthBound way, not a model); the red pilot's grid in a second OBJ palette; lint PASS on the Super Nintendo rules; six rows (idle, up, down, swing, miss, win) of up to 3 frames of 12 x 42",
+      "card": "item 1281",
+      "verdict": "worn by the computer on era 4 (src/characters.js, the Super Nintendo block's sheets.right), in place of item 1227's era4-players-right",
+      "pixels": {
+        "width": 36,
+        "height": 252
+      },
+      "bytes": 1395,
+      "sha256": "31a0bf343b33568c005eb60593360bc24b845d56919baeb50af5a149225f261c",
+      "endpoint": null,
+      "request": {
+        "description": "The Super Nintendo right player (the red pilot in the second OBJ palette): an F-Zero hover pilot facing right, round blue helmet with a dark amber visor band and a cream highlight, blue racing suit with a yellow centre stripe and yellow knee pads, dark boots, standing on a small metal hover pad with a jet flame under it; the front glove on the frame's right edge where the bat's handle is, the back arm out for balance. One SNES pixel a sheet pixel. One character in every frame.",
+        "seed": null
+      }
     }
   ]
 }
