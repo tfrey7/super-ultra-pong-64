@@ -83,12 +83,21 @@
 
   // The rows: which kind of screen each 2D machine was seen on, how strongly,
   // and how many scanlines its picture had (the arcade's tall blocks were two
-  // scanlines each; every other machine drew one line per native row).
+  // scanlines each; every other machine drew one line per native row). A row
+  // may also set its own `glow`, in place of its kind's.
+  //
+  // The Genesis has no glow (item 1201). It draws the heaviest picture of the
+  // five, and in the playtest's software-drawn Chrome the composite screen's
+  // four page-sized blends tipped it past a frame: on the ladder walk 18.18 ms
+  // with the screen on against 16.66 ms off, and its rings in and out at 23.5
+  // and 25.9 ms against 16.67. Taking either the fringes or the glow out put it
+  // back on 16.67 ms; the fringes are the Genesis-over-composite look, the glow
+  // at 0.27 alpha barely shows, so the glow went (docs/measure/item1201).
   var USE = [
     { era: 0, overlay: 'crt-mono',      strength: 1,    lines: 240 },
     { era: 1, overlay: 'crt-rf',        strength: 1,    lines: 192 },
     { era: 2, overlay: 'crt-composite', strength: 1,    lines: 240 },
-    { era: 3, overlay: 'crt-composite', strength: 0.9,  lines: 224 },
+    { era: 3, overlay: 'crt-composite', strength: 0.9,  lines: 224, glow: 0 },
     { era: 4, overlay: 'crt-svideo',    strength: 1,    lines: 224 }
   ];
 
@@ -301,12 +310,13 @@
       }
 
       // Glow: the bright shapes bleed light into the dark around them.
-      if (k.glow > 0) {
+      var glow = row.glow != null ? row.glow : k.glow;
+      if (glow > 0) {
         var g = shrunk(native, k.glowShrink);
         if (g) {
           var grow = nx * 1.5;
           ctx.globalCompositeOperation = 'lighter';
-          ctx.globalAlpha = k.glow * st;
+          ctx.globalAlpha = glow * st;
           ctx.imageSmoothingEnabled = true;
           ctx.drawImage(g, rect.x - grow, rect.y - grow, rect.w + grow * 2, rect.h + grow * 2);
         }
@@ -361,6 +371,7 @@
     r.overlay = u.overlay;
     r.strength = u.strength;
     r.lines = u.lines;
+    if (u.glow != null) r.glow = u.glow;
   });
 
   D.CRT = { KINDS: KINDS, USE: USE };

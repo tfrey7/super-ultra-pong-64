@@ -16,6 +16,33 @@ the Xbox 360, each with its own sound -- and each arriving as a ring that
 spreads the new machine across the field from the spot where the ball went out,
 followed by its name card.
 
+## HOW TO PLAY
+
+1. **Put a coin in.** The game opens on an arcade cabinet showing INSERT COIN.
+   Click anywhere or press any key -- that is your coin, and the sound comes on
+   with it.
+2. **You are the paddle on the left.** Move the mouse up and down over the
+   screen, or use the arrow keys (or W and S). The computer plays the right.
+3. **Hit the ball back past the computer.** Where the ball meets your paddle
+   sets the angle: the middle sends it straight, the ends send it steep. Every
+   hit speeds the rally up.
+4. **Swing to curve it.** Move your paddle as the ball arrives and the ball
+   bends the way you swung. Swing hard and it is a smash -- a burst of speed and
+   a heavier hit.
+5. **Every point, whoever scores it, moves the machine up one era**, from the
+   1972 arcade to the 2005 Xbox 360: new look, new sound, a new arrangement of
+   the same tune, and a computer opponent that grows up with the machine. Hits
+   land harder the newer the machine -- a flash, a shake, a squash, a trail
+   behind the ball -- and from the Nintendo 64 on a rally counter counts your hits.
+6. **Eleven points is a match.** The tenth lands you on the Xbox 360 and the
+   next point is MATCH POINT -- the last moment plays in slow motion. The higher
+   score wins; then the tape rewinds through every machine back to 1972, the old
+   screen says THANKS FOR PLAYING, and the cabinet is ready for the next coin.
+
+Press **M** to mute or unmute the music. One whole match, from the coin to the
+thanks screen, is on one sheet in
+[`docs/shots/whole-match/whole-contact-sheet.png`](docs/shots/whole-match/whole-contact-sheet.png).
+
 ## Play it
 
 Open **`index.html`** in a browser. That is the whole install: no `npm install`,
@@ -124,7 +151,23 @@ node tools/playtest.mjs --ladder              # just the walk up the ladder
 node tools/playtest.mjs --ladder --reference  # and re-take the tracked era frames
 node tools/playtest.mjs --scoring             # just a rally and a point against the computer
 node tools/playtest.mjs --curve               # just the curved shot (--reference re-takes its film strip)
+node tools/playtest.mjs --whole               # one whole match, coin to thanks screen, about two minutes
+node tools/playtest.mjs --whole --reference   # and re-take docs/shots/whole-match/ and its contact sheet
 ```
+
+**The whole match** (item 1212, `--whole`, and the last section of a plain run)
+plays one match the way a player meets it, with everything on: it waits for the
+attract screen, puts a coin in with a click, swings a curved smash on the arcade
+machine, plays a real eleven-hit rally on the Genesis, the Nintendo 64 and the
+Xbox 360, lets the eleven points go in one rung at a time, films match point in
+slow motion, then the result, the rewind and the thanks screen, and waits for
+the cabinet to go back to attract. A recorder inside the page watches every frame
+and the checks read it at the end: a smash with spin, the rally counter, every
+era's arrangement of the theme playing, eleven points and a winner, slow motion
+on match point, the rewind reaching the arcade, and ordinary play on the five 2D
+machines holding a 16.7 ms frame (the 3D machines' times are printed, not judged:
+headless, software-drawn Chrome is card 1216's). The eight frames are stitched
+into `whole-contact-sheet.png`.
 
 The point against the computer is played by a scripted hand
 (`tools/scoring-rally.js`) that plans each return against the rules, so that
@@ -223,22 +266,27 @@ match back on era 0. All eleven rungs are built.
 - **2001, Xbox:** bump-mapped metal, hard moving shadows, gamertags and green light.
 - **2005, Xbox 360:** bloom, a brown grade, film grain, motion blur, the blades and an achievement -- the top of the ladder.
 
-| Era | Machine | Look | Voice | Reference frame |
-| --- | --- | --- | --- | --- |
-| 0 | 1972 arcade Pong | black and white: two white bars, a square ball, a dashed centre line | a bare square-wave blip | [`era0-arcade.png`](docs/shots/eras/era0-arcade.png) |
-| 1 | 1977 Atari 2600 | the turn to colour: each paddle and its score in its own colour | the same blip | [`era1-atari2600.png`](docs/shots/eras/era1-atari2600.png) |
-| 2 | 1985 NES | 8-bit sprites, the NES palette and a pixel score | square and triangle chiptune | [`era2-nes.png`](docs/shots/eras/era2-nes.png) |
-| 3 | 1989 Sega Genesis | 16-bit shading, parallax and a trail behind the ball | a bright FM bell | [`era3-genesis.png`](docs/shots/eras/era3-genesis.png) |
-| 4 | 1991 Super Nintendo | a Mode 7 floor and rich sprites | layered chords with a short echo | [`era4-snes.png`](docs/shots/eras/era4-snes.png) |
-| 5 | 1994 Sony PlayStation | wobbling snapped polygons, swimming affine textures, dithered 320x240 | plucky CD notes in a room reverb | [`era5-playstation.png`](docs/shots/eras/era5-playstation.png) |
-| 6 | 1996 Nintendo 64 | blurred textures, heavy fog, round toybox shapes, rumble shake | muffled, springy samples | [`era6-n64.png`](docs/shots/eras/era6-n64.png) |
-| 7 | 1999 Sega Dreamcast | crisp cel shading, thick ink outlines, graffiti score, speed lines | punchy synth-funk, the modem | [`era7-dreamcast.png`](docs/shots/eras/era7-dreamcast.png) |
-| 8 | 2000 PlayStation 2 | letterbox, sparks, glow trail, lens flare, slow camera drift | taiko, orchestral pads, a big hit | [`era8-ps2.png`](docs/shots/eras/era8-ps2.png) |
-| 9 | 2001 Xbox | bump-mapped metal, hard moving shadows, gamertags, shield-bar score | sub-heavy metallic clangs | [`era9-xbox.png`](docs/shots/eras/era9-xbox.png) |
-| 10 | 2005 Xbox 360 | bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked | big clean hits, the achievement blip | [`era10-xbox360.png`](docs/shots/eras/era10-xbox360.png) |
+| Era | Machine | Look | Voice | Drawn at | Seen on | Reference frame |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | 1972 arcade Pong | black and white: two white bars, a square ball, a dashed centre line | a bare square-wave blip | 200 x 120, hard edges | a black-and-white arcade monitor: heavy scanlines, phosphor glow | [`era0-arcade.png`](docs/shots/eras/era0-arcade.png) |
+| 1 | 1977 Atari 2600 | the turn to colour: each paddle and its score in its own colour | the same blip | 160 x 192, hard edges | a 1970s colour TV over RF: soft scanlines, colour bleed, a rolling band, snow | [`era1-atari2600.png`](docs/shots/eras/era1-atari2600.png) |
+| 2 | 1985 NES | 8-bit sprites, the NES palette and a pixel score | square and triangle chiptune | 256 x 240, hard edges | a 1980s TV over composite: scanlines, phosphor grain, colour fringes, a curved tube | [`era2-nes.png`](docs/shots/eras/era2-nes.png) |
+| 3 | 1989 Sega Genesis | 16-bit shading, parallax and a trail behind the ball | a bright FM bell | 320 x 224, hard edges | a 1980s TV over composite, a touch lighter than the NES | [`era3-genesis.png`](docs/shots/eras/era3-genesis.png) |
+| 4 | 1991 Super Nintendo | a Mode 7 floor and rich sprites | layered chords with a short echo | 256 x 224, hard edges | a TV over S-video: fine scanlines, a mild glow | [`era4-snes.png`](docs/shots/eras/era4-snes.png) |
+| 5 | 1994 Sony PlayStation | wobbling snapped polygons, swimming affine textures, dithered 320x240 | plucky CD notes in a room reverb | 320 x 240, soft | a 1990s TV over composite: soft lines, sideways bleed, the 4 x 4 dither | [`era5-playstation.png`](docs/shots/eras/era5-playstation.png) |
+| 6 | 1996 Nintendo 64 | blurred textures, heavy fog, round toybox shapes, rumble shake | muffled, springy samples | 320 x 240, soft | a 1990s TV over composite, no dither | [`era6-n64.png`](docs/shots/eras/era6-n64.png) |
+| 7 | 1999 Sega Dreamcast | crisp cel shading, thick ink outlines, graffiti score, speed lines | punchy synth-funk, the modem | 640 x 480, soft | a VGA box: sharp, faint lines, a little edge glow | [`era7-dreamcast.png`](docs/shots/eras/era7-dreamcast.png) |
+| 8 | 2000 PlayStation 2 | letterbox, sparks, glow trail, lens flare, slow camera drift | taiko, orchestral pads, a big hit | 512 x 448, soft | a late TV over component: clean lines, a faint bloom | [`era8-ps2.png`](docs/shots/eras/era8-ps2.png) |
+| 9 | 2001 Xbox | bump-mapped metal, hard moving shadows, gamertags, shield-bar score | sub-heavy metallic clangs | 640 x 480, soft | a TV over component: sharp, fainter lines than the Dreamcast | [`era9-xbox.png`](docs/shots/eras/era9-xbox.png) |
+| 10 | 2005 Xbox 360 | bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked | big clean hits, the achievement blip | 960 x 720 (720p), soft | a 720p flat panel: no lines, LCD softness, a slight smear | [`era10-xbox360.png`](docs/shots/eras/era10-xbox360.png) |
 
 The reference frames in `docs/shots/eras/` are each era in play, taken by the
-playtest as it walks one match up the ladder (see *Run the tests*).
+playtest as it walks one match up the ladder (see *Run the tests*), so they
+show what the page shows: the machine's own resolution, scaled up, on the
+screen of its day. *Drawn at* is the native picture (`src/display.js`), and
+*Seen on* the overlay drawn over it (`src/display-crt.js`, `src/display-tv.js`).
+All eleven on one sheet, two rows: `docs/shots/eras/contact-sheet.png`
+(`py -3.10 docs/shots/eras/contact-sheet.py` rebuilds it from the frames).
 
 Eras 5 to 10 are specified in **`docs/ERAS.md`**, the era bible: every rung's name
 card, palette, camera on the shared 3D table, the look to exaggerate, its sounds
@@ -305,7 +353,11 @@ the Atari on a 1970s colour TV over RF (soft scanlines, colour bleed, a slow
 rolling band and a little snow), the NES and Genesis on a 1980s TV over
 composite (scanlines, phosphor-triad grain, red and blue fringes, a rounded
 tube with a vignette) and the Super Nintendo over S-video (fine scanlines, a
-mild glow). The tube is pre-drawn once per picture size and multiplied over
+mild glow). The Genesis's screen has no glow (item 1201): it draws the heaviest
+picture of the five, and with the glow on it lost frames in the playtest's
+software-drawn Chrome (18.2 ms a frame against 16.7 with no screen);
+`docs/measure/item1201/overlaycost.mjs` times every era with its screen on and
+off, and its ring. The tube is pre-drawn once per picture size and multiplied over
 each frame; the glow and fringes are the native frame drawn again, added at low
 alpha -- no per-pixel work. The playtest's pixel checks read the native picture
 from before the overlay; the reference frames show what the page shows, and
