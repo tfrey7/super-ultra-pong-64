@@ -280,6 +280,12 @@ his emulator — never touch either.**
   ladder walk's pixel comparison passed with era 3's pixellab court and ball on the canvas
   ("0 of 336000 pixels differ from era 3 drawn offscreen"). A page you open by hand off disk still
   taints its canvas; nothing in the game reads pixels back, so only the harness cares.
+  Item 1187's six 3D eras carry their textures as data: URIs (`src/textures3d.js`, written by
+  `assets/pixellab/tex3d-embed.mjs`) the way era 2 does, so those never taint even by hand.
+- **The playtest names a page exception by its own message now.** Until item 1187 a throw inside
+  an evaluated expression came back as the single word `Uncaught`; one climb on that card stopped
+  so while filming a change and could not be reproduced on the next two. The message and the page's
+  stack are printed in full since then, so a repeat says what it was.
 - **The pixellab balance lags the bill.** `node tools/pixellab.mjs` reads the subscription's
   generations left before and after a generation; on item 1177's test image the call was billed
   1 generation, the count read 9953 both times, and a `balance` run about two minutes later read

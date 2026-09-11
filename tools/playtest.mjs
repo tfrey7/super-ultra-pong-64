@@ -79,7 +79,12 @@ class Session extends CdpConnection {
     const r = await this.send('Runtime.evaluate', {
       expression, returnByValue: true, awaitPromise: true
     });
-    if (r.exceptionDetails) throw new Error(r.exceptionDetails.text);
+    // The exception's own description carries the message and the page's stack;
+    // the bare text is only ever "Uncaught" (item 1187 lost a climb to that).
+    if (r.exceptionDetails) {
+      const e = r.exceptionDetails;
+      throw new Error((e.exception && e.exception.description) || e.text);
+    }
     return r.result.value;
   }
   mouseTo(x, y) {
