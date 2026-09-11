@@ -32,6 +32,12 @@
  *            src/sprites.js), one row per beat in BEATS order, one frame per
  *            column, each frame `frame.w` x `frame.h` pixels; null draws the
  *            placeholder silhouette
+ *   sheets   { left, right } (item 1245): two pixellab names, when the two
+ *            players are different characters -- the left sheet for the
+ *            player, the right for the computer, which is mirrored as always.
+ *            A side it leaves out falls back to `sheet`, so a block with only
+ *            `sheet` puts the one character on both sides. Both sheets share
+ *            the block's frame, frames, hand, anchor and scale.
  *   frame    { w, h } one frame, in sheet pixels
  *   frames   how many frames each beat has; a beat left out (or 0) falls back
  *            to idle, so a sheet with only an idle row still works
@@ -94,21 +100,41 @@
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
-    8:  { skin: '#dcae8c', body: '#20242c', scale: 3.2, res: 4, round: true }, // PlayStation 2
+    // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
+    // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
+    // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
+    // fps 3, not the bible's 8: the rig has one rate for idle, move and win,
+    // and at 8 a two-frame breath reads as a flicker.
+    8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
+          sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
+          frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3 },
     9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
     10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
   };
 
   var FIRST_3D = 5;
 
-  /** An era's whole config, its own block over DEFAULTS, or null (era 0). */
-  function configFor(era) {
+  /** The pixellab name one side of an era block wears: its own of `sheets`, else `sheet`. */
+  function sheetOf(own, side) {
+    var per = own.sheets && own.sheets[side === 'right' ? 'right' : 'left'];
+    return per || own.sheet || null;
+  }
+
+  /**
+   * An era's whole config for one side ('left', the default, or 'right'), its
+   * own block over DEFAULTS, or null (era 0). The sides differ only in `sheet`.
+   */
+  function configFor(era, side) {
     var own = ERAS[era];
     if (!own) return null;
     var c = Object.assign({}, DEFAULTS, own);
+    delete c.sheets;
+    c.side = side === 'right' ? 'right' : 'left';
+    c.sheet = sheetOf(own, c.side);
     c.frames = Object.assign({}, DEFAULTS.frames, own.frames || {});
     c.anchor = Object.assign({}, DEFAULTS.anchor, own.anchor || {});
-    if (!own.sheet) {
+    if (!c.sheet) {
       // The placeholder is drawn at res sheet pixels a grid cell.
       c.frame = { w: GRID.w * c.res, h: GRID.h * c.res };
       c.hand = { x: GRID.handX * c.res, y: GRID.handY * c.res };
@@ -305,7 +331,9 @@
 
   /** The placeholder sheet for an era in an ink: drawn once, then only copied. */
   function placeholderSheet(cfg, ink) {
-    var key = cfg.era + '|' + ink;
+    // The frame size is in the key: one side of an era may wear a sheet's frame
+    // while the other, with no sheet, wears the placeholder's own.
+    var key = cfg.era + '|' + ink + '|' + cfg.frame.w + 'x' + cfg.frame.h;
     if (placeholders[key] !== undefined) return placeholders[key];
     var sheet = null;
     if (hasDocument()) {
@@ -398,7 +426,8 @@
   function drawPlayers(ctx, state, opts, R) {
     if (!enabled || !ctx || !state || !state.left || !state.right) return false;
     if (opts && opts.ink) return false;
-    var cfg = configFor(Math.floor(state.era) || 0);
+    var era = Math.floor(state.era) || 0;
+    var cfg = configFor(era);
     if (!cfg) return false;
     R = R || root.PongRender;
     var mem = memoryOf(state);
@@ -409,7 +438,9 @@
     }
     // The far player (smaller y) first, so the near one overlaps it.
     var order = state.left.y <= state.right.y ? ['left', 'right'] : ['right', 'left'];
-    for (var i = 0; i < order.length; i++) drawPlayer(ctx, state, order[i], cfg, mem, R, cam, T);
+    // Each side in its own config: they differ only in the sheet it wears.
+    var sides = { left: cfg, right: configFor(era, 'right') };
+    for (var i = 0; i < order.length; i++) drawPlayer(ctx, state, order[i], sides[order[i]], mem, R, cam, T);
     return true;
   }
 

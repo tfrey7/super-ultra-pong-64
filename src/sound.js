@@ -328,6 +328,8 @@
       errors: 0,          // anything the audio API threw, swallowed
       skipped: 0,         // notes or effects this audio context has no node for
       boots: 0,           // boot stings played: one per change into an era that has one
+      released: 0,        // buses of eras left behind, unplugged once their tails rang out (item 1238)
+      buses: function () { return Object.keys(buses).length; },
       last: null,         // { era, type, waves } of the latest event played ('boot' for a sting)
       unlock: unlock,
       handle: handle,
@@ -427,9 +429,13 @@
       if (!voices.length) return false;
       try {
         var fx = effectsFor(ev.era);
+        retireBuses(clampEra(ev.era));
         var bus = busFor(clampEra(ev.era), fx);
         var t0 = ctx.currentTime + 0.005;
-        for (var i = 0; i < voices.length; i++) voice(voices[i], t0, bus);
+        for (var i = 0; i < voices.length; i++) {
+          voice(voices[i], t0, bus);
+          bus.until = Math.max(bus.until, t0 + (voices[i].at || 0) + voices[i].dur + 0.02);
+        }
         player.played += 1;
         if (type === 'boot') player.boots += 1;
         sounded = clampEra(ev.era);
@@ -570,10 +576,13 @@
      */
     function busFor(era, fx) {
       if (buses[era]) return buses[era];
-      var bus = { dry: master, sends: [] };
+      // nodes: everything made for this bus, so leaving the era can unplug it all;
+      // until: when its last note ends; ring: how long its echo and reverb sound after.
+      var bus = { dry: master, sends: [], nodes: [], until: 0, ring: ringOf(fx) };
       var head = null;
       var tail = null;
       function chain(node) {
+        bus.nodes.push(node);
         if (tail) tail.connect(node); else head = node;
         tail = node;
       }
@@ -598,9 +607,9 @@
         bus.dry = head;
       }
       var sends = [];
-      if (fx.echo) sends.push(echoNet(fx.echo));
+      if (fx.echo) sends.push(echoNet(fx.echo, bus.nodes));
       if (fx.reverb) {
-        var rev = reverbNet(fx.reverb);
+        var rev = reverbNet(fx.reverb, bus.nodes);
         if (rev) sends.push(rev); else player.skipped += 1;
       }
       if (tail) for (var i = 0; i < sends.length; i++) tail.connect(sends[i]);
@@ -609,8 +618,40 @@
       return bus;
     }
 
+    /**
+     * Every era's effects used to stay wired to the master for the rest of the
+     * match: eleven echo loops and reverbs by the Xbox 360, one per rung climbed
+     * (item 1238). Now a bus for an era the game has left is unplugged -- every
+     * node -- once its last note and that note's echo and reverb have rung out,
+     * so what is left is the era being played. An era played again (the finale's
+     * rewind walks back down) simply builds its bus again.
+     */
+    function retireBuses(playing) {
+      var now = ctx.currentTime;
+      for (var key in buses) {
+        if (+key === playing) continue;
+        var b = buses[key];
+        if (now < b.until + b.ring) continue;
+        for (var i = 0; i < b.nodes.length; i++) {
+          try { b.nodes[i].disconnect(); } catch (e) { /* already gone */ }
+        }
+        delete buses[key];
+        player.released += 1;
+      }
+    }
+
+    /** How long a bus's effects go on sounding after its last note: the echo to -60 dB, the reverb's length. */
+    function ringOf(fx) {
+      var ring = 0.1;
+      if (fx.echo && fx.echo.feedback > 0 && fx.echo.feedback < 1) {
+        ring = Math.max(ring, fx.echo.time * Math.ceil(Math.log(0.001) / Math.log(fx.echo.feedback)));
+      } else if (fx.echo) ring = Math.max(ring, 4);
+      if (fx.reverb) ring = Math.max(ring, fx.reverb.seconds || 1);
+      return ring + 0.25;
+    }
+
     /** A slapback echo: a delay feeding back through a gain, and a wet level. */
-    function echoNet(spec) {
+    function echoNet(spec, nodes) {
       var delay = ctx.createDelay(1.0);
       delay.delayTime.value = spec.time;
       var feedback = ctx.createGain();
@@ -621,6 +662,7 @@
       feedback.connect(delay);
       delay.connect(wet);
       wet.connect(master);
+      nodes.push(delay, feedback, wet);
       return delay;
     }
 
@@ -629,7 +671,7 @@
      * (1 - i / n) ** decay, `seconds` long, and a wet level. Null when this
      * context cannot make one.
      */
-    function reverbNet(spec) {
+    function reverbNet(spec, nodes) {
       if (typeof ctx.createConvolver !== 'function' || typeof ctx.createBuffer !== 'function') return null;
       var rate = ctx.sampleRate || 44100;
       var n = Math.max(1, Math.round((spec.seconds || 1) * rate));
@@ -646,6 +688,7 @@
       wet.gain.value = typeof spec.mix === 'number' ? spec.mix : 0.25;
       conv.connect(wet);
       wet.connect(master);
+      nodes.push(conv, wet);
       return conv;
     }
 
