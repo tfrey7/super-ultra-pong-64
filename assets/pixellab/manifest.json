@@ -68,8 +68,8 @@
         "width": 320,
         "height": 240
       },
-      "bytes": 8475,
-      "sha256": "4ad286a89080049decc3f353de7a4464de1ed516d53e325ffff0122f863d9dda",
+      "bytes": 3062,
+      "sha256": "ba0e3aef89bf03a775421b300f63bb4ca1ae2b1ef194835e56e3b3538d69e4e4",
       "endpoint": "POST /v1/generate-image-pixflux",
       "request": {
         "description": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
@@ -81,6 +81,22 @@
         "outline": "lineless",
         "shading": "detailed shading",
         "detail": "highly detailed"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "4ad286a89080049decc3f353de7a4464de1ed516d53e325ffff0122f863d9dda"
       }
     },
     {
@@ -109,8 +125,8 @@
         "width": 32,
         "height": 32
       },
-      "bytes": 730,
-      "sha256": "5f77f8760a3b897a8bd5c6d868c2c60bee9dc1d9ebe7c8195358559985749143",
+      "bytes": 272,
+      "sha256": "283847bfafe01b5db4f7e126ac305e7ac6bf998645c860b1bd3342e345316694",
       "endpoint": "POST /v1/generate-image-pixflux",
       "request": {
         "description": "shiny white chrome ball sprite, 16-bit Sega Genesis style, bright white core with a hard white highlight and pale blue shading at the edge",
@@ -123,6 +139,32 @@
         "shading": "medium shading",
         "detail": "medium detail",
         "no_background": true
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "5f77f8760a3b897a8bd5c6d868c2c60bee9dc1d9ebe7c8195358559985749143",
+        "trim": {
+          "box": [
+            4,
+            4,
+            24,
+            24
+          ],
+          "width": 24,
+          "height": 24
+        }
       }
     },
     {
@@ -151,8 +193,8 @@
         "width": 16,
         "height": 96
       },
-      "bytes": 808,
-      "sha256": "912836468946d9c60f936e5b30fc894bcc3d626b56a09da6bcc92561ca12778b",
+      "bytes": 331,
+      "sha256": "01ce2c6f2f0b0ba660bd318a756e22493941e492f56c4f71fdc1a3509ee26321",
       "endpoint": "POST /v1/generate-image-pixflux",
       "request": {
         "description": "vertical bat paddle sprite for a 16-bit Sega Genesis sports game, tall narrow light grey chrome bar with bevelled rounded ends, bright highlight down the left edge, darker shading on the right",
@@ -165,6 +207,32 @@
         "shading": "detailed shading",
         "detail": "medium detail",
         "no_background": true
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "912836468946d9c60f936e5b30fc894bcc3d626b56a09da6bcc92561ca12778b",
+        "trim": {
+          "box": [
+            2,
+            0,
+            12,
+            96
+          ],
+          "width": 12,
+          "height": 96
+        }
       }
     }
   ]
