@@ -1,0 +1,209 @@
+{
+  "when": "2026-09-11T02:22:32.042Z",
+  "results": [
+    {
+      "name": "era 0: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 0,
+        "scheduled": 3,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": null,
+        "rally": 0,
+        "gameEra": 0,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 1: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 1,
+        "scheduled": 14,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 128,
+        "rally": 0,
+        "gameEra": 1,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 2: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 2,
+        "scheduled": 23,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 150,
+        "rally": 0,
+        "gameEra": 2,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 3: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 3,
+        "scheduled": 36,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 138,
+        "rally": 0,
+        "gameEra": 3,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 4: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 4,
+        "scheduled": 12,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 96,
+        "rally": 0,
+        "gameEra": 4,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 5: an empty slot books nothing",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 5,
+        "scheduled": 0,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 0,
+        "rally": 0,
+        "gameEra": 5,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "an era change cross-fades into the new loop",
+      "ok": true,
+      "detail": {
+        "before": {
+          "available": true,
+          "audio": "running",
+          "era": 1,
+          "scheduled": 6,
+          "crossfades": 0,
+          "ducks": 0,
+          "muted": false,
+          "off": false,
+          "errors": 0,
+          "tempo": 128,
+          "rally": 0,
+          "gameEra": 1,
+          "sfx": "running"
+        },
+        "after": {
+          "available": true,
+          "audio": "running",
+          "era": 2,
+          "scheduled": 15,
+          "crossfades": 1,
+          "ducks": 0,
+          "muted": false,
+          "off": false,
+          "errors": 0,
+          "tempo": 150,
+          "rally": 0,
+          "gameEra": 2,
+          "sfx": "running"
+        }
+      }
+    },
+    {
+      "name": "a 15-hit rally raises the tempo",
+      "ok": true,
+      "detail": {
+        "tempoAtRally0": 150,
+        "tempoAtRally15": 177
+      }
+    },
+    {
+      "name": "M mutes the music, and M again brings it back",
+      "ok": true,
+      "detail": {
+        "afterFirstM": true,
+        "afterSecondM": false
+      }
+    },
+    {
+      "name": "the music ducks under paddle hits in real play",
+      "ok": true,
+      "detail": {
+        "ducks": 1,
+        "scheduled": 108
+      }
+    },
+    {
+      "name": "?music=off opens no music audio; the effects still unlock",
+      "ok": true,
+      "detail": {
+        "available": false,
+        "audio": "none",
+        "era": null,
+        "scheduled": 0,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": true,
+        "errors": 0,
+        "tempo": 0,
+        "rally": 0,
+        "gameEra": 2,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

@@ -220,7 +220,7 @@
                 env: { a: 0.04, d: 0.2, s: 0.7, r: 0.25 }, legato: 0.92,
                 filter: { type: 'lowpass', freq: 2600, q: 1 },
                 vibrato: { rate: 5, cents: 22, delay: 0.2 } },
-        bass: { wave: 'triangle', gain: 0.24, unison: [0], octave: 0,
+        bass: { wave: 'triangle', gain: 0.24,
                 env: { a: 0.01, d: 0.3, s: 0.6, r: 0.1 }, legato: 0.9,
                 filter: { type: 'lowpass', freq: 600, q: 0.7 } },
         kick: { wave: 'kick', freq: 120, gain: 0.3, env: { a: 0.002, d: 0.22, s: 0, r: 0.03 } },
