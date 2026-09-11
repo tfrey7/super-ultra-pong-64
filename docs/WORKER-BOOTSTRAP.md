@@ -228,6 +228,19 @@ his emulator — never touch either.**
   compares the live canvas with each era drawn offscreen, and the card covers the middle 180 rows
   of both until the serve; a look that draws something important only there would pass unseen.
 
+- **A pixellab image drawn onto the live canvas breaks the playtest's pixel read, off disk.**
+  `tools/playtest.mjs` compares the live canvas with each era drawn offscreen by calling
+  `getImageData` in the page, and the page is opened from `file://`, where Chrome counts every
+  image as another origin: one `drawImage` of a `assets/pixellab/*.png` taints the canvas, and the
+  read throws a SecurityError. The first era card that draws pixellab art has to deal with that
+  check (serve the repo over HTTP for it, or compare screenshots instead); item 1177, which built
+  the loader, measured none of this in a browser -- it is reasoned from the harness's own code.
+- **The pixellab balance lags the bill.** `node tools/pixellab.mjs` reads the subscription's
+  generations left before and after a generation; on item 1177's test image the call was billed
+  1 generation, the count read 9953 both times, and a `balance` run about two minutes later read
+  9952. Trust the call's own `cost` in the manifest, not `generationsUsed` (which records 0 for
+  that image), for what one image costs.
+
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
 
