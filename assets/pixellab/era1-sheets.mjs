@@ -28,6 +28,7 @@
  * Each sheet is 18 x 168: 3 columns of 6-pixel frames, 6 rows of 28, in the
  * rig's beat order idle, up, down, swing, miss, win (frames 2, 2, 2, 3, 1, 2).
  */
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -138,17 +139,52 @@ export function sheetName(side, index) {
   return 'era1-' + (side === 'right' ? 'right' : 'left') + '-' + index;
 }
 
+const MANIFEST = path.join(HERE, 'manifest.json');
+const REJECTED = 'rejected (item 1224): pixflux did not lay out a 3 x 6 sprite sheet at 18 x 168 -- ' +
+  'see docs/shots/item-1224/pixflux-sheets-rejected.png; the players are painted in code by ' +
+  'assets/pixellab/era1-sheets.mjs instead';
+
+/** Write every sheet and record each in the manifest (a derived image, 0 generations). */
 export function main(log = console.log) {
   const inks = paddleInks();
+  const manifest = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'));
+  // A derived entry keeps the date of the generation it stands in for (as era 2's
+  // quantized court does), so the balance's 'cost of one image' still reads the
+  // newest real bill rather than this 0.
+  const source = manifest.images.find((e) => e.name === 'era1-players-right');
+  const date = source ? source.date : new Date().toISOString();
   let n = 0;
   for (const side of ['left', 'right']) {
     inks.forEach((ink, idx) => {
       const s = sheet(side, ink);
-      const file = path.join(HERE, sheetName(side, idx) + '.png');
-      fs.writeFileSync(file, encodePng(s.width, s.height, s.rgba));
+      const name = sheetName(side, idx);
+      const buf = encodePng(s.width, s.height, s.rgba);
+      fs.writeFileSync(path.join(HERE, name + '.png'), buf);
+      const prompt = 'painted in code, no generation: era 1\'s ' + (side === 'right' ? 'computer' : 'player') +
+        ', a one-colour 2600 sprite in ' + ink + ', 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)';
+      const entry = {
+        name, file: name + '.png', prompt,
+        size: { width: s.width, height: s.height },
+        style: { painted: 'pixel by pixel from docs/ART.md, Era 1, PLAYERS' },
+        seed: 0, date,
+        cost: { type: 'derived', generations: 0 },
+        derivedBy: 'node assets/pixellab/era1-sheets.mjs',
+        how: 'the bible\'s silhouette rows painted into a grid, one ink index ' + idx + ' of era 1\'s palette',
+        card: 'item 1224',
+        verdict: 'drawn by src/characters.js for era 1, the pair named by era 1\'s look (playerSheets)',
+        pixels: { width: s.width, height: s.height },
+        bytes: buf.length,
+        sha256: crypto.createHash('sha256').update(buf).digest('hex'),
+        endpoint: 'none',
+        request: { description: prompt, seed: 0 }
+      };
+      const at = manifest.images.findIndex((e) => e.name === name);
+      if (at >= 0) manifest.images[at] = entry; else manifest.images.push(entry);
       n++;
     });
   }
+  for (const e of manifest.images) if (/^era1-players-(left|right)$/.test(e.name)) e.verdict = REJECTED;
+  fs.writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
   log('era1-sheets: wrote ' + n + ' sheets, ' + inks.length + ' inks x 2 players, 18 x 168 each');
   return n;
 }

@@ -253,6 +253,190 @@
     ctx.restore();
   }
 
+  // ------------------------------------------ the match: a 1977 cartridge
+  // Item 1224, to docs/ART.md's Era 1 page: not a Pong of 1977 but the best a
+  // launch-year cartridge drew (Combat, Air-Sea Battle, Street Racer) that
+  // happens to be Pong. A Combat arena -- black field, a playfield wall along
+  // the top and bottom and a flickering stand of mirrored blocks -- two
+  // one-colour players (src/characters.js, sheets from
+  // assets/pixellab/era1-sheets.mjs), the picture chip's ball, and the score
+  // in playfield-block digits with a rally meter under each. Everything is
+  // laid on the 2600's own grid: 160 x 192, so one pixel is 5 x 3.125 field
+  // units, and the display samples it down to exactly that.
+  var PX = 5;              // one native pixel across, in field units
+  var LINE = 3.125;        // one scanline, in field units
+  var PLAYFIELD = '#2c3a7a';   // wall and stand (relative luminance under 0.05)
+  var BALL_INK = '#f0fff6';    // the phosphor white; the only object that never changes colour
+  var WALL_LINES = 4;
+  var STAND = { rows: 3, lines: 6, block: 4, swapS: 16 / 60, fastS: 4 / 60, fastFor: 1 };
+  var SCORE = { top: 40, offset: 110, blockW: 4 * PX, blockH: 4 * LINE, gap: 2 * PX };
+  var METER = { max: 20, gapLines: 2 };
+  var FLASH = { on: 4 / 60, times: 3 };     // 4 frames lit, 4 dark, three times
+  var ARRIVE_S = 0.8;
+
+  // One memory per game (its score object, as the rig keys it): the rally hits
+  // each side has made this serve, and the last point -- who and when. Kept
+  // here because state.events is emptied every step; an event is taken once,
+  // by its time, however many times a frame is drawn.
+  var memories = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function memoryOf(state) {
+    var key = state.score;
+    var m = memories && key && typeof key === 'object' ? memories.get(key) : null;
+    var fresh = !m;
+    if (!m || (state.time || 0) < m.time) {
+      m = { seen: -Infinity, time: 0, hits: { left: 0, right: 0 }, point: null };
+    }
+    if (fresh && state.eraChangedAt > 0 && (state.time - state.eraChangedAt) < ARRIVE_S &&
+        state.score.left !== state.score.right) {
+      // Arriving on the point that brought the machine here: the leader scored it.
+      m.point = { side: state.score.left > state.score.right ? 'left' : 'right', time: state.eraChangedAt };
+    }
+    m.time = state.time || 0;
+    var evs = state.events || [];
+    var newest = m.seen;
+    for (var i = 0; i < evs.length; i++) {
+      var ev = evs[i];
+      if (!ev || !(ev.time > m.seen)) continue;
+      if (ev.time > newest) newest = ev.time;
+      if (ev.type === 'paddle' && m.hits[ev.side] !== undefined) m.hits[ev.side] += 1;
+      if (ev.type === 'score' && (ev.side === 'left' || ev.side === 'right')) {
+        m.point = { side: ev.side, time: ev.time };
+      }
+    }
+    m.seen = newest;
+    if (!state.rally) { m.hits.left = 0; m.hits.right = 0; }   // a new serve
+    if (memories && key && typeof key === 'object') memories.set(key, m);
+    return m;
+  }
+
+  /** A paddle's palette index: which pair of player sheets matches its ink. */
+  var lastInks = { left: 0, right: 0 };
+  function inkIndex(state, side) {
+    var ink = lookPaddleInk(state, side);
+    var i = PADDLE_INKS.indexOf(ink);
+    return i < 0 ? 0 : i;
+  }
+  function lookPaddleInk(state, side) {
+    if (!state.colour) return R.INK;
+    var i = (state.paddleColour && state.paddleColour[side]) || 0;
+    return PALETTE[i % PALETTE.length];
+  }
+
+  /** The sheets the rig's era 1 players wear: each in its own paddle's ink (src/characters.js asks). */
+  function playerSheets() {
+    return { left: 'era1-left-' + lastInks.left, right: 'era1-right-' + lastInks.right };
+  }
+
+  function snapX(x) { return Math.round(x / PX) * PX; }
+  function snapY(y) { return Math.round(y / LINE) * LINE; }
+
+  /** The stand: 3 rows of mirrored 4-pixel blocks, every other one missing, two patterns swapping. */
+  function drawStand(ctx, w, phase) {
+    var bw = STAND.block * PX;
+    var bh = STAND.lines * LINE;
+    var top = WALL_LINES * LINE;
+    var half = Math.floor(w / 2 / bw);
+    ctx.fillStyle = PLAYFIELD;
+    for (var row = 0; row < STAND.rows; row++) {
+      for (var k = 0; k < half; k++) {
+        if ((k + row + phase) % 2) continue;
+        ctx.fillRect(k * bw, top + row * bh, bw, bh);              // left half
+        ctx.fillRect(w - (k + 1) * bw, top + row * bh, bw, bh);    // mirrored, as the chip does it
+      }
+    }
+  }
+
+  /** One number in playfield blocks: 3 blocks wide, 5 tall, 4 pixels by 4 lines a block. */
+  function drawScoreNumber(ctx, value, centreX) {
+    var text = String(value);
+    var digitW = 3 * SCORE.blockW;
+    var width = text.length * digitW + (text.length - 1) * SCORE.gap;
+    var x = snapX(centreX - width / 2);
+    for (var n = 0; n < text.length; n++) {
+      var rows = R.DIGITS[text[n]];
+      for (var r = 0; rows && r < rows.length; r++) {
+        for (var c = 0; c < rows[r].length; c++) {
+          if (rows[r][c] === '1') ctx.fillRect(x + c * SCORE.blockW, SCORE.top + r * SCORE.blockH, SCORE.blockW, SCORE.blockH);
+        }
+      }
+      x += digitW + SCORE.gap;
+    }
+    return { left: snapX(centreX - width / 2), bottom: SCORE.top + 5 * SCORE.blockH };
+  }
+
+  /** The whole era 1 frame (the rig draws the players over it). */
+  function draw(ctx, state, opts, api) {
+    var P = api || R;
+    if (opts && opts.ink) return P.drawBase(ctx, state, opts);   // behind the title: monochrome
+    var w = state.width, h = state.height, t = state.time || 0;
+    var mem = memoryOf(state);
+    lastInks = { left: inkIndex(state, 'left'), right: inkIndex(state, 'right') };
+    var inkL = lookPaddleInk(state, 'left');
+    var inkR = lookPaddleInk(state, 'right');
+
+    // The black field.
+    ctx.fillStyle = R.FIELD_INK;
+    ctx.fillRect(0, 0, w, h);
+
+    // Match point: under the wall, the leader's ink for 2 lines every other frame.
+    var Pong = root.Pong;
+    if (Pong && typeof Pong.isMatchPoint === 'function' && Pong.isMatchPoint(state) &&
+        state.score.left !== state.score.right && Math.floor(t * 60) % 2 === 0) {
+      ctx.fillStyle = state.score.left > state.score.right ? inkL : inkR;
+      ctx.fillRect(0, WALL_LINES * LINE, w, 2 * LINE);
+      ctx.fillRect(0, h - (WALL_LINES + 2) * LINE, w, 2 * LINE);
+    }
+
+    // The stand flickers, faster for a second after a point.
+    var sincePoint = mem.point ? t - mem.point.time : Infinity;
+    var period = sincePoint >= 0 && sincePoint < STAND.fastFor ? STAND.fastS : STAND.swapS;
+    drawStand(ctx, w, Math.floor(t / period) % 2);
+
+    // The wall, 4 lines along the top and the bottom.
+    ctx.fillStyle = PLAYFIELD;
+    ctx.fillRect(0, 0, w, WALL_LINES * LINE);
+    ctx.fillRect(0, h - WALL_LINES * LINE, w, WALL_LINES * LINE);
+
+    // The net: a dashed playfield column one pixel wide, 4 lines on, 4 off.
+    var nx = snapX(w / 2 - PX / 2);
+    for (var y = (WALL_LINES + 4) * LINE; y < h - WALL_LINES * LINE; y += 8 * LINE) {
+      ctx.fillRect(nx, y, PX, 4 * LINE);
+    }
+
+    // The scores, each in its player's ink, the scorer's flashing after a point.
+    var sides = [['left', inkL, w / 2 - SCORE.offset], ['right', inkR, w / 2 + SCORE.offset]];
+    for (var s = 0; s < sides.length; s++) {
+      var side = sides[s][0];
+      var lit = true;
+      if (mem.point && mem.point.side === side) {
+        var age = t - mem.point.time;
+        if (age >= 0 && age < FLASH.on * 2 * FLASH.times) lit = Math.floor(age / FLASH.on) % 2 === 0;
+      }
+      ctx.fillStyle = sides[s][1];
+      var box = null;
+      if (lit) box = drawScoreNumber(ctx, state.score[side], sides[s][2]);
+      // The rally meter: a pixel a hit this serve, to at most 20.
+      var hits = Math.min(METER.max, mem.hits[side] || 0);
+      if (hits > 0) {
+        var num = box || { left: snapX(sides[s][2] - (3 * SCORE.blockW) / 2), bottom: SCORE.top + 5 * SCORE.blockH };
+        ctx.fillRect(num.left, num.bottom + METER.gapLines * LINE, hits * PX, LINE);
+      }
+    }
+
+    // The paddles: the hit zones, unchanged, in their earned inks.
+    ctx.fillStyle = inkL;
+    ctx.fillRect(state.left.x, state.left.y, state.left.w, state.left.h);
+    ctx.fillStyle = inkR;
+    ctx.fillRect(state.right.x, state.right.y, state.right.w, state.right.h);
+
+    // The ball: the picture chip's ball object, 2 pixels by 4 lines, hidden while the serve waits.
+    if (state.serveDelay <= 0) {
+      ctx.fillStyle = BALL_INK;
+      var b = state.ball;
+      ctx.fillRect(snapX(b.x + b.size / 2 - PX), snapY(b.y + b.size / 2 - 2 * LINE), 2 * PX, 4 * LINE);
+    }
+  }
+
   /** The flourish hook: see the header of src/erachange.js for the contract. */
   function tvComesAlive(ctx, p, origin, fromEra, toEra, info) {
     // Only the arrival of THIS era: the Super Nintendo borrows era 1's look
@@ -284,11 +468,9 @@
     era: 1,
     name: '1977 Atari 2600',
     palette: PALETTE,
-    paddleInk: function (state, side) {
-      if (!state.colour) return R.INK;
-      var i = (state.paddleColour && state.paddleColour[side]) || 0;
-      return PALETTE[i % PALETTE.length];
-    },
+    paddleInk: lookPaddleInk,
+    draw: draw,
+    playerSheets: playerSheets,
     flourish: tvComesAlive
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
