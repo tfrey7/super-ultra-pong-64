@@ -1,0 +1,16 @@
+{
+  "label": "master",
+  "playtest": "G:\\Claude Stuff\\super-ultra-pong-64\\tools\\playtest.mjs",
+  "port": 9413,
+  "chromePid": 11544,
+  "pidFrom": "looked up as the playtest's chrome.exe child",
+  "killNote": "killed pid 11544",
+  "secondsFromStartToKill": 5.2,
+  "secondsFromKillToExit": 0.4,
+  "exitCode": 0,
+  "signal": null,
+  "printedSummary": false,
+  "failLines": [],
+  "lastLine": "PASS  the ladder walk starts a fresh match on era 0  -- phase playing, era 0, score 0-0",
+  "lineCount": 1
+}

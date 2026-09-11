@@ -22,6 +22,7 @@ import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { launchChrome } from './chrome.mjs';
+import { CdpConnection, DroppedConnection } from './cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -66,26 +67,13 @@ const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 
   'era5-playstation', 'era6-n64', 'era7-dreamcast', 'era8-ps2', 'era9-xbox', 'era10-xbox360'];
 const CHROME = arg('chrome', CHROMES.find((p) => existsSync(p)));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Every screenshot written so far, for the summary of a run that stops part way.
+const taken = [];
 
 // ------------------------------------------------------------- CDP plumbing
-class Session {
-  constructor(ws) {
-    this.ws = ws;
-    this.next = 1;
-    this.pending = new Map();
-    ws.addEventListener('message', (ev) => {
-      const msg = JSON.parse(ev.data);
-      const p = this.pending.get(msg.id);
-      if (!p) return;
-      this.pending.delete(msg.id);
-      msg.error ? p.reject(new Error(JSON.stringify(msg.error))) : p.resolve(msg.result);
-    });
-  }
-  send(method, params = {}) {
-    const id = this.next++;
-    this.ws.send(JSON.stringify({ id, method, params }));
-    return new Promise((resolve, reject) => this.pending.set(id, { resolve, reject }));
-  }
+// send() and the socket's end live in tools/cdp.mjs: when Chrome's connection
+// closes, every waiting request is rejected rather than left hanging (item 1182).
+class Session extends CdpConnection {
   async eval(expression) {
     const r = await this.send('Runtime.evaluate', {
       expression, returnByValue: true, awaitPromise: true
@@ -116,6 +104,7 @@ class Session {
     mkdirSync(SHOTS, { recursive: true });
     const file = path.join(SHOTS, name + '.png');
     writeFileSync(file, Buffer.from(r.data, 'base64'));
+    taken.push(file);
     return file;
   }
 }
@@ -388,6 +377,8 @@ async function main() {
     '--no-first-run', '--no-default-browser-check',
     url
   ], { name: 'playtest' });
+  // Named up front so a run that loses Chrome can say which process it was.
+  console.log(`chrome: pid ${chrome.pid}, DevTools port ${PORT}`);
 
   let ws;
   try {
@@ -409,7 +400,8 @@ async function main() {
     // than a fixed beat: on a busy machine 400 ms was sometimes not enough, and
     // the first read threw "Uncaught" before any check ran (item 1160).
     for (let i = 0; i < 100; i++) {
-      const ready = await s.eval('!!(window.__pong && document.getElementById("field"))').catch(() => false);
+      const ready = await s.eval('!!(window.__pong && document.getElementById("field"))')
+        .catch((e) => { if (e instanceof DroppedConnection) throw e; return false; });
       if (ready) break;
       await sleep(100);
     }
@@ -626,6 +618,15 @@ async function main() {
     const ladderShots = await walkLadder(s, url.split('?')[0]);
     summarise([titleShot, firstFrameShot,
       ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots]);
+  } catch (e) {
+    // A run that stops part way is a FAIL with its summary, never a quiet exit:
+    // Chrome's connection dropping (tools/cdp.mjs) is the case this was built for
+    // (item 1182). The finally below still closes Chrome and deletes its profile.
+    const dropped = e instanceof DroppedConnection;
+    check(dropped ? 'Chrome\'s DevTools connection stays open until the run ends'
+                  : 'the playtest runs to the end without an error', false, e.message);
+    if (!dropped) console.error(e);
+    summarise(taken);
   } finally {
     try { ws && ws.close(); } catch { /* already gone */ }
     await chrome.close();
