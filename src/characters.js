@@ -412,6 +412,11 @@
 
   // -------------------------------------------------------------- drawing
   var enabled = !(root.location && /[?&]characters=off\b/.test(String(root.location.search || '')));
+  // ?models=off keeps the 3D eras on their sprites; ?model=<name> puts that one
+  // model file on every 3D era (item 1248: how the frame-time A/B is taken).
+  var search = String((root.location && root.location.search) || '');
+  var modelsOn = !/[?&]models=off\b/.test(search);
+  var forcedModel = (/[?&]model=([a-z0-9][a-z0-9_-]*)/.exec(search) || [])[1] || null;
 
   /** One player, onto ctx, in its era's config. */
   function drawPlayer(ctx, state, sideName, cfg, mem, R, cam, T) {
@@ -523,7 +528,8 @@
     }
     // Each side in its own config: they differ only in the sheet or model it wears.
     var sides = { left: cfg, right: configFor(era, 'right') };
-    if (cfg.is3d && cfg.model && drawModels(ctx, state, sides, mem, R, cam, T, look)) return true;
+    if (cfg.is3d && cfg.model && modelsOn && forcedModel) { sides.left.model = sides.right.model = forcedModel; }
+    if (cfg.is3d && cfg.model && modelsOn && drawModels(ctx, state, sides, mem, R, cam, T, look)) return true;
     // The far player (smaller y) first, so the near one overlaps it.
     var order = state.left.y <= state.right.y ? ['left', 'right'] : ['right', 'left'];
     for (var i = 0; i < order.length; i++) drawPlayer(ctx, state, order[i], sides[order[i]], mem, R, cam, T);
