@@ -319,22 +319,27 @@
 
   /** Step 3: the moving light's hard shadows: both paddles, then the ball's. */
   function drawCastShadows(ctx, cam, T, L, state) {
+    ctx.save();
+    // Shadows fall on the metal only: a paddle near a side wall would otherwise
+    // cast out over the void beside the table.
+    T.path(ctx, cam, [[0, 0, 0], [800, 0, 0], [800, 600, 0], [0, 600, 0]]);
+    ctx.clip();
     var sides = ['left', 'right'];
     for (var i = 0; i < sides.length; i++) {
       T.quad(ctx, cam, paddleShadow(L, state[sides[i]]), { fill: '#000000', alpha: SHADOW_ALPHA });
     }
-    if (state.serveDelay > 0) return;
-    var b = state.ball, r = b.size * 0.6;
-    var at = castPoint(L, b.x + b.size / 2, b.y + b.size / 2, r);
-    var p = T.project(cam, at[0], at[1], 0);
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    ctx.scale(1, Math.max(0.05, cam.cos));
-    ctx.globalAlpha = SHADOW_ALPHA;
-    ctx.fillStyle = '#000000';
-    ctx.beginPath();
-    ctx.arc(0, 0, Math.max(0.5, r * p.scale), 0, Math.PI * 2);
-    ctx.fill();
+    if (state.serveDelay <= 0) {
+      var b = state.ball, r = b.size * 0.6;
+      var at = castPoint(L, b.x + b.size / 2, b.y + b.size / 2, r);
+      var p = T.project(cam, at[0], at[1], 0);
+      ctx.translate(p.x, p.y);
+      ctx.scale(1, Math.max(0.05, cam.cos));
+      ctx.globalAlpha = SHADOW_ALPHA;
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(0, 0, Math.max(0.5, r * p.scale), 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.restore();
   }
 
