@@ -68,6 +68,102 @@ function readable(m) {
   return m.inside && m.widthRatio >= 0.7 && m.depthRatio >= 0.55 && m.farPaddlePx >= 44;
 }
 
+// ------------------------------------------------ the realism ladder's players
+// docs/ART.md section 8 (item 1265): a player 250 units tall on a floor 110 units
+// below the table top, the front foot 30 units behind its end, centred on its
+// paddle's y. The box is the whole standing figure: 80 units of body behind the
+// front foot, 30 either side of the paddle's y, feet to the top of the head.
+const PLAYER = { height: 250, floor: -110, front: 30, depth: 80, halfWidth: 30 };
+
+/** The eight corners of one standing player's box, with its paddle at field y py. */
+function playerBox(side, py, P) {
+  P = P || PLAYER;
+  const x0 = side === 'left' ? -P.front - P.depth : W + P.front;
+  const x1 = side === 'left' ? -P.front : W + P.front + P.depth;
+  const z0 = P.floor, z1 = P.floor + P.height;
+  const out = [];
+  for (const x of [x0, x1]) for (const y of [py - P.halfWidth, py + P.halfWidth]) for (const z of [z0, z1]) out.push([x, y, z]);
+  return out;
+}
+
+/**
+ * Whether a camera holds both players whole (the ladder's camera rule). bounds
+ * is the era's own: top is the HUD band's lower edge, bottom the picture's (or
+ * the letterbox's). With the paddles at y 300 both figures, feet to head, are
+ * inside the picture and below the HUD band with `headroom` pixels to spare; with
+ * the paddles at a wall, only the head (the top 36 units) may pass behind the HUD.
+ */
+function players(spec, bounds) {
+  const b = Object.assign({ top: 64, bottom: 592 }, bounds || spec.bounds || {});
+  const c = camera(spec);
+  const headroom = spec.headroom === undefined ? 8 : spec.headroom;
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const side of ['left', 'right']) {
+    for (const p of playerBox(side, H / 2)) {
+      const s = project(c, p[0], p[1], p[2]);
+      minX = Math.min(minX, s.x); maxX = Math.max(maxX, s.x);
+      minY = Math.min(minY, s.y); maxY = Math.max(maxY, s.y);
+    }
+  }
+  // Paddle at the far wall: the neck (36 units under the head's top) stays below the HUD band.
+  const neck = project(c, -PLAYER.front, 0 - PLAYER.halfWidth, PLAYER.floor + PLAYER.height - 36).y;
+  const feet = project(c, -PLAYER.front, H / 2 + PLAYER.halfWidth, PLAYER.floor);
+  const head = project(c, -PLAYER.front, H / 2, PLAYER.floor + PLAYER.height);
+  return {
+    left: +minX.toFixed(1), right: +maxX.toFixed(1), top: +minY.toFixed(1), bottom: +maxY.toFixed(1),
+    neckAtFarWall: +neck.toFixed(1),
+    figurePx: +(feet.y - head.y).toFixed(1),
+    whole: minX >= 4 && maxX <= W - 4 && minY >= b.top + headroom && maxY <= b.bottom && neck >= b.top
+  };
+}
+
+/** The share of the picture the arena gets: everything outside the table top's quad (0..1). */
+function arenaShare(spec) {
+  const c = camera(spec);
+  const q = [project(c, 0, 0), project(c, W, 0), project(c, W, H), project(c, 0, H)];
+  let a = 0;
+  for (let i = 0; i < 4; i++) { const p = q[i], n = q[(i + 1) % 4]; a += p.x * n.y - n.x * p.y; }
+  const table = Math.abs(a) / 2;
+  const above = Math.max(0, Math.min(q[0].y, q[1].y));   // rows wholly above the far edge
+  return { share: +(1 - table / (W * H)).toFixed(3), rowsAboveFarEdge: +above.toFixed(1) };
+}
+
+/**
+ * The ladder camera for an era: keep its tilt and lens as near as they will go
+ * (tilt within 4 degrees, fov within 6), pull back until both players are whole,
+ * and among the cameras that pass R3 in every pose take the one with the biggest
+ * table, set as low on the picture as the players' feet and the near edge allow
+ * so the arena gets the rows above. Null when none passes.
+ */
+function solvePlayers(e) {
+  const b = Object.assign({ top: 64, bottom: 592 }, e.bounds || {});
+  let best = null;
+  const reach = e.reach || { tilt: 4, fov: 6 };
+  for (let tilt = e.tilt - reach.tilt; tilt <= e.tilt + reach.tilt; tilt += 1) {
+    for (let fov = Math.max(12, e.fov - reach.fov); fov <= e.fov + reach.fov; fov += 0.5) {
+      for (let height = 800; height <= 4000; height += 25) {
+        // the lowest placement that keeps the players' feet and the near edge inside
+        const probe = camera({ tilt, height, fov, screenY: H / 2 });
+        const low = Math.max(project(probe, 0, H).y, players({ tilt, height, fov, screenY: H / 2 }, b).bottom);
+        // lifted a few pixels at a time, so a camera that drifts keeps every pose inside
+        let found = null;
+        for (let lift = 0; lift <= 40 && !found; lift += 2) {
+          const screenY = Math.floor(H / 2 + (b.bottom - low)) - lift;
+          const spec = rebase(e, { tilt, height, fov, screenY });
+          const all = poses(spec);
+          if (all.every((p) => readable(measure(p, b))) && all.every((p) => players(p, b).whole)) found = screenY;
+        }
+        if (found === null) continue;
+        const m = measure(rebase(e, { tilt, height, fov, screenY: found }), b);
+        const score = m.nearRightX - m.nearLeftX;
+        if (!best || score > best.score) best = { tilt, height, fov, screenY: found, score };
+        break;    // the first height that holds them is the biggest table at this tilt and lens
+      }
+    }
+  }
+  return best && { tilt: best.tilt, height: best.height, fov: best.fov, screenY: best.screenY };
+}
+
 // The six eras' cameras exactly as docs/ERAS.md gives them. `motion` lists the
 // extremes of anything that moves the camera during play or the arrival
 // flourish; every one of them must pass R3 too.
@@ -90,6 +186,20 @@ function poses(e) {
   return [e].concat((e.motion || []).map((m) => Object.assign({}, e, m)));
 }
 
+/**
+ * An era moved to a new rest pose, its motion carried along: every motion
+ * extreme keeps its offset from the rest pose (the era files add their wobble,
+ * drift and flourish to the camera they are given), so the extremes move with it.
+ */
+function rebase(e, rest) {
+  const motion = (e.motion || []).map((m) => {
+    const o = {};
+    for (const k of Object.keys(m)) o[k] = k === 'panX' ? m[k] : rest[k] + (m[k] - e[k]);
+    return o;
+  });
+  return Object.assign({}, e, rest, { motion });
+}
+
 /** The smallest fov (largest table) whose table fits the bounds, centred between them. */
 function fit(e) {
   const b = Object.assign({ top: 64, bottom: 592 }, e.bounds || {});
@@ -106,6 +216,16 @@ function fit(e) {
 if (require.main === module) {
   if (process.argv.includes('--fit')) {
     for (const e of ERAS) console.log(`${e.era} ${e.name}: ${JSON.stringify(fit(e))}`);
+    process.exit(0);
+  }
+  if (process.argv.includes('--players')) {
+    for (const e of ERAS) {
+      const s = solvePlayers(e);
+      const before = { p: players(e), a: arenaShare(e) };
+      const after = s && rebase(e, s);
+      console.log(`${e.era} ${e.name}: ${JSON.stringify(s)}\n   before ${JSON.stringify(before)}` +
+        (after ? `\n   after  ${JSON.stringify({ p: players(after), a: arenaShare(after), m: measure(after) })}` : ''));
+    }
     process.exit(0);
   }
   // 1. tilt 0 with focal = height is today's flat 2D frame, to the unit.
@@ -134,4 +254,5 @@ if (require.main === module) {
   }
 }
 
-module.exports = { camera, project, measure, readable, poses, fit, ERAS, W, H };
+module.exports = { camera, project, measure, readable, poses, fit, ERAS, W, H,
+  PLAYER, playerBox, players, arenaShare, solvePlayers, rebase };
