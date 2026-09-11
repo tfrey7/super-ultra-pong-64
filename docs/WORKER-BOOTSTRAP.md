@@ -244,9 +244,9 @@ his emulator — never touch either.**
 - **A test that pins "era N has no flourish" goes stale when a sibling card gives it one.** Item
   1161 had to rewrite era 3's shatter test after era 2 grew a flourish; pin that the effect is your
   era's own hook, not that the others have none.
-- **The first ring on a cold page has one long frame** (about 110-120 ms at raw progress 0.006).
-  It is the ring engine's (item 1164), not your flourish's: item 1140 proved it by A/B with its
-  flourish removed. Do not chase it in an era file.
+- **The first ring on a cold page used to have one long frame** (about 100-120 ms). It was the
+  ring engine's, not a flourish's (item 1140 proved it by A/B), and item 1203 removed it; section
+  8a says why, and what to reach for if a long frame comes back.
 - **Start Chrome only through `tools/chrome.mjs`, never with a hand-built `--user-data-dir`.** A
   capture script that spawns Chrome itself leaves its profile behind -- about 18 MB a run, and on
   2026-09-10 the flourish cards' scripts left more than forty such folders in `G:/claude-tmp` (item
@@ -355,6 +355,25 @@ his emulator — never touch either.**
 
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
+
+## 8a. A long frame can be the page's own graphics work (item 1219)
+
+What the player saw: at the first era change on a freshly opened page, the paddle froze for one
+frame, about 100 ms, as the ring began. Item 1164 found only 2-3 ms of page JavaScript in that
+frame, called it browser time no page code could remove, and handed back blocked. It was the
+page's all the same: **Chrome's graphics process compiles a shader the first time a fill, gradient
+or shape is actually drawn to the screen, and the compile lands in the frame that first draws it.**
+Item 1203 traced 100-117 ms of shader compiles there, for era looks nothing had drawn yet.
+
+- **A warm-up helps only if it draws the exact looks the game will draw later**, on the page's own
+  canvas. 1164's drew the title's dimmed stand-ins and prevented nothing; 1203's draws every rung's
+  real look (`warmUp` in `src/erachange.js`) and the stall was gone on 14 of 14 cold legs.
+- **Trace before you change any code**: `node docs/measure/item-1203/trace.mjs --label <name>
+  --port <n>`, copied into your own `docs/measure/` folder first, since it writes beside itself.
+  Every leg is a fresh profile on the next port up from `--port`, so pick a range nobody holds.
+  `--timing` times the ring with no trace (tracing slows every frame), `--from-load` records from
+  before the page loads (the warm-up's own work), and `--skia` names each GPU program built.
+- **Commit one or two representative traces, not one per leg**: each is 1-2 MB gzipped.
 
 ## 9. Talk in the room as you go (item 1170)
 
