@@ -97,10 +97,29 @@ const RENDER = `(async () => {
     const game = { phase: 'playing', era: 0, rally: 0, score: { left: 0, right: 0 },
                    rules: { matchPoints: 11 }, events: [], time: 0 };
     const switches = [], checks = [], marks = [];
-    let lastEra = null, openAtSwitch = 0;
+    let lastEra = null, openThanks = null;
     const open = () => sources.filter((r) => r.stopAt === null).length;
-    function tick() {
-      now += TICK; game.time += TICK;
+    const tOver = 11 * SEG, tTitle = tOver + ANN + 10 * STEP + THANKS;
+    // The render is paused every tick and the game moved on in step with it: an
+    // offline render plays the finished graph, so booking the whole match first
+    // would render every retired arrangement already unplugged (all silence).
+    function plan(t) {
+      if (t <= tOver + 1e-9) {
+        const e = Math.min(10, Math.floor((t - 1e-6) / SEG)), t0 = e * SEG;
+        if (game.era !== e || !marks.length) marks.push({ what: 'era ' + e, t });
+        game.era = e; game.score.left = Math.ceil(e / 2); game.score.right = Math.floor(e / 2);
+        game.rally = Math.min(12, Math.floor((t - t0) / 0.45));
+      } else if (t <= tTitle + 1e-9) {
+        if (game.phase !== 'over') { game.phase = 'over'; game.overAt = game.time; game.winner = 'left'; marks.push({ what: 'over', t }); }
+        game.era = PM.timeline(game.time - game.overAt, 10).era;
+      } else if (game.phase !== 'title') {
+        openThanks = open();
+        game.phase = 'title'; marks.push({ what: 'title', t });
+      }
+    }
+    function tick(t) {
+      now = t; game.time += TICK;
+      plan(t);
       const before = sources.length;
       music.update(game);
       if (music.era !== lastEra) {
@@ -110,36 +129,22 @@ const RENDER = `(async () => {
                         step: music.lastSwitch && music.lastSwitch.step, drones: mine, phase: game.phase });
         lastEra = music.era;
       }
+      // 1.7 s into each rung: the last fade has been let go of
+      if (t <= tOver && Math.abs(((t - 0.05) % SEG) - 1.7) < TICK / 2) checks.push({ t, era: game.era, open: open(), released: music.released, crossfades: music.crossfades, intensity: music.intensityNow });
+      if (t <= tOver && Math.abs((t % SEG) - (SEG - TICK)) < TICK / 2) marks.push({ what: 'era ' + game.era + ' end', t, intensity: music.intensityNow, rally: game.rally });
     }
-    // the eleven rungs
-    for (let e = 0; e <= 10; e++) {
-      const t0 = now;
-      game.era = e; game.score.left = Math.ceil(e / 2); game.score.right = Math.floor(e / 2);
-      marks.push({ what: 'era ' + e, t: now });
-      while (now < t0 + SEG - 1e-9) {
-        game.rally = Math.min(12, Math.floor((now - t0) / 0.45));
-        tick();
-        if (Math.abs(now - (t0 + 1.7)) < TICK / 2) checks.push({ t: now, era: e, open: open(), released: music.released, crossfades: music.crossfades });
-      }
-      marks.push({ what: 'era ' + e + ' end', t: now, intensity: music.intensityNow, rally: game.rally });
+    const Q = 128 / SR;
+    const N = Math.floor(TOTAL / TICK);
+    let lastQ = -1;
+    for (let k = 1; k <= N; k++) {
+      let q = Math.round(k * TICK / Q);
+      if (q <= lastQ) q = lastQ + 1;
+      lastQ = q;
+      const t = q * Q;
+      off.suspend(t).then(() => { try { tick(t); } finally { off.resume(); } });
     }
-    // the eleventh point: the finale on the real timeline
-    game.phase = 'over'; game.overAt = game.time; game.winner = 'left';
-    const tOver = now;
-    marks.push({ what: 'over', t: now });
-    while (now < tOver + ANN + 10 * STEP + THANKS - 1e-9) {
-      const f = PM.timeline(game.time - game.overAt, 10);
-      game.era = f.era;
-      tick();
-    }
-    const openThanks = open();
-    game.phase = 'title';
-    marks.push({ what: 'title', t: now });
-    const tTitle = now;
-    while (now < tTitle + TAIL - 1e-9) tick();
-    checks.push({ t: now, era: 'title', open: open(), released: music.released, crossfades: music.crossfades });
-
     const buf = await off.startRendering();
+    checks.push({ t: now, era: 'title', open: open(), released: music.released, crossfades: music.crossfades });
     // loudness in a window: RMS (dBFS) and peak of the output (0-1) and of the input to the limiter (2-3)
     function win(a, b) {
       const i0 = Math.max(0, Math.floor(a * SR)), i1 = Math.min(buf.length, Math.floor(b * SR));
