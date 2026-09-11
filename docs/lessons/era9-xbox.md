@@ -1,0 +1,92 @@
+# Era 9: 2001 Xbox, hard, shiny, metal and green
+
+Open it: `index.html?era=9`. Reference frame: [era9-xbox.png](../shots/eras/era9-xbox.png).
+Look file: [src/eras/era9-xbox.js](../../src/eras/era9-xbox.js). Chapter 10 of [docs/ERAS.md](../ERAS.md).
+
+## THE MACHINE
+
+- **The real hardware:** the first console with programmable pixel shaders, and it showed them off.
+- **Native resolution here:** 640 x 480, scaled up soft.
+- **Palette:** green on black and gunmetal (`C` in the era file: black `#050605`, gunmetal
+  `#2a2f2b`, steel `#5b635d`).
+- **Camera:** tilt 27 degrees, height 1000, field of view 35, screen y 303, still.
+- **Texture:** a 64 x 64 diamond-plate tile built once from paths, plus the pixellab tread plate
+  (`court-metal`) laid over the court and the paddles in `overlay` blend.
+- **The light:** it is the ball. It rides 160 units over the ball, a little ahead of it.
+- **Sound:** a PC sound chip in a box, streaming real recordings.
+- **Screen:** component, `tv-vga` at strength 0.85.
+
+## WHAT SOLD THE LOOK
+
+1. **Bump-mapped diamond plate.** Each lozenge is embossed dark, light and face. The plate is laid
+   over the table in 12 depth strips, each lit in a hard band by how near it is to the moving
+   light. A specular pool under the light has a highlight-only tile clipped to it, so the emboss
+   lights up where the light is.
+2. **Hard dynamic shadows.** Each paddle's box and the ball are cast onto the table as flat black
+   shapes at 0.45 opacity: lighter than the ball's true contact shadow, so the eye still reads the
+   real position (law R5).
+3. **Green on black**: green rail tops with glow lines, and paddles edged in green glow (the era's
+   only `shadowBlur`).
+4. **Gamertags floating over both paddles**, and a Halo-style segmented shield bar as the score,
+   which flashes alarm red when its side concedes and then recharges. From the Xbox on, the
+   opponent taunts through its gamertag on a point it wins, from a short fixed list
+   (`src/opponents.js`).
+5. **The arrival: the green sphere expands and the shadows snap on** (item 1155), with tendrils,
+   and the gamertags fading in.
+
+## WHAT DID NOT WORK
+
+- **The first shadows were too faint** (item 1149). The run looked at its own first picture,
+  lowered the light and re-shot. It moved the light to 160 up where the bible said 520, and the
+  bible was not updated at the time. Even after the change, the ball's hard shadow is hard to find
+  in a still.
+- **Sixteen minutes with no commit** (item 1155's first attempt). The account's rate limit ended
+  it at 21:19 with no plan, step or checkpoint on the card. The second run found the draft still
+  uncommitted in the folder, saved it, noticed it had never been hooked into the era, and finished
+  in 4 minutes. It survived only because nothing had cleaned the folder. The lesson is about the
+  run rather than the look: commit early.
+- **Slow in software Chrome:** 26.3 ms a frame, 32.8 ms with the screen on (items 1192, 1200;
+  card 1216 still running).
+
+## SOUND AND MUSIC
+
+- **Effect voice:** sub-heavy FM metal.
+  - paddle hit: an FM sine at 180 Hz (ratio 1.41, index 3), a 45 Hz sub dropping to 35 Hz, and a
+    band-passed noise click
+  - wall: an FM clang at 620 Hz (ratio 2.76) over a 60 Hz thump
+  - point: a falling filtered sawtooth, three square alarm beeps at 880 Hz, a 40 Hz boom and a
+    rising sweep
+  - `effects: { shape: 0.3, reverb: { seconds: 1.4, decay: 2, mix: 0.3 } }`. The `shape` is a
+    WaveShaper drive on the era's bus, for grit.
+- **Boot sting, the sphere thrum:** a pulsing 45 Hz sub (an `lfo` at 6 Hz, depth 0.6), a filtered
+  unison sawtooth rising, a band-passed whoosh sweeping 400 to 3000 Hz, and a power-up chime at
+  1320 and 1980 Hz. It played once for the point in item 1155's browser check.
+- **Music** (`ARRANGEMENTS[9]`, item 1210): *drop-tuned rock*.
+  - low palm-muted power-chord chugs double-tracked hard left and right
+  - the melody screamed out on an overdriven lead guitar, and a growling bass an octave down
+  - a heavy kick, and a cracking snare rolling into each new section
+  - the chip rule is *a guitar amp in software*: a sawtooth through a heavy `drive`, the `power`
+    chord voicing, wide stereo
+  - a short, dry reverb (1 s, mix 0.12)
+
+## REUSABLE PIECES
+
+| Piece | File | For an Xbox game |
+| --- | --- | --- |
+| Look | `src/eras/era9-xbox.js` | The plate tile, strip lighting, projected shadows, green glow, gamertags, shield bar. |
+| 3D table | `src/table3d.js` | `T.quad` for projected shadow shapes; the texture overlay on court and faces. |
+| Textures | `src/textures3d.js` | `court-metal`. |
+| Taunts | `src/opponents.js` | Clean by construction: a fixed list, nothing generated. |
+| Voice and music | the era file's `voice`, `src/music.js` row 9 | FM metal, `shape`, and the rock arrangement's `drive` and `power` chords. |
+
+## START HERE
+
+1. Open `index.html?era=9`.
+2. Copy the 3D skeleton from [era5-playstation.md](era5-playstation.md), with
+   `src/eras/era9-xbox.js` in place of era 5's file. Keep `src/opponents.js` for the gamertag
+   taunts.
+3. Keep every extra shadow lighter than the contact shadow. It is what keeps a moving light fair.
+4. Delete the other era files, `src/display-crt.js`, `src/erachange.js`, `src/signboards.js`,
+   `src/match.js`, and `advanceEra`'s call.
+5. Look at your own screenshot before calling the light done. That is how item 1149 found its
+   faint shadows.

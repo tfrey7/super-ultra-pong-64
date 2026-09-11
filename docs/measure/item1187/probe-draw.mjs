@@ -11,7 +11,7 @@
  */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import { CdpConnection } from '../../../tools/cdp.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -20,8 +20,8 @@ const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application
 const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') + '?era=5';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const chrome = launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--window-size=1000,760',
-  '--remote-debugging-port=' + PORT, '--no-first-run', '--no-default-browser-check', url], { name: 'probe1187' });
+const chrome = await launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--window-size=1000,760',
+  '--remote-debugging-port=' + PORT, '--no-first-run', '--no-default-browser-check', url], { name: 'probe1187' }).catch(refusePortTaken);
 try {
   let wsUrl = null;
   for (let i = 0; i < 100 && !wsUrl; i++) {

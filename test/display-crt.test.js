@@ -83,6 +83,20 @@ test('an overlay pre-draws its tube once and stamps it with one multiply per fra
   });
 });
 
+test('the Genesis keeps its fringes but has no glow, so it holds full frame rate (item 1201)', () => {
+  withDocument(() => {
+    const native = { width: 320, height: 224 };
+    const log = [];
+    const rect = { x: 0, y: 0, w: 800, h: 600 };
+    assert.strictEqual(D.row(3).glow, 0, 'the Genesis row sets its own glow');
+    assert.strictEqual(D.row(2).glow, undefined, 'the NES keeps its kind\'s glow');
+    D.OVERLAYS['crt-composite'](recorder({ width: 800, height: 600 }, log), rect, D.row(3), { era: 3, time: 1, native });
+    const draws = log.filter((c) => c[0] === 'drawImage');
+    assert.strictEqual(draws.filter((c) => c[1] === 'lighter').length, 2, 'two fringes, no glow');
+    assert.strictEqual(draws.filter((c) => c[1] === 'multiply').length, 1, 'and the tube');
+  });
+});
+
 test('every kind draws without error, and no overlay draws on a picture it was not given', () => {
   withDocument(() => {
     for (const kind of Object.keys(CRT.KINDS)) {

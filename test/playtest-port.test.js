@@ -74,6 +74,77 @@ test('the playtest refuses a taken port: one line naming it, a non-zero exit, no
   assert.doesNotMatch(r.out, /PASS|FAIL/, 'checks ran against a port that was not ours');
 });
 
+// Item 1220: the refusal lives in launchChrome itself, so every script that starts Chrome
+// through it -- not only the playtest -- is refused a taken port before anything starts.
+// Node stands in for Chrome: if it were ever spawned it would write the marker file.
+const fs = require('node:fs');
+const os = require('node:os');
+const profiles = (name) => fs.readdirSync(os.tmpdir()).filter((f) => f.startsWith(`pong-chrome-${name}-`));
+
+test('launchChrome refuses a taken --remote-debugging-port, before any folder or process', async () => {
+  const { launchChrome, portTakenLine, portTakenWhy, PORT_TAKEN } = await load();
+  const { server, port } = await listener('127.0.0.1');
+  const marker = path.join(os.tmpdir(), `pong-1220-spawned-${process.pid}-${port}`);
+  const name = 'refuse1220';
+  const before = profiles(name).length;
+  try {
+    const why = await portTakenWhy(port);
+    await assert.rejects(
+      launchChrome(process.execPath, ['-e', `require('fs').writeFileSync(${JSON.stringify(marker)}, 'x')`, '--',
+        '--headless=new', '--remote-debugging-port=' + port], { name }),
+      (e) => {
+        assert.strictEqual(e.code, PORT_TAKEN);
+        assert.strictEqual(e.port, port);
+        assert.strictEqual(e.message.split('\n').length, 1, 'the refusal is not one line');
+        assert.ok(e.message.startsWith(`${name}: port ${port} is already in use`), e.message);
+        // The very line the playtest prints, with the launch's name in front.
+        assert.strictEqual(e.message, portTakenLine(port, why, name));
+        assert.strictEqual(portTakenLine(port, why, 'playtest'), portTakenLine(port, why), 'the playtest line changed');
+        return true;
+      });
+  } finally {
+    await close(server);
+  }
+  await new Promise((r) => setTimeout(r, 300));
+  assert.ok(!fs.existsSync(marker), 'the browser was started on a taken port');
+  assert.strictEqual(profiles(name).length, before, 'a profile folder was made on a taken port');
+});
+
+test('launchChrome on a free port launches as before', async () => {
+  const { launchChrome } = await load();
+  const { server, port } = await listener('127.0.0.1');
+  await close(server); // a port the OS just handed out and nobody holds now
+  const c = await launchChrome(process.execPath, ['-e', 'setTimeout(() => {}, 50)', '--',
+    '--remote-debugging-port=' + port], { name: 'free1220' });
+  assert.ok(c.pid, 'nothing was started on a free port');
+  assert.strictEqual(await c.exited, true);
+});
+
+test('a script that hangs refusePortTaken on its launch says one line and exits 2', async () => {
+  const { server, port } = await listener('127.0.0.1');
+  const code = `import { launchChrome, refusePortTaken } from ${JSON.stringify(HELPER)};
+    const c = await launchChrome(process.execPath, ['-e', '', '--', '--remote-debugging-port=${port}'], { name: 'script1220' })
+      .catch(refusePortTaken);
+    console.log('launched', c.pid);`;
+  let r;
+  try {
+    r = await new Promise((resolve) => {
+      const child = spawn(process.execPath, ['--input-type=module', '-e', code], { windowsHide: true });
+      let out = '', err = '';
+      child.stdout.on('data', (d) => { out += d; });
+      child.stderr.on('data', (d) => { err += d; });
+      child.on('close', (status) => resolve({ status, out, err }));
+    });
+  } finally {
+    await close(server);
+  }
+  assert.strictEqual(r.status, 2, r.err);
+  assert.strictEqual(r.out, '', 'the script carried on past a refused launch');
+  const lines = r.err.trim().split(/\r?\n/);
+  assert.strictEqual(lines.length, 1, 'expected one line, got: ' + r.err);
+  assert.match(lines[0], new RegExp(`^script1220: port ${port} is already in use.*--port`));
+});
+
 test('pickOwnPage attaches only to this checkout\'s index.html', async () => {
   const { pickOwnPage } = await load();
   const asked = 'file:///G:/Claude Stuff/super-ultra-pong-64-item-1181/index.html?era=3&title=on';

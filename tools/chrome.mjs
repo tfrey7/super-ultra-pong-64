@@ -3,9 +3,9 @@
  * of its own, made fresh under the temp directory, and deleted when Chrome
  * exits -- when the script finishes, when it throws, and on Ctrl+C.
  *
- *   import { launchChrome } from '../tools/chrome.mjs';
- *   const chrome = launchChrome(CHROME, ['--headless=new', '--remote-debugging-port=' + PORT, url],
- *     { name: 'playtest' });
+ *   import { launchChrome, refusePortTaken } from '../tools/chrome.mjs';
+ *   const chrome = await launchChrome(CHROME, ['--headless=new', '--remote-debugging-port=' + PORT, url],
+ *     { name: 'playtest' }).catch(refusePortTaken);
  *   try { ...drive it over the DevTools port... } finally { await chrome.close(); }
  *
  * The caller's flags go to Chrome exactly as given; the helper adds only
@@ -55,10 +55,34 @@ export function portTakenWhy(port, { host = '127.0.0.1', connectMs = 400 } = {})
   return listens().then(async (why) => why || await answers());
 }
 
-/** The one line a harness prints when its port is taken; it names the port and the way out. */
-export function portTakenLine(port, why) {
-  return `playtest: port ${port} is already in use by another program (probably another worker's Chrome` +
+/**
+ * The one line a harness prints when its port is taken; it names the port and the way out.
+ * `who` leads it -- the launch's name, so the playtest's line reads exactly as it always has.
+ */
+export function portTakenLine(port, why, who = 'playtest') {
+  return `${who}: port ${port} is already in use by another program (probably another worker's Chrome` +
     `${why ? '; ' + why : ''}); pick another with --port <n> -- nothing was launched`;
+}
+
+/** The code on launchChrome's refusal of a taken port (item 1220). */
+export const PORT_TAKEN = 'EPORTTAKEN';
+
+/** The --remote-debugging-port=N a launch asks for, or 0 when it asks for none (or for any: 0). */
+export function debuggingPort(args) {
+  const flag = (args || []).map(String).find((a) => a.startsWith('--remote-debugging-port='));
+  const port = flag ? Number(flag.slice('--remote-debugging-port='.length)) : 0;
+  return Number.isInteger(port) && port > 0 ? port : 0;
+}
+
+/**
+ * The catch a script hangs on its launch: `await launchChrome(...).catch(refusePortTaken)`.
+ * A taken port prints its one line and ends the script with exit code 2, having started
+ * nothing; any other error is thrown on as before.
+ */
+export function refusePortTaken(e) {
+  if (!e || e.code !== PORT_TAKEN) throw e;
+  process.stderr.write(e.message + '\n');
+  process.exit(2);
 }
 
 /** A URL compared as a file: no query, no hash, percent-decoded, and case-blind on Windows. */
@@ -151,16 +175,31 @@ function installHooks() {
 }
 
 /**
- * Start Chrome on a fresh profile folder. Returns { child, pid, profile, exited, close, closeSync }:
+ * Start Chrome on a fresh profile folder. Resolves { child, pid, profile, exited, close, closeSync }:
  * `exited` resolves once Chrome has ended and its folder has been deleted (true if the delete
  * worked), `close()` stops Chrome and waits for that, `closeSync()` does both without the event
  * loop. Nothing needs calling for the folder to go -- Chrome ending on its own deletes it, and so
  * does the script ending -- but `await chrome.close()` in a `finally` is the tidy shape.
+ *
+ * It is async because it checks the debugging port first (item 1220): when the flags carry
+ * --remote-debugging-port=N and N is already listening, it rejects with an error whose `code` is
+ * PORT_TAKEN and whose message is portTakenLine's one line, before any folder is made or any
+ * process started -- a Chrome that cannot bind N runs on without it, and whatever answers on N
+ * afterwards is somebody else's browser. Hang `.catch(refusePortTaken)` on the launch to print
+ * that line and stop.
  */
-export function launchChrome(executable, args = [], { name = 'chrome', spawnOptions = {} } = {}) {
+export async function launchChrome(executable, args = [], { name = 'chrome', spawnOptions = {} } = {}) {
   if (!executable) throw new Error('No Chrome found; pass the path to chrome.exe');
   if (args.some((a) => String(a).startsWith('--user-data-dir'))) {
     throw new Error('launchChrome makes the profile folder itself; do not pass --user-data-dir');
+  }
+  const port = debuggingPort(args);
+  const taken = port ? await portTakenWhy(port) : '';
+  if (taken) {
+    const e = new Error(portTakenLine(port, taken, name));
+    e.code = PORT_TAKEN;
+    e.port = port;
+    throw e;
   }
   installHooks();
   const profile = mkdtempSync(path.join(os.tmpdir(), `pong-chrome-${name}-`));

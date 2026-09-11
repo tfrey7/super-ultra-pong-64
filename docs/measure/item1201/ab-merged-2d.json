@@ -1,0 +1,158 @@
+{
+ "taken": "2026-09-11T03:09:06.468Z",
+ "tweak": "",
+ "rows": [
+  {
+   "setup": "harness",
+   "gpu": false,
+   "overlay": "crt-mono",
+   "era": 0,
+   "native": "200x120",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "ring": {
+    "frames": 82,
+    "total": 1449.9,
+    "mean": 17.68,
+    "p95": 33.2,
+    "max": 33.4
+   }
+  },
+  {
+   "setup": "harness",
+   "gpu": false,
+   "overlay": "crt-rf",
+   "era": 1,
+   "native": "160x192",
+   "frames": 61,
+   "total": 1016.7,
+   "mean": 16.67,
+   "p95": 16.8,
+   "max": 16.8,
+   "ring": {
+    "frames": 88,
+    "total": 1466.6,
+    "mean": 16.67,
+    "p95": 16.8,
+    "max": 16.8
+   }
+  },
+  {
+   "setup": "harness",
+   "gpu": false,
+   "overlay": "crt-composite",
+   "era": 2,
+   "native": "256x240",
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "ring": {
+    "frames": 87,
+    "total": 1450,
+    "mean": 16.67,
+    "p95": 16.7,
+    "max": 16.8
+   }
+  },
+  {
+   "setup": "harness",
+   "gpu": false,
+   "overlay": "crt-composite",
+   "era": 3,
+   "native": "320x224",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "ring": {
+    "frames": 87,
+    "total": 1449.9,
+    "mean": 16.67,
+    "p95": 16.7,
+    "max": 16.8
+   }
+  },
+  {
+   "setup": "harness-off",
+   "gpu": false,
+   "overlay": "none",
+   "era": 0,
+   "native": "200x120",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.8,
+   "max": 16.8,
+   "ring": {
+    "frames": 87,
+    "total": 1450,
+    "mean": 16.67,
+    "p95": 16.7,
+    "max": 16.8
+   }
+  },
+  {
+   "setup": "harness-off",
+   "gpu": false,
+   "overlay": "none",
+   "era": 1,
+   "native": "160x192",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.8,
+   "max": 16.8,
+   "ring": {
+    "frames": 88,
+    "total": 1466.6,
+    "mean": 16.67,
+    "p95": 16.8,
+    "max": 16.8
+   }
+  },
+  {
+   "setup": "harness-off",
+   "gpu": false,
+   "overlay": "none",
+   "era": 2,
+   "native": "256x240",
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "ring": {
+    "frames": 88,
+    "total": 1466.5,
+    "mean": 16.66,
+    "p95": 16.8,
+    "max": 16.8
+   }
+  },
+  {
+   "setup": "harness-off",
+   "gpu": false,
+   "overlay": "none",
+   "era": 3,
+   "native": "320x224",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "ring": {
+    "frames": 87,
+    "total": 1450,
+    "mean": 16.67,
+    "p95": 16.7,
+    "max": 16.8
+   }
+  }
+ ]
+}
