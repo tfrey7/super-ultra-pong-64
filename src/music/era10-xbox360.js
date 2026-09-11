@@ -32,7 +32,7 @@
     clap: { wave: 'noise', gain: 0.12, bursts: 3, env: { a: 0.001, d: 0.14, s: 0, r: 0.02 }, filter: { type: 'bandpass', freq: 1300, q: 1 } },
     crash: { wave: 'noise', gain: 0.07, env: { a: 0.001, d: 1.6, s: 0, r: 0.02 }, filter: { type: 'highpass', freq: 4500, q: 0.5 } },
     tom: { wave: 'sine', freq: 105, gain: 0.3, env: { a: 0.001, d: 0.35, s: 0, r: 0.03 }, drop: { ratio: 0.55, time: 0.25 } },
-    taiko: [{ wave: 'sine', freq: 55, gain: 0.5, env: { a: 0.001, d: 0.9, s: 0, r: 0.03 }, drop: { ratio: 0.5, time: 0.3 } }, { wave: 'noise', gain: 0.1, env: { a: 0.001, d: 0.1, s: 0, r: 0.02 }, filter: { type: 'lowpass', freq: 350, q: 0.8 } }]
+    taiko: [{ wave: 'sine', freq: 55, gain: 0.25, env: { a: 0.001, d: 0.9, s: 0, r: 0.03 }, drop: { ratio: 0.5, time: 0.3 } }, { wave: 'noise', gain: 0.05, env: { a: 0.001, d: 0.1, s: 0, r: 0.02 }, filter: { type: 'lowpass', freq: 350, q: 0.8 } }]
   },
   chain: { hall: { seconds: 3.5, decay: 2.5, mix: 0.15 } },
 
@@ -56,7 +56,7 @@
   parts: [
     // ---------------------------------------------------------- the intro
     { play: 'melody', rule: 'arp', speed: 1, shape: [0, 12, 7, 12],
-      voice: { wave: 'sawtooth', gain: 0.045, unison: [8], spread: 0.5,
+      voice: { wave: 'sawtooth', gain: 0.07, unison: [8], spread: 0.5,
                env: { a: 0.001, d: 0.12, s: 0.25, r: 0.05 }, legato: 0.85,
                filter: { type: 'lowpass', freq: 3000, q: 3, sweep: { to: 900, time: 0.1 } } } },
     // The string ostinato: the chord's notes an octave down, in sixteenths.
@@ -64,7 +64,7 @@
       voice: { wave: 'sawtooth', gain: 0.04, env: { a: 0.003, d: 0.08, s: 0.4, r: 0.04 }, legato: 0.75,
                filter: { type: 'lowpass', freq: 1800, q: 1.2 } } },
     { play: 'bass', rule: 'held', octave: -1,
-      voice: { wave: 'sine', gain: 0.1, pump: 0.6, env: { a: 0.005, d: 0.1, s: 0.9, r: 0.05 }, legato: 0.97 } },
+      voice: { wave: 'sine', gain: 0.16, pump: 0.6, env: { a: 0.005, d: 0.1, s: 0.9, r: 0.05 }, legato: 0.97 } },
     { play: 'drum', from: 0.3, pattern: 'X . . . X . . . X . . . X . . .',
       voice: { wave: 'kick', freq: 165, gain: 0.6, env: { a: 0.001, d: 0.3, s: 0, r: 0.03 } } },
     { play: 'drum', hit: 'hat', pattern: '. . x . . . x . . . x . . . x .' },

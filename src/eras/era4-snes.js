@@ -530,6 +530,118 @@
     ctx.stroke();
   }
 
+  // ------------------------ the table in perspective (item 1267, realism rung 4)
+  // The realism ladder (docs/ART.md sections 7 and 8): the whole table top is
+  // tilted back in play, Mode 7 style, over the landed floor. The far side edge
+  // (the top wall, y 0) is TABLE.far of the near one's width (y 600), and every
+  // field point is drawn at sx(x, y) = 400 + (x - 400) * s(y), where s runs in
+  // perspective from TABLE.far at the far edge to 1 at the near. Heights are
+  // left where the rules have them, so the pointer still reaches the same
+  // field y and every layer drawn in field units (the feel layer, the ring)
+  // still lands on the right row; only the widths narrow into the distance.
+  // The bats are rung 3's -- rubber in the earned ink on the net side, a wood
+  // line, black rubber behind, a handle -- and they, the ball and the shadows
+  // are all drawn through the same projection. Play is untouched: the rules
+  // still hit-test the flat rectangles.
+  var TABLE = {
+    left: 32, right: 768, far: 0.9,
+    topFar: '#18307a', topNear: '#2860c8',        // colour math: the top brightens toward you
+    haze: 'rgba(245, 154, 92, 0.32)', hazeDepth: 170,
+    line: '#e8e8d8', edge: 6, centre: 3,
+    net: { w: 8, post: 10, ink: '#c8c8d0', mesh: '#707088', shadow: 'rgba(0, 0, 0, 0.35)', drop: 7 },
+    bat: { black: '#202020', wood: '#b07840', woodShade: '#704820', outer: 5, woodW: 2, handle: 12.5, handleH: 6 }
+  };
+
+  /** How much of its flat width a field row keeps on screen: TABLE.far at y 0, 1 at the bottom. Pure. */
+  function rowScale(y, H) {
+    var u = 1 - Math.max(0, Math.min(1, y / (H || 600)));      // 1 at the far edge, 0 at the near
+    return 1 / (1 + (1 / TABLE.far - 1) * u);
+  }
+
+  /** A field point's screen x on the tilted table (its y is unchanged). Pure. */
+  function project(x, y, W, H) {
+    var cx = (W || 800) / 2;
+    return cx + (x - cx) * rowScale(y, H);
+  }
+
+  /** Adds a field rectangle to the path as the quad it becomes on the tilted table. */
+  function quadPath(ctx, x, y, w, h, W, H) {
+    ctx.moveTo(project(x, y, W, H), y);
+    ctx.lineTo(project(x + w, y, W, H), y);
+    ctx.lineTo(project(x + w, y + h, W, H), y + h);
+    ctx.lineTo(project(x, y + h, W, H), y + h);
+    ctx.closePath();
+  }
+
+  function fillQuad(ctx, ink, x, y, w, h, W, H) {
+    ctx.beginPath();
+    quadPath(ctx, x, y, w, h, W, H);
+    ctx.fillStyle = ink;
+    ctx.fill();
+  }
+
+  /** The tilted top, its haze, its edge and centre lines, and the net with its shadow. */
+  function drawTable(ctx, state) {
+    var T = TABLE, W = state.width, H = state.height, e = T.edge, N = T.net;
+    var top = ctx.createLinearGradient(0, 0, 0, H);
+    top.addColorStop(0, T.topFar);
+    top.addColorStop(1, T.topNear);
+    fillQuad(ctx, top, T.left, 0, T.right - T.left, H, W, H);
+    // The far end sinks into the dusk, as the floor's far rows do.
+    var haze = ctx.createLinearGradient(0, 0, 0, T.hazeDepth);
+    haze.addColorStop(0, T.haze);
+    haze.addColorStop(1, 'rgba(245, 154, 92, 0)');
+    fillQuad(ctx, haze, T.left, 0, T.right - T.left, T.hazeDepth, W, H);
+    // Edge lines round all four edges and the centre line, one path, one fill.
+    ctx.beginPath();
+    quadPath(ctx, T.left - e, 0, T.right - T.left + 2 * e, e, W, H);
+    quadPath(ctx, T.left - e, H - e, T.right - T.left + 2 * e, e, W, H);
+    quadPath(ctx, T.left - e, 0, e, H, W, H);
+    quadPath(ctx, T.right, 0, e, H, W, H);
+    quadPath(ctx, T.left, 300 - T.centre / 2, T.right - T.left, T.centre, W, H);
+    ctx.fillStyle = T.line;
+    ctx.fill();
+    // The net: its shadow on the top, the band, a mesh line, the posts on each side edge.
+    var nx = W / 2 - N.w / 2;
+    fillQuad(ctx, N.shadow, nx + N.drop, 0, N.w, H, W, H);
+    fillQuad(ctx, N.ink, nx, 0, N.w, H, W, H);
+    fillQuad(ctx, N.mesh, nx + 3, 0, 2, H, W, H);
+    ctx.beginPath();
+    quadPath(ctx, W / 2 - N.post / 2, 0, N.post, N.post, W, H);
+    quadPath(ctx, W / 2 - N.post / 2, H - N.post, N.post, N.post, W, H);
+    ctx.fillStyle = '#404050';
+    ctx.fill();
+  }
+
+  /**
+   * A bat on the tilted table: rung 3's two rubbers and wood line, and a handle
+   * off the outer face's middle. The handle reaches out to the flat outer face,
+   * where the rig still puts the pilot's glove (src/characters.js places the
+   * players in flat field units), so the glove holds it at every height.
+   */
+  function drawBat(ctx, p, ink, side, W, H) {
+    var B = TABLE.bat, left = side !== 'right';
+    var mid = p.y + p.h / 2;
+    var s = rowScale(mid, H);
+    var hy = mid - B.handleH / 2;
+    var face = left ? p.x : p.x + p.w;
+    var faceScreen = project(face, mid, W, H);
+    var reach = left ? Math.min(faceScreen - B.handle * s, face - 4) : Math.max(faceScreen + B.handle * s, face + 4);
+    ctx.fillStyle = B.wood;
+    ctx.fillRect(Math.min(faceScreen, reach), hy, Math.abs(faceScreen - reach), B.handleH);
+    ctx.fillStyle = B.woodShade;
+    ctx.fillRect(Math.min(faceScreen, reach), hy + B.handleH - 2, Math.abs(faceScreen - reach), 2);
+    var innerW = p.w - B.outer - B.woodW;
+    var ix = left ? p.x + B.outer + B.woodW : p.x;
+    var wx = left ? p.x + B.outer : p.x + innerW;
+    var bx = left ? p.x : p.x + innerW + B.woodW;
+    fillQuad(ctx, ink, ix, p.y, innerW, p.h, W, H);
+    fillQuad(ctx, shade(ink, 0.35), ix, p.y, innerW, 4, W, H);          // the lit top edge
+    fillQuad(ctx, shade(ink, -0.4), ix, p.y + p.h - 4, innerW, 4, W, H); // the shadowed foot
+    fillQuad(ctx, B.wood, wx, p.y, B.woodW, p.h, W, H);
+    fillQuad(ctx, B.black, bx, p.y, B.outer, p.h, W, H);
+  }
+
   // The scoreboard as F-Zero's (item 1227): two see-through boxes, 40 x 16
   // Super Nintendo pixels each, a helmet icon beside each, and under each a
   // power bar 32 x 3 that fills 4 of its pixels a paddle hit and flashes full.
@@ -834,18 +946,31 @@
     drawFloor(ctx, state);
     drawPylons(ctx, state);
 
+    drawTable(ctx, state);
+
+    // Everything on the table is drawn through the tilt (rung 4): the shadows,
+    // the bats and the ball at their projected x, narrowed by their row's scale.
+    var W = state.width, H = state.height;
     var ballShown = state.serveDelay <= 0;
     var l = state.left, rt = state.right, b = state.ball;
-    drawShadow(ctx, l.x + l.w / 2 + SHADOW_DX, l.y + l.h / 2 + SHADOW_DY, l.w * 1.1, l.h * 0.58, 0.55);
-    drawShadow(ctx, rt.x + rt.w / 2 + SHADOW_DX, rt.y + rt.h / 2 + SHADOW_DY, rt.w * 1.1, rt.h * 0.58, 0.55);
+    var sl = rowScale(l.y + l.h / 2, H), sr = rowScale(rt.y + rt.h / 2, H);
+    drawShadow(ctx, project(l.x + l.w / 2 + SHADOW_DX, l.y + l.h / 2, W, H), l.y + l.h / 2 + SHADOW_DY,
+               l.w * 1.1 * sl, l.h * 0.58, 0.55);
+    drawShadow(ctx, project(rt.x + rt.w / 2 + SHADOW_DX, rt.y + rt.h / 2, W, H), rt.y + rt.h / 2 + SHADOW_DY,
+               rt.w * 1.1 * sr, rt.h * 0.58, 0.55);
+    var bs = rowScale(b.y + b.size / 2, H);
+    var tb = {
+      x: project(b.x + b.size / 2, b.y + b.size / 2, W, H) - b.size * bs / 2, y: b.y + b.size * (1 - bs) / 2,
+      size: b.size * bs, vx: b.vx * bs, vy: b.vy
+    };
     if (ballShown) {
-      drawShadow(ctx, b.x + b.size / 2 + SHADOW_DX * 0.8, b.y + b.size / 2 + SHADOW_DY * 0.8,
-                 b.size * 0.95, b.size * 0.55, 0.5);
+      drawShadow(ctx, tb.x + tb.size / 2 + SHADOW_DX * 0.8 * bs, tb.y + tb.size / 2 + SHADOW_DY * 0.8,
+                 tb.size * 0.95, tb.size * 0.55, 0.5);
     }
 
-    drawPaddle(ctx, l, P.paddleInk(state, 'left'));
-    drawPaddle(ctx, rt, P.paddleInk(state, 'right'));
-    if (ballShown) drawBall(ctx, b);
+    drawBat(ctx, l, P.paddleInk(state, 'left'), 'left', W, H);
+    drawBat(ctx, rt, P.paddleInk(state, 'right'), 'right', W, H);
+    if (ballShown) drawBall(ctx, tb);
 
     drawPanel(ctx, state, P);
     ctx.restore();
@@ -858,6 +983,8 @@
     horizon: HORIZON,
     draw: draw,
     flourish: flourish,
+    // The in-play tilt (item 1267): the table, and the projection every piece on it is drawn through.
+    table: TABLE, rowScale: rowScale, project: project,
     // The arrival's pure parts, for the tests.
     arrival: {
       M7: M7, tiltPose: tiltPose, tiltStrips: tiltStrips,

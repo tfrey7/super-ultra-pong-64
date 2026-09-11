@@ -72,6 +72,28 @@ test('the paddles are gradient-shaded, in their own colours, with a shadow', () 
   assert.notStrictEqual(look.paddleInk(g, 'left'), look.paddleInk(g, 'right'));
 });
 
+test('realism rung 3 (item 1267): a blue table with white edge and centre lines, the net band with posts and shadow, two-rubber bats with handles', () => {
+  const g = rally();
+  const calls = drawn(g);
+  const has = (ink, x, y, w, h) => calls.some((c) => c[0] === ink && c[1] === x && c[2] === y && c[3] === w && c[4] === h);
+  assert.ok(has('#00246d', 32, 0, 736, 600), 'the blue top, its ends at the paddles\' outer faces (x 32 and 768)');
+  assert.ok(has('#dbdbdb', 26, 0, 748, 6) && has('#dbdbdb', 26, 594, 748, 6), 'white side edges, 6 wide, on the walls');
+  assert.ok(has('#dbdbdb', 26, 0, 6, 600) && has('#dbdbdb', 768, 0, 6, 600), 'white end lines just past each paddle');
+  assert.ok(has('#dbdbdb', 32, 298.5, 736, 3), 'the centre line, 3 wide on y 300, end to end');
+  assert.ok(has('#929292', 396, 0, 8, 600), 'the net: an 8-unit band across x 400');
+  assert.ok(calls.some((c) => c[0] === 'rgba(0,0,36,0.5)' && c[1] === 402 && c[3] === 8), 'with its shadow on the blue');
+  assert.ok(has('#242424', 395, 0, 10, 10) && has('#242424', 395, 590, 10, 10), 'a post 10 square on each side edge');
+  const net = calls.findIndex((c) => c[0] === '#929292' && c[1] === 396);
+  const ball = calls.findIndex((c, i) => i > net && c[0] === '#b6b6db' && c[3] === g.ball.size);
+  assert.ok(ball === -1 || ball > net, 'the net is drawn before the ball');
+  // The bats: black rubber on the player's side, a wood line, rubber in the earned ink toward the net, a handle.
+  const L = g.left, Rt = g.right;
+  assert.ok(has('#242424', L.x, L.y, 5, L.h) && has('#b66d49', L.x + 5, L.y, 2, L.h), 'left bat: black rubber outside, the wood line');
+  assert.ok(has('#242424', Rt.x + 9, Rt.y, 5, Rt.h) && has('#b66d49', Rt.x + 7, Rt.y, 2, Rt.h), 'right bat mirrored');
+  assert.ok(has('#b66d49', L.x - 10, Math.round(L.y + L.h / 2 - 3), 10, 6), 'the left handle, 10 long, off the outer face\'s middle');
+  assert.ok(has('#b66d49', Rt.x + Rt.w, Math.round(Rt.y + Rt.h / 2 - 3), 10, 6), 'the right handle');
+});
+
 test('the ball leaves a fading trail back along its flight, and none while the serve waits', () => {
   const trailOf = (g) => drawn(g).filter(([ink]) => ink.startsWith(`rgba(${look.TRAIL_INK},`));
   const g = rally();

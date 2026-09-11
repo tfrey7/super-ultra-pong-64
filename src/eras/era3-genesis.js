@@ -152,18 +152,74 @@
   }
 
   // ------------------------------------------------------------- the play
-  function drawCentreLine(ctx, state) {
-    var dash = 20;
-    var gap = 16;
-    var w = 8;
-    var x = (state.width - w) / 2;
-    for (var y = 6; y < state.height; y += dash + gap) {
-      var h = Math.min(dash, state.height - y);
-      ctx.fillStyle = '#6d6db6';
-      ctx.fillRect(x, y, w, h);
-      ctx.fillStyle = '#b6b6ff';
-      ctx.fillRect(x, y, w / 2, h);
+  // ------------------------------- the table (item 1267, realism rung 3)
+  // A drawn table tennis table seen from straight above, on the arena's stone
+  // floor: a blue top (snapped to the 512 colours) whose ends are the paddles'
+  // outer faces, x 32 and 768, so the bats stand on its ends and the players
+  // on the stone behind them; white edge lines 6 units wide round it, a centre
+  // line 3 wide along y 300, and the net across x 400 as a band with a post on
+  // each side edge and its shadow on the blue. The net replaces the dashed
+  // centre line it grew from. The arena wall and the torches stand across the
+  // table's far end, as the NES crowd does, so the landed wall is kept whole.
+  // Every piece is fillRect, drawn before the ball (R1, R2).
+  var TABLE = {
+    left: 32, right: 768,
+    top: '#00246d',              // table-tennis blue, on the palette
+    topLit: '#002492',           // the lit band down the middle of the top
+    line: '#dbdbdb',             // edge and centre lines: under the ball's #ffffff glint
+    edge: 6, centre: 3,
+    net: { w: 8, post: 10, ink: '#929292', tape: '#dbdbdb', shadow: 'rgba(0,0,36,0.5)', drop: 6 },
+    floor: '#494949', floorJoint: '#242424', floorLit: '#6d6d6d', slab: 40
+  };
+
+  /** The stone floor round the table: slabs, where the players stand. */
+  function drawFloor(ctx, state) {
+    var h = state.height, w = state.width, T = TABLE;
+    var strips = [[0, T.left - T.edge], [T.right + T.edge, w - T.right - T.edge]];
+    for (var i = 0; i < strips.length; i++) {
+      var x = strips[i][0], sw = strips[i][1];
+      ctx.fillStyle = T.floor;
+      ctx.fillRect(x, 0, sw, h);
+      ctx.fillStyle = T.floorJoint;
+      for (var y = T.slab; y < h; y += T.slab) ctx.fillRect(x, y - 2, sw, 2);
+      ctx.fillStyle = T.floorLit;
+      for (y = 0; y < h; y += T.slab) ctx.fillRect(x, y, sw, 2);
     }
+  }
+
+  /** The blue top, its edge lines and its centre line. */
+  function drawTable(ctx, state) {
+    var T = TABLE, h = state.height, e = T.edge;
+    var x0 = T.left, x1 = T.right;
+    ctx.fillStyle = T.top;
+    ctx.fillRect(x0, 0, x1 - x0, h);
+    ctx.fillStyle = T.topLit;                        // a stepped highlight, as a 16-bit artist lit a surface
+    ctx.fillRect(x0 + 80, 0, x1 - x0 - 160, h);
+    ctx.fillStyle = T.line;
+    ctx.fillRect(x0 - e, 0, x1 - x0 + 2 * e, e);      // side edges (the walls)
+    ctx.fillRect(x0 - e, h - e, x1 - x0 + 2 * e, e);
+    ctx.fillRect(x0 - e, 0, e, h);                    // the ends, just past the paddles' outer faces
+    ctx.fillRect(x1, 0, e, h);
+    ctx.fillRect(x0, 300 - T.centre / 2, x1 - x0, T.centre);   // the centre line, end to end
+  }
+
+  /** The net: a band across x 400 with its shadow on the blue and a post on each side edge. */
+  function drawNet(ctx, state) {
+    var N = TABLE.net, h = state.height, x = state.width / 2 - N.w / 2;
+    ctx.fillStyle = N.shadow;
+    ctx.fillRect(x + N.drop, 0, N.w, h);
+    ctx.fillStyle = N.ink;
+    ctx.fillRect(x, 0, N.w, h);
+    ctx.fillStyle = '#6d6d6d';                         // the mesh: a dark square every 8 units
+    for (var y = 4; y < h; y += 8) ctx.fillRect(x + 2, y, 4, 4);
+    ctx.fillStyle = N.tape;                            // the top tape along the band
+    ctx.fillRect(x, 0, 2, h);
+    ctx.fillStyle = '#242424';
+    ctx.fillRect(state.width / 2 - N.post / 2, 0, N.post, N.post);
+    ctx.fillRect(state.width / 2 - N.post / 2, h - N.post, N.post, N.post);
+    ctx.fillStyle = '#b6b6b6';
+    ctx.fillRect(state.width / 2 - N.post / 2, 0, N.post, 2);
+    ctx.fillRect(state.width / 2 - N.post / 2, h - N.post, N.post, 2);
   }
 
   /** What a paddle and its score wear: era 1's pick, snapped to the palette. */
@@ -174,20 +230,47 @@
   // Across the bar, left to right: lit edge to shadowed edge.
   var BAR_STEPS = [2, 1, 0, 0, -1, -2];
 
-  function drawShadedBar(ctx, p, ink) {
+  // A bat that reads as a bat (item 1267, realism rung 3): the bar split along
+  // its length -- the inner half rubber in the earned ink, the outer half black
+  // rubber, a wood line between them -- and a wood handle 4 native pixels long
+  // off the outer face's middle, where the rig puts the player's fist.
+  var BAT = { black: '#242424', blackLit: '#494949', wood: '#b66d49', woodShade: '#6d4924',
+              outer: 5, woodW: 2, handle: 10, handleH: 6 };
+
+  function drawShadedBar(ctx, p, ink, side) {
+    var B = BAT, left = side !== 'right';
     ctx.fillStyle = SHADOW;
     ctx.fillRect(p.x + 5, p.y + 5, p.w, p.h);
+    // the handle first, so the bat's edge covers its root
+    var hy = Math.round(p.y + p.h / 2 - B.handleH / 2);
+    var hx = left ? p.x - B.handle : p.x + p.w;
+    ctx.fillStyle = B.wood;
+    ctx.fillRect(hx, hy, B.handle, B.handleH);
+    ctx.fillStyle = B.woodShade;
+    ctx.fillRect(hx, hy + B.handleH - 2, B.handle, 2);
+    // the rubber on the net side, stepped from lit to shadowed
+    var innerW = p.w - B.outer - B.woodW;
+    var ix = left ? p.x + B.outer + B.woodW : p.x;
     var n = BAR_STEPS.length;
     for (var i = 0; i < n; i++) {
-      var x0 = p.x + Math.round(i * p.w / n);
-      var x1 = p.x + Math.round((i + 1) * p.w / n);
+      var x0 = ix + Math.round(i * innerW / n);
+      var x1 = ix + Math.round((i + 1) * innerW / n);
       ctx.fillStyle = onPalette(ink, BAR_STEPS[i]);
       ctx.fillRect(x0, p.y, x1 - x0, p.h);
     }
     ctx.fillStyle = onPalette(ink, 3);          // the top catches the light
-    ctx.fillRect(p.x, p.y, p.w, 3);
+    ctx.fillRect(ix, p.y, innerW, 3);
     ctx.fillStyle = onPalette(ink, -3);         // the bottom falls away
-    ctx.fillRect(p.x, p.y + p.h - 3, p.w, 3);
+    ctx.fillRect(ix, p.y + p.h - 3, innerW, 3);
+    // the wood line and the black rubber on the player's side
+    var wx = left ? p.x + B.outer : p.x + innerW;
+    var bx = left ? p.x : p.x + innerW + B.woodW;
+    ctx.fillStyle = B.wood;
+    ctx.fillRect(wx, p.y, B.woodW, p.h);
+    ctx.fillStyle = B.black;
+    ctx.fillRect(bx, p.y, B.outer, p.h);
+    ctx.fillStyle = B.blackLit;
+    ctx.fillRect(bx, p.y, B.outer, 3);
   }
 
   var TRAIL = 6;          // ghosts behind the ball
@@ -528,18 +611,20 @@
       drawStars(ctx, state, p.far);
       drawRidge(ctx, state, p.far, 150, 70, 0.4, '#242449', '#49496d');
     }
+    drawFloor(ctx, state);
+    drawTable(ctx, state);
+    drawNet(ctx, state);
     drawWall(ctx, state, S, p.near);
     drawTorches(ctx, state, S, p.near, m, hot);
 
-    drawCentreLine(ctx, state);
     drawPanel(ctx, state, S, hot);
     drawPortrait(ctx, state, S, 'left', m);
     drawPortrait(ctx, state, S, 'right', m);
     drawScore(ctx, state, 'left', state.width / 2 - SCORE.offset);
     drawScore(ctx, state, 'right', state.width / 2 + SCORE.offset);
 
-    drawShadedBar(ctx, state.left, paddleInk(state, 'left'));
-    drawShadedBar(ctx, state.right, paddleInk(state, 'right'));
+    drawShadedBar(ctx, state.left, paddleInk(state, 'left'), 'left');
+    drawShadedBar(ctx, state.right, paddleInk(state, 'right'), 'right');
 
     // The ball blinks out while the serve waits, as in every era.
     if (state.serveDelay <= 0) drawBall(ctx, state, S);

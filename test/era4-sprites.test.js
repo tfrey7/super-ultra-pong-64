@@ -225,30 +225,30 @@ test('with the pictures decoded, era 4 draws the sky, both paddles and the ball 
     const floor = calls.findIndex((c) => c.op === 'fill' && c.fillStyle === '#2e2a86');
     assert.ok(floor > calls.indexOf(sky), 'the Mode 7 floor is still drawn, after the sky');
 
-    // The dyed paddles are the made canvases drawn paddle-wide (item 1227's dusk balloons are made canvases too).
+    // Realism rung 4 (item 1267): the bats are rung 3's two-rubber bats drawn
+    // through the tilt, so the dyed capsule sprite is no longer drawn in play.
+    const look = R.eraLook(4);
     const paddles = images.filter((c) => made.includes(c.args[0]) && c.args[3] === g.left.w);
-    assert.strictEqual(paddles.length, 2, 'both paddles are the dyed sprite');
-    for (const p of [g.left, g.right]) {
-      assert.ok(paddles.some((c) => c.args.slice(1).join() === [p.x, p.y, p.w, p.h].join() && c.smoothing === false),
-        'over the exact rectangle the rules collide with, unsmoothed');
-    }
+    assert.strictEqual(paddles.length, 0, 'no dyed capsule: the bats are the table tennis bats');
+    const rubbers = calls.filter((c) => c.op === 'fill' && (c.fillStyle === R.paddleInk(g, 'left') || c.fillStyle === R.paddleInk(g, 'right')));
+    assert.ok(rubbers.length >= 2, 'each bat\'s rubber in its earned ink');
 
     const ball = images.find((c) => srcOf(c) === e.ball);
     assert.ok(ball, 'the ball is the generated picture');
     const [, bx, by, bw, bh] = ball.args;
     assert.deepStrictEqual([bw, bh], [16, 16], 'drawn at half its 32 pixels');
-    assert.ok(Math.abs(bx + 8 - (g.ball.x + g.ball.size / 2)) <= 0.5 && Math.abs(by + 8 - (g.ball.y + g.ball.size / 2)) <= 0.5,
-      'centred on the ball');
+    const bcx = g.ball.x + g.ball.size / 2, bcy = g.ball.y + g.ball.size / 2;
+    assert.ok(Math.abs(bx + 8 - look.project(bcx, bcy, 800, 600)) <= 0.5 && Math.abs(by + 8 - bcy) <= 0.5,
+      'centred on the ball, where the tilt puts it (same height, x narrowed toward the net)');
     assert.strictEqual(ball.smoothing, false);
-    assert.ok(calls.indexOf(ball) > Math.max(...paddles.map((c) => calls.indexOf(c))), 'on top of both paddles (R2)');
+    assert.ok(calls.indexOf(ball) > Math.max(...rubbers.map((c) => calls.indexOf(c))), 'on top of both bats (R2)');
     assert.ok(!calls.some((c) => c.op === 'fill' && c.fillStyle.kind === 'radial' && c.fillStyle.stops[0][1] === '#ffffff'),
       'and the hand-drawn orb is not drawn under it');
   });
 });
 
-test('each paddle wears its own ink: the ink overlaid on the grey sprite and cut to its shape, once per ink', () => {
+test('each bat wears its own ink on its rubber, and drawing again makes no new canvases (item 1267: the dye is retired in play)', () => {
   withDecoding(true, () => {
-    const e = embeds();
     const g = rally();
     frame(g);
     const before = made.length;
@@ -258,18 +258,22 @@ test('each paddle wears its own ink: the ink overlaid on the grey sprite and cut
 
     const ink = '#5a8f2c';
     const P = Object.assign({}, R, { paddleInk: (s, side) => (side === 'left' ? ink : R.paddleInk(s, side)) });
-    const look = R.eraLook(4);
-    look.draw(canvas().ctx, g, undefined, P);
-    look.draw(canvas().ctx, g, undefined, P);
-    assert.strictEqual(made.length, before + 1, 'one new canvas for a new ink, across two frames');
-    const dyed = made[made.length - 1];
-    assert.deepStrictEqual(dyed.calls.map((x) => [x.op, x.comp]), [
-      ['drawImage', 'source-over'], ['fillRect', 'overlay'], ['drawImage', 'destination-in']
-    ], 'the picture, the ink overlaid on it, the picture\'s shape kept');
-    assert.strictEqual(dyed.calls[1].fillStyle, ink);
-    assert.ok(srcOf(dyed.calls[0]) === e.paddle && srcOf(dyed.calls[2]) === e.paddle);
-    assert.deepStrictEqual([dyed.width, dyed.height], [10, 58], 'the paddle cropped to the pixels it draws');
+    const c = canvas();
+    R.eraLook(4).draw(c.ctx, g, undefined, P);
+    assert.strictEqual(made.length, before, 'a new ink makes no canvas either: the rubber is a filled quad');
+    assert.ok(c.calls.some((x) => x.op === 'fill' && x.fillStyle === ink), 'the left bat\'s rubber is the left ink');
   });
+});
+
+test('the table is tilted in play (realism rung 4): far edge 0.9 of the near, heights unchanged, the net on x 400', () => {
+  const look = R.eraLook(4);
+  assert.ok(look.table.far >= 0.85 && look.table.far < 1, `far edge ${look.table.far} of the near, at least 0.85`);
+  assert.strictEqual(look.rowScale(600, 600), 1, 'the near edge keeps its width');
+  assert.ok(Math.abs(look.rowScale(0, 600) - look.table.far) < 1e-12, 'the far edge narrows to TABLE.far');
+  for (let y = 0; y < 600; y += 50) assert.ok(look.rowScale(y, 600) < look.rowScale(y + 50, 600), 'widths grow toward you');
+  assert.strictEqual(look.project(400, 0, 800, 600), 400, 'the net stays on x 400 at every height');
+  const farLeft = look.project(32, 0, 800, 600), farRight = look.project(768, 0, 800, 600);
+  assert.ok(Math.abs((farRight - farLeft) / (768 - 32) - look.table.far) < 1e-12, 'the far end is that much narrower');
 });
 
 test('before the pictures have decoded, era 4 draws its hand-drawn sky, paddles and ball for that frame', () => {
