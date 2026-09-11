@@ -6,9 +6,10 @@ as the session goes on the game grows up through the eras around it: colour,
 sound, sprites, physics, whatever each later era brings. Evoland, but for Pong.
 
 **Every point either side scores moves the machine up one era**, from the 1972
-arcade machine to the Super Nintendo (see *The era ladder* below). Today eras 0
-and 1 are built — black and white, then the Atari turn to colour — and eras 2 to
-4 are placeholders that draw era 1 until their own cards land.
+arcade machine to the Super Nintendo (see *The era ladder* below): black and
+white, the Atari's turn to colour, the NES's 8-bit sprites, the Genesis's 16-bit
+shading and the Super Nintendo's Mode 7 floor, each with its own sound and a
+flash-and-name-card moment as the machine moves up.
 
 ## Play it
 
@@ -72,13 +73,25 @@ beep through your speakers. `--no-audio` runs the same checks with the browser's
 audio taken away, to prove the game still plays silently. Pass
 `--chrome "<path to chrome.exe>"` if it cannot find a browser on its own.
 
-Every run rewrites the screenshots it drops in `docs/shots/playtest/`. Those are
-ignored output, not source: the directory is gitignored, nobody needs to check
-them afterwards and there is nothing to restore, so a playtest leaves `git
-status` empty. The one tracked reference frame is
-`docs/shots/bootstrap/era-zero.png` — the picture of era zero a reader opens. If
-you deliberately change how era zero looks, update that file on purpose, in its
-own commit.
+Last of all it **walks one match up the whole ladder**: a fresh machine on era
+0, then it lets a point through for each rung, checks that every point moved the
+machine up exactly one era, photographs each era in play once its change moment
+has cleared, and scores one more at the top to prove the ladder stops on the
+Super Nintendo. `--ladder` runs only that walk, in about half a minute:
+
+```bash
+node tools/playtest.mjs --ladder              # just the walk up the ladder
+node tools/playtest.mjs --ladder --reference  # and re-take the tracked era frames
+```
+
+Every run rewrites the screenshots it drops in `docs/shots/playtest/` —
+`ladder-era0-arcade.png` to `ladder-era4-snes.png` among them. Those are ignored
+output, not source: the directory is gitignored, nobody needs to check them
+afterwards and there is nothing to restore, so a playtest leaves `git status`
+empty. The tracked reference frames are the five in `docs/shots/eras/`, one per
+era, plus the older `docs/shots/bootstrap/era-zero.png`. Only `--reference`
+writes to `docs/shots/eras/`: if you deliberately change how an era looks,
+re-take them that way and commit them on purpose, in their own commit.
 
 ## Working on it as a fleet agent
 
@@ -108,16 +121,22 @@ through `state.rng`, so a test can pin it down.
 
 ## The era ladder
 
-Every point either side scores moves the machine up one era, and it stops at
-the top:
+A match starts on the 1972 machine. **Every point either side scores moves it
+up one era** -- it does not matter who scored, only that a point was scored --
+so the fourth point of a match lands on the Super Nintendo, and it stops there:
+a fifth point, or a fiftieth, leaves it on the top rung. A reload starts a fresh
+match back on era 0. All five rungs are built:
 
-| Era | Machine | Look today |
-| --- | --- | --- |
-| 0 | 1972 arcade Pong | black and white |
-| 1 | 1977 Atari 2600 | the turn to colour: each paddle and its score in its own colour |
-| 2 | 1985 NES | placeholder, draws era 1 |
-| 3 | 1989 Sega Genesis | placeholder, draws era 1 |
-| 4 | 1991 Super Nintendo | placeholder, draws era 1 |
+| Era | Machine | Look | Voice | Reference frame |
+| --- | --- | --- | --- | --- |
+| 0 | 1972 arcade Pong | black and white: two white bars, a square ball, a dashed centre line | a bare square-wave blip | [`era0-arcade.png`](docs/shots/eras/era0-arcade.png) |
+| 1 | 1977 Atari 2600 | the turn to colour: each paddle and its score in its own colour | the same blip | [`era1-atari2600.png`](docs/shots/eras/era1-atari2600.png) |
+| 2 | 1985 NES | 8-bit sprites, the NES palette and a pixel score | square and triangle chiptune | [`era2-nes.png`](docs/shots/eras/era2-nes.png) |
+| 3 | 1989 Sega Genesis | 16-bit shading, parallax and a trail behind the ball | a bright FM bell | [`era3-genesis.png`](docs/shots/eras/era3-genesis.png) |
+| 4 | 1991 Super Nintendo | a Mode 7 floor and rich sprites | layered chords with a short echo | [`era4-snes.png`](docs/shots/eras/era4-snes.png) |
+
+The reference frames in `docs/shots/eras/` are each era in play, taken by the
+playtest as it walks one match up the ladder (see *Run the tests*).
 
 The rules (`Pong.ERAS` in `src/game.js`) carry only the number: `state.era`,
 and `state.eraChangedAt`, the game time it last moved, for a transition to read.
@@ -129,8 +148,14 @@ give `draw(ctx, state, opts, PongRender)` to take over the whole frame
 (`PongRender.drawBase` is the stock frame to paint over). A brand-new rung is one
 new file, one `<script>` line in `index.html`, and one entry in `Pong.ERAS`.
 
-**Open the page at any era** with a query: `index.html?era=3`. The playtest
-takes `--era 3` for the same thing.
+**Open the page at any era** with a query, so you can look at one machine
+without playing up to it: `index.html?era=0` is the arcade machine (the same as
+no query), `?era=2` the NES, `?era=4` the Super Nintendo. Anything above 4 opens
+on 4, and anything that is not a number opens on 0. The match still starts on
+the title screen, its score at 0-0, and climbs from that era -- so `?era=3` is
+one point from the top -- and a reload comes back to the era in the address.
+The playtest takes `--era 3` for the same thing, and `--ladder` walks the whole
+ladder from era 0 instead.
 
 **The change is a moment.** When a point moves the machine up a rung the field
 flashes, a band of the new machine's colours wipes across it, and a name card
