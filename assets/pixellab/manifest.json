@@ -931,6 +931,98 @@
         "shading": "medium shading",
         "detail": "low detail"
       }
+    },
+    {
+      "name": "era3-players-left",
+      "file": "era3-players-left.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226001,
+      "date": "2026-09-11T03:23:35.447Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 6,
+      "seconds": 74.8,
+      "pixels": {
+        "width": 36,
+        "height": 312
+      },
+      "bytes": 7083,
+      "sha256": "f3017e0247d16fc92f43fd6eae655bbf77bf9c09777137269a8288c22214b4c3",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226001,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era3-players-right",
+      "file": "era3-players-right.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226002,
+      "date": "2026-09-11T03:23:56.033Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 17.6,
+      "pixels": {
+        "width": 36,
+        "height": 312
+      },
+      "bytes": 5593,
+      "sha256": "b695bee5b8e73eb3324ce069afe7765fe689b6527c2a3d2ff0a83dc9fc900749",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226002,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
     }
   ]
 }
