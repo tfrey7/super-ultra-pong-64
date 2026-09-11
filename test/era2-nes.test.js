@@ -22,7 +22,8 @@ function midRally(era, rng = 0.1) {
   g.serveDelay = 0;
   g.ball.x = 612.5;
   g.ball.y = 297.25;
-  g.left.y = 40;
+  // below the stands (item 1225: the band and the crowd fill the top 84 units)
+  g.left.y = 140;
   g.right.y = 390;
   return g;
 }
@@ -99,6 +100,7 @@ test('paddles and ball are chunky sprites with two-tone shading', () => {
     const ball = within(calls, g.ball, 4).filter(([, , , w, h]) => w < 800 && h < 600);
     const ballInks = inksOf(ball);
     ballInks.delete('#000000');
+    ballInks.delete(NES_LOOK().nesPalette[0x38]);  // the tennis ball's seam (item 1225)
     assert.strictEqual(ballInks.size, 2, 'the ball is lit and shaded');
     assert.ok(ball.length >= 6, 'the ball is a sprite');
   }
@@ -156,9 +158,13 @@ test('the score is its own pixel font, drawn with a shadow, and it is the score 
   const inA = new Set(fa.map(key)), inB = new Set(fb.map(key));
   const moved = fa.filter((c) => !inB.has(key(c))).concat(fb.filter((c) => !inA.has(key(c))));
   assert.ok(moved.length > 0);
-  for (const [, , y] of moved) assert.ok(y < 90, 'only the scoreboard at the top changed');
-  const digits = within(fa, { x: 400 - 110 - 40, y: 32, w: 80, h: 48 });
-  assert.ok(inksOf(digits).has('#000000') && inksOf(digits).has(R.paddleInk(a, 'left')), 'shadow and paddle colour');
+  for (const [, , y] of moved) assert.ok(y < 44, 'only the status band at the top changed');
+  // Tennis's status band (item 1225): the score in $30 over the black shadow,
+  // beside P1 in the player's paddle colour.
+  const band = fb.filter(([, , y, , h]) => y >= 4 && y + h <= 48);
+  const pal = NES_LOOK().nesPalette;
+  assert.ok(inksOf(moved).has(pal[0x30]) && inksOf(moved).has('#000000'), 'the score in white over its shadow');
+  assert.ok(inksOf(band).has(R.paddleInk(a, 'left')), 'P1 in the paddle colour');
 });
 
 test('the ball blinks out while the serve waits, as in every era', () => {
@@ -167,7 +173,8 @@ test('the ball blinks out while the serve waits, as in every era', () => {
   g.serveDelay = 0.4;
   const waiting = frame(g);
   const ball = within(live, g.ball, 4).filter(([, , , w, h]) => w < 800 && h < 600);
-  assert.strictEqual(live.length - waiting.length, ball.length);
+  // the ball, its seam, and its shadow under it (item 1225) all go with it
+  assert.strictEqual(live.length - waiting.length, ball.length + 1);
   assert.ok(ball.length > 0);
 });
 
