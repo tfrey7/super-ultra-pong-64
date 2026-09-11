@@ -247,22 +247,23 @@ async function filmChange(s, clip, from) {
     const render = (era) => { const c = document.createElement('canvas'); c.width = w; c.height = h;
       R.draw(c.getContext('2d'), era === g.era ? g : Object.assign({}, g, { era: era })); return pix(c); };
     const L = pix(live), N = render(${from + 1}), O = render(${from});
-    let asNew = 0, asOld = 0, counted = 0;
+    let asNew = 0, asOld = 0, apart = 0, counted = 0;
     for (let y = 0; y < h; y++) {
       if (y >= h / 2 - 90 && y < h / 2 + 90) continue;
       for (let x = 0; x < w; x++) {
         const i = (y * w + x) * 4; counted++;
         if (L[i] !== N[i] || L[i + 1] !== N[i + 1] || L[i + 2] !== N[i + 2]) asNew++;
         if (L[i] !== O[i] || L[i + 1] !== O[i + 1] || L[i + 2] !== O[i + 2]) asOld++;
+        if (N[i] !== O[i] || N[i + 1] !== O[i + 1] || N[i + 2] !== O[i + 2]) apart++;
       }
     }
     const m = R.eraChangeMoment(g);
     // A rung that borrows its neighbour's whole look (a like: N stand-in with no
-    // draw of its own) draws the same frame as the era it replaces, so "closer to
-    // the new era than the old" cannot hold; for that change the live canvas only
-    // has to match the new era exactly (items 1145-1150, 1179).
-    const same = R.eraLook(${from + 1}).draw === R.eraLook(${from}).draw;
-    done({ era: g.era, ring: !!(m && m.wiping), asNew: asNew, asOld: asOld, counted: counted, same: same });
+    // draw of its own) draws the very same frame as the era it replaces, so
+    // "closer to the new era than the old" cannot hold; when the two offscreen
+    // frames are identical the live canvas only has to match the new era
+    // exactly (items 1145-1150, 1179).
+    done({ era: g.era, ring: !!(m && m.wiping), asNew: asNew, asOld: asOld, counted: counted, same: apart === 0 });
   })))`);
   return out;
 }
@@ -360,7 +361,7 @@ async function walkLadder(s, baseUrl) {
         `${e.radius.toFixed(0)}, far corner ${e.corner.toFixed(0)}` : 'the ring was never seen to finish') +
       `; afterwards on era ${d.era}, ${d.asNew} of ${d.counted} pixels differ from era ${c.from + 1} ` +
       `drawn offscreen, ${d.asOld} from era ${c.from}` +
-      (d.same ? ' (the two rungs draw the same look, so only an exact match with the new era is asked)' : ''));
+      (d.same ? ' (the two rungs draw the same frame, so only an exact match with the new era is asked)' : ''));
   }
 
   if (REFERENCE) {
