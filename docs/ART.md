@@ -281,9 +281,13 @@ between them.
   landed sheet (0 generations), or, failing that, a finding naming the one line of era 4's block in
   `src/characters.js` that would crop it.
 - **Card 1266, the 3D table and camera.** It delivers section 8's 3D table (lines, net and posts,
-  legs, floor) and the camera, in `src/table3d.js`, keeping the projection's contract. The
-  stand-ins stay where the rig draws them. Placing figures on the floor is the polygon cards'
-  work, so 1266's screenshots show the camera's room for them rather than the figures standing.
+  legs, floor) and the camera, in `src/table3d.js`, keeping the projection's contract. One snag
+  for its planner: its goal asks for the stand-ins to stand behind each end, but the rig puts them
+  at the paddle's outer edge, and 1266 may not touch `src/characters.js`. So 1266's screenshots
+  show the stand-ins where the rig draws them, plus the room the camera leaves behind each end for
+  a whole figure. Standing figures on the floor is the polygon cards' work. If the stand-ins should
+  move before those cards land, that is one `anchor` line per era block in `src/characters.js`, and
+  a small card of its own.
   **Card 1263** (a per-era camera, so the Dreamcast arena shows) works in the same camera code:
   1266's pulled-back camera gives every arena much of the room 1263 asks for, and whichever of
   the two lands second merges onto the other.
