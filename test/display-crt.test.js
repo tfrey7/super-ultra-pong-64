@@ -63,6 +63,16 @@ test('each screen has the traits of its day', () => {
     'and it is the cleanest of the five');
 });
 
+// The native-sized copy the fringes and glow are blended on, kept frame to
+// frame in the module's work canvases; its log is emptied before each draw.
+function drawOnPost(draw) {
+  if (CRT.work.post) CRT.work.post.log.length = 0;
+  draw();
+  const post = CRT.work.post;
+  assert.ok(post && post.log.some((e) => e[0] === 'drawImage' && e[1] === 'copy'), 'the copy starts from the native picture');
+  return post;
+}
+
 test('an overlay pre-draws its tube once and stamps it with one multiply per frame', () => {
   withDocument((made) => {
     const native = { width: 256, height: 240 };
@@ -78,8 +88,24 @@ test('an overlay pre-draws its tube once and stamps it with one multiply per fra
     const draws = log.filter((c) => c[0] === 'drawImage');
     const multiplies = draws.filter((c) => c[1] === 'multiply');
     assert.strictEqual(multiplies.length, 1, 'one multiply of the pre-drawn tube');
-    assert.strictEqual(draws.filter((c) => c[1] === 'lighter').length, 3, 'two fringes and a glow, added');
-    assert.ok(draws.length <= 4, `four page draws a frame at most, saw ${draws.length}`);
+    assert.ok(draws.length <= 2, `two page draws a frame at most, saw ${draws.length}`);
+  });
+});
+
+test('fringes and glow blend on a native-sized copy, and the page gets plain draws (item 1240)', () => {
+  withDocument(() => {
+    const native = { width: 256, height: 240 };
+    const log = [];
+    const page = recorder({ width: 1600, height: 1200 }, log);
+    const post = drawOnPost(() =>
+      D.OVERLAYS['crt-composite'](page, { x: 0, y: 0, w: 1600, h: 1200 }, D.row(2), { era: 2, time: 1, native }));
+    const draws = log.filter((c) => c[0] === 'drawImage');
+    assert.strictEqual(draws.filter((c) => c[1] === 'lighter').length, 0, 'nothing is added over the page');
+    assert.deepStrictEqual(draws.map((c) => c[1]), ['source-over', 'multiply'],
+      'the finished copy, plainly, then the tube');
+    assert.strictEqual(post.width + 'x' + post.height, '256x240', 'a copy the size of the native picture');
+    const onPost = post.log.filter((c) => c[0] === 'drawImage');
+    assert.strictEqual(onPost.filter((c) => c[1] === 'lighter').length, 3, 'two fringes and a glow, added on the copy');
   });
 });
 
@@ -90,10 +116,11 @@ test('the Genesis keeps its fringes but has no glow, so it holds full frame rate
     const rect = { x: 0, y: 0, w: 800, h: 600 };
     assert.strictEqual(D.row(3).glow, 0, 'the Genesis row sets its own glow');
     assert.strictEqual(D.row(2).glow, undefined, 'the NES keeps its kind\'s glow');
-    D.OVERLAYS['crt-composite'](recorder({ width: 800, height: 600 }, log), rect, D.row(3), { era: 3, time: 1, native });
+    const post = drawOnPost(() =>
+      D.OVERLAYS['crt-composite'](recorder({ width: 800, height: 600 }, log), rect, D.row(3), { era: 3, time: 1, native }));
     const draws = log.filter((c) => c[0] === 'drawImage');
-    assert.strictEqual(draws.filter((c) => c[1] === 'lighter').length, 2, 'two fringes, no glow');
-    assert.strictEqual(draws.filter((c) => c[1] === 'multiply').length, 1, 'and the tube');
+    assert.strictEqual(draws.filter((c) => c[1] === 'multiply').length, 1, 'the tube');
+    assert.strictEqual(post.log.filter((c) => c[0] === 'drawImage' && c[1] === 'lighter').length, 2, 'two fringes, no glow');
   });
 });
 
