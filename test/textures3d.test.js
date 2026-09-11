@@ -42,7 +42,10 @@ test('every texture a 3D era names is one of the embedded tiles', () => {
     const names = [...block[1].matchAll(/name: '([a-z0-9-]+)'/g)].map((m) => m[1]);
     assert.deepStrictEqual(names.length, 4, `${era}: court, trim, paddle and ball`);
     for (const n of names) assert.ok(EMBED.TILES[n], `${era} names ${n}, which is embedded`);
-    assert.ok(/texture: TEXTURE\.court/.test(src) && /texture: TEXTURE\.paddle/.test(src) && /texture: TEXTURE\.ball/.test(src),
+    // The ball's skin goes through ball()'s texture, or (era 5's faceted gem,
+    // which draws its own ball) straight through textureOver.
+    assert.ok(/texture: TEXTURE\.court/.test(src) && /texture: TEXTURE\.paddle/.test(src) &&
+      /texture: TEXTURE\.ball|textureOver\([^)]*TEXTURE\.ball/.test(src),
       `${era} hands the court, the paddles and the ball their textures`);
   }
 });

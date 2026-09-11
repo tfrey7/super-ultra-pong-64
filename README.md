@@ -249,6 +249,25 @@ arrival its own look with a `flourish(ctx, p, origin, fromEra, toEra, info)`
 hook, drawn over the ring's edge every frame of the ring that brings it in --
 the header of `src/erachange.js` is the contract.
 
+### Each era at its machine's own resolution
+
+Every frame is drawn at the resolution of the machine on screen and then scaled
+up to the page (`src/display.js`, item 1198): 200 x 120 tall blocks for the 1972
+arcade, 160 x 192 for the Atari 2600, 256 x 240 for the NES, 320 x 224 for the
+Genesis, 256 x 224 for the Super Nintendo, 320 x 240 for the PlayStation and the
+N64, 640 x 480 for the Dreamcast and the Xbox, 512 x 448 for the PS2 and the 720
+lines of 720p for the Xbox 360. The 2D machines are scaled with hard pixel edges
+(each is drawn at field size and sampled down, so every pixel is one whole
+colour), the 3D ones with the soft scaling a television gave them. During an era
+change the display switches to the new machine the moment the ring passes the
+centre. Each row of the table also names the screen the machine was seen on --
+an overlay kind and its strength; this card ships only `none`, and
+`src/display-crt.js` and `src/display-tv.js`, already in the page's script list,
+are where the CRT and TV overlays plug in. `index.html?display=off` draws
+straight onto the page as before. All eleven side by side:
+`docs/shots/eras/contact-sheet-native.png` (from
+`docs/measure/item1198/contact-sheet.html`).
+
 ### Each era change, step by step
 
 Every rung arrives with its own flourish riding the ring. The playtest's ladder

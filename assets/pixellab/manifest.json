@@ -354,6 +354,385 @@
       "verdict": "used: shrunk to the 12-unit ball box and inked in NES $30/$10/$00/$0F as era2-ball.png by era2-nes-quantize.mjs, the era 2 ball"
     },
     {
+      "name": "genesis-court",
+      "file": "genesis-court.png",
+      "prompt": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
+      "size": {
+        "width": 320,
+        "height": 240
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 530743640,
+      "date": "2026-09-11T01:16:13.015Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 22.4,
+      "pixels": {
+        "width": 320,
+        "height": 240
+      },
+      "bytes": 3062,
+      "sha256": "ba0e3aef89bf03a775421b300f63bb4ca1ae2b1ef194835e56e3b3538d69e4e4",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
+        "image_size": {
+          "width": 320,
+          "height": 240
+        },
+        "seed": 530743640,
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "4ad286a89080049decc3f353de7a4464de1ed516d53e325ffff0122f863d9dda"
+      }
+    },
+    {
+      "name": "genesis-ball",
+      "file": "genesis-ball.png",
+      "prompt": "shiny white chrome ball sprite, 16-bit Sega Genesis style, bright white core with a hard white highlight and pale blue shading at the edge",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 1527937682,
+      "date": "2026-09-11T01:16:30.804Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 17.1,
+      "pixels": {
+        "width": 24,
+        "height": 24
+      },
+      "bytes": 272,
+      "sha256": "283847bfafe01b5db4f7e126ac305e7ac6bf998645c860b1bd3342e345316694",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "shiny white chrome ball sprite, 16-bit Sega Genesis style, bright white core with a hard white highlight and pale blue shading at the edge",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1527937682,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "5f77f8760a3b897a8bd5c6d868c2c60bee9dc1d9ebe7c8195358559985749143",
+        "trim": {
+          "box": [
+            4,
+            4,
+            24,
+            24
+          ]
+        }
+      }
+    },
+    {
+      "name": "snes-sky",
+      "file": "snes-sky.png",
+      "prompt": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",
+      "size": {
+        "width": 256,
+        "height": 48
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "highly detailed"
+      },
+      "seed": 134143913,
+      "date": "2026-09-11T01:16:21.270Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 18,
+      "pixels": {
+        "width": 256,
+        "height": 48
+      },
+      "bytes": 2862,
+      "sha256": "dec9b836616b876b1a22c2475032ca7e6de70e407fc5a34211d9b56741e96a54",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",
+        "image_size": {
+          "width": 256,
+          "height": 48
+        },
+        "seed": 134143913,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "snes-paddle",
+      "file": "snes-paddle.png",
+      "prompt": "a vertical pill-shaped metal pong paddle, light grey shaded body with shiny chrome end caps, 16-bit Super Nintendo sprite, pixel art",
+      "size": {
+        "width": 16,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 575168117,
+      "date": "2026-09-11T01:16:44.798Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 22.9,
+      "pixels": {
+        "width": 16,
+        "height": 64
+      },
+      "bytes": 797,
+      "sha256": "8d269098b238bb1bc62f50556f216f511392ae2ab48c4e3941faf316aca9480a",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a vertical pill-shaped metal pong paddle, light grey shaded body with shiny chrome end caps, 16-bit Super Nintendo sprite, pixel art",
+        "image_size": {
+          "width": 16,
+          "height": 64
+        },
+        "seed": 575168117,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      }
+    },
+    {
+      "name": "snes-ball",
+      "file": "snes-ball.png",
+      "prompt": "a glowing round ball, white-hot centre, bright yellow then orange rim, shiny highlight, 16-bit Super Nintendo sprite, pixel art",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 1400847945,
+      "date": "2026-09-11T01:17:00.507Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 15.1,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 666,
+      "sha256": "047ecaec38580dd12de5465b1e3467c38c9b0fc05e5e384da8f553b863236dcd",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a glowing round ball, white-hot centre, bright yellow then orange rim, shiny highlight, 16-bit Super Nintendo sprite, pixel art",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1400847945,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-sky",
+      "file": "era4-sky.png",
+      "prompt": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",
+      "size": {
+        "width": 256,
+        "height": 48
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "highly detailed"
+      },
+      "seed": 134143913,
+      "date": "2026-09-11T01:16:21.270Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 256,
+        "height": 48
+      },
+      "bytes": 1606,
+      "sha256": "1bf5ead67917776eb2af2662aeab32491f88027b52e0c3740843e6e03167d523",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",
+        "image_size": {
+          "width": 256,
+          "height": 48
+        },
+        "seed": 134143913,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "highly detailed"
+      },
+      "derivedFrom": "snes-sky.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not; 29 colours",
+      "card": "item 1180",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
+      "name": "era4-paddle",
+      "file": "era4-paddle.png",
+      "prompt": "a vertical pill-shaped metal pong paddle, light grey shaded body with shiny chrome end caps, 16-bit Super Nintendo sprite, pixel art",
+      "size": {
+        "width": 16,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 575168117,
+      "date": "2026-09-11T01:16:44.798Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 10,
+        "height": 58
+      },
+      "bytes": 428,
+      "sha256": "7cc1804407bc5d62e7ef7dec5fef9326990b016448e324aef4ca676dce5e0616",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a vertical pill-shaped metal pong paddle, light grey shaded body with shiny chrome end caps, 16-bit Super Nintendo sprite, pixel art",
+        "image_size": {
+          "width": 16,
+          "height": 64
+        },
+        "seed": 575168117,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "derivedFrom": "snes-paddle.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not, cropped to the pixels it draws; 23 colours",
+      "card": "item 1180",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
+      "name": "era4-ball",
+      "file": "era4-ball.png",
+      "prompt": "a glowing round ball, white-hot centre, bright yellow then orange rim, shiny highlight, 16-bit Super Nintendo sprite, pixel art",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 1400847945,
+      "date": "2026-09-11T01:17:00.507Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 379,
+      "sha256": "80f210f911a9cfe58126cc3cca61a23e88946505076a7028262079e3fb26e92e",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a glowing round ball, white-hot centre, bright yellow then orange rim, shiny highlight, 16-bit Super Nintendo sprite, pixel art",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1400847945,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "derivedFrom": "snes-ball.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not; 13 colours",
+      "card": "item 1180",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
       "name": "tex3d-court-grain",
       "file": "tex3d-court-grain.png",
       "prompt": "seamless tileable texture, sports court floor of long wooden boards with faint grain and a few knots, grey monochrome, top-down, flat, evenly lit, no objects",
