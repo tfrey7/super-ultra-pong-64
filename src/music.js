@@ -8,7 +8,11 @@
  * do. The 1972 arcade has no sound chip, so it only taps the melody's bones
  * over the cabinet's hum; the Atari plays it on two out-of-tune squares; the
  * NES on its pulse, triangle and noise channels; the Genesis as an FM groove;
- * the Super Nintendo as a small orchestra in the echo.
+ * the Super Nintendo as a small orchestra in the echo. Then the 3D table: the
+ * PlayStation as grainy ambient techno under a filter sweep, the Nintendo 64
+ * as a muffled synth orchestra, the Dreamcast as bright jazzy chords over a
+ * breakbeat, the PlayStation 2 as a wide dark film score, the Xbox as
+ * drop-tuned rock and the Xbox 360 as big-room with a wobbling bass.
  *
  * Every arrangement shares the bar count and the tempo, so the song position
  * is ONE clock: at an era change the old arrangement fades out and the new one
@@ -17,7 +21,7 @@
  *
  * Two halves, kept apart like src/sound.js:
  *   - THEME and ARRANGEMENTS are plain data, so a stranger adds an era's
- *     arrangement without reading the player. Rows 5 to 10 are empty slots.
+ *     arrangement without reading the player. A row may be null (silence).
  *     arrange() turns theme + arrangement into the notes of the loop.
  *   - createMusic() books those notes AHEAD on the audio clock (a lookahead
  *     scheduler: each tick books every step that starts in the next LOOKAHEAD
@@ -84,35 +88,55 @@
   // One row per era; null is an empty slot (played as silence). A row:
   //   name, about (what it sounds like), trait (the chip trait that sells it)
   //   parts    the players, each one of:
-  //     { play: 'melody', rule: 'full' | 'bones', voice, octave?, sections? }
+  //     { play: 'melody', rule: 'full' | 'bones' | 'arp', voice, octave?, sections? }
   //         full  = every note as written; bones = the first note of each
-  //         half bar, as one short tap (two a bar)
+  //         half bar, as one short tap (two a bar); arp = each melody note
+  //         broken into a fast arpeggio while it sounds, `speed` notes a step,
+  //         cycling `shape` (semitones above the note, default [0, 12, 7, 12]),
+  //         so the melody note itself always lands on its own beat
   //     { play: 'bass', rule: 'held' | 'eighths' | 'octaves' | 'sixteenths' | 'pizz', voice, octave? }
   //         held = each note for its half bar; eighths = repeated 8ths;
   //         octaves = 8ths leaping root/octave; sixteenths = 16ths with an
   //         octave pop on the off-16ths; pizz = short quarter notes
-  //     { play: 'chords', rule: 'pad' | 'arp' | 'offbeat' | 'broken', voice, speed?, octave? }
+  //     { play: 'chords', rule: 'pad' | 'arp' | 'offbeat' | 'broken' | 'rhythm', voice, speed?, octave?, voicing? }
   //         pad = the chord held the whole bar; arp = its notes cycled fast,
   //         `speed` per step (the NES's fake chord); offbeat = stabs on the
-  //         8th off-beats; broken = 8ths climbing the chord
+  //         8th off-beats; broken = 8ths climbing the chord; rhythm = the
+  //         chord struck on a `pattern` (and `fill`) written like a drum's,
+  //         where '-' holds it (stabs, comping, chugs)
+  //         voicing: 'triad' (as written), 'power' (root, fifth, octave: a
+  //         guitar's power chord), 'seventh' / 'ninth' (the key's own 7th, and
+  //         9th, stacked on: the jazzy chords)
   //     { play: 'echo', of: 'melody', delay: steps, voice }
   //         the melody again, `delay` steps late, on a quieter voice
-  //     { play: 'drum', pattern, fill?, voice, steals? }
+  //     { play: 'drum', pattern, fill?, open?, voice, steals? }
   //         one bar of 'x'/'X'/'.' repeated; `fill` replaces it in the last
-  //         bar of each section; steals: 'bass' silences the bass while the
-  //         drum sounds (a chip with too few channels)
+  //         bar of each section and `open` in the first (a crash on the
+  //         downbeat); steals: 'bass' silences the bass while the drum sounds
+  //         (a chip with too few channels)
   //     Any part may carry sections: ['A'] or ['B'] to play in only one.
+  //   swing    optional share of a step every off-16th is played late (the
+  //            rhythm feel: 0 straight, 0.2 a lazy shuffle)
   //   detune   optional 12 cents offsets by pitch class, C first (a chip whose
   //            pitch dividers cannot hit the scale)
   //   drone    optional [{ wave, freq, gain, filter?, wobble?: { rate, depth } }]
   //            sounds that run the whole time the era is on
-  //   effects  optional { grit, lowpass, echo: { time, feedback, mix },
-  //                       reverb: { seconds, decay, mix } }
+  //   effects  optional { grit, crush (bits: a grainy, compressed edge),
+  //                       lowpass, sweep: { freq, depth, bars, q } (a resonant
+  //                       low-pass over the whole mix whose cutoff rises and
+  //                       falls once every `bars` bars), echo: { time,
+  //                       feedback, mix }, reverb: { seconds, decay, mix } }
   //
   // A voice: { wave: 'square'|'triangle'|'sine'|'sawtooth'|'pulse12'|'pulse25'
   //            |'pulse50'|'noise'|'kick', gain, env: { a, d, s, r }, legato?,
-  //            freq? (for a drum's hit), unison?: [cents...], filter?: { type,
-  //            freq, q }, fm?: { ratio, index }, vibrato?: { rate, cents, delay } }
+  //            freq? (for a drum's hit), unison?: [cents...], spread? (0..1:
+  //            the unison layers placed left and right), pan? (-1..1),
+  //            drive? (0..1: an overdrive before the filter, a guitar amp),
+  //            pump? (0..1: the side-chain duck on every beat), filter?: {
+  //            type, freq, q, sweep?: { to, time } (the cutoff glides there
+  //            as the note starts), lfo?: { perBeat, depth, wave? } (the
+  //            cutoff wobbles `perBeat` times a beat, by depth x freq) },
+  //            fm?: { ratio, index }, vibrato?: { rate, cents, delay } }
   // Gains are on src/sound.js's scale; the whole soundtrack then sits
   // MUSIC_DB under it.
 
@@ -240,16 +264,221 @@
       effects: { lowpass: 5200, echo: { time: 0.23, feedback: 0.38, mix: 0.35 } }
     },
 
-    // 5 to 10 -- the 3D table, PlayStation to Xbox 360. Empty slots: the next
-    // card fills each one with another arrangement of the same THEME, in the
-    // format above. Until then an empty slot plays silence (the effects still
-    // sound).
-    null, // 5 PlayStation
-    null, // 6 Nintendo 64
-    null, // 7 Dreamcast
-    null, // 8 PlayStation 2
-    null, // 9 Xbox
-    null  // 10 Xbox 360
+    // 5 -- 1995 PlayStation: the SPU's 24 voices of compressed samples, and
+    // its hardware reverb.
+    {
+      name: 'PlayStation',
+      about: 'Ambient techno: a soft four-on-the-floor under lush seventh-chord pads, squelchy off-beat stabs and a rolling bass, the melody on a smooth sampled lead, the whole mix breathing through a slow resonant filter sweep and washing out in reverb and a dotted-eighth delay.',
+      trait: 'CD-era sequenced samples: a slightly grainy compressed edge, real chords for the first time, resonant filter sweeps and the SPU\'s built-in reverb.',
+      parts: [
+        { play: 'melody', rule: 'full',
+          voice: { wave: 'triangle', gain: 0.085, unison: [6],
+                   env: { a: 0.012, d: 0.3, s: 0.65, r: 0.25 }, legato: 0.9,
+                   filter: { type: 'lowpass', freq: 3200, q: 0.9 },
+                   vibrato: { rate: 5, cents: 10, delay: 0.25 } } },
+        { play: 'chords', rule: 'pad', voicing: 'seventh',
+          voice: { wave: 'sawtooth', gain: 0.03, unison: [-10, 10], spread: 0.6,
+                   env: { a: 0.6, d: 0.5, s: 0.85, r: 0.8 }, legato: 0.98,
+                   filter: { type: 'lowpass', freq: 1700, q: 0.8 } } },
+        { play: 'chords', rule: 'rhythm', pattern: '. . x . . . x . . . x . . . x .',
+          voice: { wave: 'sawtooth', gain: 0.03, env: { a: 0.001, d: 0.16, s: 0, r: 0.04 },
+                   filter: { type: 'lowpass', freq: 3400, q: 9, sweep: { to: 380, time: 0.13 } } } },
+        { play: 'bass', rule: 'octaves',
+          voice: { wave: 'sawtooth', gain: 0.12, env: { a: 0.002, d: 0.1, s: 0.45, r: 0.03 }, legato: 0.8,
+                   filter: { type: 'lowpass', freq: 900, q: 7, sweep: { to: 200, time: 0.11 } } } },
+        { play: 'drum', pattern: 'X . . . x . . . X . . . x . . .',
+          voice: { wave: 'kick', freq: 115, gain: 0.3, env: { a: 0.001, d: 0.2, s: 0, r: 0.02 } } },
+        { play: 'drum', pattern: '. . x . . . x . . . x . . . x .', fill: '. . x . . . x . . . x . x x x x',
+          voice: { wave: 'noise', gain: 0.04, pan: 0.3, env: { a: 0.001, d: 0.05, s: 0, r: 0.01 },
+                   filter: { type: 'highpass', freq: 8500, q: 0.7 } } },
+        { play: 'drum', pattern: '. . . . x . . . . . . . x . . .',
+          voice: { wave: 'noise', gain: 0.06, pan: -0.2, env: { a: 0.001, d: 0.14, s: 0, r: 0.04 },
+                   filter: { type: 'bandpass', freq: 1500, q: 0.8 } } }
+      ],
+      effects: { crush: 8, sweep: { freq: 2600, depth: 2100, bars: 4, q: 5 },
+                 echo: { time: 0.34, feedback: 0.32, mix: 0.22 },
+                 reverb: { seconds: 2.2, decay: 3, mix: 0.3 } }
+    },
+
+    // 6 -- 1996 Nintendo 64: samples squeezed onto a cartridge, played by the
+    // RSP, so everything sounds muffled and bathed in reverb.
+    {
+      name: 'Nintendo 64',
+      about: 'Synth-orchestral: a fat, slowly vibrating string pad, brassy stabs punching the chords, the melody on a breathy flute in the A section and a proud horn in the B, bowed basses, timpani and a crash at each section, all a little muffled and swimming in a big hall reverb.',
+      trait: 'Cartridge-squeezed samples: the whole mix rolled off above about 9 kHz, orchestral pads and brass, and a big reverb over everything.',
+      parts: [
+        { play: 'melody', rule: 'full', sections: ['A'],
+          voice: { wave: 'triangle', gain: 0.085, env: { a: 0.04, d: 0.25, s: 0.75, r: 0.2 }, legato: 0.92,
+                   filter: { type: 'lowpass', freq: 2600, q: 0.7 },
+                   vibrato: { rate: 5.2, cents: 16, delay: 0.18 } } },
+        { play: 'melody', rule: 'full', sections: ['B'],
+          voice: { wave: 'sawtooth', gain: 0.065, unison: [6], env: { a: 0.05, d: 0.25, s: 0.8, r: 0.2 }, legato: 0.92,
+                   filter: { type: 'lowpass', freq: 1500, q: 1.2 },
+                   vibrato: { rate: 5, cents: 14, delay: 0.25 } } },
+        { play: 'chords', rule: 'pad',
+          voice: { wave: 'sawtooth', gain: 0.028, unison: [-13, -5, 6, 12], spread: 0.6,
+                   env: { a: 0.45, d: 0.4, s: 0.85, r: 0.7 }, legato: 0.98,
+                   filter: { type: 'lowpass', freq: 2100, q: 0.7 },
+                   vibrato: { rate: 4.4, cents: 8, delay: 0.3 } } },
+        { play: 'chords', rule: 'rhythm', pattern: 'X . . x . . x . . . . . x . . .', fill: 'X . . x . . x . . . x . X . X .',
+          voice: { wave: 'sawtooth', gain: 0.04, unison: [8],
+                   env: { a: 0.015, d: 0.16, s: 0.45, r: 0.1 }, legato: 0.8,
+                   filter: { type: 'lowpass', freq: 850, q: 1.5, sweep: { to: 2700, time: 0.07 } } } },
+        { play: 'bass', rule: 'held',
+          voice: { wave: 'sawtooth', gain: 0.1, env: { a: 0.08, d: 0.3, s: 0.8, r: 0.25 }, legato: 0.95,
+                   filter: { type: 'lowpass', freq: 420, q: 0.8 } } },
+        { play: 'drum', pattern: 'X . . . . . . . x . . . . . . .', fill: 'X . . . . . . . x . . . x . x x',
+          voice: { wave: 'kick', freq: 95, gain: 0.26, env: { a: 0.002, d: 0.4, s: 0, r: 0.05 } } },
+        { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
+          voice: { wave: 'noise', gain: 0.06, env: { a: 0.002, d: 1.2, s: 0, r: 0.1 },
+                   filter: { type: 'highpass', freq: 4500, q: 0.6 } } }
+      ],
+      effects: { lowpass: 9000, reverb: { seconds: 3.2, decay: 2.5, mix: 0.42 } }
+    },
+
+    // 7 -- 1998 Dreamcast: the AICA's 64 voices at full CD quality, and a
+    // proper effects DSP.
+    {
+      name: 'Dreamcast',
+      about: 'Bright and upbeat: jazzy ninth chords comped on an electric piano, a funky bass popping octaves, the melody on a crisp synth lead, a vibraphone climbing the chords in the B section, over a swung breakbeat with ghost-note snares, a sizzling ride and a crash at each section.',
+      trait: 'Crisp, full-band sound for the first time: clean bright chords with real extensions, a breakbeat with real cymbals, and no filter muffling the top end.',
+      swing: 0.12,
+      parts: [
+        { play: 'melody', rule: 'full',
+          voice: { wave: 'sawtooth', gain: 0.06, unison: [5], env: { a: 0.004, d: 0.2, s: 0.7, r: 0.1 }, legato: 0.85,
+                   filter: { type: 'lowpass', freq: 5200, q: 0.8 },
+                   vibrato: { rate: 6, cents: 14, delay: 0.15 } } },
+        { play: 'chords', rule: 'rhythm', voicing: 'ninth', pattern: 'x - . . . . x - . . x . . . . .',
+          fill: 'x - . . . . x - . . x . x . x .',
+          voice: { wave: 'sine', gain: 0.07, fm: { ratio: 1, index: 1.3 },
+                   env: { a: 0.002, d: 0.45, s: 0.3, r: 0.18 }, legato: 0.9 } },
+        { play: 'chords', rule: 'broken', voicing: 'seventh', octave: 1, sections: ['B'],
+          voice: { wave: 'sine', gain: 0.045, pan: 0.35, fm: { ratio: 3.5, index: 0.8 },
+                   env: { a: 0.002, d: 0.35, s: 0, r: 0.1 } } },
+        { play: 'bass', rule: 'octaves',
+          voice: { wave: 'sine', gain: 0.18, fm: { ratio: 1, index: 2 },
+                   env: { a: 0.002, d: 0.14, s: 0.35, r: 0.03 }, legato: 0.75 } },
+        { play: 'drum', pattern: 'X . x . . . . . . . x x . . . .', fill: 'X . x . . . . . . . x . x . x .',
+          voice: { wave: 'kick', freq: 140, gain: 0.38, env: { a: 0.001, d: 0.15, s: 0, r: 0.02 } } },
+        { play: 'drum', pattern: '. . . . X . . x . x . . X . . x', fill: '. . . . X . . x . x . . X x X X',
+          voice: { wave: 'noise', gain: 0.13, env: { a: 0.001, d: 0.12, s: 0, r: 0.03 },
+                   filter: { type: 'bandpass', freq: 2100, q: 0.7 } } },
+        { play: 'drum', pattern: 'X . x x X . x x X . x x X . x x',
+          voice: { wave: 'noise', gain: 0.03, pan: -0.35, env: { a: 0.001, d: 0.2, s: 0, r: 0.04 },
+                   filter: { type: 'highpass', freq: 6500, q: 0.6 } } },
+        { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
+          voice: { wave: 'noise', gain: 0.06, pan: 0.4, env: { a: 0.001, d: 1.1, s: 0, r: 0.1 },
+                   filter: { type: 'highpass', freq: 5000, q: 0.5 } } }
+      ],
+      effects: { reverb: { seconds: 1.2, decay: 4, mix: 0.16 } }
+    },
+
+    // 8 -- 2000 PlayStation 2: streamed film-score audio, wide and dark.
+    {
+      name: 'PlayStation 2',
+      about: 'Cinematic: slow, wide strings singing the melody over a dark string bed, a low A drone that never lets go, a deep eighth-note pulse under it and a heartbeat of distant drums that swell into taiko hits at the end of each section.',
+      trait: 'Film-score texture: slow strings spread wide across the stereo field, a low drone and a deep pulse, dark and rolled off, in a long hall.',
+      parts: [
+        { play: 'melody', rule: 'full',
+          voice: { wave: 'sawtooth', gain: 0.06, unison: [-8, 7], spread: 0.7,
+                   env: { a: 0.22, d: 0.3, s: 0.9, r: 0.5 }, legato: 0.98,
+                   filter: { type: 'lowpass', freq: 1500, q: 0.8 },
+                   vibrato: { rate: 4.6, cents: 12, delay: 0.3 } } },
+        { play: 'chords', rule: 'pad', octave: -1,
+          voice: { wave: 'sawtooth', gain: 0.03, unison: [-14, 13], spread: 1,
+                   env: { a: 0.9, d: 0.4, s: 0.9, r: 1.2 }, legato: 0.99,
+                   filter: { type: 'lowpass', freq: 900, q: 0.7 } } },
+        { play: 'bass', rule: 'eighths', octave: -1,
+          voice: { wave: 'triangle', gain: 0.22, env: { a: 0.004, d: 0.14, s: 0.25, r: 0.05 }, legato: 0.7,
+                   filter: { type: 'lowpass', freq: 320, q: 0.9 } } },
+        { play: 'drum', pattern: 'X . . x . . . . X . . x . . . .', fill: 'X . . x . . . . X . . . X . X X',
+          voice: { wave: 'kick', freq: 70, gain: 0.34, env: { a: 0.002, d: 0.35, s: 0, r: 0.05 } } }
+      ],
+      drone: [
+        { wave: 'sawtooth', freq: 55, gain: 0.045, filter: { type: 'lowpass', freq: 240, q: 1 },
+          wobble: { rate: 0.13, depth: 0.4 } },
+        { wave: 'sine', freq: 110, gain: 0.025 }
+      ],
+      effects: { lowpass: 4200, reverb: { seconds: 4, decay: 2, mix: 0.45 } }
+    },
+
+    // 9 -- 2001 Xbox: a PC sound chip in a box, streaming real recordings;
+    // the soundtrack goes guitar.
+    {
+      name: 'Xbox',
+      about: 'Drop-tuned rock: low palm-muted power-chord chugs double-tracked hard left and right, the melody screamed out on an overdriven lead guitar, a growling bass an octave down, a heavy kick and a cracking snare that rolls into each new section, with a crash to open it.',
+      trait: 'A guitar amp in software: a saw through a heavy drive, power chords tuned down low, a heavy kick and snare and wide stereo.',
+      parts: [
+        { play: 'melody', rule: 'full',
+          voice: { wave: 'sawtooth', gain: 0.055, drive: 0.6, env: { a: 0.004, d: 0.2, s: 0.8, r: 0.1 }, legato: 0.92,
+                   filter: { type: 'lowpass', freq: 3600, q: 1 },
+                   vibrato: { rate: 6.2, cents: 28, delay: 0.14 } } },
+        // The riff double-tracked: two takes, one hard left and one hard right,
+        // a few cents apart, so the chugs fill the sides and leave the middle
+        // to the kick, the bass and the lead.
+        { play: 'chords', rule: 'rhythm', voicing: 'power', octave: -1,
+          pattern: 'X - x x X - x x X - x x X x X x', fill: 'X - x x X - x x X - X - X - X -',
+          voice: { wave: 'sawtooth', gain: 0.11, unison: [-7], pan: -1, drive: 0.85,
+                   env: { a: 0.002, d: 0.08, s: 0.55, r: 0.03 }, legato: 0.8,
+                   filter: { type: 'lowpass', freq: 3000, q: 0.9 } } },
+        { play: 'chords', rule: 'rhythm', voicing: 'power', octave: -1,
+          pattern: 'X - x x X - x x X - x x X x X x', fill: 'X - x x X - x x X - X - X - X -',
+          voice: { wave: 'sawtooth', gain: 0.11, unison: [8], pan: 1, drive: 0.85,
+                   env: { a: 0.003, d: 0.08, s: 0.55, r: 0.03 }, legato: 0.78,
+                   filter: { type: 'lowpass', freq: 2800, q: 0.9 } } },
+        { play: 'bass', rule: 'eighths', octave: -1,
+          voice: { wave: 'sawtooth', gain: 0.12, drive: 0.25, env: { a: 0.002, d: 0.1, s: 0.6, r: 0.03 }, legato: 0.85,
+                   filter: { type: 'lowpass', freq: 520, q: 1 } } },
+        { play: 'drum', pattern: 'X . . . . . x . X . x . . . . .', fill: 'X . . . . . x . X x X x X x X x',
+          voice: { wave: 'kick', freq: 125, gain: 0.45, env: { a: 0.001, d: 0.14, s: 0, r: 0.02 } } },
+        { play: 'drum', pattern: '. . . . X . . . . . . . X . . .', fill: '. . . . X . . . . . X . X X X X',
+          voice: { wave: 'noise', gain: 0.2, env: { a: 0.001, d: 0.15, s: 0, r: 0.03 },
+                   filter: { type: 'bandpass', freq: 1900, q: 0.8 } } },
+        { play: 'drum', pattern: 'x . x . x . x . x . x . x . x .',
+          voice: { wave: 'noise', gain: 0.04, pan: 0.45, env: { a: 0.001, d: 0.05, s: 0, r: 0.01 },
+                   filter: { type: 'highpass', freq: 8000, q: 0.7 } } },
+        { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
+          voice: { wave: 'noise', gain: 0.07, pan: -0.45, env: { a: 0.001, d: 1.0, s: 0, r: 0.1 },
+                   filter: { type: 'highpass', freq: 4500, q: 0.5 } } }
+      ],
+      effects: { reverb: { seconds: 1, decay: 4, mix: 0.12 } }
+    },
+
+    // 10 -- 2005 Xbox 360: the big-room era; the soundtrack is a festival.
+    {
+      name: 'Xbox 360',
+      about: 'Big-room: a huge four-on-the-floor kick, a wobbling bass whose filter throbs twice a beat, supersaw pads pumping against the kick, the melody spun into bright plucked arpeggios the whole way through, and for the B section a wide supersaw lead on the tune itself, with a snare roll building into each section.',
+      trait: 'Big-room production: a bass filter driven by a tempo-locked LFO, side-chain pumping on the pads, arpeggios and a huge kick, wide and loud.',
+      parts: [
+        { play: 'melody', rule: 'arp', speed: 1, shape: [0, 12, 7, 12],
+          voice: { wave: 'sawtooth', gain: 0.055, unison: [8], spread: 0.5,
+                   env: { a: 0.001, d: 0.12, s: 0.25, r: 0.05 }, legato: 0.85,
+                   filter: { type: 'lowpass', freq: 3000, q: 3, sweep: { to: 900, time: 0.1 } } } },
+        { play: 'melody', rule: 'full', sections: ['B'],
+          voice: { wave: 'sawtooth', gain: 0.045, unison: [-15, -7, 7, 15], spread: 0.9,
+                   env: { a: 0.01, d: 0.2, s: 0.8, r: 0.15 }, legato: 0.92,
+                   filter: { type: 'lowpass', freq: 5000, q: 0.8 } } },
+        { play: 'chords', rule: 'pad',
+          voice: { wave: 'sawtooth', gain: 0.03, unison: [-12, -5, 5, 12], spread: 0.8, pump: 0.8,
+                   env: { a: 0.05, d: 0.3, s: 0.9, r: 0.3 }, legato: 0.98,
+                   filter: { type: 'lowpass', freq: 3500, q: 0.7 } } },
+        { play: 'bass', rule: 'held', octave: -1,
+          voice: { wave: 'sawtooth', gain: 0.13, unison: [-10, 10], drive: 0.3,
+                   env: { a: 0.005, d: 0.1, s: 0.9, r: 0.05 }, legato: 0.97,
+                   filter: { type: 'lowpass', freq: 900, q: 8, lfo: { perBeat: 2, depth: 0.88 } } } },
+        { play: 'bass', rule: 'held', octave: -1,
+          voice: { wave: 'sine', gain: 0.1, pump: 0.6, env: { a: 0.005, d: 0.1, s: 0.9, r: 0.05 }, legato: 0.97 } },
+        { play: 'drum', pattern: 'X . . . X . . . X . . . X . . .',
+          voice: { wave: 'kick', freq: 165, gain: 0.6, env: { a: 0.001, d: 0.3, s: 0, r: 0.03 } } },
+        { play: 'drum', pattern: '. . . . X . . . . . . . X . . .', fill: '. . . . X . . . X . X . X X X X',
+          voice: { wave: 'noise', gain: 0.16, env: { a: 0.001, d: 0.11, s: 0, r: 0.03 },
+                   filter: { type: 'bandpass', freq: 1250, q: 1 } } },
+        { play: 'drum', pattern: '. . x . . . x . . . x . . . x .',
+          voice: { wave: 'noise', gain: 0.05, pan: -0.3, env: { a: 0.001, d: 0.06, s: 0, r: 0.01 },
+                   filter: { type: 'highpass', freq: 9000, q: 0.7 } } }
+      ],
+      effects: { reverb: { seconds: 1.8, decay: 3, mix: 0.2 } }
+    }
   ];
 
   // ============================================================ the numbers
@@ -266,10 +495,40 @@
   var NOTE_INDEX = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
   var PLAYS = { melody: 1, bass: 1, chords: 1, echo: 1, drum: 1 };
   var RULES = {
-    melody: { full: 1, bones: 1 },
+    melody: { full: 1, bones: 1, arp: 1 },
     bass: { held: 1, eighths: 1, octaves: 1, sixteenths: 1, pizz: 1 },
-    chords: { pad: 1, arp: 1, offbeat: 1, broken: 1 }
+    chords: { pad: 1, arp: 1, offbeat: 1, broken: 1, rhythm: 1 }
   };
+  var VOICINGS = { triad: 1, power: 1, seventh: 1, ninth: 1 };
+  var SCALES = { major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10] };
+
+  /** The theme's key as pitch classes: 'A minor' -> [9, 11, 0, 2, 4, 5, 7]. */
+  function keyScale(theme) {
+    var m = /^([A-G])([#b]?)\s+(major|minor)/i.exec(String(theme.key || 'C major'));
+    var tonic = m ? noteMidi(m[1] + m[2] + '4') % 12 : 0;
+    var steps = SCALES[m ? m[3].toLowerCase() : 'major'];
+    return steps.map(function (s) { return (tonic + s) % 12; });
+  }
+
+  /** A chord (midis, root first) re-voiced: power chord, or the key's 7th / 9th stacked on. */
+  function voiceChord(chord, voicing, theme) {
+    if (!voicing || voicing === 'triad') return chord;
+    var root = chord[0];
+    if (voicing === 'power') return [root, root + 7, root + 12];
+    var scale = keyScale(theme);
+    var pc = ((root % 12) + 12) % 12;
+    var idx = scale.indexOf(pc);
+    if (idx === -1) return chord;   // a root outside the key: leave it plain
+    function above(degree, floor) {
+      var want = scale[(idx + degree) % 7];
+      var m = root + ((want - pc + 12) % 12);
+      while (m <= floor) m += 12;
+      return m;
+    }
+    var out = chord.concat([above(6, root)]);
+    if (voicing === 'ninth') out.push(above(1, root + 12));
+    return out;
+  }
 
   /** 'C#4' -> MIDI note number (A4 = 69); NaN for anything that is not a note. */
   function noteMidi(name) {
@@ -308,6 +567,10 @@
     var list = s ? theme.sections[s] : [];
     return list.length && list[list.length - 1] === bar;
   }
+  function firstBarOfSection(bar, theme) {
+    var s = sectionOf(bar, theme);
+    return !!s && theme.sections[s][0] === bar;
+  }
 
   /**
    * Theme + one arrangement -> the loop as notes: an array of THEME.steps *
@@ -327,23 +590,40 @@
 
     function add(step, part, pi, midis, len, at, accent) {
       var sh = 12 * (part.octave || 0);
+      var late = arr.swing && (step % 2) ? arr.swing : 0;   // the off-16ths, played late
       out[step % total].push({
         part: pi, voice: part.voice, midis: midis.map(function (m) { return m + sh; }),
-        len: len, at: at || 0, accent: !!accent
+        len: len, at: (at || 0) + late, accent: !!accent
       });
     }
     function inSection(part, bar) {
       return !part.sections || part.sections.indexOf(sectionOf(bar, theme)) !== -1;
+    }
+    function patternFor(part, bar) {
+      if (part.fill && lastBarOfSection(bar, theme)) return part.fill;
+      if (part.open && firstBarOfSection(bar, theme)) return part.open;
+      return part.pattern;
     }
 
     arr.parts.forEach(function (part, pi) {
       for (var bar = 0; bar < theme.bars; bar++) {
         if (!inSection(part, bar)) continue;
         var b0 = bar * S;
-        var chord = chords[bar];
+        var chord = voiceChord(chords[bar], part.voicing, theme);
         if (part.play === 'melody' || part.play === 'echo') {
           var delay = part.play === 'echo' ? (part.delay || 3) : 0;
-          if (part.rule === 'bones') {
+          if (part.rule === 'arp') {
+            var asp = part.speed || 1, shp = part.shape || [0, 12, 7, 12];
+            var cur = null, curEnd = 0, ti = 0;
+            for (var mk = 0; mk < S; mk++) {
+              var me = melody[bar][mk];
+              if (me) { cur = me.midis[0]; curEnd = mk + me.len; ti = 0; }
+              if (cur === null || mk >= curEnd) continue;
+              for (var aj = 0; aj < asp; aj++) {
+                add(b0 + mk + delay, part, pi, [cur + shp[ti++ % shp.length]], 1 / asp, aj / asp, !!me && aj === 0);
+              }
+            }
+          } else if (part.rule === 'bones') {
             for (var h = 0; h < 2; h++) {
               for (var k = h * half; k < (h + 1) * half; k++) {
                 var e = melody[bar][k];
@@ -376,9 +656,13 @@
             for (var st = 0; st < S; st++) {
               for (var j = 0; j < sp; j++) add(b0 + st, part, pi, [tones[idx++ % tones.length]], 1 / sp, j / sp, false);
             }
+          } else if (part.rule === 'rhythm') {
+            parseBar(patternFor(part, bar)).forEach(function (e, k) {
+              if (e) add(b0 + k, part, pi, chord, e.len, 0, e.accent);
+            });
           }
         } else if (part.play === 'drum') {
-          var pat = parseBar(part.fill && lastBarOfSection(bar, theme) ? part.fill : part.pattern);
+          var pat = parseBar(patternFor(part, bar));
           pat.forEach(function (e, k) {
             if (!e) return;
             add(b0 + k, part, pi, [], 1, 0, e.accent);
@@ -440,17 +724,20 @@
       if (!PLAYS[p.play]) bad.push(tag + ': unknown play');
       if (RULES[p.play] && !RULES[p.play][p.rule]) bad.push(tag + ': unknown rule ' + p.rule);
       if (!p.voice || !(p.voice.gain > 0) || !p.voice.wave) bad.push(tag + ': needs a voice with a wave and a gain');
-      if (p.play === 'drum') {
-        [p.pattern, p.fill].forEach(function (pat) {
+      if (p.play === 'drum' || p.rule === 'rhythm') {
+        if (p.pattern === undefined) bad.push(tag + ': needs a pattern');
+        [p.pattern, p.fill, p.open].forEach(function (pat) {
           if (pat === undefined) return;
           var n = String(pat).trim().split(/\s+/).length;
           if (n !== theme.steps) bad.push(tag + ': a pattern of ' + n + ' steps, want ' + theme.steps);
         });
-        if (p.voice && p.voice.wave !== 'noise' && !(p.voice.freq > 0)) bad.push(tag + ': a pitched drum needs a freq');
       }
+      if (p.play === 'drum' && p.voice && p.voice.wave !== 'noise' && !(p.voice.freq > 0)) bad.push(tag + ': a pitched drum needs a freq');
+      if (p.voicing && !VOICINGS[p.voicing]) bad.push(tag + ': unknown voicing ' + p.voicing);
       (p.sections || []).forEach(function (s) { if (!theme.sections[s]) bad.push(tag + ': no section ' + s); });
     });
     if (arr.detune && arr.detune.length !== 12) bad.push('detune needs 12 offsets');
+    if (arr.swing !== undefined && !(arr.swing >= 0 && arr.swing < 0.5)) bad.push('swing is a share of a step under 0.5');
     return bad;
   }
 
@@ -622,7 +909,7 @@
       music.era = era;
       if (arr) {
         current.score = scoreOf(arr);
-        if (arr.effects) current.fxIn = effectsChain(arr.effects, bus);
+        if (arr.effects) current.fxIn = effectsChain(arr.effects, bus, current);
         if (arr.drone) startDrones(current);
       }
     }
@@ -689,24 +976,88 @@
         var f = midiFreq(m);
         return arr.detune ? f * Math.pow(2, arr.detune[((m % 12) + 12) % 12] / 1200) : f;
       });
+      var beat = stepDur * theme.steps / 4;
       for (var i = 0; i < freqs.length; i++) {
+        var end = t + held + (env.s > 0 ? env.r : env.d) + 0.03;
+        // osc -> drive -> filter -> envelope -> pump -> pan -> the era's bus
         var g = ctx.createGain();
         shape(g.gain, t, held, peak / Math.sqrt(freqs.length), env);
+        var tail = g;
+        if (v.pump) {
+          var pg = ctx.createGain();
+          pumpShape(pg.gain, t, end, beat, v.pump);
+          tail.connect(pg);
+          tail = pg;
+        }
+        if (v.pan) tail = panned(tail, v.pan);
+        tail.connect(out);
         var head = g;
         if (v.filter) {
           var flt = ctx.createBiquadFilter();
           flt.type = v.filter.type;
           flt.frequency.value = v.filter.freq;
           flt.Q.value = v.filter.q || 0.7;
-          flt.connect(g);
+          if (v.filter.sweep) {
+            flt.frequency.setValueAtTime(v.filter.freq, t);
+            flt.frequency.exponentialRampToValueAtTime(Math.max(20, v.filter.sweep.to), t + Math.max(0.01, v.filter.sweep.time));
+          }
+          if (v.filter.lfo) {
+            var wob = ctx.createOscillator();
+            wob.type = v.filter.lfo.wave || 'sine';
+            wob.frequency.value = v.filter.lfo.perBeat / beat;
+            var wd = ctx.createGain();
+            wd.gain.value = v.filter.freq * v.filter.lfo.depth;
+            wob.connect(wd);
+            wd.connect(flt.frequency);
+            wob.start(t);
+            wob.stop(end);
+          }
+          flt.connect(head);
           head = flt;
         }
-        g.connect(out);
-        var end = t + held + (env.s > 0 ? env.r : env.d) + 0.03;
+        if (v.drive) {
+          var sh = ctx.createWaveShaper();
+          sh.curve = driveCurve(v.drive);
+          sh.connect(head);
+          head = sh;
+        }
         if (v.wave === 'noise') { noise(head, t, end); continue; }
         var layers = [0].concat(v.unison || []);
-        for (var u = 0; u < layers.length; u++) osc(v, freqs[i], layers[u], head, t, held, end, layers.length);
+        for (var u = 0; u < layers.length; u++) {
+          // spread: the unison layers alternate left and right (the centre layer stays put)
+          var into = v.spread && u > 0 ? panned(null, (u % 2 ? -1 : 1) * v.spread, head) : head;
+          osc(v, freqs[i], layers[u], into, t, held, end, layers.length);
+        }
       }
+    }
+
+    /** A stereo panner after `from` (or before `to`); a context without one passes straight through. */
+    function panned(from, pan, to) {
+      if (typeof ctx.createStereoPanner !== 'function') return from || to;
+      var p = ctx.createStereoPanner();
+      p.pan.value = Math.max(-1, Math.min(1, pan));
+      if (from) from.connect(p);
+      if (to) p.connect(to);
+      return p;
+    }
+
+    /** The side-chain pump: the gain dips on every beat and swells back, as if a kick pushed it. */
+    function pumpShape(param, t, end, beat, depth) {
+      param.setValueAtTime(1, t);
+      for (var b = t, n = 0; b < end && n < 64; b += beat, n++) {
+        param.setValueAtTime(Math.max(0.0001, 1 - depth), b);
+        param.linearRampToValueAtTime(1, b + beat * 0.6);
+      }
+    }
+
+    var driveCurves = {};
+    /** An overdrive's transfer curve (a hard-ish tanh), cached per amount. */
+    function driveCurve(amount) {
+      if (driveCurves[amount]) return driveCurves[amount];
+      var n = 1024, c = new Float32Array(n), k = 1 + amount * 30, norm = Math.tanh(k);
+      for (var i = 0; i < n; i++) { var x = i * 2 / n - 1; c[i] = Math.tanh(k * x) / norm; }
+      driveCurves[amount] = c;
+      return c;
     }
 
     function shape(param, t, held, peak, env) {
@@ -796,7 +1147,7 @@
      * An era's output chain, into its bus: grit (a soft clip), a low-pass
      * over the whole mix, then an echo and/or a reverb fed from after them.
      */
-    function effectsChain(fx, bus) {
+    function effectsChain(fx, bus, track) {
       var input = ctx.createGain();
       var node = input;
       if (fx.grit) {
@@ -807,6 +1158,15 @@
         node.connect(shaper);
         node = shaper;
       }
+      if (fx.crush) {
+        // Fewer amplitude steps: the grainy edge of compressed samples.
+        var crusher = ctx.createWaveShaper();
+        var cn = 2048, cc = new Float32Array(cn), lv = Math.pow(2, fx.crush) / 2;
+        for (var ci = 0; ci < cn; ci++) cc[ci] = Math.round((ci * 2 / cn - 1) * lv) / lv;
+        crusher.curve = cc;
+        node.connect(crusher);
+        node = crusher;
+      }
       if (fx.lowpass) {
         var lp = ctx.createBiquadFilter();
         lp.type = 'lowpass';
@@ -814,6 +1174,24 @@
         lp.Q.value = 0.5;
         node.connect(lp);
         node = lp;
+      }
+      if (fx.sweep) {
+        // A resonant low-pass whose cutoff rises and falls once every `bars` bars.
+        var sw = ctx.createBiquadFilter();
+        sw.type = 'lowpass';
+        sw.frequency.value = fx.sweep.freq;
+        sw.Q.value = fx.sweep.q || 6;
+        var lfo = ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 1 / ((fx.sweep.bars || 4) * 4 * 60 / theme.bpm);
+        var dep = ctx.createGain();
+        dep.gain.value = Math.min(fx.sweep.depth, fx.sweep.freq - 40);
+        lfo.connect(dep);
+        dep.connect(sw.frequency);
+        lfo.start(ctx.currentTime);
+        if (track) track.drones.push(lfo);
+        node.connect(sw);
+        node = sw;
       }
       node.connect(bus);   // the dry path
       if (fx.echo) {
@@ -933,6 +1311,8 @@
     noteMidi: noteMidi,
     noteFreq: noteFreq,
     parseBar: parseBar,
+    keyScale: keyScale,
+    voiceChord: voiceChord,
     arrange: arrange,
     themeProblems: themeProblems,
     arrangementProblems: arrangementProblems,

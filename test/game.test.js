@@ -670,7 +670,8 @@ test('the era records the game time it last changed at', () => {
 });
 
 test('the ladder stops at the top: more points never pass the last era', () => {
-  const g = newGame();
+  // A game with no match end (the attract rally's rules), so points can go on.
+  const g = Pong.createGame({ rng: () => 0.5, phase: 'playing', rules: { matchPoints: 0 } });
   for (let i = 0; i < Pong.TOP_ERA; i++) concede(g);
   assert.strictEqual(g.era, Pong.TOP_ERA);
   const stamp = g.eraChangedAt;
