@@ -931,6 +931,186 @@
         "shading": "medium shading",
         "detail": "low detail"
       }
+    },
+    {
+      "name": "era2-players-left",
+      "file": "era2-players-left.png",
+      "prompt": "NES 8-bit sprite sheet of a tennis player boy, side view facing right, red headband, white shirt and white shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "seed": 12251,
+      "date": "2026-09-11T03:22:11.121Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 19.8,
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 343,
+      "sha256": "c2416c48a6b372eadce1c2cb67ed67de6a08135bd99e03c3fd54acade667ea8b",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite sheet of a tennis player boy, side view facing right, red headband, white shirt and white shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+        "image_size": {
+          "width": 30,
+          "height": 264
+        },
+        "seed": 12251,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era2-players-right",
+      "file": "era2-players-right.png",
+      "prompt": "NES 8-bit sprite sheet of a rival tennis player, side view facing right, blue cap, green shirt, dark shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "seed": 12252,
+      "date": "2026-09-11T03:22:26.218Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 14.5,
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 499,
+      "sha256": "6ba2c57d9adecce1687056102a705ae66cfef6aef7cf9072b3d0801324767344",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite sheet of a rival tennis player, side view facing right, blue cap, green shirt, dark shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+        "image_size": {
+          "width": 30,
+          "height": 264
+        },
+        "seed": 12252,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era2-player-left-pose",
+      "file": "era2-player-left-pose.png",
+      "prompt": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12253,
+      "date": "2026-09-11T03:23:42.867Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 27.7,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 2250,
+      "sha256": "c03b53887e6321903b3b0fc920fa790cfbb1c365792fff9663068d7a924d528d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12253,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era2-player-right-pose",
+      "file": "era2-player-right-pose.png",
+      "prompt": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12254,
+      "date": "2026-09-11T03:24:06.548Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 21.5,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 2414,
+      "sha256": "bb9643dd7f9636e6cb9955e85c5908ce6a59cdbc0117454313e979a5f4d3d1a5",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12254,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
     }
   ]
 }
