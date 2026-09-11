@@ -144,3 +144,5 @@ art bible's era 8 page, [docs/ART.md](../ART.md)).
    sparks, the flare, the rain, the ball, and the letterbox with its subtitle and plates.
 4. The typed line: a subtitle that reveals one letter every 0.03 s and holds a second is the
    cheapest "cutscene" there is.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the bottom plates already say CPU, so a second caption beside the digits earned nothing.

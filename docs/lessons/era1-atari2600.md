@@ -152,3 +152,5 @@ art bible's era 1 page, [docs/ART.md](../ART.md)). A rally at this era:
    kernel's rate).
 4. [rally.mjs](../shots/item-1224/rally.mjs): plays a real rally in headless Chrome by following
    the ball with the mouse, and times two seconds of it (16.7 ms a frame, mean and p95).
+
+- **The opponent's name is not drawn in this era (item 1261)**: the HUD is two digits in the paddles' own colours, and the 3x5 caption under the right one read as a smudge at the 2600's resolution; a 2600 cart named nobody anyway.

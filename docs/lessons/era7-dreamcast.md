@@ -149,3 +149,5 @@ arcade table. Rally frame: [rally-era7.png](../shots/item-1231/rally-era7.png).
 4. Real models for the players, not sprites (see above). The stand-in's concept (an orange
    skater in headphones against a blue one in a beanie, both on yellow skates) is the brief
    for them.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the placard already says CPU beside the right score, so DREAM CPU beside it said the same thing twice.
