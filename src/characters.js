@@ -95,7 +95,12 @@
   var ERAS = {
     1:  { skin: '#d4a060', body: '#2c3c9c', scale: 2.5 },                    // Atari 2600
     2:  { sheets: { left: 'era2-sheet-left', right: 'era2-sheet-right' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' }, // NES (item 1225: assets/pixellab/era2-players-sheet.mjs)
-    3:  { skin: '#eeaa88', body: '#222266', scale: 2.5, res: 2 },            // Genesis
+    // Genesis (item 1226): the barbarian and the knight, pixflux sheets re-cut
+    // offline to 20 x 25 frames (assets/pixellab/era3-players-cut.mjs), so the
+    // scale is 3.2, not the bible's 2.6 for 12 x 52: 80 units tall, one paddle.
+    3:  { sheets: { left: 'era3-p1', right: 'era3-p2' }, frame: { w: 20, h: 25 },
+          hand: { x: 20, y: 13 }, scale: 3.2, fps: 10,
+          skin: '#eeaa88', body: '#222266', res: 1 },
     4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
