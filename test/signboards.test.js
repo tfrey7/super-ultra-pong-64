@@ -58,20 +58,31 @@ function contrast(a, b) {
 
 /** Every lit block of the name, where the block font puts it: [x, y] of each cell. */
 function nameCells(k) {
+  // A routine that letters its name at its own size says so (k.nameCell, the
+  // Atari's since item 1196); every other rung uses the card's.
+  const cw = k.nameCell ? k.nameCell.w : S.card.cell;
+  const ch = k.nameCell ? k.nameCell.h : S.card.cell;
+  const gap = k.nameGap !== undefined ? k.nameGap : S.card.gap;
   const out = [];
-  let x = k.mid - k.textW / 2;
-  for (const ch of k.text) {
-    const rows = S.glyphs[ch];
+  let x = k.nameLeft !== undefined ? k.nameLeft : k.mid - k.textW / 2;
+  for (const c0 of k.text) {
+    const rows = S.glyphs[c0];
     if (rows) {
       rows.forEach((row, r) => {
         for (let c = 0; c < row.length; c++) {
-          if (row[c] === '1') out.push([x + c * S.card.cell, k.nameTop + r * S.card.cell]);
+          if (row[c] === '1') out.push([x + c * cw, k.nameTop + r * ch]);
         }
       });
     }
-    x += (rows ? rows[0].length : 2) * S.card.cell + S.card.gap;
+    x += (rows ? rows[0].length : 2) * cw + gap;
   }
   return out;
+}
+
+/** Is v a whole number of steps of size step? */
+function onGrid(v, step) {
+  const n = v / step;
+  return Math.abs(n - Math.round(n)) < 1e-6;
 }
 
 test('the hook takes all eleven rungs, and every machine has a signboard of its own', () => {
@@ -149,6 +160,19 @@ test('every signboard stays legible for its whole display time, at its machine\'
           assert.ok(hit[3] >= pw - 1e-6 && hit[4] >= ph - 1e-6,
             `era ${era}: a ${hit[3]}x${hit[4]} block is at least one ${px.w}x${px.h} pixel (${pw.toFixed(2)}x${ph.toFixed(2)})`);
           assert.ok(contrast(hit[0], box) >= 3, `era ${era}: ${hit[0]} on ${box} reads (contrast ${contrast(hit[0], box).toFixed(2)})`);
+          // A block under two machine pixels across that straddles the machine's
+          // pixels smears into its neighbours on that screen: the Atari's old
+          // 7-wide blocks were 1.4 of its pixels, and at 160 wide the 9 of 1977
+          // read as a 5 and 2600 ran together (item 1196). Such a block has to
+          // start and end on the machine's own pixel columns, and start on its lines.
+          if (hit[3] < 2 * pw - 1e-6) {
+            assert.ok(onGrid(hit[1], pw) && onGrid(hit[1] + hit[3], pw),
+              `era ${era}: the ${hit[3]}-wide block at x ${hit[1]} of "${k.text}" sits on the ${px.w}-wide screen's pixels (${pw.toFixed(2)} each)`);
+          }
+          if (hit[4] < 2 * ph - 1e-6) {
+            assert.ok(onGrid(hit[2], ph),
+              `era ${era}: the ${hit[4]}-high block at y ${hit[2]} of "${k.text}" starts on one of the ${px.h} lines (${ph.toFixed(3)} each)`);
+          }
         }
       }
       Pong.step(g, FRAME, {});

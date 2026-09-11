@@ -17,7 +17,11 @@ built** -- each has its own look, its own voice and a change moment -- and the R
 ladder* tables them, with a tracked reference frame of each in `docs/shots/eras/`. Eras 5 to 10
 are specified in `docs/ERAS.md`, the era bible. It opens on a **title screen** -- a real `phase` in
 `src/game.js`, where `step()` moves nothing at all until `startGame()` is called -- with a
-self-playing demo rally behind it, drawn from the score's own block font. It is plain HTML and plain JavaScript — **no npm, no
+self-playing demo rally behind it, drawn from the score's own block font. `src/attract.js` (item
+1207) dresses that phase as the cabinet: the tube warming up, PONG and INSERT COIN, and a click as
+a coin whose CREDIT 1 / PLAYER 1 READY plays inside a held first serve -- so the game is already
+`'playing'` 150 ms after the click, which is what the playtest checks. `Pong.backToTitle(game)` is
+the one call that returns a finished match to it; `?title=off` or any `?era=N` skips it. It is plain HTML and plain JavaScript — **no npm, no
 `package.json`, no build step, no framework, no dependencies of any kind** — and that is a
 deliberate property to preserve, not an accident of it being early. The layout exists so later
 eras are *additions*: `src/game.js` is the rules, `src/render.js` the look, `src/input.js` the
@@ -72,7 +76,7 @@ done. The repo itself binds nothing.
 node --test
 ```
 
-From the repo root, Node 18+. **333 tests, about two seconds** (2.3 s measured by item 1157, with all eleven eras built). It is the headless suite over the pure rules
+From the repo root, Node 18+. **373 tests, about three seconds** (2.7 s measured by item 1181 on master 1c8c0c3 merged in, with all eleven eras built). It is the headless suite over the pure rules
 in `src/game.js` — paddle bounces and their angles, wall bounces, scoring on each side, the serve
 reset, frame-rate independence and the era ladder — plus the era-look checks, which draw on a
 recording canvas and need no browser, and the sound checks (`test/sound.test.js`), which drive the
@@ -200,7 +204,12 @@ his emulator — never touch either.**
   the final one, so a hit and a bounce in one frame would lose a note. `src/sound.js` reads the list
   and writes nothing, plays the real game only (never the attract rally), and opens no audio until
   `begin()` in `src/main.js` unlocks it from a click or key -- browsers refuse sound before that.
-  An era's voice is its row in `VOICES` in `src/sound.js`.
+  An era's voice is its row in `VOICES` in `src/sound.js` (eras 0 to 4) or its look's `voice`
+  (eras 5 up), and every note field and effect in `docs/ERAS.md` section 3 is played (item 1181).
+  **Eras 0 to 4 are pinned call for call**: `tools/sound-eras0-4.json` holds every node, ramp and
+  connection they schedule, and a test compares the live player against it. A change to the player
+  that should leave them alone must leave that test green; a deliberate change to one of those
+  voices re-records it with `node tools/soundtrace.js`, committed with the change and said so.
 - **Nothing under `test/` may be a helper.** `node --test` runs every `.js` file under `test/`,
   which is why the era-look loader and scenes live in `tools/eralooks.js`.
 - **The computer paddle is deliberately beatable** — it only chases once the ball heads its way,
@@ -239,6 +248,12 @@ his emulator — never touch either.**
 - **Proof paths in a report must survive the landing.** The integrator deletes your worktree, so
   a picture cited at `G:/Claude Stuff/super-ultra-pong-64-<name>/...` is a dead link the moment the
   branch lands (item 1138). Cite the path the file will have in the main checkout.
+- **A debugging port another run's Chrome already holds hands you THAT run's page.** Item 1196
+  ran the full playtest on `--port 9347` while another worker was on it: the first checks read
+  a page already in play at 3-4 with its sound unlocked ("phase is playing"), and the DevTools
+  connection dropped (code 1006) when the other run finished -- 2 of 6, none of it the game.
+  The same command on a port nobody was using passed 44/44. A playtest that fails its opening
+  title-screen checks with a score already on the board is this; move to another `--port`.
 - **The ladder walk's "new era draws afterwards" check leaves out the name card's band.** It
   compares the live canvas with each era drawn offscreen, and the card covers the middle 180 rows
   of both until the serve; a look that draws something important only there would pass unseen.
@@ -272,6 +287,12 @@ his emulator — never touch either.**
   ladder walk's pixel comparison passed with era 3's pixellab court and ball on the canvas
   ("0 of 336000 pixels differ from era 3 drawn offscreen"). A page you open by hand off disk still
   taints its canvas; nothing in the game reads pixels back, so only the harness cares.
+  Item 1187's six 3D eras carry their textures as data: URIs (`src/textures3d.js`, written by
+  `assets/pixellab/tex3d-embed.mjs`) the way era 2 does, so those never taint even by hand.
+- **The playtest names a page exception by its own message now.** Until item 1187 a throw inside
+  an evaluated expression came back as the single word `Uncaught`; one climb on that card stopped
+  so while filming a change and could not be reproduced on the next two. The message and the page's
+  stack are printed in full since then, so a repeat says what it was.
 - **The pixellab balance lags the bill.** `node tools/pixellab.mjs` reads the subscription's
   generations left before and after a generation; on item 1177's test image the call was billed
   1 generation, the count read 9953 both times, and a `balance` run about two minutes later read
