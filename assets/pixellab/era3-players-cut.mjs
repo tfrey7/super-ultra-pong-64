@@ -18,6 +18,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { decode, encode, snapImage } from '../../tools/palette-snap.mjs';
 
@@ -99,11 +100,32 @@ export function main(argv) {
   // One frame size for both players, so the rig's one frame/hand fits both.
   let w = 0, h = 0;
   for (const c of cut) for (const f of c.figs) { w = Math.max(w, f.w); h = Math.max(h, f.h); }
+  const manifestPath = path.join(HERE, 'manifest.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
   for (const c of cut) {
     const sheet = snapImage(pack(c.img, c.figs, w, h), 3, ALPHA);
-    fs.writeFileSync(path.join(HERE, c.job.to), encode(sheet));
+    const png = encode(sheet);
+    fs.writeFileSync(path.join(HERE, c.job.to), png);
     console.log(c.job.to, sheet.width + 'x' + sheet.height, 'frame', w + 'x' + h, 'from', c.figs.length, 'figures');
+    // A derived file costs 0 generations and carries its source's request.
+    const src = manifest.images.find((e) => e.file === c.job.from);
+    const name = c.job.to.replace(/\.png$/, '');
+    const entry = Object.assign({}, src, {
+      name, file: c.job.to,
+      cost: { type: 'derived', generations: 0 },
+      derivedFrom: c.job.from,
+      derivedBy: 'node assets/pixellab/era3-players-cut.mjs',
+      how: `the ${c.figs.length} figures pixflux stacked in one column, packed in order into a 3 x 6 sheet of ${w} x ${h} frames (idle 2, up 2, down 2, swing 3 with the first repeated, miss 1, win 2), feet down and shield edge right, snapped to 3 bits a channel`,
+      card: 'item 1226',
+      verdict: 'worn by era 3\'s players (src/characters.js)',
+      pixels: { width: sheet.width, height: sheet.height },
+      bytes: png.length,
+      sha256: crypto.createHash('sha256').update(png).digest('hex')
+    });
+    const at = manifest.images.findIndex((e) => e.file === c.job.to);
+    if (at >= 0) manifest.images[at] = entry; else manifest.images.push(entry);
   }
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main(process.argv.slice(2));
