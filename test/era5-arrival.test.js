@@ -115,7 +115,8 @@ test('the camera is held back until beat 3, pops home with one small overshoot, 
   for (let k = 0; k <= 200; k++) lowest = Math.min(lowest, A.liftAt(0.8 + 0.2 * k / 200));
   assert.ok(lowest < 0 && lowest >= N.floor, `one overshoot past rest, floored (${lowest.toFixed(2)})`);
   const m = look.motion;
-  for (const h of [1150 + 40 + m.height, 1150 + lowest - m.height]) {
+  const rest = look.camera.height;
+  for (const h of [rest + 40 + m.height, rest + lowest - m.height]) {
     for (const panX of [-m.pan, m.pan]) {
       const cam = T.camera(Object.assign({}, look.camera, { height: h, panX }));
       const nl = T.project(cam, 0, 600, 0), nr = T.project(cam, 800, 600, 0);

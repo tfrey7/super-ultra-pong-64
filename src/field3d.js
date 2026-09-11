@@ -47,20 +47,59 @@
   var NEAR = 10;
   var FAR = 20000;
 
-  // The scene's sizes, in field units. Item 1266 builds the real table, net and
-  // players on top of these; keep them as data so it can.
+  // The scene's sizes, in field units: the realism ladder's table (docs/ART.md
+  // section 8, built by item 1266). The top is still the rules' field, 0..800 by
+  // 0..600, its ends at x 0 and 800; the lines are paint on it, the net stands
+  // across x 400 on two posts, and four legs stand inside the top's footprint
+  // (R6: nothing between the camera and the near edge) down to a floor 110 below.
   var SIZES = {
     slab: 14,            // the table top's thickness under z 0
     rail: { depth: 18, z: 22 },
     lip: 10,
-    line: { w: 6, dash: 20, gap: 16, lift: 0.4 },
-    net: { z: 10, w: 2, post: 3, postZ: 14 },
+    line: { edge: 6, centre: 3, lift: 0.4 },
+    net: { x: 400, z: 24, w: 1.5, y0: -20, y1: 620, tape: 2.5, opacity: 0.45, post: 4 },
+    legs: { inset: { x: 70, y: 50 }, size: 12, floor: -110 },
+    floorShadow: { pad: 30, opacity: 0.28 },
     bat: { z: 22, handle: 26, handleR: 4 },
     ballRadius: 0.6,     // of ball.size, as table3d draws it
     shadow: 0.55
   };
 
   var COLOURS = { surface: '#203048', line: '#9aa3b5', rail: '#8a8f9c', net: '#e8e8e8', ball: '#ffffff', handle: '#6a4a2a' };
+
+  /**
+   * The table's pieces as field-space boxes: { x0, x1, y0, y1, z0, z1 } each,
+   * in the units the rules use (z up off the top). Pure, so node --test pins the
+   * ladder's numbers without a WebGL context; rebuild() makes a mesh per box.
+   */
+  function tableGeometry() {
+    var S = SIZES, L = S.line, N = S.net, G = S.legs;
+    var lift = [0, L.lift];
+    function b(x0, x1, y0, y1, z) { return { x0: x0, x1: x1, y0: y0, y1: y1, z0: z[0], z1: z[1] }; }
+    var lines = [
+      b(0, W, 0, L.edge, lift),                     // far edge line
+      b(0, W, H - L.edge, H, lift),                 // near edge line
+      b(0, L.edge, 0, H, lift),                     // the player's end
+      b(W - L.edge, W, 0, H, lift),                 // the computer's end
+      b(0, W, H / 2 - L.centre / 2, H / 2 + L.centre / 2, lift)   // the centre line, end to end
+    ];
+    var net = {
+      body: b(N.x - N.w / 2, N.x + N.w / 2, N.y0, N.y1, [0, N.z - N.tape]),
+      tape: b(N.x - N.w, N.x + N.w, N.y0, N.y1, [N.z - N.tape, N.z]),
+      posts: [N.y0, N.y1].map(function (y) {
+        return b(N.x - N.post / 2, N.x + N.post / 2, y - N.post / 2, y + N.post / 2, [-S.slab, N.z + 1]);
+      })
+    };
+    var legs = [];
+    [G.inset.x, W - G.inset.x].forEach(function (x) {
+      [G.inset.y, H - G.inset.y].forEach(function (y) {
+        legs.push(b(x - G.size / 2, x + G.size / 2, y - G.size / 2, y + G.size / 2, [G.floor, -S.slab]));
+      });
+    });
+    var P = S.floorShadow.pad;
+    return { lines: lines, net: net, legs: legs, floor: G.floor,
+      floorShadow: b(-P, W + P, -P, H + P, [G.floor, G.floor + 0.5]) };
+  }
 
   // ------------------------------------------------------------- the maths
   /**
@@ -183,23 +222,30 @@
       return add(new THREE.BoxGeometry(x1 - x0, z1 - z0, fy1 - fy0), mat,
         (x0 + x1) / 2 - W / 2, (z0 + z1) / 2, (fy0 + fy1) / 2 - H / 2);
     }
+    function part(g, mat) { return box(g.x0, g.x1, g.y0, g.y1, g.z0, g.z1, mat); }
+    var geo = tableGeometry();
     p.surfaceMat = material(THREE, lighting, COLOURS.surface);
     p.railMat = material(THREE, lighting, COLOURS.rail);
     p.lineMat = material(THREE, lighting, COLOURS.line);
+    // The floor under the table, as a soft shadow only: the era's painted arena
+    // is the floor, and the players' (the polygon cards') feet stand on its level.
+    p.floorShadow = part(geo.floorShadow, new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true,
+      opacity: S.floorShadow.opacity, depthWrite: false }));
+    p.legs = geo.legs.map(function (g) { return part(g, p.railMat); });
     p.slab = box(0, W, 0, H, -S.slab, 0, p.surfaceMat);
     p.farRail = box(0, W, -S.rail.depth, 0, -S.slab, S.rail.z, p.railMat);
     p.nearLip = box(0, W, H, H + S.lip, -S.slab, 0, p.railMat);
-    var lx = (W - S.line.w) / 2;
-    for (var y = 6; y < H; y += S.line.dash + S.line.gap) {
-      var y1 = Math.min(y + S.line.dash, H);
-      box(lx, lx + S.line.w, y, y1, 0, S.line.lift, p.lineMat);
-    }
-    // The net stands on the centre line, low and see-through, with a post at each end.
-    p.netMat = material(THREE, lighting, COLOURS.net, { transparent: true, opacity: 0.45, depthWrite: false });
-    p.net = box(W / 2 - S.net.w / 2, W / 2 + S.net.w / 2, 0, H, 0, S.net.z, p.netMat);
+    p.lines = geo.lines.map(function (g) { return part(g, p.lineMat); });
+    // The net across x 400, on a post at each side edge: a see-through body and a
+    // top tape in the line colour. Both are drawn before the ball (renderOrder,
+    // and neither writes depth), so the ball always passes over it (docs/ART.md 8).
+    p.netMat = material(THREE, lighting, COLOURS.net, { transparent: true, opacity: S.net.opacity, depthWrite: false });
+    p.net = part(geo.net.body, p.netMat);
+    p.tapeMat = material(THREE, lighting, COLOURS.line, { transparent: true, opacity: 1, depthWrite: false });
+    p.tape = part(geo.net.tape, p.tapeMat);
+    p.net.renderOrder = p.tape.renderOrder = 1;
     p.postMat = material(THREE, lighting, COLOURS.rail);
-    box(W / 2 - S.net.post, W / 2 + S.net.post, -S.net.post * 2, 0, 0, S.net.postZ, p.postMat);
-    box(W / 2 - S.net.post, W / 2 + S.net.post, H, H + S.net.post * 2, 0, S.net.postZ, p.postMat);
+    p.posts = geo.net.posts.map(function (g) { return part(g, p.postMat); });
 
     // The bats: a blade standing on the paddle's own rectangle (a unit box,
     // scaled to the rect every frame) and a handle out toward the owner's wall.
@@ -214,8 +260,11 @@
     });
 
     // The ball and its contact shadow (R5), a dark disc on the table at the true footprint.
-    p.ballMat = material(THREE, lighting, COLOURS.ball);
+    // The ball rides the transparent pass (at full opacity) after the net and its
+    // tape, so nothing of the net is ever drawn over it (R1, R2).
+    p.ballMat = material(THREE, lighting, COLOURS.ball, { transparent: true, opacity: 1 });
     p.ball = add(new THREE.SphereGeometry(1, 20, 14), p.ballMat, 0, 0, 0);
+    p.ball.renderOrder = 2;
     p.shadow = add(new THREE.CircleGeometry(1, 20),
       new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: S.shadow, depthWrite: false }), 0, 0.6, 0);
     p.shadow.rotation.x = -Math.PI / 2;
@@ -237,7 +286,9 @@
 
     p.surfaceMat.color.set(colourOf(look.surface, COLOURS.surface));
     p.lineMat.color.set(colourOf(look.line, COLOURS.line));
+    p.tapeMat.color.set(colourOf(look.line, COLOURS.line));
     p.railMat.color.set(colourOf(look.rail, COLOURS.rail));
+    p.postMat.color.set(colourOf(look.rail, COLOURS.rail));
 
     ['left', 'right'].forEach(function (side) {
       var r = state[side], bat = p.bats[side];
@@ -497,6 +548,7 @@
   return {
     SIZES: SIZES,
     COLOURS: COLOURS,
+    tableGeometry: tableGeometry,
     matrices: matrices,
     projectThrough: projectThrough,
     draw: draw,

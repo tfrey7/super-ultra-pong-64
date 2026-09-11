@@ -11,6 +11,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
 const eralooks = require('../tools/eralooks.js');
+const cameras = require('../tools/table3d-cameras.js');   // the ladder cameras (item 1266)
 
 const { Pong, R } = eralooks.loadRenderer(path.join(__dirname, '..'));
 const PongSound = require('../src/sound.js');
@@ -45,7 +46,7 @@ test('era 9 is the Xbox: its own look, the bible\'s camera and name card, no lon
   assert.strictEqual(look.name, '2001 Xbox');
   assert.ok(!look.placeholder);
   assert.notStrictEqual(look.draw, R.eraLook(5).draw);
-  assert.deepStrictEqual(look.camera, { tilt: 27, height: 1000, fov: 35, screenY: 303 });
+  assert.deepStrictEqual(look.camera, cameras.LADDER[9]);
   assert.strictEqual(look.card.border, '#7cd320');
   assert.strictEqual(look.card.dots, null);
   assert.strictEqual(look.paddleInk, R.eraLook(1).paddleInk, 'wears the colours era 1 picked');

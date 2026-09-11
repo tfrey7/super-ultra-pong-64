@@ -43,7 +43,7 @@
     core: '#ffffff', glow: '#ffb347'
   };
 
-  var CAMERA = { tilt: 30, height: 1250, fov: 29, screenY: 281 };
+  var CAMERA = { tilt: 26, height: 1900, fov: 23.5, screenY: 333 };   // the ladder camera (item 1266)
   // Slow drift, each term slower than one cycle in 12 s (R7); the four extremes
   // are the measured poses in tools/table3d-cameras.js.
   var DRIFT = { tilt: { amp: 1.5, period: 17 }, panX: { amp: 10, period: 23 }, height: { amp: 40, period: 29 } };
