@@ -96,6 +96,50 @@
   var SHADOW_DY = 18;
   var TRAIL = 0.014;                 // seconds between the ball's afterimages
 
+  // ------------------------------------------------------ the pixel-art sprites
+  // Generated with tools/pixellab.mjs (item 1180); each prompt, seed and size is
+  // in assets/pixellab/manifest.json. The sky is 256x48 -- the Super Nintendo's
+  // 256-pixel line, scaled 3.125x across the 800-wide field -- the paddle a
+  // neutral grey 16x64 capsule dyed each side's ink once, and the ball a 32x32
+  // orb drawn at exactly half size so it stays pixel-sharp. Until an image has
+  // decoded (and under node --test, where there is no PongSprites) the
+  // hand-drawn shape below draws in its place.
+  var SPRITES = { sky: 'snes-sky', paddle: 'snes-paddle', ball: 'snes-ball' };
+  var BALL_SPRITE = 16;              // on-screen size of the ball sprite, field units
+  var tints = {};                    // ink -> the paddle sprite dyed that ink, made once
+
+  function spriteApi() {
+    var S = root.PongSprites;
+    return S && typeof S.draw === 'function' && typeof S.ready === 'function' ? S : null;
+  }
+
+  /**
+   * The paddle sprite dyed one ink, on a canvas of its own: the grey image,
+   * multiplied by the ink, cut back to the image's own shape. Two drawImage
+   * calls and a fillRect, once per ink; null until the image and a canvas exist.
+   */
+  function tintedPaddle(S, ink) {
+    if (tints[ink]) return tints[ink];
+    var doc = root.document;
+    if (!doc || typeof doc.createElement !== 'function') return null;
+    var img = S.load(SPRITES.paddle);
+    var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+    if (!(w > 0 && h > 0)) return null;
+    var c = doc.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    var x = c.getContext('2d');
+    x.drawImage(img, 0, 0);
+    x.globalCompositeOperation = 'multiply';
+    x.fillStyle = ink;
+    x.fillRect(0, 0, w, h);
+    x.globalCompositeOperation = 'destination-in';
+    x.drawImage(img, 0, 0);
+    x.globalCompositeOperation = 'source-over';
+    tints[ink] = c;
+    return c;
+  }
+
   // -------------------------------------------------------------- the panel
   var PANEL = { w: 372, top: 22, h: 106, r: 14 };
   var SCORE = { cell: 14, gap: 12, top: 40, offset: 110 };   // render.js's score layout
@@ -144,6 +188,8 @@
   }
 
   function drawSky(ctx, state) {
+    var S = spriteApi();
+    if (S && S.draw(ctx, SPRITES.sky, 0, 0, state.width, HORIZON)) return;
     var sky = ctx.createLinearGradient(0, 0, 0, HORIZON);
     for (var i = 0; i < SKY_STOPS.length; i++) sky.addColorStop(SKY_STOPS[i][0], SKY_STOPS[i][1]);
     ctx.fillStyle = sky;
@@ -244,6 +290,18 @@
 
   /** A paddle as a shaded capsule with chrome caps, over its exact rectangle. */
   function drawPaddle(ctx, p, ink) {
+    var S = spriteApi();
+    if (S) {
+      S.load(SPRITES.paddle);
+      var dyed = S.ready(SPRITES.paddle) ? tintedPaddle(S, ink) : null;
+      if (dyed) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(dyed, p.x, p.y, p.w, p.h);
+        ctx.restore();
+        return;
+      }
+    }
     var body = ctx.createLinearGradient(p.x, 0, p.x + p.w, 0);
     body.addColorStop(0, shade(ink, -0.55));
     body.addColorStop(0.3, shade(ink, 0.45));
@@ -287,6 +345,10 @@
       }
       ctx.globalAlpha = 1;
     }
+
+    var S = spriteApi();
+    var half = BALL_SPRITE / 2;
+    if (S && S.draw(ctx, SPRITES.ball, Math.round(cx - half), Math.round(cy - half), BALL_SPRITE, BALL_SPRITE)) return;
 
     var orb = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r);
     orb.addColorStop(0, '#ffffff');
