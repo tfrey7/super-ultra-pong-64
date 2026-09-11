@@ -79,7 +79,12 @@ export const ERAS = {
        snap(c) { this.table = this.table || nesTable(); const t = rgbOf(c); let b = this.table[0];
          for (const e of this.table) if (dist2(rgbOf(e), t) < dist2(rgbOf(b), t)) b = e; return b; } },
   3: { name: 'Sega Genesis', colours: 15, bits: 3, snap: (c) => hexOf(...rgbOf(c).map((v) => nearestLevel(v, levels(3)))) },
-  4: { name: 'Super Nintendo', colours: 15, bits: 5, snap: (c) => hexOf(...rgbOf(c).map((v) => nearestLevel(v, levels(5)))) }
+  // Super Nintendo (item 1281): 15-bit colour, 5 bits a channel; one of the
+  // eight OBJ palettes a figure, 15 colours and clear; and 34 8 x 8 OBJ tiles
+  // on one scanline (272 pixels) for the whole screen -- two figures, the orb
+  // and its shadow, the balloons and the pylons -- so one figure spends at most
+  // 12 tiles on any line (`lineTiles`), counted on the 8-pixel tile grid.
+  4: { name: 'Super Nintendo', colours: 15, bits: 5, lineTiles: 12, snap: (c) => hexOf(...rgbOf(c).map((v) => nearestLevel(v, levels(5)))) }
 };
 
 // ---- the grid file ------------------------------------------------------------
@@ -198,6 +203,15 @@ export function lint(doc) {
     opaque += g.flat().filter((c) => c !== '.').length;
   }
   if (era && used.size > era.colours) faults.push(`${used.size} colours used; one ${era.name} sprite palette holds ${era.colours}`);
+  // the SNES's per-scanline OBJ budget (item 1281): 8-pixel tile columns lit on each line
+  if (era && era.lineTiles) {
+    for (const n of names.filter((m) => frames[m])) {
+      frames[n].forEach((row, y) => {
+        const tiles = new Set(row.map((c, x) => (c === '.' ? -1 : x >> 3)).filter((t) => t >= 0)).size;
+        if (tiles > era.lineTiles) faults.push(`frame ${n} row ${y} lights ${tiles} OBJ tiles; the ${era.name} gives one figure ${era.lineTiles} a line (34 for the whole screen)`);
+      });
+    }
+  }
   // feet on the floor: every beat but the win's hop stands on one row (EarthBound's 1-row rule)
   const floorRows = Object.entries(bases).filter(([n]) => !n.startsWith('win')).map(([, b]) => b);
   if (floorRows.length && Math.max(...floorRows) - Math.min(...floorRows) > 1) {
