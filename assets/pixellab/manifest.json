@@ -1909,6 +1909,1210 @@
       "how": "the 11 figures pixflux stacked in one column, packed in order into a 3 x 6 sheet of 20 x 25 frames (idle 2, up 2, down 2, swing 3 with the first repeated, miss 1, win 2), feet down and shield edge right, snapped to 3 bits a channel",
       "card": "item 1226",
       "verdict": "worn by era 3's players (src/characters.js)"
+    },
+    {
+      "name": "era4-players-left-sheet",
+      "file": "era4-players-left-sheet.png",
+      "prompt": "16-bit Super Nintendo sprite sheet, 3 columns by 6 rows of the same small hover-racing pilot facing right, side view: red and white racing suit, round red helmet with dark visor band, standing on a small grey hover pad with a blue jet flame under it. row 1 idle, row 2 leaning up, row 3 leaning down, row 4 spinning, row 5 slumped, row 6 both arms raised in victory",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "seed": 4101,
+      "date": "2026-09-11T03:22:24.000Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 17.8,
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 2747,
+      "sha256": "11a177fa2e5e2e5b62fd059bda8e50deae747b1bdd90eee1f465b66aa68a9b7c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite sheet, 3 columns by 6 rows of the same small hover-racing pilot facing right, side view: red and white racing suit, round red helmet with dark visor band, standing on a small grey hover pad with a blue jet flame under it. row 1 idle, row 2 leaning up, row 3 leaning down, row 4 spinning, row 5 slumped, row 6 both arms raised in victory",
+        "image_size": {
+          "width": 30,
+          "height": 264
+        },
+        "seed": 4101,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-left",
+      "file": "era4-pilot-left.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4102,
+      "date": "2026-09-11T03:22:43.007Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 18.4,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 3368,
+      "sha256": "b540f00eb7cd8f9abd2ada1318f982156b973f440a9215ed5b50065d461e4d2d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4102,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-right",
+      "file": "era4-pilot-right.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4103,
+      "date": "2026-09-11T03:23:02.185Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 18.5,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 2428,
+      "sha256": "76629ee98a492715a310632ea1e277f1176d4b2433bba5d85b5d216a0fc248e6",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4103,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-balloon",
+      "file": "era4-balloon.png",
+      "prompt": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "seed": 4104,
+      "date": "2026-09-11T03:23:43.204Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 27.7,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 879,
+      "sha256": "e03bd501ee9d5e36537acb2883c2f54565d4115eab2e74bcc85f4b491fd770ec",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4104,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pylon",
+      "file": "era4-pylon.png",
+      "prompt": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 4105,
+      "date": "2026-09-11T03:23:59.604Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 15.1,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 330,
+      "sha256": "cd0834af21a86f6707e68ec4bc316f2e1d2201217b57add600a72028a87de47e",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4105,
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-left-win",
+      "file": "era4-pilot-left-win.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: red and white racing suit, round red helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4106,
+      "date": "2026-09-11T03:37:50.097Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 16.5,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 1129,
+      "sha256": "d6885607f33de30237b31793b16d4cf3c4d5600db23786562de6f5701c353ad0",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: red and white racing suit, round red helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4106,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-right-win",
+      "file": "era4-pilot-right-win.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4107,
+      "date": "2026-09-11T03:38:19.463Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 24.8,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 1035,
+      "sha256": "246b8cbd1d85587efbf51000d48ca4e4d4ba383511b2dfb7c6f3c25801c91c17",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4107,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-players-left",
+      "file": "era4-players-left.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4102,
+      "date": "2026-09-11T03:22:43.007Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 96,
+        "height": 606
+      },
+      "bytes": 13669,
+      "sha256": "b634003b385ff5e610fdab67f4c1259de8b802b1e623ce0f4854099bcf24bb3a",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4102,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era4-pilot-left.png",
+      "derivedBy": "node assets/pixellab/era4-players-build.mjs",
+      "how": "the one pose cut into the rig's six beats (idle, up, down, swing, miss, win; 2/2/2/3/2/2 frames), jet flame and raised arms drawn in code, 15-bit SNES colour, capped at #f8f8d0; frame 32x101, hand (32, 41)",
+      "card": "item 1227",
+      "verdict": "worn by era 4's players (src/characters.js, ERAS[4].sheets)"
+    },
+    {
+      "name": "era4-players-right",
+      "file": "era4-players-right.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4103,
+      "date": "2026-09-11T03:23:02.185Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 96,
+        "height": 606
+      },
+      "bytes": 9292,
+      "sha256": "0cc9924325b70aacce2e229b8d5b8d99e5de6c2c10a5794be2cab53e9fb4e1ca",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4103,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era4-pilot-right.png",
+      "derivedBy": "node assets/pixellab/era4-players-build.mjs",
+      "how": "the one pose cut into the rig's six beats (idle, up, down, swing, miss, win; 2/2/2/3/2/2 frames), jet flame and raised arms drawn in code, 15-bit SNES colour, capped at #f8f8d0; frame 32x101, hand (32, 41)",
+      "card": "item 1227",
+      "verdict": "worn by era 4's players (src/characters.js, ERAS[4].sheets)"
+    },
+    {
+      "name": "era4-balloon-snes",
+      "file": "era4-balloon-snes.png",
+      "prompt": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "seed": 4104,
+      "date": "2026-09-11T03:23:43.204Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 18,
+        "height": 26
+      },
+      "bytes": 458,
+      "sha256": "8b46c34ac11e95d047ce09a79da6873e684c08208bf2249904f733e8eae237b1",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4104,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "derivedFrom": "era4-balloon.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not, cropped to the pixels it draws; 32 colours",
+      "card": "item 1227",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
+      "name": "era4-pylon-snes",
+      "file": "era4-pylon-snes.png",
+      "prompt": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 4105,
+      "date": "2026-09-11T03:23:59.604Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 8,
+        "height": 28
+      },
+      "bytes": 195,
+      "sha256": "fe51a7287c8f977df309c6d9edf873bebf15b8f6fc72aee420d849aac9bee1f5",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4105,
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "derivedFrom": "era4-pylon.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not, cropped to the pixels it draws; 12 colours",
+      "card": "item 1227",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
+      "name": "era9-armour-left",
+      "file": "era9-armour-left.png",
+      "prompt": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90101,
+      "date": "2026-09-11T03:34:40.245Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 84,
+        "height": 324
+      },
+      "bytes": 11414,
+      "sha256": "3d05574f72959dc7f6af2397387a8ab5d8e7c9599e073b9834ab69caf0109fbc",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 90101,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "derivedFrom": "era9-armour-left-raw.png",
+      "derivedBy": "assets/pixellab/era9-derive.mjs",
+      "how": "pixflux drew 13 figures in 7 rows of two instead of a 3 x 6 grid; each beat's frame cut from its cell, the ground keyed out, pasted onto 28 x 54 frames, feet down, front to the right",
+      "card": "1233",
+      "verdict": "used: all six beats; swing is the shield-forward pair with the glowing-shield figure mirrored as the contact frame"
+    },
+    {
+      "name": "era9-armour-left-raw",
+      "file": "era9-armour-left-raw.png",
+      "prompt": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90101,
+      "date": "2026-09-11T03:34:40.245Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 13.3,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 24206,
+      "sha256": "0a43bff00e2f8d378bd525b50c389b12383739a090cd19ed0583d3ea2c3f491a",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 90101,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      }
+    },
+    {
+      "name": "era9-armour-right-raw",
+      "file": "era9-armour-right-raw.png",
+      "prompt": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one tall steel cyborg robot seen from the side facing right, polished steel armour plates, a single glowing red eye slit in the head, embossed metal panels, holding a glowing energy shield in the right hand. row 1 idle stance two frames; row 2 strafing step leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, middle frame widest; row 5 hit recoil rocked back one frame; row 6 fist raised in victory two frames. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90102,
+      "date": "2026-09-11T03:34:58.212Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 17.2,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 20502,
+      "sha256": "fca712ffd816924ffbdedf18f6160bde38d43642c3cb157ac6b2f1c40141f289",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one tall steel cyborg robot seen from the side facing right, polished steel armour plates, a single glowing red eye slit in the head, embossed metal panels, holding a glowing energy shield in the right hand. row 1 idle stance two frames; row 2 strafing step leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, middle frame widest; row 5 hit recoil rocked back one frame; row 6 fist raised in victory two frames. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 90102,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "verdict": "not used: four figures of two sizes, no grid -- replaced from the re-roll reserve by era9-armour-right-row"
+    },
+    {
+      "name": "era9-hangar",
+      "file": "tex3d-era9-hangar.png",
+      "prompt": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+      "size": {
+        "width": 400,
+        "height": 80
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90103,
+      "date": "2026-09-11T03:35:13.605Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 400,
+        "height": 80
+      },
+      "bytes": 40185,
+      "sha256": "875de8cc475ef3dae1d4b7a8b514c311a2c39a0281353cd9e2c05dbf9f90052c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+        "image_size": {
+          "width": 400,
+          "height": 80
+        },
+        "seed": 90103,
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "derivedFrom": "era9-hangar.png",
+      "derivedBy": "assets/pixellab/era9-derive.mjs",
+      "how": "copied as it came, then embedded in src/textures3d.js",
+      "card": "1233",
+      "verdict": "used as it came"
+    },
+    {
+      "name": "era9-hangar",
+      "file": "era9-hangar.png",
+      "prompt": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+      "size": {
+        "width": 400,
+        "height": 80
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90103,
+      "date": "2026-09-11T03:35:13.605Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 5,
+      "seconds": 14.7,
+      "pixels": {
+        "width": 400,
+        "height": 80
+      },
+      "bytes": 40185,
+      "sha256": "875de8cc475ef3dae1d4b7a8b514c311a2c39a0281353cd9e2c05dbf9f90052c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+        "image_size": {
+          "width": 400,
+          "height": 80
+        },
+        "seed": 90103,
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "era9-beacon",
+      "file": "tex3d-era9-beacon.png",
+      "prompt": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90104,
+      "date": "2026-09-11T03:35:29.965Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 1013,
+      "sha256": "15c5b8c13174158458876a4e95e186ffb5115b463e0c581c1c99d7544ebeae9d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 90104,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "derivedFrom": "era9-beacon.png",
+      "derivedBy": "assets/pixellab/era9-derive.mjs",
+      "how": "ground keyed out, then embedded in src/textures3d.js",
+      "card": "1233",
+      "verdict": "used as it came"
+    },
+    {
+      "name": "era9-beacon",
+      "file": "era9-beacon.png",
+      "prompt": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90104,
+      "date": "2026-09-11T03:35:29.965Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 15.7,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 1626,
+      "sha256": "d9dbd34ac01c9bc6d99ea849173768ea0e01c0841eb34f10fd201b5c9ba5b040",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 90104,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "era9-armour-right",
+      "file": "era9-armour-right.png",
+      "prompt": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 54
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90105,
+      "date": "2026-09-11T03:37:06.596Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 84,
+        "height": 324
+      },
+      "bytes": 3812,
+      "sha256": "c7a49c1908af41ad28529bb9054c430b416de0a84187ae10fe5f21e730dbaa79",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 54
+        },
+        "seed": 90105,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "derivedFrom": "era9-armour-right-row.png",
+      "derivedBy": "assets/pixellab/era9-derive.mjs",
+      "how": "the re-roll: one row of three 24 x 54 stances; cut on the rig's grid, the swing and recoil made by sliding a stance 1-3 pixels toward or away from the ball",
+      "card": "1233",
+      "verdict": "used, weakly: the three stances barely differ, so the cyborg's beats read mostly through position and the code-drawn miss flash"
+    },
+    {
+      "name": "era9-armour-right-row",
+      "file": "era9-armour-right-row.png",
+      "prompt": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 54
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90105,
+      "date": "2026-09-11T03:37:06.596Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 12,
+      "pixels": {
+        "width": 72,
+        "height": 54
+      },
+      "bytes": 2947,
+      "sha256": "59e6756b9f4726c4974ba8c5c6ead8b44b81ffa6238d3700a34f8403a710f98c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 54
+        },
+        "seed": 90105,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      }
+    },
+    {
+      "name": "era10-banner",
+      "file": "era10-banner.png",
+      "prompt": "torn hanging cloth banner, ragged bottom edge, faded original military emblem of a stylised cog and wings, no text, dusty mud brown and faded green, gritty 2005 shooter style",
+      "size": {
+        "width": 64,
+        "height": 96
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 679215469,
+      "date": "2026-09-11T03:35:15.939Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 6,
+      "seconds": 31,
+      "pixels": {
+        "width": 64,
+        "height": 96
+      },
+      "bytes": 4636,
+      "sha256": "3c53cae800ced46309100d9244b640cf930276ae5da8e55f94a963698639dc6e",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "torn hanging cloth banner, ragged bottom edge, faded original military emblem of a stylised cog and wings, no text, dusty mud brown and faded green, gritty 2005 shooter style",
+        "image_size": {
+          "width": 64,
+          "height": 96
+        },
+        "seed": 679215469,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-armour-left",
+      "file": "era10-armour-left.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 1326562740,
+      "date": "2026-09-11T03:36:49.365Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 44.1,
+      "pixels": {
+        "width": 96,
+        "height": 396
+      },
+      "bytes": 36295,
+      "sha256": "e4805d4f4c9cb4e1ba20f50b9f7558ceb8ee67acfda50d006fd521bbbf6e78eb",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 1326562740,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-armour-right",
+      "file": "era10-armour-right.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 2017111403,
+      "date": "2026-09-11T03:37:38.972Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 31.1,
+      "pixels": {
+        "width": 96,
+        "height": 396
+      },
+      "bytes": 34786,
+      "sha256": "0a6780b85026229a406a07d532cfd2d9492a715bb27c992e1640b023cedc5f5b",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 2017111403,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-soldier-left",
+      "file": "era10-soldier-left.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 1326562740,
+      "date": "2026-09-11T03:36:49.365Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 1,
+      "seconds": 44.1,
+      "pixels": {
+        "width": 288,
+        "height": 792
+      },
+      "bytes": 248552,
+      "sha256": "0c738a2d5f0f8e4d3521cd8c436a096042f8afd072e95d2c751bbbbd4e20d62c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 1326562740,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "derivedFrom": "era10-armour-left.png",
+      "derivedBy": "node assets/pixellab/era10-derive.mjs",
+      "how": "11 figures found in the generated sheet, reposed per beat (POSES), graded toward #c9b89a, a 1-pixel HDR-sun rim and its glow, seeded grain at 0.12, at twice the size with bilinear filtering",
+      "card": "item 1234",
+      "verdict": "drawn by the character rig (src/characters.js, era 10 block) behind its paddle"
+    },
+    {
+      "name": "era10-soldier-right",
+      "file": "era10-soldier-right.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 2017111403,
+      "date": "2026-09-11T03:37:38.972Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 1,
+      "seconds": 31.1,
+      "pixels": {
+        "width": 288,
+        "height": 792
+      },
+      "bytes": 159207,
+      "sha256": "8671ea55dd96239c40a8893da6cc5382b3bc5ffb7260ea739cc6b89f543f325c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 2017111403,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "derivedFrom": "era10-armour-right.png",
+      "derivedBy": "node assets/pixellab/era10-derive.mjs",
+      "how": "8 figures found in the generated sheet, reposed per beat (POSES), graded toward #c9b89a, a 1-pixel HDR-sun rim and its glow, seeded grain at 0.12, at twice the size with bilinear filtering",
+      "card": "item 1234",
+      "verdict": "drawn by the character rig (src/characters.js, era 10 block) behind its paddle"
+    },
+    {
+      "name": "era10-ruin",
+      "file": "era10-ruin.png",
+      "prompt": "ruined city plaza at sunset, six broken concrete columns with jagged tops, bombed-out stone, umber and mud brown, dusty haze, gritty 2005 shooter backdrop, side view, desaturated",
+      "size": {
+        "width": 400,
+        "height": 120
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 7870210,
+      "date": "2026-09-11T03:49:39.203Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 17.9,
+      "pixels": {
+        "width": 400,
+        "height": 120
+      },
+      "bytes": 32643,
+      "sha256": "3f3321b3166494309ecc81669d4bf4c008b270e62e34c5186aebb075ec5d69d8",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "ruined city plaza at sunset, six broken concrete columns with jagged tops, bombed-out stone, umber and mud brown, dusty haze, gritty 2005 shooter backdrop, side view, desaturated",
+        "image_size": {
+          "width": 400,
+          "height": 120
+        },
+        "seed": 7870210,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-gamerpics",
+      "file": "era10-gamerpics.png",
+      "prompt": "two square avatar icons side by side, left a bulky original soldier helmet with a narrow slit visor in dark green armour, right the same kind of helmet in ash grey, dark background, 2005 console profile picture style, original design",
+      "size": {
+        "width": 64,
+        "height": 32
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "negative_description": "gold visor, orange visor, halo, master chief"
+      },
+      "seed": 1267114965,
+      "date": "2026-09-11T03:50:48.716Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 12.6,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 2166,
+      "sha256": "e357477a122c1865dccaadf5222921554581dedc19c9c3272efd39211be14702",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "two square avatar icons side by side, left a bulky original soldier helmet with a narrow slit visor in dark green armour, right the same kind of helmet in ash grey, dark background, 2005 console profile picture style, original design",
+        "image_size": {
+          "width": 64,
+          "height": 32
+        },
+        "seed": 1267114965,
+        "negative_description": "gold visor, orange visor, halo, master chief",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "era10-gamerpics-heads",
+      "file": "era10-gamerpics-heads.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 1326562740,
+      "date": "2026-09-11T03:36:49.365Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 1,
+      "seconds": 44.1,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 4747,
+      "sha256": "b4430c44ac03f129dbd870fd504b26b86507aa88b823e66f61d20e937b2136f7",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 1326562740,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "derivedFrom": "era10-armour-left.png",
+      "derivedBy": "node assets/pixellab/era10-derive.mjs",
+      "how": "the left and right sheets' first idle figures, each head cropped square and scaled to 32 x 32 on #1b1b1b (era10-gamerpics.png, two rolls, read as a famous franchise helmet and is not drawn)",
+      "card": "item 1234",
+      "verdict": "drawn by the character rig (src/characters.js, era 10 block) behind its paddle"
     }
   ]
 }

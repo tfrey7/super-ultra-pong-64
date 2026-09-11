@@ -225,7 +225,8 @@ test('with the pictures decoded, era 4 draws the sky, both paddles and the ball 
     const floor = calls.findIndex((c) => c.op === 'fill' && c.fillStyle === '#2e2a86');
     assert.ok(floor > calls.indexOf(sky), 'the Mode 7 floor is still drawn, after the sky');
 
-    const paddles = images.filter((c) => made.includes(c.args[0]));
+    // The dyed paddles are the made canvases drawn paddle-wide (item 1227's dusk balloons are made canvases too).
+    const paddles = images.filter((c) => made.includes(c.args[0]) && c.args[3] === g.left.w);
     assert.strictEqual(paddles.length, 2, 'both paddles are the dyed sprite');
     for (const p of [g.left, g.right]) {
       assert.ok(paddles.some((c) => c.args.slice(1).join() === [p.x, p.y, p.w, p.h].join() && c.smoothing === false),

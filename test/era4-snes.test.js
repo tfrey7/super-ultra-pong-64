@@ -156,25 +156,30 @@ test('while the serve waits the ball and its shadow are both hidden', () => {
   assert.strictEqual(ops.filter(isBallSprite).length, 0, 'no ball');
 });
 
-test('the score sits on a translucent panel, each number in its paddle ink', () => {
+test('the score sits in two F-Zero boxes, see-through, each number in its paddle ink (item 1227)', () => {
   const g = rally();
   const ops = frame(g);
-  const panel = ops.find((o) => {
-    if (o.op !== 'fill' || typeof o.style !== 'string') return false;
-    const a = alphaOf(o.style) * o.alpha;
-    if (!(a > 0.2 && a < 0.8)) return false;
-    const pts = o.subpaths.flat();
-    const xs = pts.map((p) => p[0]); const ys = pts.map((p) => p[1]);
-    return Math.min(...xs) < 290 - 48 && Math.max(...xs) > 510 + 48 && Math.min(...ys) < 40 && Math.max(...ys) > 110;
-  });
-  assert.ok(panel, 'a see-through panel spans both scores');
-  const at = ops.indexOf(panel);
+  const boxes = ops.filter((o) => o.op === 'fillRect' && typeof o.style === 'string' &&
+    alphaOf(o.style) * o.alpha > 0.2 && alphaOf(o.style) * o.alpha < 0.8 && o.rect[2] >= 100 && o.rect[3] >= 30);
+  assert.strictEqual(boxes.length, 2, 'one see-through box for each score');
   for (const [side, onLeft] of [['left', true], ['right', false]]) {
+    const box = boxes.find((o) => (onLeft ? o.rect[0] < 400 : o.rect[0] > 400));
+    assert.ok(box, `a ${side} box`);
     const ink = R.paddleInk(g, side);
-    const digits = ops.slice(at).filter((o) => o.op === 'fillRect' && o.style === ink &&
+    const digits = ops.slice(ops.indexOf(box)).filter((o) => o.op === 'fillRect' && o.style === ink &&
       (onLeft ? o.rect[0] < 400 : o.rect[0] > 400));
-    assert.ok(digits.length > 10, `the ${side} score is drawn over the panel in its paddle's ink`);
+    assert.ok(digits.length > 10, `the ${side} score is drawn over its box in its paddle's ink`);
+    assert.ok(digits.every((o) => o.rect[0] >= box.rect[0] && o.rect[0] + o.rect[2] <= box.rect[0] + box.rect[2] + 1e-9),
+      `the ${side} score is inside its box`);
   }
+});
+
+test('the power bars fill with the rally, 4 of their 32 pixels a hit, and read full from 8 hits (item 1227)', () => {
+  const bars = (hits) => frame(Object.assign(rally(), { rally: hits }))
+    .filter((o) => o.op === 'fillRect' && (o.style === '#f8a000' || o.style === '#f8f8d0') && o.rect[3] === 8);
+  assert.strictEqual(bars(0).every((o) => o.rect[2] === 0), true, 'empty at the serve');
+  assert.deepStrictEqual(bars(2).map((o) => o.rect[2]), [25, 25], 'two hits: a quarter each');
+  assert.deepStrictEqual(bars(20).map((o) => o.rect[2]), [100, 100], 'full, and no fuller');
 });
 
 test('behind the title (a dimmed frame) era 4 keeps the stock frame, so the title stays legible', () => {

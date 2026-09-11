@@ -101,7 +101,15 @@
     3:  { sheets: { left: 'era3-p1', right: 'era3-p2' }, frame: { w: 20, h: 25 },
           hand: { x: 20, y: 13 }, scale: 3.2, fps: 10,
           skin: '#eeaa88', body: '#222266', res: 1 },
-    4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
+    // Super Nintendo (item 1227): two hover pilots, built from one pixellab pose
+    // each by assets/pixellab/era4-players-build.mjs. The glove is on the frame's
+    // right edge, so the figure stands wholly behind its paddle; at 1.2 a frame
+    // is 38 x 121 field units, the pad's back rim just past the wall. miss has
+    // two frames (the pad there and gone), so at fps 12 the conceding pad blinks.
+    4:  { skin: '#f8c8a0', body: '#384878', res: 2,
+          sheets: { left: 'era4-players-left', right: 'era4-players-right' },
+          frame: { w: 32, h: 101 }, hand: { x: 32, y: 41 }, scale: 1.2, fps: 12,
+          frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
@@ -114,8 +122,24 @@
           sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
           frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3 },
-    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
-    10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
+    // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
+    // cyborg, cut from pixellab by assets/pixellab/era9-derive.mjs; the hand on
+    // the shield at the paddle box's top (dz 24), 90 table units tall. A
+    // STAND-IN: Tim ruled sprite players out for the 3D eras (23:47 EDT,
+    // 2026-09-10); the polygon-model card swaps this block's sheets out.
+    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 1.667, res: 4, round: true,
+          sheets: { left: 'era9-armour-left', right: 'era9-armour-right' },
+          frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6 },
+    // Xbox 360 (item 1234, docs/ART.md era 10): two heavy soldiers, pixellab
+    // sheets reposed, graded, rimmed and grained offline by
+    // assets/pixellab/era10-derive.mjs at twice the bible's 32 x 66 (a 96 x 132
+    // frame holding a 48 x 66 figure cell), so the rig's unsmoothed draw of a
+    // pre-smoothed sheet reads HD. 0.68 table units a sheet pixel is the
+    // bible's 1.36 at that doubling: about 90 units tall on the table.
+    10: { skin: '#e2b294', body: '#2a2e36', res: 4, round: true,
+          sheets: { left: 'era10-soldier-left', right: 'era10-soldier-right' },
+          frame: { w: 96, h: 132 }, hand: { x: 84, y: 84 }, scale: 0.68,
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8 }
   };
 
   var FIRST_3D = 5;
