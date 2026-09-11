@@ -118,6 +118,19 @@
   }
   function hitStopSeconds(hard) { return hitStopFrames(hard) * HITSTOP.frame; }
 
+  /**
+   * The freeze for one paddle event. When the rules suggest one (item 1208's
+   * paddle physics puts `hitStop` seconds on each hit, longer on a smash) it is
+   * taken, held to the same two-to-four frames; otherwise the hit's hardness says.
+   */
+  function hitStopFor(ev, hard) {
+    if (ev && typeof ev.hitStop === 'number' && ev.hitStop >= 0) {
+      var lo = HITSTOP.minFrames * HITSTOP.frame, hi = HITSTOP.maxFrames * HITSTOP.frame;
+      return ev.hitStop < lo ? lo : (ev.hitStop > hi ? hi : ev.hitStop);
+    }
+    return hitStopSeconds(hard);
+  }
+
   // --------------------------------------------------------- match point
   /** The match card defines match point formally; until then, the point that reaches era 10. */
   function isMatchPoint(state) {
@@ -219,9 +232,10 @@
     for (var i = 0; i < ev.length; i++) {
       var e = ev[i];
       if (e.type === 'paddle') {
-        var hard = hardness(state);
+        // A smash (paddle physics, item 1208) is as hard as a hit gets.
+        var hard = e.smash ? 1 : hardness(state);
         var impact = 0.45 + 0.55 * hard;
-        if (fx.hitstop && state.serveDelay <= 0) m.hitStop = hitStopSeconds(hard);
+        if (fx.hitstop && state.serveDelay <= 0) m.hitStop = hitStopFor(e, hard);
         if (fx.flash) {
           m.flashLen = (1 + Math.floor(k * 2.5)) * HITSTOP.frame;
           m.flash = m.flashLen;
@@ -486,6 +500,7 @@
     effects: effects,
     hitStopFrames: hitStopFrames,
     hitStopSeconds: hitStopSeconds,
+    hitStopFor: hitStopFor,
     isMatchPoint: isMatchPoint,
     secondsToLine: secondsToLine,
     defenderCovers: defenderCovers,

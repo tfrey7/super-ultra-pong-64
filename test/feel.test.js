@@ -87,6 +87,14 @@ test('hit-stop is two frames on a soft hit and four on the hardest, never outsid
   assert.ok(Math.abs(Feel.hitStopSeconds(1) - 4 / 60) < 1e-12);
 });
 
+test('a freeze the rules suggest on the event (item 1208 paddle physics) is taken, held to two-to-four frames', () => {
+  const f = (s) => Math.round(s * 60 * 1000) / 1000;
+  assert.strictEqual(f(Feel.hitStopFor({ type: 'paddle', hitStop: 0.03 }, 0)), 2);    // a plain hit
+  assert.strictEqual(f(Feel.hitStopFor({ type: 'paddle', hitStop: 0.11, smash: true }, 1)), 4);  // a smash
+  assert.strictEqual(f(Feel.hitStopFor({ type: 'paddle', hitStop: 0.05 }, 0)), 3);
+  assert.strictEqual(f(Feel.hitStopFor({ type: 'paddle' }, 1)), 4);                  // none suggested
+});
+
 /** Step frame by frame until the paddle hit; count the frames the ball then holds still. */
 function frozenFramesAfterHit(era, speed) {
   const g = playing(era);
