@@ -5,6 +5,9 @@ Look file: [src/eras/era9-xbox.js](../../src/eras/era9-xbox.js). Chapter 10 of [
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Halo: Combat Evolved* + *Project Gotham Racing*. Added: a dynamic light with cast shadows (the
+  ball is the light). Changed: per-pixel materials: bump-mapped plate, specular bats and ball.
 - **The real hardware:** the first console with programmable pixel shaders, and it showed them off.
 - **Native resolution here:** 640 x 480, scaled up soft.
 - **Palette:** green on black and gunmetal (`C` in the era file: black `#050605`, gunmetal
@@ -78,6 +81,7 @@ Look file: [src/eras/era9-xbox.js](../../src/eras/era9-xbox.js). Chapter 10 of [
 | Textures | `src/textures3d.js` | `court-metal`. |
 | Taunts | `src/opponents.js` | Clean by construction: a fixed list, nothing generated. |
 | Voice and music | the era file's `voice`, `src/music.js` row 9 | FM metal, `shape`, and the rock arrangement's `drive` and `power` chords. |
+| The rally counter and callouts in the HUD's green glow (item 1262) | `src/feel.js` `LETTERING[9]` | Sets them in green-glow sans, the counter in a dark panel framed in the shield bar's green. |
 
 ## START HERE
 

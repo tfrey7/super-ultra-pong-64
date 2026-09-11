@@ -235,6 +235,114 @@ test('drawing: the arcade draws its own frame and nothing more; the N64 adds the
   }
 });
 
+// --------------------------------------------- each era's lettering (item 1262)
+
+/** A context that measures text and records every fillText with its font and ink. */
+function lettering() {
+  const texts = [];
+  const target = {
+    measureText: (s) => ({ width: String(s).length * 10 }),
+    fillText(text, x, y) { texts.push({ text, x, y, font: target.font, ink: target.fillStyle, alpha: target.globalAlpha }); },
+    globalAlpha: 1
+  };
+  const fills = [];
+  target.fill = () => fills.push(target.fillStyle);
+  const ctx = new Proxy(target, {
+    get: (t, k) => (k in t ? t[k] : () => {}),
+    set: (t, k, v) => { t[k] = v; return true; }
+  });
+  return { ctx, texts, fills };
+}
+
+/** A game at an era whose rally has just reached ten on a real hit: RALLY 10 and GREAT. */
+function greatRally(era) {
+  const g = playing(era);
+  g.rally = 9;
+  aboutToHitLeft(g, 400);
+  for (let i = 0; i < 40 && g.rally < 10; i++) Feel.step(g, FRAME, hold);
+  assert.strictEqual(g.rally, 10);
+  assert.strictEqual(Feel.moment(g).callout, 'GREAT');
+  // Let the hit-stop pass so the frame is a plain one.
+  for (let i = 0; i < 5; i++) Feel.step(g, FRAME, hold);
+  return g;
+}
+
+const PINNED = {
+  6: { family: 'Arial Black', ink: '#ffd23c', look: 'outline', what: 'toy-yellow in a blue outline, the N64 HUD' },
+  7: { family: 'Verdana', ink: '#ffd400', look: 'skew', what: 'leaning graffiti with a magenta drop' },
+  8: { family: 'Arial', ink: '#9ec9ff', look: 'glow', what: 'thin blue film type, the counter in the bottom bar' },
+  9: { family: 'Arial', ink: '#b8ff3c', look: 'glow', what: 'green-glow sans in a framed panel' },
+  10: { family: 'Segoe UI', ink: '#ffffff', look: 'glow', what: 'clean white sans, the callout an achievement toast' }
+};
+
+test('every era with a rally counter letters it in its own interface style, and none falls back to 1972 blocks', () => {
+  for (let e = 0; e <= Pong.TOP_ERA; e++) {
+    const L = Feel.letteringFor(e);
+    if (!Feel.effects(e).counter) {
+      assert.strictEqual(L, Feel.BLOCK, `era ${e} has no counter, so no row`);
+      continue;
+    }
+    const want = PINNED[e];
+    assert.ok(want, `era ${e} has a counter and a pinned lettering`);
+    assert.strictEqual(L.font, 'hd', `era ${e}: ${want.what}`);
+    assert.ok(L.family.includes(want.family), `era ${e} family ${L.family}`);
+    assert.strictEqual(L.ink, want.ink, `era ${e} ink`);
+    assert.ok(L[want.look], `era ${e} carries its ${want.look}`);
+    assert.ok(L.counter.size > 0 && L.callout.size > L.counter.size, `era ${e}: the callout is bigger than the counter`);
+  }
+  // The particulars each era's HUD asked for.
+  assert.strictEqual(Feel.LETTERING[6].outline, '#1f3fbf', 'the N64 score outline');
+  assert.strictEqual(Feel.LETTERING[7].shadow, '#ff2e88', 'the Dreamcast magenta extrusion');
+  assert.ok(Feel.LETTERING[8].counterY > 540, 'the PS2 counter sits in the letterbox bottom bar');
+  assert.strictEqual(Feel.LETTERING[9].counter.stroke, '#5cff2a', 'the Xbox panel framed in green');
+  assert.ok(Feel.LETTERING[10].callout.kicker && Feel.LETTERING[10].callout.plate, 'the 360 callout is a toast');
+});
+
+test('drawing a rally of ten: each era sets RALLY 10 and GREAT in its own font and ink, not the block font', () => {
+  for (const era of Object.keys(PINNED).map(Number)) {
+    const blocks = [];
+    globalThis.PongRender = { drawText: (c, text) => blocks.push(text) };
+    try {
+      const g = greatRally(era);
+      const { ctx, texts } = lettering();
+      Feel.draw(ctx, g, () => {});
+      assert.deepStrictEqual(blocks, [], `era ${era} drew nothing in the block font`);
+      const counter = texts.filter((t) => t.text === 'RALLY 10' && t.ink === PINNED[era].ink);
+      const callout = texts.filter((t) => t.text === 'GREAT' && t.ink === PINNED[era].ink);
+      assert.ok(counter.length >= 1, `era ${era} counter: ${JSON.stringify(texts)}`);
+      assert.ok(callout.length === 1, `era ${era} callout`);
+      for (const t of counter.concat(callout)) assert.ok(t.font.includes(PINNED[era].family), `era ${era} font ${t.font}`);
+      assert.ok(callout[0].font.match(/(\d+)px/)[1] > counter[0].font.match(/(\d+)px/)[1] * 1, `era ${era} callout bigger`);
+    } finally {
+      delete globalThis.PongRender;
+    }
+  }
+});
+
+test('the Xbox 360 callout is an achievement toast: a dark plate, a green badge and the rally on a silver line above', () => {
+  const g = greatRally(10);
+  const { ctx, texts, fills } = lettering();
+  Feel.draw(ctx, g, () => {});
+  const kick = texts.find((t) => t.text === 'RALLY 10' && t.ink === '#d9dcd6');
+  const big = texts.find((t) => t.text === 'GREAT');
+  assert.ok(kick && big, JSON.stringify(texts));
+  assert.ok(kick.y < big.y, 'the rally line sits above the callout');
+  assert.ok(fills.includes('#1b1b1b'), 'the toast plate, in the era toast colour');
+  assert.ok(fills.includes('#5dc21e'), 'the green badge');
+});
+
+test('the PS2 counter is a subtitle in the bottom letterbox bar; the others keep the bottom-middle place', () => {
+  const at = (era) => {
+    const g = playing(era);
+    g.rally = 12;
+    const { ctx, texts } = lettering();
+    Feel.draw(ctx, g, () => {});
+    return texts.filter((t) => t.text === 'RALLY 12').pop();
+  };
+  assert.ok(at(8).y > 540 && at(8).y < 600, `PS2 at ${at(8).y}`);
+  for (const era of [6, 7, 9, 10]) assert.ok(Math.abs(at(era).y - 562) < 1, `era ${era} at ${at(era).y}`);
+});
+
 test('a squashed paddle is squashed for the draw only: the rules never see it', () => {
   const g = playing(10);
   aboutToHitLeft(g, 700);

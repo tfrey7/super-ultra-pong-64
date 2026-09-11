@@ -128,23 +128,36 @@
     // assets/pixellab/ where the loader looks. Same frame, hand and scale as
     // item 1225's sheets, so the figure holds the paddle where it did.
     2:  { sheets: { left: 'era2-boy', right: 'era2-rival' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' },
-    // Eras 5 to 10 (item 1248): each block also names a polygon model from
-    // assets/models/ (tools/blender/player-proof.py) and a shading, drawn by
-    // src/models3d.js in place of the sheets, which draw only until it has loaded.
-    // Genesis (item 1226): the barbarian and the knight, pixflux sheets re-cut
-    // offline to 20 x 25 frames (assets/pixellab/era3-players-cut.mjs), so the
-    // scale is 3.2, not the bible's 2.6 for 12 x 52: 80 units tall, one paddle.
-    3:  { sheets: { left: 'era3-p1', right: 'era3-p2' }, frame: { w: 20, h: 25 },
+    // Eras 5 to 10 (item 1248): a block may name a model from assets/models/
+    // (`model`, or `models: { left, right }`; `figure` for item 1274's glTF
+    // layer) and a shading, drawn in place of the sheets once it has loaded.
+    // Item 1283 (Tim, 2026-09-11: "can't reuse that primitive character like
+    // that"): NO block names the proof figure, so every 3D era draws its own
+    // stand-in pair until its own model card (1253-1258) names its own file.
+    // The proof figure is an opt-in: ?model=player-proof-hi (both layers),
+    // ?figure=<name> (the glTF layer only), or PongCharacters.forcedModel.
+    // Genesis (item 1280): the barbarian and the knight drawn as text grids with
+    // tools/spritegen.mjs, not pixellab -- assets/spritegen/era3-barbarian.json
+    // and era3-knight.json, posed from parts by
+    // assets/spritegen/era3-players-compose.mjs and built into assets/pixellab/
+    // where the loader looks. Item 1226's 20 x 25 frame, hand and scale kept
+    // (3.2, not the bible's 2.6 for 12 x 52: 80 units tall, one paddle), so the
+    // figure holds the bat where it did.
+    3:  { sheets: { left: 'era3-barbarian', right: 'era3-knight' }, frame: { w: 20, h: 25 },
           hand: { x: 20, y: 13 }, scale: 3.2, fps: 10,
           skin: '#eeaa88', body: '#222266', res: 1 },
-    // Super Nintendo (item 1227): two hover pilots, built from one pixellab pose
-    // each by assets/pixellab/era4-players-build.mjs. The glove is on the frame's
-    // right edge, so the figure stands wholly behind its paddle; at 1.2 a frame
-    // is 38 x 121 field units, the pad's back rim just past the wall. miss has
-    // two frames (the pad there and gone), so at fps 12 the conceding pad blinks.
+    // Super Nintendo (item 1281): two hover pilots drawn as text grids with
+    // tools/spritegen.mjs, not pixellab -- assets/spritegen/era4-pilot-red.json
+    // by hand, the blue pilot the same grid in a second OBJ palette
+    // (assets/spritegen/era4-pilots-compose.mjs, which builds both into
+    // assets/pixellab/ where the loader looks). One sheet pixel is one SNES
+    // pixel: 3.125 field units, 800 / 256. The glove is on the frame's right
+    // edge, so the figure stands wholly behind its paddle; a frame is 37.5 x
+    // 131 field units. miss has two frames (the pad lit, then dark), so at fps
+    // 12 the conceding pad blinks.
     4:  { skin: '#f8c8a0', body: '#384878', res: 2,
-          sheets: { left: 'era4-players-left', right: 'era4-players-right' },
-          frame: { w: 32, h: 101 }, hand: { x: 32, y: 41 }, scale: 1.2, fps: 12,
+          sheets: { left: 'era4-pilot-red', right: 'era4-pilot-blue' },
+          frame: { w: 12, h: 42 }, hand: { x: 12, y: 17 }, scale: 3.125, fps: 12,
           frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
     // PlayStation (item 1228): a STAND-IN only. Tim ruled flat sprites out of
     // the 3D eras; the real players are polygon models from item 1248's
@@ -157,7 +170,7 @@
           sheets: { left: 'era5-left', right: 'era5-right' },
           frame: { w: 20, h: 30 }, hand: { x: 19, y: 18 }, scale: 3.6,
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
-          model: 'player-proof-lo', shading: 'flat' },       // item 1248: the polygon proof figure
+          shading: 'flat' },   // item 1283: no model until era 5's own lands (1253-1258)
     // Nintendo 64 (item 1230, docs/ART.md Era 6): the penguin holds the player's paddle and the
     // frog the computer's, chunky toy mascots drawn smoothed and fogged at their paddle's depth
     // (capped at 0.35, as the era caps its paddles). Sheets derived by
@@ -168,7 +181,7 @@
           sheets: { left: 'era6-penguin', right: 'era6-frog' },
           frame: { w: 32, h: 44 }, hand: { x: 29, y: 28 }, anchor: { dx: 0, dy: 0, dz: 24 },
           fps: 6, smooth: true, fogCap: 0.35,
-          model: 'player-proof-lo', shading: 'gouraud' },    // item 1248
+          shading: 'gouraud' },
     // Dreamcast (item 1231): two Jet Set Radio-manner skaters, cut from pixflux by
     // assets/pixellab/era7-skater-cut.py; each figure about 68 px tall, so 1.3 table
     // units a pixel stands it about 90 tall, the hand on the paddle box's top (dz 24).
@@ -177,7 +190,7 @@
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 1.3, res: 3, round: true,
           sheets: { left: 'era7-skater-left-sheet', right: 'era7-skater-right-sheet' },
           frame: { w: 44, h: 84 }, hand: { x: 44, y: 66 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 10,
-          model: 'player-proof-mid', shading: 'cel' },       // item 1248
+          shading: 'cel' },
     // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
     // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
     // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
@@ -188,7 +201,7 @@
           sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
           frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3, clip: { y0: 52, y1: 548 },
-          model: 'player-proof-mid', shading: 'specular' },  // item 1248
+          shading: 'specular' },
     // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
     // cyborg, cut from pixellab by assets/pixellab/era9-derive.mjs; the hand on
     // the shield at the paddle box's top (dz 24), 90 table units tall. A
@@ -197,7 +210,7 @@
     9:  { skin: '#d6a684', body: '#1c2a1c', scale: 1.667, res: 4, round: true,
           sheets: { left: 'era9-armour-left', right: 'era9-armour-right' },
           frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6,
-          model: 'player-proof-hi', shading: 'vertex' },     // item 1248
+          shading: 'vertex' },
     // Xbox 360 (item 1234, docs/ART.md era 10): two heavy soldiers, pixellab
     // sheets reposed, graded, rimmed and grained offline by
     // assets/pixellab/era10-derive.mjs at twice the bible's 32 x 66 (a 96 x 132
@@ -208,10 +221,19 @@
           sheets: { left: 'era10-soldier-left', right: 'era10-soldier-right' },
           frame: { w: 96, h: 132 }, hand: { x: 84, y: 84 }, scale: 0.68,
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
-          model: 'player-proof-hi', shading: 'hd' }          // item 1248
+          shading: 'hd' }
   };
 
   var FIRST_3D = 5;
+
+  // ?models=off keeps the 3D eras on their sprites; ?model=<name> puts that one
+  // model file on every 3D era (item 1248: how the frame-time A/B is taken), and
+  // ?figure=<name> that one glTF figure (item 1274's layer). Since item 1283 no
+  // era names the proof figure, so these are how a test or a look asks for it.
+  var search = String((root.location && root.location.search) || '');
+  var modelsOn = !/[?&]models=off\b/.test(search);
+  var forcedModel = (/[?&]model=([a-z0-9][a-z0-9_-]*)/.exec(search) || [])[1] || null;
+  var forcedFigure = (/[?&]figure=([a-z0-9][a-z0-9_-]*)/.exec(search) || [])[1] || null;
 
   /** The model name one side of an era block wears: its own of `models`, else `model`. */
   function modelOf(own, side) {
@@ -248,6 +270,9 @@
     }
     c.era = era;
     c.is3d = era >= FIRST_3D;
+    // The opt-in (item 1283): one model, or one glTF figure, on every 3D era.
+    if (c.is3d && modelsOn && forcedModel) c.model = forcedModel;
+    if (c.is3d && modelsOn && forcedFigure) c.figure = forcedFigure;
     return c;
   }
 
@@ -496,12 +521,6 @@
 
   // -------------------------------------------------------------- drawing
   var enabled = !(root.location && /[?&]characters=off\b/.test(String(root.location.search || '')));
-  // ?models=off keeps the 3D eras on their sprites; ?model=<name> puts that one
-  // model file on every 3D era (item 1248: how the frame-time A/B is taken).
-  var search = String((root.location && root.location.search) || '');
-  var modelsOn = !/[?&]models=off\b/.test(search);
-  var forcedModel = (/[?&]model=([a-z0-9][a-z0-9_-]*)/.exec(search) || [])[1] || null;
-
   /**
    * The fog over a 3D figure (item 1230): { colour, amount } -- the era look's
    * own fog at its paddle's depth, capped at the block's `fogCap` the way the
@@ -661,7 +680,6 @@
     }
     // Each side in its own config: they differ only in the sheet or model it wears.
     var sides = { left: cfg, right: configFor(era, 'right') };
-    if (cfg.is3d && cfg.model && modelsOn && forcedModel) { sides.left.model = sides.right.model = forcedModel; }
     // The far player (smaller y) first, so the near one overlaps it.
     var order = state.left.y <= state.right.y ? ['left', 'right'] : ['right', 'left'];
     var band = clipBand(cfg.clip);
@@ -726,14 +744,21 @@
     clipBand: clipBand,
     install: install,
     get enabled() { return enabled; },
-    set enabled(v) { enabled = !!v; }
+    set enabled(v) { enabled = !!v; },
+    /** The opt-in model on every 3D era (item 1283), or null: ?model=<name> sets it at load. */
+    get forcedModel() { return forcedModel; },
+    set forcedModel(v) { forcedModel = v ? String(v) : null; if (forcedModel && root.PongModels3D) root.PongModels3D.get(forcedModel); },
+    /** The opt-in glTF figure on every 3D era (item 1283), or null: ?figure=<name> sets it at load. */
+    get forcedFigure() { return forcedFigure; },
+    set forcedFigure(v) { forcedFigure = v ? String(v) : null; }
   };
 
-  /** Ask for every era block's model now, so the first 3D frame has it. */
+  /** Ask for every era block's model now (and the opt-in's), so the first 3D frame has it. */
   function preloadModels() {
     var M = root.PongModels3D;
     if (!M) return 0;
     var n = 0;
+    if (forcedModel && modelsOn) { M.get(forcedModel); n++; }
     Object.keys(ERAS).forEach(function (e) {
       [ERAS[e].model, ERAS[e].models && ERAS[e].models.left, ERAS[e].models && ERAS[e].models.right]
         .forEach(function (name) { if (name) { M.get(name); n++; } });

@@ -5,6 +5,10 @@ Look file: [src/eras/era6-n64.js](../../src/eras/era6-n64.js). Chapter 7 of [doc
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Super Mario 64* + *Wave Race 64*. Added: shadows under the players and the ball (blob discs).
+  Changed: smooth: three-point-filtered tiny textures, fog to the far wall, anti-aliased smooth
+  shading.
 - **Native resolution here:** 320 x 240, scaled up soft.
 - **Texture budget:** tiny. The grass is textured from a **16 x 16 tile** through 8 x 6 finely cut
   quads, under the pixellab wood-grain court (`court-grain`).
@@ -78,6 +82,7 @@ Look file: [src/eras/era6-n64.js](../../src/eras/era6-n64.js). Chapter 7 of [doc
 | Camera | `tools/table3d-cameras.js` | The close camera and its R3 check. |
 | Textures | `src/textures3d.js` | `court-grain`. |
 | Voice and music | the era file's `voice`, `src/music.js` row 6 | The muffling `bus` and the hall reverb. |
+| The rally counter and callouts in the toy HUD's lettering (item 1262) | `src/feel.js` `LETTERING[6]` | Sets RALLY and NICE/GREAT in fat toy-yellow type in the score's blue outline, the counter on a round blue plate; a new HUD word on this era takes that row. |
 
 ## START HERE
 

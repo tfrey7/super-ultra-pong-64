@@ -6,6 +6,10 @@ Look file: [src/eras/era5-playstation.js](../../src/eras/era5-playstation.js). C
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Ridge Racer* + *Tekken*. Added: real 3D: lit polygons, the players standing whole. Changed: the
+  picture through the PlayStation's limits: 320x240, no filtering, flat and Gouraud, affine swim,
+  jitter, dither.
 - **The real hardware's flaws, drawn on purpose:** no perspective-correct texture mapping, no
   sub-pixel precision and no z-buffer, typically at 320 x 240.
 - **Native resolution here:** 320 x 240, scaled up soft (`smooth: true` in `src/display.js`) the

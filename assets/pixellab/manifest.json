@@ -4845,6 +4845,182 @@
         "description": "NES 1985, the computer: a rival in a blue cap and green shirt, blue shorts, brown hair, black sneakers with white toes, facing right (the rig mirrors him), a fist on the bat handle",
         "seed": null
       }
+    },
+    {
+      "name": "era3-barbarian",
+      "file": "era3-barbarian.png",
+      "prompt": "The Genesis left player (item 1280, from item 1272's grid): a Golden Axe barbarian facing right, horned steel helmet, red beard, bare chest, fur loincloth, fur-cuffed boots, the round wooden shield on the far arm raised in guard, the near fist on the bat's handle at the frame's right edge. Drawn as parts and posed per frame so the six beats move.",
+      "size": {
+        "width": 60,
+        "height": 150
+      },
+      "style": {
+        "tool": "tools/spritegen.mjs",
+        "era": 3,
+        "machine": "Sega Genesis",
+        "frame": {
+          "w": 20,
+          "h": 25
+        },
+        "hand": {
+          "x": 20,
+          "y": 13
+        }
+      },
+      "seed": null,
+      "date": "2026-09-11T03:23:35.447Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "assets/spritegen/era3-barbarian.json",
+      "derivedBy": "node assets/spritegen/era3-players-compose.mjs && node tools/spritegen.mjs build assets/spritegen/era3-barbarian.json --out assets/pixellab/era3-barbarian.png",
+      "how": "drawn as a text grid, one letter a pixel, from head, torso, shield, arm and leg parts posed per frame (the EarthBound way, not a model); lint PASS on the 3-bit grid, 15 colours at most; six rows (idle, up, down, swing, miss, win) of 3 frames of 20 x 25",
+      "card": "item 1280",
+      "verdict": "worn by the player on era 3 (src/characters.js, the Genesis block's sheets.left), in place of item 1226's era3-p1",
+      "pixels": {
+        "width": 60,
+        "height": 150
+      },
+      "bytes": 1458,
+      "sha256": "3579c69fc8141abf8260bf9db326c65373a8c203a9957171d9a49a0033ed42f1",
+      "endpoint": null,
+      "request": {
+        "description": "The Genesis left player (item 1280, from item 1272's grid): a Golden Axe barbarian facing right, horned steel helmet, red beard, bare chest, fur loincloth, fur-cuffed boots, the round wooden shield on the far arm raised in guard, the near fist on the bat's handle at the frame's right edge. Drawn as parts and posed per frame so the six beats move.",
+        "seed": null
+      }
+    },
+    {
+      "name": "era3-knight",
+      "file": "era3-knight.png",
+      "prompt": "The Genesis right player (item 1280): an armoured knight in a crested great helm, facing right (the rig mirrors him), plate in #6d6d92 and #b6b6db, the crest #924924, a gold belt, a red heater shield on the far arm, the near gauntlet on the bat's handle. The barbarian's skeleton and poses in plate, so the pair match.",
+      "size": {
+        "width": 60,
+        "height": 150
+      },
+      "style": {
+        "tool": "tools/spritegen.mjs",
+        "era": 3,
+        "machine": "Sega Genesis",
+        "frame": {
+          "w": 20,
+          "h": 25
+        },
+        "hand": {
+          "x": 20,
+          "y": 13
+        }
+      },
+      "seed": null,
+      "date": "2026-09-11T03:23:56.033Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "assets/spritegen/era3-knight.json",
+      "derivedBy": "node assets/spritegen/era3-players-compose.mjs && node tools/spritegen.mjs build assets/spritegen/era3-knight.json --out assets/pixellab/era3-knight.png",
+      "how": "drawn as a text grid, one letter a pixel, from head, torso, shield, arm and leg parts posed per frame (the EarthBound way, not a model); lint PASS on the 3-bit grid, 15 colours at most; six rows (idle, up, down, swing, miss, win) of 3 frames of 20 x 25",
+      "card": "item 1280",
+      "verdict": "worn by the computer on era 3 (src/characters.js, the Genesis block's sheets.right), in place of item 1226's era3-p2",
+      "pixels": {
+        "width": 60,
+        "height": 150
+      },
+      "bytes": 1344,
+      "sha256": "452c9507910e20eaa945962579e74cac1a0e29d6dadf0871ef0bb0391b897175",
+      "endpoint": null,
+      "request": {
+        "description": "The Genesis right player (item 1280): an armoured knight in a crested great helm, facing right (the rig mirrors him), plate in #6d6d92 and #b6b6db, the crest #924924, a gold belt, a red heater shield on the far arm, the near gauntlet on the bat's handle. The barbarian's skeleton and poses in plate, so the pair match.",
+        "seed": null
+      }
+    },
+    {
+      "name": "era4-pilot-red",
+      "file": "era4-pilot-red.png",
+      "prompt": "The Super Nintendo left player: an F-Zero hover pilot facing right, round red helmet with a dark visor band and a cream highlight, red racing suit with a white centre stripe and white knee pads, dark boots, standing on a small metal hover pad with a jet flame under it; the front glove on the frame's right edge where the bat's handle is, the back arm out for balance. One SNES pixel a sheet pixel. One character in every frame.",
+      "size": {
+        "width": 36,
+        "height": 252
+      },
+      "style": {
+        "tool": "tools/spritegen.mjs",
+        "era": 4,
+        "machine": "Super Nintendo",
+        "frame": {
+          "w": 12,
+          "h": 42
+        },
+        "hand": {
+          "x": 12,
+          "y": 17
+        }
+      },
+      "seed": null,
+      "date": "2026-09-11T03:22:43.007Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "assets/spritegen/era4-pilot-red.json",
+      "derivedBy": "node assets/spritegen/era4-pilots-compose.mjs",
+      "how": "drawn as a text grid, one letter a SNES pixel (the EarthBound way, not a model); lint PASS on the Super Nintendo rules; six rows (idle, up, down, swing, miss, win) of up to 3 frames of 12 x 42",
+      "card": "item 1281",
+      "verdict": "worn by the player on era 4 (src/characters.js, the Super Nintendo block's sheets.left), in place of item 1227's era4-players-left",
+      "pixels": {
+        "width": 36,
+        "height": 252
+      },
+      "bytes": 1399,
+      "sha256": "2248e1390569e8d9d1ef5598f91999b074502bcdeb59f1b7d15bb323ae09191a",
+      "endpoint": null,
+      "request": {
+        "description": "The Super Nintendo left player: an F-Zero hover pilot facing right, round red helmet with a dark visor band and a cream highlight, red racing suit with a white centre stripe and white knee pads, dark boots, standing on a small metal hover pad with a jet flame under it; the front glove on the frame's right edge where the bat's handle is, the back arm out for balance. One SNES pixel a sheet pixel. One character in every frame.",
+        "seed": null
+      }
+    },
+    {
+      "name": "era4-pilot-blue",
+      "file": "era4-pilot-blue.png",
+      "prompt": "The Super Nintendo right player (the red pilot in the second OBJ palette): an F-Zero hover pilot facing right, round blue helmet with a dark amber visor band and a cream highlight, blue racing suit with a yellow centre stripe and yellow knee pads, dark boots, standing on a small metal hover pad with a jet flame under it; the front glove on the frame's right edge where the bat's handle is, the back arm out for balance. One SNES pixel a sheet pixel. One character in every frame.",
+      "size": {
+        "width": 36,
+        "height": 252
+      },
+      "style": {
+        "tool": "tools/spritegen.mjs",
+        "era": 4,
+        "machine": "Super Nintendo",
+        "frame": {
+          "w": 12,
+          "h": 42
+        },
+        "hand": {
+          "x": 12,
+          "y": 17
+        }
+      },
+      "seed": null,
+      "date": "2026-09-11T03:23:02.185Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "assets/spritegen/era4-pilot-blue.json",
+      "derivedBy": "node assets/spritegen/era4-pilots-compose.mjs",
+      "how": "drawn as a text grid, one letter a SNES pixel (the EarthBound way, not a model); the red pilot's grid in a second OBJ palette; lint PASS on the Super Nintendo rules; six rows (idle, up, down, swing, miss, win) of up to 3 frames of 12 x 42",
+      "card": "item 1281",
+      "verdict": "worn by the computer on era 4 (src/characters.js, the Super Nintendo block's sheets.right), in place of item 1227's era4-players-right",
+      "pixels": {
+        "width": 36,
+        "height": 252
+      },
+      "bytes": 1395,
+      "sha256": "31a0bf343b33568c005eb60593360bc24b845d56919baeb50af5a149225f261c",
+      "endpoint": null,
+      "request": {
+        "description": "The Super Nintendo right player (the red pilot in the second OBJ palette): an F-Zero hover pilot facing right, round blue helmet with a dark amber visor band and a cream highlight, blue racing suit with a yellow centre stripe and yellow knee pads, dark boots, standing on a small metal hover pad with a jet flame under it; the front glove on the frame's right edge where the bat's handle is, the back arm out for balance. One SNES pixel a sheet pixel. One character in every frame.",
+        "seed": null
+      }
     }
   ]
 }

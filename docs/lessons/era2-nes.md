@@ -5,6 +5,10 @@ Look file: [src/eras/era2-nes.js](../../src/eras/era2-nes.js).
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Super Mario Bros.* + *Tennis*. Added: the game speaks: a scoreline band with names, the rally
+  count and the umpire's calls. Changed: the arena as Tennis's hall: a green table, a tile crowd, an
+  umpire.
 - **Picture:** a dark tiled court with a white border, not the black void. Paddles and ball are
   chunky sprites with a lit side and a shaded side. A dotted net runs between two posts. The score
   is in an NES-style pixel font: thick two-pixel strokes with a drop shadow.

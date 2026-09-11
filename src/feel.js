@@ -408,23 +408,221 @@
     ctx.restore();
   }
 
+  // ----------------------------------------------------------- lettering
+  /*
+   * Each era letters its rally counter and callouts the way its own interface
+   * letters everything else (item 1262), the pattern src/opponents.js uses for
+   * the opponent's name. One row per era that has the counter (the Nintendo 64
+   * up); any other era gets the 1972 block font, BLOCK, which is also what a
+   * context that cannot measure text (the headless recorder) falls back to.
+   *
+   *   family, weight   the system font the era's HUD is set in
+   *   ink              the letters; outline a stroke round them; shadow a
+   *                    hard drop (depth: how far, in field units); glow a blur
+   *   skew             an italic lean (the Dreamcast's graffiti)
+   *   spacing          letter-spacing in px, where the canvas has it (the PS2)
+   *   counter, callout { size, plate, plateAlpha, radius, stroke, kicker }:
+   *                    size is the letter height in field units; plate a panel
+   *                    behind the text; kicker a small upper line on a callout
+   *                    plate, the rally count, which makes the Xbox 360's callout
+   *                    an achievement toast in the same shape as the era's own
+   *   counterY         where the counter's centre sits, when the era's HUD
+   *                    wants it somewhere other than the bottom middle
+   * Positions are the old ones -- the counter at the bottom middle, the callout
+   * at y 140 -- except where a row says otherwise.
+   */
+  var BLOCK = { font: 'block' };
+  var LETTERING = {
+    // N64: the round toy HUD -- toy-yellow fat letters in a blue outline
+    // (era 6's hudFill and hudOutline), the counter on a round blue plate.
+    6: { font: 'hd', family: '"Arial Black", Arial, sans-serif', weight: 900,
+         ink: '#ffd23c', outline: '#1f3fbf', shadow: '#0f2a80', depth: 3,
+         counter: { size: 26, plate: '#1f3fbf', plateAlpha: 0.9, radius: 18, stroke: '#ffd23c' },
+         callout: { size: 64 } },
+    // Dreamcast: spray-paint graffiti -- yellow, leaning, a magenta extrusion
+    // and a fat ink outline, the score's own treatment (era 7's palette).
+    7: { font: 'hd', family: 'Verdana, sans-serif', weight: 700,
+         ink: '#ffd400', outline: '#1a1a1a', shadow: '#ff2e88', depth: 5, skew: -0.25,
+         counter: { size: 24 },
+         callout: { size: 60 } },
+    // PS2: the film interface -- thin, wide-tracked blue type with a blue
+    // glow, the counter set as a subtitle in the letterbox's bottom bar.
+    8: { font: 'hd', family: 'Arial, sans-serif', weight: 400,
+         ink: '#9ec9ff', glow: '#2a6cff', spacing: 6,
+         counter: { size: 20 }, counterY: 572,
+         callout: { size: 46 } },
+    // Xbox: the green-glow sans of a 2001 shooter HUD, the counter in a dark
+    // panel framed in green like the era's shield bar.
+    9: { font: 'hd', family: 'Arial, sans-serif', weight: 700,
+         ink: '#b8ff3c', glow: '#5cff2a', spacing: 2,
+         counter: { size: 22, plate: '#06140a', plateAlpha: 0.7, radius: 2, stroke: '#5cff2a' },
+         callout: { size: 54 } },
+    // Xbox 360: clean Segoe-style sans, white with a soft green glow; the
+    // callout is an achievement toast (dark rounded plate, green edge, the
+    // rally on a small silver line above), the counter a small blade.
+    10: { font: 'hd', family: '"Segoe UI", "Helvetica Neue", Arial, sans-serif', weight: 600,
+          ink: '#ffffff', glow: '#5dc21e',
+          counter: { size: 22, plate: '#1b1b1b', plateAlpha: 0.92, radius: 10, stroke: '#5dc21e' },
+          callout: { size: 34, plate: '#1b1b1b', plateAlpha: 0.92, radius: 12, stroke: '#5dc21e',
+                     kicker: '#d9dcd6' } }
+  };
+
+  /** The lettering row for an era: its own, or the block font. */
+  function letteringFor(era) {
+    return LETTERING[Math.floor(Number(era)) || 0] || BLOCK;
+  }
+
+  function roundedPlate(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    if (typeof ctx.roundRect === 'function') { ctx.roundRect(x, y, w, h, r); return; }
+    r = Math.min(r || 0, w / 2, h / 2);
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
+
+  function setFont(ctx, L, px) {
+    ctx.font = L.weight + ' ' + Math.round(px) + 'px ' + L.family;
+    if ('letterSpacing' in ctx) ctx.letterSpacing = (L.spacing || 0) + 'px';
+  }
+
+  /** The text's width in the era's font, or 0 when the context cannot measure. */
+  function measure(ctx, L, text, px) {
+    if (!('measureText' in ctx) || !('fillText' in ctx)) return 0;
+    setFont(ctx, L, px);
+    var mt = ctx.measureText(text);
+    return mt && mt.width > 0 ? mt.width : 0;
+  }
+
+  /** One line in the era's lettering, centred on (x, y): drop, outline, glow, ink. */
+  function hdLine(ctx, L, text, x, y, px, ink) {
+    setFont(ctx, L, px);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (L.shadow) {
+      var d = L.depth || 2;
+      ctx.fillStyle = L.shadow;
+      for (var i = d; i >= 1; i--) ctx.fillText(text, x + i * 0.6, y + i);
+    }
+    if (L.outline) {
+      ctx.strokeStyle = L.outline;
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = Math.max(2, px * 0.14);
+      ctx.strokeText(text, x, y);
+    }
+    if (L.glow) { ctx.shadowColor = L.glow; ctx.shadowBlur = Math.max(6, px * 0.35); }
+    ctx.fillStyle = ink || L.ink;
+    ctx.fillText(text, x, y);
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'rgba(0,0,0,0)';
+  }
+
+  function plate(ctx, spec, x, y, w, h) {
+    if (!spec.plate) return;
+    ctx.save();
+    ctx.globalAlpha *= spec.plateAlpha == null ? 1 : spec.plateAlpha;
+    roundedPlate(ctx, x, y, w, h, spec.radius || 0);
+    ctx.fillStyle = spec.plate;
+    ctx.fill();
+    ctx.restore();
+    if (spec.stroke) {
+      ctx.save();
+      ctx.globalAlpha *= 0.8;
+      roundedPlate(ctx, x, y, w, h, spec.radius || 0);
+      ctx.strokeStyle = spec.stroke;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  /** The skew, about the text's own centre line, so the lean does not move it. */
+  function lean(ctx, L, y) {
+    if (L.skew) ctx.transform(1, 0, L.skew, 1, -L.skew * y, 0);
+  }
+
+  function drawCounterHd(ctx, state, L, label, w) {
+    var S = L.counter;
+    var cx = state.width / 2;
+    var cy = L.counterY != null ? L.counterY : state.height - 38;
+    var padX = S.size * 0.8, padY = S.size * 0.45;
+    ctx.save();
+    lean(ctx, L, cy);
+    plate(ctx, S, cx - w / 2 - padX, cy - S.size / 2 - padY, w + 2 * padX, S.size + 2 * padY);
+    hdLine(ctx, L, label, cx, cy, S.size);
+    ctx.restore();
+  }
+
+  function drawCalloutHd(ctx, state, L, callout, f, pop) {
+    var S = L.callout;
+    var cx = state.width / 2, cy = 140;
+    var px = S.size * pop;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, f * 2.5);
+    lean(ctx, L, cy);
+    if (S.kicker) {
+      // The achievement toast: a dark plate, the rally on a small line above
+      // the callout, both left-aligned past a green badge like the era's own.
+      var kick = 'RALLY ' + (callout.rally || '');
+      var wBig = measure(ctx, L, callout.text, px);
+      var wKick = measure(ctx, L, kick, S.size * 0.42);
+      var inner = Math.max(wBig, wKick);
+      var badge = S.size * 1.3;
+      var w = badge + inner + S.size * 1.4, h = S.size * 2.2;
+      var x = cx - w / 2, y = cy - h / 2;
+      plate(ctx, S, x, y, w, h);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x + S.size * 0.35 + badge / 2, cy, badge / 2 * 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = S.stroke || L.glow || L.ink;
+      ctx.fill();
+      ctx.restore();
+      var tx = x + S.size * 0.7 + badge + inner / 2;
+      hdLine(ctx, { family: L.family, weight: L.weight, ink: S.kicker }, kick, tx, cy - S.size * 0.52, S.size * 0.42);
+      hdLine(ctx, L, callout.text, tx, cy + S.size * 0.28, px);
+    } else {
+      if (S.plate) {
+        var wp = measure(ctx, L, callout.text, px);
+        plate(ctx, S, cx - wp / 2 - px * 0.5, cy - px * 0.7, wp + px, px * 1.4);
+      }
+      hdLine(ctx, L, callout.text, cx, cy, px);
+    }
+    ctx.restore();
+  }
+
   function drawHud(ctx, state, m, fx) {
     var R = root.PongRender;
-    if (!fx.counter || !R || !R.drawText) return;
+    if (!fx.counter) return;
+    var L = letteringFor(state.era);
+    var showCounter = state.rally >= COUNTER_FROM && state.serveDelay <= 0;
+    var label = 'RALLY ' + state.rally;
+    var f = m.callout ? m.callout.left / CALLOUT_LEN : 0;   // 1 fresh .. 0 gone
+    var pop = f > 0.85 ? 1 + (f - 0.85) * 2 : 1;             // a quick pop in
+    // The era's own lettering, where the context can measure it.
+    if (L.font === 'hd') {
+      var w = measure(ctx, L, label, L.counter.size);
+      if (w > 0) {
+        if (showCounter) drawCounterHd(ctx, state, L, label, w);
+        if (m.callout) drawCalloutHd(ctx, state, L, m.callout, f, pop);
+        return;
+      }
+    }
+    // The 1972 block font: every era without a row, and the recorder.
+    if (!R || !R.drawText) return;
     ctx.save();
-    if (state.rally >= COUNTER_FROM && state.serveDelay <= 0) {
+    if (showCounter) {
       ctx.globalAlpha = 0.85;
       ctx.fillStyle = '#000000';
-      var label = 'RALLY ' + state.rally;
       var cell = 5, gap = 4;
-      var w = label.length * (3 * cell + gap) - gap;   // block font: 3 cells a glyph
-      ctx.fillRect(state.width / 2 - w / 2 - 10, state.height - 54, w + 20, 5 * cell + 16);
+      var bw = label.length * (3 * cell + gap) - gap;   // block font: 3 cells a glyph
+      ctx.fillRect(state.width / 2 - bw / 2 - 10, state.height - 54, bw + 20, 5 * cell + 16);
       ctx.fillStyle = '#ffffff';
       R.drawText(ctx, label, state.width / 2, state.height - 46, cell, gap);
     }
     if (m.callout) {
-      var f = m.callout.left / CALLOUT_LEN;             // 1 fresh .. 0 gone
-      var pop = f > 0.85 ? 1 + (f - 0.85) * 2 : 1;       // a quick pop in
       var c = Math.round((8 + 4 * fx.intensity) * pop);
       ctx.globalAlpha = Math.min(1, f * 2.5);
       ctx.fillStyle = '#000000';
@@ -496,6 +694,9 @@
     SLOWMO: SLOWMO,
     CALLOUTS: CALLOUTS,
     COUNTER_FROM: COUNTER_FROM,
+    LETTERING: LETTERING,
+    BLOCK: BLOCK,
+    letteringFor: letteringFor,
     intensity: intensity,
     effects: effects,
     hitStopFrames: hitStopFrames,

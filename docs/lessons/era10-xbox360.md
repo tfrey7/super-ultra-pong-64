@@ -5,6 +5,10 @@ Look file: [src/eras/era10-xbox360.js](../../src/eras/era10-xbox360.js). Chapter
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Gears of War* (2006) + *Project Gotham Racing 3*. Added: achievements: the toast and the
+  gamerscore. Changed: HD 720p with the full post chain (bloom, depth of field, motion blur, grain,
+  grade) over everything the ladder built.
 - **Native resolution here:** 720p. The field is 4:3, so it gets the 960 x 720 middle of a
   1280 x 720 frame, and the HDTV's side bars fall outside the page's canvas. That is 9 times a
   PlayStation's pixels, and it is what every full-frame pass costs.
@@ -88,6 +92,7 @@ last, after every post pass.
 | Game feel | `src/feel.js` | Hit-stop, shake, flash, squash, trail, rally callouts and match-point slow motion, all at intensity 1. |
 | Finale | `src/match.js` | Match point, result, rewind and thanks. |
 | Voice and music | the era file's `VOICE`, `src/music.js` row 10 | Achievement blip; `pump`, `filter.lfo`, `spread`. |
+| The callout is an achievement toast (item 1262) | `src/feel.js` `LETTERING[10]` | Draws GREAT and the rest on a dark rounded plate with a green badge and the rally on a silver line above, in the blades' clean sans with a soft green glow; the counter is a small plate of the same kind. |
 
 ## START HERE
 

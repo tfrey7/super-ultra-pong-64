@@ -5,6 +5,9 @@ Look file: [src/eras/era7-dreamcast.js](../../src/eras/era7-dreamcast.js). Chapt
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Jet Set Radio* (2000) + *Soulcalibur*. Added: contact effects: the impact burst and speed lines.
+  Changed: cel shading with ink outlines at 640x480, no fog.
 - **Native resolution here:** 640 x 480, the VGA box's picture, scaled up soft. The era itself
   draws straight onto the canvas at full resolution, with no low-resolution buffer, no smoothing
   and no post pass. Next to the Nintendo 64's smear, the first thing a player sees is how sharp it
@@ -82,6 +85,7 @@ Look file: [src/eras/era7-dreamcast.js](../../src/eras/era7-dreamcast.js). Chapt
 | Look | `src/eras/era7-dreamcast.js` | Poster palette, graffiti score, speed lines, starburst. |
 | VGA screen | `src/display-tv.js` | `tv-vga`. |
 | Voice and music | the era file's `voice`, `src/music.js` row 7 | The slap bass and its filter sweep; the `swing` and `ninth` arrangement options. |
+| The rally counter and callouts as graffiti (item 1262) | `src/feel.js` `LETTERING[7]` | Leans them like the score, yellow over a magenta extrusion with a fat ink outline, so a callout reads as another tag on the wall. |
 
 ## START HERE
 

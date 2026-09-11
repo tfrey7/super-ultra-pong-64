@@ -5,6 +5,9 @@ Look file: [src/eras/era3-genesis.js](../../src/eras/era3-genesis.js).
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Golden Axe* + *Altered Beast*. Added: depth: line-scrolled parallax planes behind the arena.
+  Changed: the HUD as a status bar with portraits and a meter of pots.
 - **Native resolution here:** 320 x 224, hard pixel edges.
 - **Palette:** 3 bits a channel, 512 colours. The paddles keep the colours the rules picked
   (era 1's), snapped to that palette. They are shaded by moving whole palette steps lighter and
@@ -182,10 +185,38 @@ frame, and they cost nothing measurable. The tenth hit is `docs/shots/item-1226/
   helmet and shield from frame to frame (11 different figures across 12 frames).
 - **A barbarian drawn as a text grid** (`assets/spritegen/era3-barbarian.json`): 12 frames of
   20 x 25, 14 colours on the 3-bit grid, one character throughout. It took 3 min 44 s to draw
-  and 17 ms to build. It is not wired into the game yet;
+  and 17 ms to build. It was a proof, not wired into the game (item 1280 below redrew and wired it);
   [contact.png](../shots/item-1272/contact.png) puts it beside today's sheet. The whole pipeline
   is in [sprites.md](sprites.md).
 - **Genesis colours are `levels(3)`**: 0, 36, 73, 109, 146, 182, 219 and 255 per channel. Write
   the palette in those values, and the checker refuses anything else, naming the nearest.
 
 - **The opponent's name is not drawn in this era (item 1261)**: the stone panel already shows the knight's portrait beside the score, and the caption left over the court read as "PLAST ARETTSSSIP" at 320 x 224.
+
+## LESSONS: the players redrawn the EarthBound way (item 1280)
+
+- **LESSON: draw a figure as parts, then pose the parts; never shift one whole frame.** Item 1272's
+  barbarian was one frame moved a row and patched, and 9 of its 12 frames differed, by a few
+  pixels. `assets/spritegen/era3-players-compose.mjs` draws each figure once as a head, a torso, a
+  back-arm shield, four front arms (holding, wound up, thrown out, dropped) and three pairs of legs
+  (together, apart, knees bent), and one table places them per frame. The legs stride on a move,
+  the body lunges 2 pixels into a swing and is knocked back 3 on a miss, and the win raises an axe
+  and then hops with both feet off the ground. All 12 frames are different, every one at least 20
+  pixels from idle (`test/era3-players.test.js` holds both numbers).
+- **One skeleton, two characters.** The knight is the barbarian's pose table with his own head,
+  torso, heater shield and sword, and his arms and legs are the barbarian's letters swapped to plate
+  (skin to steel, fur boots to sabatons). The two sides then move alike and read as a matched pair,
+  which pixellab's two sheets never did: they came back at 46 and 41 colours with 11 different
+  figures each. The new sheets are 14 and 10 colours of the Genesis's 15.
+- **The frame, hand and scale stayed item 1226's** (20 x 25, hand at 20, 13, scale 3.2), so each
+  figure holds the bat by its handle where the old one did, at the ends of item 1267's table.
+- **Both figures, two passes each with a look after each, were drawn inside the run's first 8
+  minutes**, reading the pipeline included. The part-and-pose table made the second pass a
+  six-line edit (the knight's plate shaded toward the ball, the crest turned deep red).
+- **The loader reads only `assets/pixellab/`**, so each sheet is built twice, beside its grid and
+  into `assets/pixellab/` (item 1279's convention). The test fails if either copy drifts from the
+  grid.
+- Measured on the playtest with master merged in: the twelve-hit Genesis rally ran 1,174 frames
+  at a mean of 16.7 ms, p95 16.8 ms (16.7 with the feel layer out). The tenth hit is
+  [rally-era3.png](../shots/item-1280/rally-era3.png), and old beside new is
+  [contact.png](../shots/item-1280/contact.png).
