@@ -297,13 +297,13 @@ between them.
   each beat reads stay as the page gives them. Only the grip changes, to a bat held by its
   handle:
 
-  | Card | Era | The two characters | Budget each (from the card) |
+  | Card | Era | The two characters | Budget each, from the card (fewer if 1248's measurements say so) |
   | --- | --- | --- | --- |
   | 1253 | 5 PlayStation | the red-gi and blue-top fighters | about 200 triangles |
-  | 1254 | 6 Nintendo 64 | the penguin and the frog | from 1248's measurements |
-  | 1255 | 7 Dreamcast | the orange and blue skaters | from 1248's measurements |
-  | 1256 | 8 PlayStation 2 | the midnight and slate operatives | from 1248's measurements |
-  | 1257 | 9 Xbox | the space marine and the steel cyborg | from 1248's measurements |
+  | 1254 | 6 Nintendo 64 | the penguin and the frog | about 350 triangles |
+  | 1255 | 7 Dreamcast | the orange and blue skaters | about 600 triangles |
+  | 1256 | 8 PlayStation 2 | the midnight and slate operatives | about 800 triangles |
+  | 1257 | 9 Xbox | the space marine and the steel cyborg | about 1000 triangles |
   | 1258 | 10 Xbox 360 | the green-trim and grey-trim soldiers | about 1200 triangles |
 
 ---
