@@ -101,7 +101,8 @@ On the way up it **films each of the four era changes**: a frame caught mid-ring
 the farthest corner from where the ball went out, and a check that once the ring has gone the live
 canvas matches the new era drawn offscreen more closely than the old one.
 The changes alternate sides (item 1174): a change out of an even era (0 to 1, 2 to 3, ...) starts its ring at the left edge, a real miss past the player, and a change out of an odd era (1 to 2, 3 to 4, ...) starts it at the right edge, the player's own point put just past the computer's paddle -- and a check names the edge each ring came from.
-`--ladder` runs only that walk (about half a minute); `--reference` also copies its five era frames
+`--ladder` runs only that walk (about half a minute); `--scoring` runs only the rally and the
+scoring check (about fifteen seconds a run); `--reference` also copies its five era frames
 and four change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
 `index.html?era=N` (N is 0 to 4) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
@@ -175,11 +176,16 @@ his emulator — never touch either.**
   the browser (`window.Pong`) and `node --test` (CommonJS). `tools/playtest.mjs` is `.mjs` because
   Node runs it, not the page.
 - **Run `node --test` from the repo root.** The suite reaches `src/game.js` by relative path.
-- **One playtest check is a coin flip and always has been.** "The player can score against the
-  computer" allows 22 seconds of ball-tracking play and asks for a point;
-  `node tools/beatability-sample.mjs` measures that at 44% over 300 sessions, identically on
-  master. Do not read a single failure of that one line as a regression you caused -- run the
-  sampler before you believe it.
+- **The scoring check plays a scripted hand, so believe its FAIL.** "The player can score against
+  the computer" used to give 22 seconds of plain ball-tracking and passed only 44% of the time --
+  the computer is beatable by design, not beatable every 22 seconds. Since item 1160 the harness
+  plays `tools/scoring-rally.js` instead, which asks the rules where to stand so the computer
+  cannot return the shot, and keeps shooting for up to 45 seconds (it stops at the point, usually
+  inside fifteen). A FAIL on that line now means scoring is really
+  broken, or the computer has been made unbeatable -- both regressions. `node tools/playtest.mjs
+  --scoring` runs just that check, about fifteen seconds a run. `node tools/beatability-sample.mjs` still
+  measures how beatable the game itself is: its `track` and `corner` rows are the design, its
+  `scripted` row is the check's hand.
 - **Eras 0 and 1 are pinned to the pixel.** `tools/eralooks-today.json` holds every draw call
   those two eras made before the ladder existed, and a test compares the live renderer against
   it. A deliberate change to either look re-records it: `node tools/eralooks.js`, committed with
@@ -222,6 +228,19 @@ his emulator — never touch either.**
 - **The ladder walk's "new era draws afterwards" check leaves out the name card's band.** It
   compares the live canvas with each era drawn offscreen, and the card covers the middle 180 rows
   of both until the serve; a look that draws something important only there would pass unseen.
+
+- **A pixellab image drawn onto the live canvas breaks the playtest's pixel read, off disk.**
+  `tools/playtest.mjs` compares the live canvas with each era drawn offscreen by calling
+  `getImageData` in the page, and the page is opened from `file://`, where Chrome counts every
+  image as another origin: one `drawImage` of a `assets/pixellab/*.png` taints the canvas, and the
+  read throws a SecurityError. The first era card that draws pixellab art has to deal with that
+  check (serve the repo over HTTP for it, or compare screenshots instead); item 1177, which built
+  the loader, measured none of this in a browser -- it is reasoned from the harness's own code.
+- **The pixellab balance lags the bill.** `node tools/pixellab.mjs` reads the subscription's
+  generations left before and after a generation; on item 1177's test image the call was billed
+  1 generation, the count read 9953 both times, and a `balance` run about two minutes later read
+  9952. Trust the call's own `cost` in the manifest, not `generationsUsed` (which records 0 for
+  that image), for what one image costs.
 
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
