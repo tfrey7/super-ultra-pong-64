@@ -9,8 +9,9 @@
  * files, no dependencies.
  *
  * Two halves, kept apart on purpose:
- *   - VOICES / voicesFor / echoFor are plain data -- what each era sounds like
- *     -- so the headless suite can check the design with no audio anywhere.
+ *   - VOICES / voicesFor / echoFor / effectsFor are plain data -- what each era
+ *     sounds like -- so the headless suite can check the design with no audio
+ *     anywhere.
  *   - createPlayer() turns the game's per-step event list (state.events, which
  *     the rules fill) into scheduled oscillators. It READS the state and never
  *     writes it.
