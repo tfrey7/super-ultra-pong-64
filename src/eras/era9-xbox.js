@@ -432,8 +432,21 @@
     });
   }
 
+  // The pixellab tiles (item 1187), laid over the era's own fills through the
+  // shared table: the generated tread plate pressed into the bump-mapped
+  // metal under the light, steel tread on the paddles' steel, rivets on the
+  // rails. Overlay keeps the moving light's falloff underneath in charge.
+  var TEXTURE = {
+    court: { name: 'court-metal', alpha: 0.5, blend: 'overlay', period: 64, strip: 2, fade: 0.3, smooth: true },
+    trim: { name: 'trim', alpha: 0.3, blend: 'overlay', period: 26, smooth: true },
+    paddle: { name: 'court-metal', alpha: 0.4, blend: 'overlay', period: 16, smooth: true },
+    ball: { name: 'ball', alpha: 0.25, blend: 'soft-light', period: 12, smooth: true }
+  };
+
   function tableStyle(ctx, cam, T, L, tile) {
     return {
+      texture: TEXTURE.court,
+      trim: TEXTURE.trim,
       surface: function () { drawMetal(ctx, cam, T, L, tile); },
       line: C.steel,
       rail: function (c, cm, pts) {
@@ -554,6 +567,7 @@
   function drawPaddle(ctx, cam, T, L, rect, ink) {
     var out = T.box(ctx, cam, rect, 0, PADDLE_Z, {
       shade: 'gradient',
+      texture: TEXTURE.paddle,
       fill: function (face, pts) {
         if (face === 'near') return ink;                    // R4: full saturation
         var span = screenSpan(pts);
@@ -715,7 +729,7 @@
     for (var s = 0; s < sides.length; s++) drawGamertag(ctx, cam, T, P, state, sides[s], tags);
 
     // 7. the ball, last of everything on the table; hidden in the serve pause
-    if (live) T.ball(ctx, cam, state.ball, { fill: C.ball });
+    if (live) T.ball(ctx, cam, state.ball, { fill: C.ball, texture: TEXTURE.ball });
 
     // 8. the HUD band: the shield bars
     drawShield(ctx, T, P, state, 'left');

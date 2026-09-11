@@ -204,8 +204,10 @@
    * nothing, a fresh serve, and the clock restarted. Calling it while already
    * playing does nothing, so a fistful of keypresses cannot restart a rally.
    * Returns true only if it actually started something.
+   * hold (seconds, optional) keeps the first serve waiting at least that long:
+   * the cabinet's coin moment -- CREDIT 1, PLAYER 1 READY -- plays inside it.
    */
-  function startGame(state) {
+  function startGame(state, hold) {
     if (state.phase !== 'title') return false;
     state.phase = 'playing';
     state.time = 0;
@@ -222,6 +224,19 @@
     state.missAt = null;
     serve(state, 1);
     if (state.era >= 1) flipToColour(state);
+    if (hold > 0) state.serveDelay = Math.max(state.serveDelay, hold);
+    return true;
+  }
+
+  /**
+   * Back to the attract screen: the one call a finished match makes. The field
+   * stops dead and the cabinet shows INSERT COIN again (src/attract.js); the
+   * next coin is a fresh startGame(). Returns true only if a game was running.
+   */
+  function backToTitle(state) {
+    if (state.phase === 'title') return false;
+    state.phase = 'title';
+    state.events = [];
     return true;
   }
 
@@ -448,6 +463,7 @@
     TOP_ERA: TOP_ERA,
     createGame: createGame,
     startGame: startGame,
+    backToTitle: backToTitle,
     flipToColour: flipToColour,
     advanceEra: advanceEra,
     clampEra: clampEra,

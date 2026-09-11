@@ -16,7 +16,7 @@ const { Pong, R } = eralooks.loadRenderer(ROOT);
 const PongSound = require('../src/sound.js');
 
 const BIBLE_CAMERA = { tilt: 26, height: 900, fov: 39.5, screenY: 301 };
-const BIBLE_FOG = { start: 0.25, end: 1.15, power: 1.2, max: 0.92, colour: '#b9d4ec' };
+const BIBLE_FOG = { start: 0.25, end: 0.85, power: 1.4, max: 0.97, colour: '#b9d4ec' };
 const BIBLE_CARD = { flash: '#ffffff', wipe: ['#b9d4ec', '#3cb93c', '#1f5fd6'], box: '#1f5fd6', border: '#ffc72c',
   inner: null, year: '#ffc72c', name: '#ffffff', label: '#bfe3ff', dots: null };
 const BIBLE_VOICE = {
@@ -136,10 +136,20 @@ test('the ball is the last thing drawn on the table: a smooth sphere, then its w
   assert.ok(hx < cx && hy < cy && r > 0, 'the hot spot sits up and to the left');
   const cam = T.camera(BIBLE_CAMERA);
   const s = T.ballScreen(cam, g);
-  const centre = T.project(cam, g.ball.x + g.ball.size / 2, g.ball.y + g.ball.size / 2, g.ball.size * 0.7);
+  const centre = T.project(cam, g.ball.x + g.ball.size / 2, g.ball.y + g.ball.size / 2, g.ball.size * 0.9);
   assert.ok(Math.abs(cx - centre.x) < 1e-9 && Math.abs(cy - centre.y) < 1e-9, 'the ball stands on its true footprint, one radius up');
-  assert.ok(r > s.r, 'a bigger ball than the stock table ball');
+  assert.ok(r >= s.r * 1.45, `plainly bigger than the stock table ball the PlayStation draws (${(r / s.r).toFixed(2)}x)`);
   assert.ok(fills.slice(0, -1).every((o) => o.fill !== '#ffffff'), 'R1: no other fill is pure white');
+});
+
+test('the fog swallows the far end before the far rail, and leaves the near half of the court clear', () => {
+  const H = 600;
+  const at = (d) => T.fogAmount(H - d * H, BIBLE_FOG);
+  assert.ok(at(1) >= 0.95, `the far rail is all but gone (${at(1).toFixed(2)})`);
+  assert.ok(at(0.85) >= 0.95, `the last stretch of court is already at full fog (${at(0.85).toFixed(2)})`);
+  assert.ok(at(0.75) >= 0.7, `thick a quarter of the court short of the far rail (${at(0.75).toFixed(2)})`);
+  assert.ok(at(0.5) <= 0.4, `mid-court only hazed (${at(0.5).toFixed(2)})`);
+  assert.strictEqual(at(0.25), 0, 'the near end of the court is clear');
 });
 
 test('paddles are smooth-shaded boxes, the far one first and fogged no more than 0.35', () => {

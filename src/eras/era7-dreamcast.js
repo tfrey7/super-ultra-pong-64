@@ -126,6 +126,17 @@
     }
   }
 
+  // The pixellab tiles (item 1187), laid over the era's own flat bands through
+  // the shared table and kept light: a cel-shaded game's textures were flat
+  // colour with a little printed grain, so the bands and the ink stay in
+  // charge. Filtered smooth, as the Dreamcast's were.
+  var TEXTURE = {
+    court: { name: 'court-grain', alpha: 0.35, blend: 'soft-light', period: 110, strip: 2, smooth: true },
+    trim: { name: 'trim', alpha: 0.3, blend: 'soft-light', period: 28, smooth: true },
+    paddle: { name: 'paddle', alpha: 0.25, blend: 'soft-light', period: 20, smooth: true },
+    ball: { name: 'ball', alpha: 0.3, blend: 'soft-light', period: 12, smooth: true }
+  };
+
   // --------------------------------------------------------------- 2. table
   function tableStyle(T) {
     return {
@@ -140,7 +151,9 @@
       line: PALETTE.ink,
       rail: PALETTE.orange,
       railTop: PALETTE.yellow,
-      nearLip: PALETTE.ink
+      nearLip: PALETTE.ink,
+      texture: TEXTURE.court,
+      trim: TEXTURE.trim
     };
   }
 
@@ -160,6 +173,7 @@
       ink: ink,
       shade: 'banded',
       bands: 2,
+      texture: TEXTURE.paddle,
       fill: function (face, pts) {
         var pair = faces[face] || faces.near;
         var top = Infinity, bottom = -Infinity;
@@ -245,7 +259,8 @@
     var s = T.ball(ctx, cam, state.ball, {
       fill: PALETTE.ballCore,
       shadow: T.rgba(PALETTE.ink, 0.35),
-      outline: { width: 2, colour: PALETTE.ink }
+      outline: { width: 2, colour: PALETTE.ink },
+      texture: TEXTURE.ball
     });
     // The shade band: the same circle offset (+0.35r, +0.35r), inside the ball.
     // Drawn as the lens where the two circles overlap -- two arcs, no clip.

@@ -117,7 +117,7 @@
   /** One colour field of the frame so far: the canvas multiplied by a pure tint. */
   function colourField(x, canvas, tint, w, h) {
     x.globalCompositeOperation = 'copy';
-    x.drawImage(canvas, 0, 0);
+    x.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, w, h);
     x.globalCompositeOperation = 'multiply';
     x.fillStyle = tint;
     x.fillRect(0, 0, w, h);
@@ -128,11 +128,12 @@
    * Inside the ring, the picture rolls up one whole frame and locks, its red
    * and blue-green fields drifting apart and back. Rebuilt from two tinted
    * copies of the frame, added back together: with no drift they add up to the
-   * frame exactly. Needs the page's canvas at field size; false when it has none.
+   * frame exactly. The canvas may be any size (the display draws each era at its
+   * machine's own resolution): it is copied into field-sized buffers. False with no canvas.
    */
   function rollAndFringe(ctx, o, r, s, w, h) {
     var canvas = ctx.canvas;
-    if (!canvas || canvas.width !== w || canvas.height !== h || s >= 1) return false;
+    if (!canvas || !(canvas.width > 0) || !(canvas.height > 0) || s >= 1) return false;
     var red = buffer('red', w, h);
     var cyan = red && buffer('cyan', w, h);
     if (!red || !cyan) return false;

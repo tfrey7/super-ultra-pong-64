@@ -218,11 +218,14 @@
     if (sideX !== null) {
       out.side = path(ctx, cam, [[sideX, y0, z0], [sideX, y1, z0], [sideX, y1, z1], [sideX, y0, z1]]);
       paint(ctx, cam, out.side, 'side', style);
+      if (style && style.texture) texturePart(ctx, out.side, style.texture);
     }
     out.near = path(ctx, cam, [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]]);
     paint(ctx, cam, out.near, 'near', style);
+    if (style && style.texture) texturePart(ctx, out.near, style.texture);
     out.top = path(ctx, cam, [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]]);
     paint(ctx, cam, out.top, 'top', style);
+    if (style && style.texture) texturePart(ctx, out.top, style.texture);
     return out;
   }
 
@@ -272,6 +275,7 @@
     ctx.fillStyle = typeof style.fill === 'function' ? style.fill(s.x, s.y, s.r)
       : (style.fill || style.ink || '#ffffff');
     ctx.fill();
+    if (style.texture) ballTexture(ctx, s, b, style.texture, style.radius);
     if (style.alpha !== undefined) ctx.globalAlpha = prevAlpha;
     return { x: s.x, y: s.y, r: s.r, footX: s.footX, footY: s.footY };
   }
@@ -302,6 +306,7 @@
     var s = Object.assign({}, TABLE_DEFAULTS, style || {});
     var out = { surface: null, line: [], farRail: { near: null, top: null }, nearLip: null };
     out.surface = tablePart(ctx, cam, [[0, 0, 0], [W, 0, 0], [W, H, 0], [0, H, 0]], s.surface);
+    if (s.texture) courtTexture(ctx, cam, s.texture);
     var lx = (W - 6) / 2;
     for (var y = 6; y < H; y += 36) {
       var y1 = Math.min(y + 20, H);
@@ -311,6 +316,11 @@
     out.farRail.near = tablePart(ctx, cam, [[0, 0, 0], [W, 0, 0], [W, 0, 22], [0, 0, 22]], s.rail);
     out.farRail.top = tablePart(ctx, cam, [[0, -18, 22], [W, -18, 22], [W, 0, 22], [0, 0, 22]], s.railTop);
     out.nearLip = tablePart(ctx, cam, [[0, H, 0], [W, H, 0], [W, H + 10, 0], [0, H + 10, 0]], s.nearLip);
+    if (s.trim) {
+      texturePart(ctx, out.farRail.near, s.trim);
+      texturePart(ctx, out.farRail.top, s.trim);
+      texturePart(ctx, out.nearLip, s.trim);
+    }
     return out;
   }
 
@@ -389,6 +399,216 @@
     return buf;
   }
 
+  // -------------------------------------------------------------- textures
+  // Pixel-art tiles from pixellab.ai (item 1187), handed over as data: URIs by
+  // src/textures3d.js (window.PongTextures3D.TILES) so the canvas of a page
+  // opened off disk stays readable. A texture is laid OVER a surface the era
+  // has already painted, through a blend mode (overlay by default) at an alpha,
+  // so the era's own palette, lighting and treatment stay what they were and
+  // the tile adds grain, tread or stitching on top. Nothing loops over pixels:
+  // a tile is mirrored 2 x 2 once with four drawImage calls (which makes it
+  // seamless), the court is one strip-mapped canvas built once per camera and
+  // canvas size, and paddles, rails and the ball take a pattern.
+  //
+  //   texture spec: { name: 'court-grain', alpha: 0.5, blend: 'overlay',
+  //                   period: 64,        field units one mirrored tile spans
+  //                   strip: 2,          court only: device px per strip
+  //                   fade: 0.6,         court only: alpha lost by the far edge
+  //                   smooth: false }    bilinear (true) or blocky (false)
+  //
+  // Headless (no document or no Image), before a tile has decoded, or with no
+  // such tile, every helper draws nothing and answers false/null: the era's
+  // plain surface is the fallback, and the recorded draw calls do not change.
+  var TEX = {};
+  var COURTS = {};
+  var COURT_KEYS = [];
+  var COURT_CACHE = 12;
+
+  function texSource(name) {
+    var t = root.PongTextures3D && root.PongTextures3D.TILES;
+    return (t && typeof name === 'string' && t[name]) || null;
+  }
+
+  /** The decoded, mirrored tile for a name, or null. */
+  function textureTile(name) {
+    if (!hasDocument() || typeof root.Image !== 'function') return null;
+    var t = TEX[name];
+    if (!t) {
+      var src = texSource(name);
+      if (!src) return null;
+      t = TEX[name] = { image: new root.Image(), tile: null, pattern: null, field: {} };
+      t.image.src = src;
+    }
+    if (t.tile) return t;
+    var img = t.image;
+    if (!img.complete || !(img.naturalWidth > 0)) return null;
+    var w = img.naturalWidth, h = img.naturalHeight;
+    var canvas = root.document.createElement('canvas');
+    canvas.width = 2 * w;
+    canvas.height = 2 * h;
+    var c = canvas.getContext('2d');
+    if (!c) return null;
+    c.imageSmoothingEnabled = false;
+    for (var i = 0; i < 4; i++) {
+      var fx = i & 1, fy = i >> 1;
+      c.setTransform(fx ? -1 : 1, 0, 0, fy ? -1 : 1, fx ? 2 * w : 0, fy ? 2 * h : 0);
+      c.drawImage(img, 0, 0);
+    }
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    t.tile = canvas;
+    return t;
+  }
+
+  /** True once a texture name can draw (for tests and eras that care). */
+  function textureReady(name) { return !!textureTile(name); }
+
+  /** Start decoding every tile now, so the first 3D frame has them. */
+  function preloadTextures() {
+    var t = root.PongTextures3D && root.PongTextures3D.TILES;
+    if (t) Object.keys(t).forEach(textureTile);
+  }
+
+  function blendIn(ctx, tex) {
+    ctx.globalCompositeOperation = tex.blend || 'overlay';
+    ctx.globalAlpha = ctx.globalAlpha * (tex.alpha === undefined ? 0.5 : tex.alpha);
+    ctx.imageSmoothingEnabled = !!tex.smooth;
+  }
+
+  /**
+   * Lay a texture over the path already traced through pts (a face, a rail),
+   * anchored at pts[0] so it travels with the shape. k is screen px per field
+   * unit there. Answers true when it drew.
+   */
+  function overlayPath(ctx, pts, tex, k) {
+    var t = tex && textureTile(tex.name);
+    if (!t || !pts || !pts.length || typeof ctx.createPattern !== 'function') return false;
+    var pat = t.pattern || (t.pattern = ctx.createPattern(t.tile, 'repeat'));
+    if (!pat) return false;
+    var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (var i = 0; i < pts.length; i++) {
+      x0 = Math.min(x0, pts[i].x); x1 = Math.max(x1, pts[i].x);
+      y0 = Math.min(y0, pts[i].y); y1 = Math.max(y1, pts[i].y);
+    }
+    var s = Math.max(0.05, (tex.period || 32) * (k || 1) / t.tile.width);
+    ctx.save();
+    ctx.clip();
+    blendIn(ctx, tex);
+    ctx.translate(pts[0].x, pts[0].y);
+    ctx.scale(s, s);
+    ctx.fillStyle = pat;
+    ctx.fillRect((x0 - pts[0].x) / s - 1, (y0 - pts[0].y) / s - 1, (x1 - x0) / s + 2, (y1 - y0) / s + 2);
+    ctx.restore();
+    return true;
+  }
+
+  /** Trace pts and lay a texture over them: a face or a rail. */
+  function texturePart(ctx, pts, tex) {
+    if (!tex || !pts || !pts.length || !textureTile(tex.name)) return false;
+    tracePath(ctx, pts);
+    return overlayPath(ctx, pts, tex, pts[0].scale);
+  }
+
+  /** The field y the floor shows at screen row sy (the inverse of project at z 0). */
+  function floorYAt(cam, sy) {
+    var u = (cam.screenY - sy) / cam.focal;
+    var Y = cam.height * (cam.sin + u * cam.cos) / (cam.cos - u * cam.sin);
+    return H / 2 + cam.back - Y;
+  }
+
+  /** The texture laid flat over the whole field, 1 px per field unit, built once. */
+  function fieldTexture(t, tex) {
+    var key = (tex.period || 64) + (tex.smooth ? 's' : 'b');
+    if (t.field[key]) return t.field[key];
+    var canvas = root.document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    var c = canvas.getContext('2d');
+    if (!c) return null;
+    var s = (tex.period || 64) / t.tile.width;
+    c.imageSmoothingEnabled = !!tex.smooth;
+    c.scale(s, s);
+    c.fillStyle = c.createPattern(t.tile, 'repeat');
+    c.fillRect(0, 0, W / s, H / s);
+    t.field[key] = canvas;
+    return canvas;
+  }
+
+  /**
+   * The court's texture in perspective, as the PlayStation did it: the floor
+   * cut into horizontal screen strips, each an affine copy of one band of the
+   * flat field texture scaled to the width the camera gives that depth. Built
+   * once per camera, texture and canvas size and kept; a frame is then one
+   * drawImage.
+   */
+  function courtCanvas(ctx, cam, tex, t) {
+    var d = 1;
+    if (typeof ctx.getTransform === 'function') {
+      var m = ctx.getTransform();
+      d = Math.max(0.1, Math.sqrt(m.a * m.a + m.b * m.b)) || 1;
+    }
+    var cw = Math.max(1, Math.round(W * d)), ch = Math.max(1, Math.round(H * d));
+    var strip = Math.max(1, Math.round(tex.strip || 2));
+    var key = [tex.name, tex.period, strip, tex.fade || 0, tex.smooth ? 1 : 0,
+      cam.tilt, cam.height, cam.fov, cam.screenY, cam.panX, cw, ch].join('|');
+    if (COURTS[key]) return COURTS[key];
+    var field = fieldTexture(t, tex);
+    if (!field) return null;
+    // A drifting camera (the PS2's) misses every frame: past the cache's size
+    // the oldest canvas is cleared and reused rather than a new one made.
+    var canvas = null;
+    if (COURT_KEYS.length >= COURT_CACHE) {
+      var old = COURT_KEYS.shift();
+      canvas = COURTS[old];
+      delete COURTS[old];
+    }
+    if (!canvas) canvas = root.document.createElement('canvas');
+    if (canvas.width !== cw) canvas.width = cw;
+    if (canvas.height !== ch) canvas.height = ch;
+    var c = canvas.getContext('2d');
+    if (!c) return null;
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.globalAlpha = 1;
+    c.clearRect(0, 0, cw, ch);
+    c.imageSmoothingEnabled = !!tex.smooth;
+    var top = Math.max(0, Math.floor(project(cam, W / 2, 0, 0).y * d));
+    var bottom = Math.min(ch, Math.ceil(project(cam, W / 2, H, 0).y * d));
+    for (var sy = top; sy < bottom; sy += strip) {
+      var ya = Math.max(0, floorYAt(cam, sy / d));
+      var yb = Math.min(H, floorYAt(cam, (sy + strip) / d));
+      if (!(yb > ya)) continue;
+      var mid = project(cam, 0, (ya + yb) / 2, 0);
+      c.globalAlpha = 1 - (tex.fade || 0) * (1 - (ya + yb) / 2 / H);
+      c.drawImage(field, 0, ya, W, yb - ya, mid.x * d, sy, W * mid.scale * d, strip);
+    }
+    COURTS[key] = canvas;
+    COURT_KEYS.push(key);
+    return canvas;
+  }
+
+  /** Lay a texture over the court surface (already painted). Answers true when it drew. */
+  function courtTexture(ctx, cam, tex) {
+    var t = tex && textureTile(tex.name);
+    if (!t) return false;
+    var canvas = courtCanvas(ctx, cam, tex, t);
+    if (!canvas) return false;
+    ctx.save();
+    blendIn(ctx, tex);
+    ctx.drawImage(canvas, 0, 0, W, H);
+    ctx.restore();
+    return true;
+  }
+
+  /** Lay a texture over the ball's disc, anchored to the ball so it rides with it. */
+  function ballTexture(ctx, s, b, tex, radius) {
+    if (!tex || !textureTile(tex.name)) return false;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, Math.max(0.5, s.r), 0, Math.PI * 2);
+    var k = s.r / Math.max(0.01, b.size * (radius || 0.6));
+    return overlayPath(ctx, [{ x: s.x - s.r, y: s.y - s.r }, { x: s.x + s.r, y: s.y + s.r }], tex, k);
+  }
+
+  preloadTextures();
+
   return {
     W: W,
     H: H,
@@ -408,6 +628,10 @@
     fogBand: fogBand,
     BAYER4: BAYER4,
     ditherTile: ditherTile,
-    offscreen: offscreen
+    offscreen: offscreen,
+    textureReady: textureReady,
+    textureOver: texturePart,
+    courtTexture: courtTexture,
+    floorYAt: floorYAt
   };
 });
