@@ -17,12 +17,12 @@
  * Screenshots land in docs/shots/playtest/. This is a verification tool, not
  * part of the game: nothing in src/ knows it exists.
  */
-import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import os from 'node:os';
+import { launchChrome } from './chrome.mjs';
+import { CdpConnection, DroppedConnection } from './cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -56,8 +56,9 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 // --scoring runs only the rally and the scoring check (section 6), about ten
 // seconds -- the quick way to ask "can the player still score?" many times.
 const SCORING_ONLY = process.argv.includes('--scoring');
-// --reference also copies the five era frames the walk takes, and the four
-// frames it catches mid-change (change-era0-to-era1.png to change-era3-to-era4.png),
+// --reference also copies the eleven era frames the walk takes (era0-arcade.png to
+// era10-xbox360.png), and the ten frames it catches mid-change (change-era0-to-era1.png
+// to change-era9-to-era10.png),
 // into the TRACKED docs/shots/eras/, the reference pictures a reader opens. Off by default,
 // because every walk's frames differ and a plain playtest must leave git clean.
 const REFERENCE = process.argv.includes('--reference');
@@ -67,26 +68,13 @@ const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 
   'era5-playstation', 'era6-n64', 'era7-dreamcast', 'era8-ps2', 'era9-xbox', 'era10-xbox360'];
 const CHROME = arg('chrome', CHROMES.find((p) => existsSync(p)));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Every screenshot written so far, for the summary of a run that stops part way.
+const taken = [];
 
 // ------------------------------------------------------------- CDP plumbing
-class Session {
-  constructor(ws) {
-    this.ws = ws;
-    this.next = 1;
-    this.pending = new Map();
-    ws.addEventListener('message', (ev) => {
-      const msg = JSON.parse(ev.data);
-      const p = this.pending.get(msg.id);
-      if (!p) return;
-      this.pending.delete(msg.id);
-      msg.error ? p.reject(new Error(JSON.stringify(msg.error))) : p.resolve(msg.result);
-    });
-  }
-  send(method, params = {}) {
-    const id = this.next++;
-    this.ws.send(JSON.stringify({ id, method, params }));
-    return new Promise((resolve, reject) => this.pending.set(id, { resolve, reject }));
-  }
+// send() and the socket's end live in tools/cdp.mjs: when Chrome's connection
+// closes, every waiting request is rejected rather than left hanging (item 1182).
+class Session extends CdpConnection {
   async eval(expression) {
     const r = await this.send('Runtime.evaluate', {
       expression, returnByValue: true, awaitPromise: true
@@ -117,6 +105,7 @@ class Session {
     mkdirSync(SHOTS, { recursive: true });
     const file = path.join(SHOTS, name + '.png');
     writeFileSync(file, Buffer.from(r.data, 'base64'));
+    taken.push(file);
     return file;
   }
 }
@@ -247,17 +236,23 @@ async function filmChange(s, clip, from) {
     const render = (era) => { const c = document.createElement('canvas'); c.width = w; c.height = h;
       R.draw(c.getContext('2d'), era === g.era ? g : Object.assign({}, g, { era: era })); return pix(c); };
     const L = pix(live), N = render(${from + 1}), O = render(${from});
-    let asNew = 0, asOld = 0, counted = 0;
+    let asNew = 0, asOld = 0, apart = 0, counted = 0;
     for (let y = 0; y < h; y++) {
       if (y >= h / 2 - 90 && y < h / 2 + 90) continue;
       for (let x = 0; x < w; x++) {
         const i = (y * w + x) * 4; counted++;
         if (L[i] !== N[i] || L[i + 1] !== N[i + 1] || L[i + 2] !== N[i + 2]) asNew++;
         if (L[i] !== O[i] || L[i + 1] !== O[i + 1] || L[i + 2] !== O[i + 2]) asOld++;
+        if (N[i] !== O[i] || N[i + 1] !== O[i + 1] || N[i + 2] !== O[i + 2]) apart++;
       }
     }
     const m = R.eraChangeMoment(g);
-    done({ era: g.era, ring: !!(m && m.wiping), asNew: asNew, asOld: asOld, counted: counted });
+    // A rung that borrows its neighbour's whole look (a like: N stand-in with no
+    // draw of its own) draws the very same frame as the era it replaces, so
+    // "closer to the new era than the old" cannot hold; when the two offscreen
+    // frames are identical the live canvas only has to match the new era
+    // exactly (items 1145-1150, 1179).
+    done({ era: g.era, ring: !!(m && m.wiping), asNew: asNew, asOld: asOld, counted: counted, same: apart === 0 });
   })))`);
   return out;
 }
@@ -348,13 +343,14 @@ async function walkLadder(s, baseUrl) {
   for (const c of changes) {
     const e = c.end, d = c.drawn;
     const reached = !!e && e.radius >= e.corner;
-    const newDraws = d.era === c.from + 1 && !d.ring && d.asNew < d.asOld;
+    const newDraws = d.era === c.from + 1 && !d.ring && (d.same ? d.asNew === 0 : d.asNew < d.asOld);
     check(`the change to the ${eras[c.from + 1]} ran from the ${sideOf(c)} edge: the ring reached the far corner and the new era draws afterwards`,
       !!c.file && reached && newDraws,
       (e ? `ring from ${e.origin.x.toFixed(0)},${e.origin.y.toFixed(0)} ended at radius ` +
         `${e.radius.toFixed(0)}, far corner ${e.corner.toFixed(0)}` : 'the ring was never seen to finish') +
       `; afterwards on era ${d.era}, ${d.asNew} of ${d.counted} pixels differ from era ${c.from + 1} ` +
-      `drawn offscreen, ${d.asOld} from era ${c.from}`);
+      `drawn offscreen, ${d.asOld} from era ${c.from}` +
+      (d.same ? ' (the two rungs draw the same frame, so only an exact match with the new era is asked)' : ''));
   }
 
   if (REFERENCE) {
@@ -368,7 +364,7 @@ async function walkLadder(s, baseUrl) {
 function summarise(shots) {
   console.log('\nscreenshots:');
   for (const f of shots) console.log('  ' + f);
-  if (REFERENCE) console.log(`the five era frames and the four mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
+  if (REFERENCE) console.log(`the era frames and the mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
   process.exitCode = failed.length ? 1 : 0;
@@ -378,12 +374,10 @@ async function main() {
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
   const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') +
     (ERA ? '?era=' + encodeURIComponent(ERA) : '');
-  // Never '.' as the fallback: that puts a Chrome profile in the repo root and dirties
-  // the worktree. os.tmpdir() always answers, and honours TEMP/TMP when they are set.
-  // One profile per debugging port, so two playtests on two ports can run at once.
-  const profile = path.join(os.tmpdir(), 'pong-playtest-profile-' + PORT);
-
-  const chrome = spawn(CHROME, [
+  // The profile is a fresh folder under the temp directory, deleted when Chrome
+  // exits -- on success, on an error and on Ctrl+C (tools/chrome.mjs, item 1169) --
+  // so two playtests on two ports never share one and none is left behind.
+  const chrome = launchChrome(CHROME, [
     // --mute-audio: the audio graph still runs and is still checked, but a
     // playtest never beeps through the speakers of the machine it runs on.
     // --allow-file-access-from-files: the page is opened off disk, where Chrome
@@ -393,9 +387,11 @@ async function main() {
     '--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
     '--allow-file-access-from-files',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
-    '--user-data-dir=' + profile, '--no-first-run', '--no-default-browser-check',
+    '--no-first-run', '--no-default-browser-check',
     url
-  ], { stdio: 'ignore' });
+  ], { name: 'playtest' });
+  // Named up front so a run that loses Chrome can say which process it was.
+  console.log(`chrome: pid ${chrome.pid}, DevTools port ${PORT}`);
 
   let ws;
   try {
@@ -417,7 +413,8 @@ async function main() {
     // than a fixed beat: on a busy machine 400 ms was sometimes not enough, and
     // the first read threw "Uncaught" before any check ran (item 1160).
     for (let i = 0; i < 100; i++) {
-      const ready = await s.eval('!!(window.__pong && document.getElementById("field"))').catch(() => false);
+      const ready = await s.eval('!!(window.__pong && document.getElementById("field"))')
+        .catch((e) => { if (e instanceof DroppedConnection) throw e; return false; });
       if (ready) break;
       await sleep(100);
     }
@@ -634,9 +631,18 @@ async function main() {
     const ladderShots = await walkLadder(s, url.split('?')[0]);
     summarise([titleShot, firstFrameShot,
       ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots]);
+  } catch (e) {
+    // A run that stops part way is a FAIL with its summary, never a quiet exit:
+    // Chrome's connection dropping (tools/cdp.mjs) is the case this was built for
+    // (item 1182). The finally below still closes Chrome and deletes its profile.
+    const dropped = e instanceof DroppedConnection;
+    check(dropped ? 'Chrome\'s DevTools connection stays open until the run ends'
+                  : 'the playtest runs to the end without an error', false, e.message);
+    if (!dropped) console.error(e);
+    summarise(taken);
   } finally {
     try { ws && ws.close(); } catch { /* already gone */ }
-    chrome.kill();
+    await chrome.close();
   }
 }
 

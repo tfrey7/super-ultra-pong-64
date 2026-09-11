@@ -10,8 +10,8 @@
 //   2. frames captured at about 0.35 and 0.75 of the eased wipe, and one just
 //      after the ring has covered the field (card up, no shards left).
 // Writes the PNGs and shatter-capture.json beside this file.
-import { spawn } from 'node:child_process';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { launchChrome } from '../../../tools/chrome.mjs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -21,14 +21,14 @@ const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i > -1 
 const PORT = Number(arg('port', 9341));
 const CHROME = arg('chrome', ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p)));
-const PROFILE = path.join(process.env.TMP || 'G:/claude-tmp', `item-1139-chrome-${PORT}`);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const url = pathToFileURL(path.join(ROOT, 'index.html')).href + '?era=2';
 
-const chrome = spawn(CHROME, [
-  '--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
+// A fresh profile folder, deleted when Chrome exits (tools/chrome.mjs, item 1169).
+const chrome = launchChrome(CHROME, [
+  '--headless=new', `--remote-debugging-port=${PORT}`,
   '--mute-audio', '--no-first-run', '--no-default-browser-check', '--window-size=1000,760', url
-], { stdio: 'ignore' });
+], { name: 'shatter' });
 console.log(`chrome pid ${chrome.pid}`);
 
 let ws;
@@ -138,5 +138,5 @@ try {
   if (!fullRate || errors.length || eraAfter !== 3) process.exitCode = 1;
 } finally {
   try { ws && ws.close(); } catch { /* gone */ }
-  chrome.kill();
+  await chrome.close();
 }

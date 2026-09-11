@@ -11,8 +11,8 @@
  * canvas holds a mid-flip frame; that frame is saved as flip-era1-to-2.png
  * beside flipshot.json. Nothing in src/ knows this exists.
  */
-import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { launchChrome } from '../../../tools/chrome.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -74,10 +74,10 @@ const stats = (stamps) => {
 
 async function main() {
   const url = pathToFileURL(path.join(ROOT, 'index.html')).href + '?era=1';
-  const profile = path.join('G:/claude-tmp', 'item-1138-flipshot-' + PORT);
-  const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
-    '--window-size=1000,760', '--remote-debugging-port=' + PORT, '--user-data-dir=' + profile,
-    '--no-first-run', '--no-default-browser-check', url], { stdio: 'ignore' });
+  // A fresh profile folder, deleted when Chrome exits (tools/chrome.mjs, item 1169).
+  const chrome = launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
+    '--window-size=1000,760', '--remote-debugging-port=' + PORT,
+    '--no-first-run', '--no-default-browser-check', url], { name: 'flipshot' });
   let s;
   try {
     s = await connect();
@@ -142,7 +142,7 @@ async function main() {
     console.log(JSON.stringify(out, null, 2));
   } finally {
     try { s && s.ws.close(); } catch { /* gone */ }
-    chrome.kill();
+    await chrome.close();
   }
 }
 

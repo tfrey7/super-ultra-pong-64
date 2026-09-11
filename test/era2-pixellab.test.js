@@ -77,7 +77,7 @@ test('the quantizer rebuilds both pictures byte for byte from the raw generation
   const q = await quantizer();
   const pal = q.nesPalette(ERA_SRC);
   const courtInks = [...new Set(pal)].filter((c) => q.luma(c) < q.COURT_LUMA_MAX);
-  const court = q.quantize(q.decodePng(fs.readFileSync(path.join(ASSETS, 'era2-court-raw.png'))), courtInks);
+  const court = q.paintOut(q.quantize(q.decodePng(fs.readFileSync(path.join(ASSETS, 'era2-court-raw.png'))), courtInks));
   const ball = q.shrink(q.decodePng(fs.readFileSync(path.join(ASSETS, 'era2-ball-raw2.png'))),
     q.BALL_SIZE, [pal[0x30], pal[0x10], pal[0x00], pal[0x0F]]);
   assert.deepStrictEqual(q.encodePng(court.width, court.height, court.rgba), fs.readFileSync(path.join(ASSETS, 'era2-court.png')));
@@ -100,6 +100,32 @@ test('every pixel is an NES colour, at NES resolution, and the court never out-s
   assert.ok(courtMax < q.luma('#fcfcfc'), `the court's brightest ink (luma ${courtMax.toFixed(2)}) stays below the ball core`);
   for (let i = 3; i < court.rgba.length; i += 4) assert.strictEqual(court.rgba[i], 255, 'the court is opaque');
   for (let i = 3; i < ball.rgba.length; i += 4) assert.ok(ball.rgba[i] === 0 || ball.rgba[i] === 255, 'the ball is crisp: opaque or clear');
+});
+
+test('the court carries no mark that reads as a number: no light-grey box by either goal, no halfway line of its own (item 1191)', async () => {
+  const q = await quantizer();
+  const court = q.decodePng(fs.readFileSync(path.join(ASSETS, 'era2-court.png')));
+  const ink = (x, y) => {
+    const i = (y * court.width + x) * 4;
+    return '#' + [0, 1, 2].map((k) => court.rgba[i + k].toString(16).padStart(2, '0')).join('');
+  };
+  const counts = q.inkCounts(court);
+  const floor = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
+  // The generator's two boxes were the only ink lighter than the grey court lines.
+  for (const c of Object.keys(counts)) assert.ok(q.luma(c) < 0.5, `${c} (luma ${q.luma(c).toFixed(2)}) is a light mark on the court`);
+  for (const r of q.PAINT_OUT) {
+    for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
+      assert.strictEqual(ink(x, y), floor, `court pixel ${x},${y} beside the goal is plain floor`);
+    }
+  }
+  // Inside the pitch the halfway column keeps only the pixels where another line crosses it.
+  const { x, y0, y1 } = q.HALFWAY;
+  let run = 0, longest = 0;
+  for (let y = y0; y <= y1; y++) {
+    run = ink(x, y) === floor || ink(x, y) === '#787878' ? 0 : run + 1;
+    longest = Math.max(longest, run);
+  }
+  assert.ok(longest <= 4, `the pitch's halfway line is gone (longest dark run down column ${x}: ${longest})`);
 });
 
 test('with the art decoded, the court and the ball are one drawImage each: court first, ball exactly on its box and last', () => {

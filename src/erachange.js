@@ -40,8 +40,9 @@
  * With no hook the plain ring plays. A hook draws, and nothing else.
  *
  * The year and the machine's name come from the ladder (Pong.ERAS in
- * src/game.js). Each rung's card style is in STYLES below; an era file may
- * carry its own `card` object on its look (same fields) and that wins.
+ * src/game.js). Each rung's card colours are in STYLES below; an era file may
+ * carry its own `card` object on its look (same fields) and that wins. HOW the
+ * card is drawn -- the arriving machine's signboard -- is src/signboards.js.
  *
  * Loaded by index.html after the era files, before the loop. The loop draws
  * every frame through PongRender.drawEraFrame(ctx, state, opts).
@@ -115,38 +116,11 @@
          dots: ['#d82800', '#f8c000', '#00a844', '#2058d8'] }
   };
 
-  // The score's block font, plus a one-column middle dot for "1985 · NES".
-  var GLYPHS = Object.assign({}, R.DIGITS, R.LETTERS, {
-    '·': ['0', '0', '1', '0', '0']
-  });
-  var SPACE_CELLS = 2;
-
-  function cells(ch) {
-    var rows = GLYPHS[ch];
-    return rows ? rows[0].length : SPACE_CELLS;
-  }
-
-  function textWidth(text, cell, gap) {
-    var w = 0;
-    for (var i = 0; i < text.length; i++) w += (i ? gap : 0) + cells(text[i]) * cell;
-    return w;
-  }
-
-  /** One line of block text starting at left; returns where it ended. */
-  function drawRun(ctx, text, left, top, cell, gap) {
-    var x = left;
-    for (var i = 0; i < text.length; i++) {
-      var rows = GLYPHS[text[i]];
-      if (rows) {
-        for (var r = 0; r < rows.length; r++) {
-          for (var c = 0; c < rows[r].length; c++) {
-            if (rows[r][c] === '1') ctx.fillRect(x + c * cell, top + r * cell, cell, cell);
-          }
-        }
-      }
-      x += cells(text[i]) * cell + gap;
-    }
-    return x;
+  // Every signboard routine, and the block-font lettering they share, live in
+  // src/signboards.js. The page loads it first; under node --test there are no
+  // script tags, so it is required here, the way ladderEntry reaches the rules.
+  if (typeof R.drawSignboard !== 'function' && typeof module === 'object' && typeof require === 'function') {
+    require('./signboards.js');
   }
 
   function rgba(hex, a) {
@@ -208,65 +182,13 @@
     };
   }
 
-  function ink(style, key, state) {
-    var v = style[key];
-    if (v === 'paddle-left') return R.paddleInk(state, 'left');
-    if (v === 'paddle-right') return R.paddleInk(state, 'right');
-    return v;
-  }
-
-  var CARD = { height: 170, pad: 36, cell: 7, gap: 5, labelCell: 4, labelGap: 3, frame: 6 };
-
+  /**
+   * The name card is the arriving machine's signboard: src/signboards.js holds
+   * one routine per rung (R.SIGNBOARDS[era]) and the plain card for a rung that
+   * has none yet, all inside the same rectangle. This is the per-era hook.
+   */
   function drawCard(ctx, state, m, style) {
-    var mid = state.width / 2;
-    var textW = textWidth(m.text, CARD.cell, CARD.gap);
-    var w = Math.min(state.width - 40, textW + CARD.pad * 2);
-    var h = CARD.height;
-    var left = mid - w / 2;
-    var top = state.height / 2 - h / 2;
-    var f = CARD.frame;
-
-    // The window: frame, then fill, then (NES) the inner frame line.
-    if (style.border) {
-      ctx.fillStyle = style.border;
-      ctx.fillRect(left, top, w, h);
-    }
-    ctx.fillStyle = style.box;
-    ctx.fillRect(left + f, top + f, w - 2 * f, h - 2 * f);
-    if (style.inner) {
-      ctx.fillStyle = style.inner;
-      var o = f + 6;
-      ctx.fillRect(left + o, top + o, w - 2 * o, 2);
-      ctx.fillRect(left + o, top + h - o - 2, w - 2 * o, 2);
-      ctx.fillRect(left + o, top + o, 2, h - 2 * o);
-      ctx.fillRect(left + w - o - 2, top + o, 2, h - 2 * o);
-    }
-
-    // ERA n, small, above.
-    var label = 'ERA ' + m.era;
-    ctx.fillStyle = ink(style, 'label', state);
-    drawRun(ctx, label, mid - textWidth(label, CARD.labelCell, CARD.labelGap) / 2,
-            top + 30, CARD.labelCell, CARD.labelGap);
-
-    // "1985 · NES": the year in its ink, the rest in the machine's.
-    var textTop = top + 72;
-    var year = m.text.split(' ')[0];
-    var rest = m.text.slice(year.length);
-    var x = mid - textW / 2;
-    ctx.fillStyle = ink(style, 'year', state);
-    x = drawRun(ctx, year, x, textTop, CARD.cell, CARD.gap);
-    ctx.fillStyle = ink(style, 'name', state);
-    drawRun(ctx, rest, x, textTop, CARD.cell, CARD.gap);
-
-    if (style.dots) {
-      var size = 12;
-      var spacing = 22;
-      var dx = mid - (style.dots.length * spacing - (spacing - size)) / 2;
-      for (var i = 0; i < style.dots.length; i++) {
-        ctx.fillStyle = style.dots[i];
-        ctx.fillRect(dx + i * spacing, top + h - 36, size, size);
-      }
-    }
+    return R.drawSignboard(ctx, state, m, style);
   }
 
   // ------------------------------------------------- the two layers

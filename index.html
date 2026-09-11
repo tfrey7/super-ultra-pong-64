@@ -37,7 +37,14 @@
           aria-label="Pong: your paddle on the left, the computer on the right"></canvas>
 
   <!-- Plain scripts, in dependency order, so this page opens straight off disk:
-       ES modules are blocked over file:// and would need a dev server. -->
+       ES modules are blocked over file:// and would need a dev server.
+       The list sits inside a <template>, where the browser parses it but runs
+       nothing; the small loader after it starts each one, in this order, with a
+       ?v= stamp that changes every minute. GitHub Pages tells the browser to
+       keep every file for ten minutes, and a plain refresh (F5) re-checks the
+       page but not its scripts, so without the stamp a new game stayed hidden
+       behind the old scripts until a hard refresh (item 1193). -->
+  <template id="game-scripts">
   <script src="src/game.js"></script>
   <!-- Named pixel-art images from assets/pixellab/ (tools/pixellab.mjs makes
        them), for any era file to draw with one drawImage: window.PongSprites. -->
@@ -60,6 +67,9 @@
   <script src="src/eras/era8-ps2.js"></script>
   <script src="src/eras/era9-xbox.js"></script>
   <script src="src/eras/era10-xbox360.js"></script>
+  <!-- Every era's signboard -- the name card the ring brings in, lettered in
+       that machine's own style -- which the era change looks up by rung. -->
+  <script src="src/signboards.js"></script>
   <!-- The era change as a moment: flash, wipe and name card, over the frame. -->
   <script src="src/erachange.js"></script>
   <!-- The voice: every era's notes, synthesised on the page, silent until the
@@ -67,5 +77,18 @@
   <script src="src/sound.js"></script>
   <script src="src/input.js"></script>
   <script src="src/main.js"></script>
+  </template>
+  <script>
+    (function () {
+      var stamp = Math.floor(Date.now() / 60000);
+      var list = document.getElementById('game-scripts').content.querySelectorAll('script[src]');
+      for (var i = 0; i < list.length; i++) {
+        var s = document.createElement('script');
+        s.src = list[i].getAttribute('src') + '?v=' + stamp;
+        s.async = false; // added scripts otherwise run in whatever order they arrive
+        document.body.appendChild(s);
+      }
+    })();
+  </script>
 </body>
 </html>

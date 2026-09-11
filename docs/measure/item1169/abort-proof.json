@@ -1,0 +1,43 @@
+{
+ "when": "2026-09-11T01:40:06.410Z",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "runs": [
+  {
+   "label": "error (uncaught throw)",
+   "exitCode": 1,
+   "seconds": 2,
+   "chromeAnsweredBeforeTheEnd": true,
+   "profile": "G:\\claude-tmp\\pong-chrome-abort-1y9QxV",
+   "profileLeft": false,
+   "chromePid": 37752,
+   "chromeStillRunning": false,
+   "stderr": [
+    "file:///G:/Claude%20Stuff/super-ultra-pong-64-item-1169/[eval1]:10",
+    "    throw new Error('boom');",
+    "          ^"
+   ]
+  },
+  {
+   "label": "ctrl-c (the SIGINT handler)",
+   "exitCode": 130,
+   "seconds": 1.8,
+   "chromeAnsweredBeforeTheEnd": true,
+   "profile": "G:\\claude-tmp\\pong-chrome-abort-aJcRIu",
+   "profileLeft": false,
+   "chromePid": 32812,
+   "chromeStillRunning": false,
+   "stderr": []
+  },
+  {
+   "label": "exit (process.exit(3))",
+   "exitCode": 3,
+   "seconds": 1.8,
+   "chromeAnsweredBeforeTheEnd": true,
+   "profile": "G:\\claude-tmp\\pong-chrome-abort-xP4xtO",
+   "profileLeft": false,
+   "chromePid": 20852,
+   "chromeStillRunning": false,
+   "stderr": []
+  }
+ ]
+}
