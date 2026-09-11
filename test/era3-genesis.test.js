@@ -89,11 +89,12 @@ test('the ball leaves a fading trail back along its flight, and none while the s
   assert.strictEqual(trailOf(g).length, 0);
 });
 
-test('the score is bolder than the stock frame and drops a shadow', () => {
+test('the score sits in the stone panel, bevelled, and drops a shadow', () => {
   const g = rally();
   const calls = drawn(g);
   const cell = look.SCORE.cell;
-  assert.ok(cell > 14, 'bigger blocks than the 14-unit stock score');
+  // Item 1226: the digits live in Golden Axe's stone panel, 16 native lines (43 units).
+  assert.ok(look.SCORE.top + 5 * cell + look.SCORE.shadow <= look.ARENA.panelH, 'the digits fit the panel');
   const ink = look.paddleInk(g, 'left');
   const { shadow, bevel } = look.SCORE;
   const blocks = calls.filter(([c, x, y, w]) => c === ink && w === cell && y < 150);

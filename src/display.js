@@ -214,6 +214,81 @@
     return rect;
   }
 
+  /**
+   * Every row's screen overlay drawn once, at page load, so none of them is
+   * drawn for the first time in the middle of an era change (item 1239).
+   *
+   * An overlay blends onto the PAGE canvas in present() -- the CRT tubes
+   * multiply their shade over the picture -- and Chrome's graphics process
+   * builds a GPU program the first time a draw of that kind reaches the screen.
+   * The Super Nintendo's S-video tube was first drawn the frame the first ring
+   * passed the centre (raw progress 0.50, when shownEra switches to the
+   * arriving era), and that frame took 16.7-41.8 ms against a 4.2 ms median on
+   * 8 of 8 fresh pages, 31 ms under trace, all of it one D3D shader compile for
+   * an image drawn with a blend that reads the destination
+   * (docs/measure/item-1239/). The ring's own warm-up in src/erachange.js never
+   * reaches these draws: it draws field pictures, not the page's overlays.
+   *
+   * Drawn on a page-sized layer, then that layer copied once onto the page and
+   * the page cleared: the copy is what makes Chrome rasterise the layer's draws
+   * (item 1218: draws made straight onto the canvas are thrown away unrasterised
+   * by the clear that ends a warm-up). It also builds each tube's shade at the
+   * page's size, which the first frame of that era would otherwise pay for.
+   * The main loop calls it once, on the first frame, before present(). A warm-up
+   * is only ever an optimisation: nothing it does may stop the page.
+   */
+  function warmOverlays(pageCtx) {
+    var page = pageCtx && pageCtx.canvas;
+    var native = live.native;
+    if (typeof document === 'undefined' || !document.createElement || !page || !native) return false;
+    var drew = 0;
+    try {
+      var layer = document.createElement('canvas');
+      layer.width = page.width;
+      layer.height = page.height;
+      var x = layer.getContext('2d');
+      if (!x) return false;
+      for (var e = 0; e < ROWS.length; e++) {
+        var r = ROWS[e];
+        var fn = OVERLAYS[r.overlay];
+        if (!fn || fn === OVERLAYS.none) continue;
+        var rect = fitRect(page.width, page.height, r.aspect);
+        // One row's failure never stops the others from warming.
+        x.save();
+        try {
+          x.setTransform(1, 0, 0, 1, 0, 0);
+          x.imageSmoothingEnabled = !!r.smooth;
+          if (r.smooth) x.imageSmoothingQuality = 'high';
+          x.drawImage(native, 0, 0, native.width, native.height, rect.x, rect.y, rect.w, rect.h);
+          // era -1: no real era, so an overlay that keeps a previous frame (the
+          // 720p panel's smear) never blends this one into a real frame.
+          fn(x, rect, r, { era: -1, time: 0, native: native });
+          drew++;
+        } catch (rowErr) {
+          // this row stays cold; the rest still warm
+        } finally {
+          x.restore();
+        }
+      }
+      if (drew) {
+        pageCtx.save();
+        pageCtx.setTransform(1, 0, 0, 1, 0, 0);
+        pageCtx.drawImage(layer, 0, 0);
+        pageCtx.restore();
+      }
+    } catch (err) {
+      // An optimisation only.
+    } finally {
+      if (drew) {
+        pageCtx.save();
+        pageCtx.setTransform(1, 0, 0, 1, 0, 0);
+        pageCtx.clearRect(0, 0, page.width, page.height);
+        pageCtx.restore();
+      }
+    }
+    return drew > 0;
+  }
+
   /** ?display=off draws straight onto the page, the way it was before. */
   function enabledFor(search) {
     return !/[?&]display=off(&|$)/.test(String(search || ''));
@@ -229,6 +304,7 @@
     prepare: prepare,
     begin: begin,
     present: present,
+    warmOverlays: warmOverlays,
     render: render,
     canvas: canvas,
     enabledFor: enabledFor,

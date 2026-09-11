@@ -1,0 +1,120 @@
+{
+ "taken": "2026-09-11T03:50:12.679Z",
+ "base": "G:/claude-tmp/item1233-base",
+ "summary": {
+  "branch9": 34.45,
+  "base9": 41.99,
+  "branch8": 36.54,
+  "base8": 44.59
+ },
+ "rows": [
+  {
+   "round": 1,
+   "tree": "branch",
+   "era": 9,
+   "frames": 58,
+   "mean": 17.24,
+   "p95": 16.8,
+   "max": 33.3
+  },
+  {
+   "round": 1,
+   "tree": "branch",
+   "era": 8,
+   "frames": 60,
+   "mean": 16.94,
+   "p95": 16.8,
+   "max": 33.3
+  },
+  {
+   "round": 1,
+   "tree": "base",
+   "era": 9,
+   "frames": 28,
+   "mean": 36.9,
+   "p95": 50,
+   "max": 66.6
+  },
+  {
+   "round": 1,
+   "tree": "base",
+   "era": 8,
+   "frames": 27,
+   "mean": 38.27,
+   "p95": 50.1,
+   "max": 83.4
+  },
+  {
+   "round": 2,
+   "tree": "base",
+   "era": 9,
+   "frames": 25,
+   "mean": 40.67,
+   "p95": 50,
+   "max": 50
+  },
+  {
+   "round": 2,
+   "tree": "base",
+   "era": 8,
+   "frames": 25,
+   "mean": 42,
+   "p95": 50.1,
+   "max": 83.3
+  },
+  {
+   "round": 2,
+   "tree": "branch",
+   "era": 9,
+   "frames": 24,
+   "mean": 42.36,
+   "p95": 50,
+   "max": 66.7
+  },
+  {
+   "round": 2,
+   "tree": "branch",
+   "era": 8,
+   "frames": 21,
+   "mean": 49.2,
+   "p95": 66.7,
+   "max": 100
+  },
+  {
+   "round": 3,
+   "tree": "branch",
+   "era": 9,
+   "frames": 24,
+   "mean": 43.75,
+   "p95": 50.1,
+   "max": 66.7
+  },
+  {
+   "round": 3,
+   "tree": "branch",
+   "era": 8,
+   "frames": 23,
+   "mean": 43.48,
+   "p95": 50.1,
+   "max": 83.3
+  },
+  {
+   "round": 3,
+   "tree": "base",
+   "era": 9,
+   "frames": 21,
+   "mean": 48.41,
+   "p95": 66.6,
+   "max": 116.6
+  },
+  {
+   "round": 3,
+   "tree": "base",
+   "era": 8,
+   "frames": 19,
+   "mean": 53.51,
+   "p95": 150,
+   "max": 150
+  }
+ ]
+}

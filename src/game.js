@@ -100,7 +100,16 @@
                             // the last lands on the Xbox 360 and ends it. 0 never
                             // ends (the attract rally behind the title).
     titleBlink: 0.62,       // seconds the 'press any key' line stays on, then off
-    maxSubstep: 6           // never move the ball further than this in one go
+    maxSubstep: 6,          // never move the ball further than this in one go
+    maxFrame: 0.15          // the most real time one frame may hand the rules.
+                            // Longer (a tab that was in the background) is cut
+                            // to this. It was 0.05 until item 1247 measured a
+                            // software-drawn 1920x1080 page: the 3D eras draw at
+                            // 59-121 ms a frame there, and a 50 ms cap threw the
+                            // rest away, so the whole game ran at 72% of its pace
+                            // from the PlayStation and 40% on the Xbox 360 --
+                            // "slower and slower" with every era. Substeps keep
+                            // a long frame from tunnelling.
   };
 
   // ------------------------------------------------------------------ helpers
@@ -562,7 +571,7 @@
    */
   function step(state, dt, intent) {
     if (!(dt > 0)) return state;
-    dt = Math.min(dt, 0.05);     // a tab that was in the background, say
+    dt = Math.min(dt, state.rules.maxFrame || 0.15);   // a tab that was in the background, say
     state.time += dt;
     state.lastEvent = null;
     state.events = [];

@@ -115,7 +115,9 @@
   var ART = {
     sky: 'data:image/png;base64,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',
     paddle: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAA6CAYAAACJSMgQAAABc0lEQVR42qWWIZaDMBCGkZVIrlCJ3CsgkVhkJDIWiYzEruQItZUr9wp7jOz7w04akv+1s7TvzWshX//MTAZmqir51HXtm6aJVrGPLHxtm4eN4+jry8UX0M/97o2ZggFqr1ff9/1DWf5ljClA2DAMHi4l4A4JcADBgIbBrxzC1rIeFXGRKgokaxFc3RaVYQjCuU8OwiSH67pfx4AFtHbxAosty1oqMpAqwp8cmmdXKjKQKs5k6xi1euuD4ux0igyEO6qtYzCvouZbk6hpHtm2ah+tgKniNM26PFqtj+8l/C3Fpwl/VeG8ejIQalRRfdZ44k6ftfoppPVIo2ZFoc6j+giZf+ojVL/N7L+DOfWmUCuerkdAtB5zRXU9BkWWHlaPT/uM6m2GhbQh8aJY9xb3fbsFw2/ce4B/jTGdAKRny70I4gZU9uZuigngoIgGLmDas8NswcC8uUcwHT7a9iOMBsU8kc88+Iavi7W+67oSYgNSDv0CEov0DR2dRKAAAAAASUVORK5CYII=',
-    ball: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABQklEQVR42u1WuxHDIAz1GGk9Qkpaj5AVUnoVSpWZxyN4jZSU5DAWBiwwP7vIWXfvyJ0henoSQl13222ZJt8PGcM1Tj+MxllktNNBY+ylFECA62+4rwUBMfZSYSGgHCC+r221fyMRtbZQQh0W87D8qZiYSwId2QqsENNTr3OhEibqJXIIOOYJKFRC55JZ0fhRgtxZRAks0CICO7mPjFIih4Bz1Y6iDpIAkkASCcc5VjgimYB/YyD9arrRQ75zMhWQnoaNAHcVKCVgFGCVKbieAC/Lf+g25NeAl4KsW1BbhKQKUB49sLxuSPeBxFRQjQhyO6FFwLTTIyLEnuJWbJ5h5+3nmYD6Z1kR0M9wRIlg5KDP1swDrhJWZFjZ5ECyAs+1moz03BcfybZ9rO1MaFRA4NznY/2Oyp0yIQtL2svG8tv+2n7zKxX0rBb/TwAAAABJRU5ErkJggg=='
+    ball: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABQklEQVR42u1WuxHDIAz1GGk9Qkpaj5AVUnoVSpWZxyN4jZSU5DAWBiwwP7vIWXfvyJ0henoSQl13222ZJt8PGcM1Tj+MxllktNNBY+ylFECA62+4rwUBMfZSYSGgHCC+r221fyMRtbZQQh0W87D8qZiYSwId2QqsENNTr3OhEibqJXIIOOYJKFRC55JZ0fhRgtxZRAks0CICO7mPjFIih4Bz1Y6iDpIAkkASCcc5VjgimYB/YyD9arrRQ75zMhWQnoaNAHcVKCVgFGCVKbieAC/Lf+g25NeAl4KsW1BbhKQKUB49sLxuSPeBxFRQjQhyO6FFwLTTIyLEnuJWbJ5h5+3nmYD6Z1kR0M9wRIlg5KDP1swDrhJWZFjZ5ECyAs+1moz03BcfybZ9rO1MaFRA4NznY/2Oyp0yIQtL2svG8tv+2n7zKxX0rBb/TwAAAABJRU5ErkJggg==',
+    balloon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAaCAYAAAC6nQw6AAABkUlEQVR42p2VrbKDMBCF+xh9BWQkFhkZia2svBJbWYnERiKRtZWVSF4Bidw7Z2HDAmFKycwZNsvulyV/XC6R5kxK1hjCM6bLt2aThAHeGvo0BbWFpb7zrM+fpXddUONSkrg4xBgOgiS5r9xsl7PtnWFtYCgXI0J9V88QDYLNsPH9+57R65YtYehw0DTq0NyCBLTxTfEBhGrWo4ek9rkPQmUaxtVUjobXfTkf5dLHUFU1+/C+UqDBO5aMNNR5UEja83kFwjKPS12zpK+Xf+ub4xiEOUKne84lw4Y0SHzruAUIywj1bcnC0ookaeGb4iRvAeI9NAXInhr3ld/6VFyTq2OjjwUEWyRJ2qfjNhtStj0HuLnfNg9WAE0+fm8jxwQHUUAhcErSVYZqcNaShHZPP+ZLg9afCxvzsguJwlbzAR9D9q6QGAzLjIqQCMGG72sl65YbQ5m5BpBLk98hciuI5No9/EnrGxMNxwAQtFMgSUYT+9DFv/cnER3+g8RAdZHRI0/DhXYaBAjUecvP06Bffo7/8C0tEvHd0f0AAAAASUVORK5CYII=',
+    pylon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAcCAYAAABcSP4GAAAAiklEQVR42mNggAInJ6f/yJgBGVhaOv3f6mUIxmuhGCSGoeD5Oc3/984pgtnYFTw/B8ZgBYaWqArWophgiWkCSAfcfkNLVBPgipAwAzoACUZFRf338vLCocDQEqEA3fiBUDAkHDk8FYDyAXpcwOMDxGiproanQxgGi4EUwRIsSAAZw8RRUjUKhloBAO7x/PEyKA0yAAAAAElFTkSuQmCC'
   };
   // END pixellab embeds
   var BALL_SPRITE = 16;              // on-screen size of the ball sprite, field units
@@ -144,6 +146,120 @@
   artImage('sky');
   artImage('paddle');
   artImage('ball');
+  artImage('balloon');
+  artImage('pylon');
+
+  // ----------------------------------------- the test ground's set dressing
+  // Item 1227 (docs/ART.md, era 4): the F-Zero track under a Pilotwings sky.
+  // Two hot-air balloons drift across the sky -- the far one smaller and
+  // slower, so the sky, the balloons and the sliding floor are three layers
+  // moving at three rates -- and four marker pylons stand on the floor's far
+  // edge, blinking. The balloon is one pixellab picture; the second balloon is
+  // the same picture turned to another hue, both lit for dusk once, in code.
+  var BALLOONS = [
+    { x: 170, y: 66, h: 38, speed: 3, swap: false },
+    { x: 600, y: 96, h: 26, speed: 2, swap: true }      // low over the mountains, clear of the score
+  ];
+  var WRAP = 880;                    // drift off the right, back in on the left
+  var PYLONS = [120, 300, 500, 680]; // field x, on the floor's far edge
+  var PYLON_H = 34;
+  var LAMP = '#f8a000';
+  var dusk = {};                     // 'plain' | 'swap' -> the balloon lit for dusk, made once
+  var lastPointAt = -Infinity;       // the newest point seen scored, by state.time
+
+  /** Whether this is the match's last point (item 1211); false when the rules cannot say. */
+  function matchPoint(state) {
+    var Pg = root.Pong;
+    try { return !!(Pg && typeof Pg.isMatchPoint === 'function' && Pg.isMatchPoint(state)); } catch (e) { return false; }
+  }
+
+  /** When the latest point went in: a score event seen, or this era's own arrival (every point is an era change). */
+  function pointAt(state) {
+    var t = state.time || 0;
+    if (lastPointAt > t) lastPointAt = -Infinity;       // a new game on the same page
+    var ev = state.events || [];
+    for (var i = 0; i < ev.length; i++) {
+      if (ev[i] && ev[i].type === 'score' && ev[i].time > lastPointAt) lastPointAt = ev[i].time;
+    }
+    return Math.max(lastPointAt, typeof state.eraChangedAt === 'number' ? state.eraChangedAt : -Infinity);
+  }
+
+  /** The balloon picture, lit for dusk (and for `swap` turned to a cool hue), on a canvas of its own. */
+  function duskBalloon(swap) {
+    var key = swap ? 'swap' : 'plain';
+    var img = artImage('balloon');
+    if (!img) return null;
+    if (dusk[key]) return dusk[key];
+    var doc = root.document;
+    if (!doc || typeof doc.createElement !== 'function') return null;
+    var c = doc.createElement('canvas');
+    c.width = img.naturalWidth;
+    c.height = img.naturalHeight;
+    var x = c.getContext('2d');
+    if (swap) x.filter = 'hue-rotate(160deg)';
+    x.drawImage(img, 0, 0);
+    x.filter = 'none';
+    // The dusk light over it, so the backdrop stays darker than the ball (ART.md shared rule 1).
+    x.globalCompositeOperation = 'source-atop';
+    x.fillStyle = 'rgba(24, 18, 72, 0.5)';
+    x.fillRect(0, 0, c.width, c.height);
+    x.globalCompositeOperation = 'source-over';
+    dusk[key] = c;
+    return c;
+  }
+
+  function drawBalloons(ctx, state, mp) {
+    var t = state.time || 0;
+    for (var i = 0; i < BALLOONS.length; i++) {
+      var b = BALLOONS[i];
+      var img = duskBalloon(b.swap);
+      var h = b.h, w = img ? h * img.width / img.height : h * 0.7;
+      var x = ((b.x + t * b.speed) % WRAP + WRAP) % WRAP - 40;
+      var y = b.y + Math.sin(t * 0.7 + i * 2) * 2;
+      if (mp) {
+        // Match point: streamers flying from the basket.
+        ctx.fillStyle = LAMP;
+        for (var s = 0; s < 3; s++) {
+          ctx.fillRect(x + w * (0.25 + 0.25 * s) + Math.sin(t * 6 + s) * 2, y + h, 2, 10 + 4 * Math.sin(t * 5 + s * 1.7));
+        }
+      }
+      if (img) {
+        blit(ctx, img, Math.round(x), Math.round(y), w, h);
+      } else {
+        ctx.fillStyle = b.swap ? '#3a5a7a' : '#7a4a3a';
+        circlePath(ctx, x + w / 2, y + h * 0.38, w * 0.48);
+        ctx.fill();
+        ctx.fillStyle = '#3a2a1a';
+        ctx.fillRect(x + w * 0.38, y + h * 0.85, w * 0.24, h * 0.15);
+      }
+    }
+  }
+
+  /** The four pylons, blinking in turn -- all lit together for half a second after a point. */
+  function drawPylons(ctx, state) {
+    var t = state.time || 0;
+    var img = artImage('pylon');
+    var since = t - pointAt(state);
+    var allLit = since >= 0 && since < 0.5;
+    var w = img ? PYLON_H * img.naturalWidth / img.naturalHeight : 8;
+    for (var i = 0; i < PYLONS.length; i++) {
+      var x = PYLONS[i] - w / 2, y = HORIZON + 6 - PYLON_H;
+      if (img) blit(ctx, img, x, y, w, PYLON_H);
+      else {
+        ctx.fillStyle = '#2a2a3a';
+        ctx.fillRect(x + w * 0.35, y + 4, w * 0.3, PYLON_H - 4);
+      }
+      var on = allLit || (Math.floor(t / 0.5) + i) % 2 === 0;
+      ctx.fillStyle = on ? LAMP : '#3a2400';
+      ctx.fillRect(x + 1, y, w - 2, 5);
+      if (on) {
+        ctx.globalAlpha = 0.3;
+        circlePath(ctx, x + w / 2, y + 2.5, 7);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+  }
 
   /**
    * The paddle sprite dyed one ink, on a canvas of its own: the ink laid over
@@ -174,8 +290,6 @@
   }
 
   // -------------------------------------------------------------- the panel
-  var PANEL = { w: 372, top: 22, h: 106, r: 14 };
-  var SCORE = { cell: 14, gap: 12, top: 40, offset: 110 };   // render.js's score layout
 
   /** Blend a #rrggbb toward white (t > 0) or black (t < 0). */
   function shade(hex, t) {
@@ -224,6 +338,16 @@
     var img = artImage('sky');
     if (img) {
       blit(ctx, img, 0, 0, state.width, HORIZON);
+      // The high stars twinkle over the picture, as they do over the hand-drawn sky.
+      var tt = state.time || 0;
+      ctx.fillStyle = '#ffffff';
+      for (var q = 0; q < STARS.length; q++) {
+        if (STARS[q].y > 70) continue;
+        ctx.globalAlpha = 0.2 + 0.25 * Math.sin(tt * 1.7 + STARS[q].phase);
+        ctx.fillRect(STARS[q].x, STARS[q].y, 2, 2);
+      }
+      ctx.globalAlpha = 1;
+      drawBalloons(ctx, state, matchPoint(state));
       return;
     }
     var sky = ctx.createLinearGradient(0, 0, 0, HORIZON);
@@ -245,6 +369,7 @@
     rangePath(ctx, NEAR_RANGE, state.width, 0);
     ctx.fillStyle = '#241650';
     ctx.fill();
+    drawBalloons(ctx, state, matchPoint(state));
   }
 
   /** One trapezoid of floor between depths z0 (near) and z1 (far). */
@@ -266,7 +391,8 @@
     ctx.fillRect(0, HORIZON, W, H - HORIZON);
 
     // The whole board slides toward the viewer; two tiles on it looks the same.
-    var offset = ((state.time || 0) * SCROLL) % (2 * TILE);
+    // At match point the track runs at twice its rate (item 1227).
+    var offset = ((state.time || 0) * SCROLL * (matchPoint(state) ? 2 : 1)) % (2 * TILE);
     var zNear = K / (H - HORIZON + 4);
     var kFirst = Math.floor((zNear + offset) / TILE);
     var kLast = Math.ceil((FAR + offset) / TILE);
@@ -375,6 +501,15 @@
       ctx.globalAlpha = 1;
     }
 
+    // The colour-math halo (item 1227): 1.6 times the orb, added light, under the core (R1).
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = '#f8f8d0';
+    circlePath(ctx, cx, cy, BALL_SPRITE / 2 * 1.6);
+    ctx.fill();
+    ctx.restore();
+
     var img = artImage('ball');
     if (img) {
       var half = BALL_SPRITE / 2;
@@ -395,38 +530,59 @@
     ctx.stroke();
   }
 
-  /** The score on a glassy panel across the sky, each number in its paddle's ink. */
+  // The scoreboard as F-Zero's (item 1227): two see-through boxes, 40 x 16
+  // Super Nintendo pixels each, a helmet icon beside each, and under each a
+  // power bar 32 x 3 that fills 4 of its pixels a paddle hit and flashes full.
+  var BOX = { w: 125, h: 43, top: 20, offset: 110, cell: 6, gap: 5, fill: 'rgba(11, 15, 60, 0.5)' };
+  var BAR = { w: 100, h: 8, below: 7, perHit: 4 / 32 };
+  var HELMET = { left: '#f83800', right: '#3868f8', r: 11 };
+
+  /** A round racing helmet, 8 x 8 Super Nintendo pixels, its visor toward the court. */
+  function drawHelmet(ctx, cx, cy, suit, facing) {
+    ctx.fillStyle = '#101020';
+    circlePath(ctx, cx, cy, HELMET.r + 1.5);
+    ctx.fill();
+    ctx.fillStyle = suit;
+    circlePath(ctx, cx, cy, HELMET.r);
+    ctx.fill();
+    ctx.fillStyle = '#101828';
+    ctx.fillRect(facing > 0 ? cx - 1 : cx - HELMET.r + 1, cy - 3, HELMET.r, 7);
+    ctx.fillStyle = '#f8f8d0';
+    ctx.fillRect(cx - facing * 5 - 1.5, cy - 7, 3, 3);
+  }
+
+  /** Both score boxes, each number in its paddle's ink, with helmets and power bars. */
   function drawPanel(ctx, state, P) {
-    var mid = state.width / 2;
-    var x = mid - PANEL.w / 2;
-    roundRectPath(ctx, x, PANEL.top, PANEL.w, PANEL.h, PANEL.r);
-    ctx.fillStyle = 'rgba(14, 16, 52, 0.52)';
-    ctx.fill();
-
-    var gloss = ctx.createLinearGradient(0, PANEL.top, 0, PANEL.top + PANEL.h / 2);
-    gloss.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
-    gloss.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    roundRectPath(ctx, x + 3, PANEL.top + 3, PANEL.w - 6, PANEL.h / 2 - 3, PANEL.r - 3);
-    ctx.fillStyle = gloss;
-    ctx.fill();
-
-    roundRectPath(ctx, x, PANEL.top, PANEL.w, PANEL.h, PANEL.r);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(210, 220, 255, 0.7)';
-    ctx.stroke();
-
-    ctx.fillStyle = 'rgba(210, 220, 255, 0.5)';
-    ctx.fillRect(mid - 1, PANEL.top + 18, 2, PANEL.h - 36);
-
+    var mid = state.width / 2, t = state.time || 0;
+    var mp = matchPoint(state);
+    var power = Math.min(1, (state.rally || 0) * BAR.perHit);
     var sides = [['left', -1], ['right', 1]];
     for (var i = 0; i < sides.length; i++) {
-      var side = sides[i][0];
-      var at = mid + sides[i][1] * SCORE.offset;
+      var side = sides[i][0], dir = sides[i][1];
+      var cx = mid + dir * BOX.offset, x = cx - BOX.w / 2;
+      ctx.fillStyle = BOX.fill;
+      ctx.fillRect(x, BOX.top, BOX.w, BOX.h);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#f8f8d0';
+      ctx.strokeRect(x + 1, BOX.top + 1, BOX.w - 2, BOX.h - 2);
+
       var text = String(state.score[side]);
+      var ty = BOX.top + (BOX.h - 5 * BOX.cell) / 2;
       ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-      P.drawText(ctx, text, at + 3, SCORE.top + 3, SCORE.cell, SCORE.gap);
+      P.drawText(ctx, text, cx + 2, ty + 2, BOX.cell, BOX.gap);
       ctx.fillStyle = P.paddleInk(state, side);
-      P.drawText(ctx, text, at, SCORE.top, SCORE.cell, SCORE.gap);
+      P.drawText(ctx, text, cx, ty, BOX.cell, BOX.gap);
+
+      drawHelmet(ctx, cx + dir * (BOX.w / 2 + 18), BOX.top + BOX.h / 2, HELMET[side], -dir);
+
+      var bx = cx - BAR.w / 2, by = BOX.top + BOX.h + BAR.below;
+      ctx.fillStyle = BOX.fill;
+      ctx.fillRect(bx - 2, by - 2, BAR.w + 4, BAR.h + 4);
+      var full = mp || power >= 1;
+      ctx.globalAlpha = mp ? 0.55 + 0.45 * Math.abs(Math.sin(t * 6)) : 1;   // match point: both bars pulse
+      ctx.fillStyle = full && Math.floor(t * 8) % 2 === 0 ? '#f8f8d0' : LAMP;
+      ctx.fillRect(bx, by, BAR.w * (full ? 1 : power), BAR.h);
+      ctx.globalAlpha = 1;
     }
   }
 
@@ -676,6 +832,7 @@
     ctx.globalAlpha = 1;
     drawSky(ctx, state);
     drawFloor(ctx, state);
+    drawPylons(ctx, state);
 
     var ballShown = state.serveDelay <= 0;
     var l = state.left, rt = state.right, b = state.ball;
