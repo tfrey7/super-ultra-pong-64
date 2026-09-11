@@ -70,7 +70,10 @@ in which the layer really stood the figures. The raw readings are in
   with `docs/measure/item-1203/trace.mjs`, and if that is the cause, compile the figures during
   load (`renderer.compile`) or ask for their files at page start instead of on first sight.
 - The frame-rate lines the playtest fails on eras 5 to 10 in this Chrome are still card 1216's.
-  They fail with the polygon figures as well.
+  They fail with the polygon figures as well. The ladder walk on the merged tree with the figures on
+  passed 36 of 42 checks, the same count as item 1273's, and all six misses were those lines. Every
+  ring, every "new era draws afterwards" pixel check and the finale passed.
+  The log is [ladder-figures.txt](../measure/item-1274/ladder-figures.txt).
 
 ## What did not work, or is not done
 
