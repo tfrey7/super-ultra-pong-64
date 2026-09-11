@@ -17,8 +17,8 @@
  * script. Writes <tag>.json (default crt-capture.json) and the PNGs beside
  * this file. Chrome runs muted.
  */
-import { spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { writeFileSync, existsSync } from 'node:fs';
+import { launchChrome } from '../../../tools/chrome.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -36,7 +36,6 @@ const CHROME = [
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'
 ].find((p) => existsSync(p));
-const TMP = process.env.TMP || 'G:/claude-tmp';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 class Session {
@@ -115,13 +114,12 @@ async function timeRing(s) {
 
 async function main() {
   const url = pathToFileURL(path.join(ROOT, 'index.html')).href;
-  const profile = path.join(TMP, `pong-1137-chrome-${PORT}`);
-  mkdirSync(profile, { recursive: true });
-  const chrome = spawn(CHROME, [
-    '--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`,
+  // A fresh profile folder, deleted when Chrome exits (tools/chrome.mjs, item 1169).
+  const chrome = launchChrome(CHROME, [
+    '--headless=new', `--remote-debugging-port=${PORT}`,
     '--mute-audio', '--autoplay-policy=no-user-gesture-required', '--window-size=1000,750',
     '--no-first-run', '--no-default-browser-check', url
-  ], { stdio: 'ignore' });
+  ], { name: 'crt' });
   const out = { root: ROOT, url, chromePid: chrome.pid };
   let ws;
   try {
@@ -171,7 +169,7 @@ async function main() {
     }
   } finally {
     try { ws && ws.close(); } catch { /* gone */ }
-    chrome.kill();
+    await chrome.close();
   }
   writeFileSync(path.join(HERE, TAG + '.json'), JSON.stringify(out, null, 1) + '\n');
   console.log(JSON.stringify(out, null, 1));

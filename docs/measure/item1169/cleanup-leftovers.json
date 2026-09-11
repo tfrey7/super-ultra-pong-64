@@ -1,0 +1,233 @@
+{
+ "when": "2026-09-10T21:47:42",
+ "root": "G:/claude-tmp",
+ "patterns": [
+  "item-11*-chrome-*",
+  "item-1138-flipshot-*"
+ ],
+ "chromeProfilesOpen": [
+  "g:\\claude-tmp\\pong-playtest-profile-9356",
+  "g:\\claude-tmp\\pong-playtest-profile-9386"
+ ],
+ "removed": [
+  {
+   "name": "item-1138-flipshot-9472",
+   "mb": 14.6,
+   "minutesSinceWrite": 79.6,
+   "removed": true
+  },
+  {
+   "name": "item-1138-flipshot-9562",
+   "mb": 14.6,
+   "minutesSinceWrite": 45.0,
+   "removed": true
+  },
+  {
+   "name": "item-1139-chrome-9341",
+   "mb": 19.1,
+   "minutesSinceWrite": 78.1,
+   "removed": true
+  },
+  {
+   "name": "item-1140-chrome-9341",
+   "mb": 19.2,
+   "minutesSinceWrite": 72.3,
+   "removed": true
+  },
+  {
+   "name": "item-1140-chrome-9343",
+   "mb": 19.1,
+   "minutesSinceWrite": 71.1,
+   "removed": true
+  },
+  {
+   "name": "item-1153-chrome-9353",
+   "mb": 52.3,
+   "minutesSinceWrite": 11.6,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9361-1789087218774",
+   "mb": 18.8,
+   "minutesSinceWrite": 67.2,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9362-1789087224391",
+   "mb": 19.1,
+   "minutesSinceWrite": 67.0,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9363-1789087231711",
+   "mb": 19.1,
+   "minutesSinceWrite": 66.9,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9364-1789087238883",
+   "mb": 19.1,
+   "minutesSinceWrite": 66.8,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9365-1789087246031",
+   "mb": 19.2,
+   "minutesSinceWrite": 66.7,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9366-1789087253215",
+   "mb": 19.1,
+   "minutesSinceWrite": 66.6,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9381-1789087426705",
+   "mb": 19.2,
+   "minutesSinceWrite": 63.7,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9382-1789087433392",
+   "mb": 16.0,
+   "minutesSinceWrite": 63.6,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9383-1789087440353",
+   "mb": 19.2,
+   "minutesSinceWrite": 63.4,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9384-1789087447511",
+   "mb": 19.1,
+   "minutesSinceWrite": 63.3,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9385-1789087454408",
+   "mb": 19.2,
+   "minutesSinceWrite": 63.2,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9386-1789087461351",
+   "mb": 19.1,
+   "minutesSinceWrite": 63.1,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9401-1789087572917",
+   "mb": 19.2,
+   "minutesSinceWrite": 61.2,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9402-1789087579857",
+   "mb": 19.1,
+   "minutesSinceWrite": 61.1,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9403-1789087586807",
+   "mb": 19.2,
+   "minutesSinceWrite": 61.0,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9404-1789087593700",
+   "mb": 16.0,
+   "minutesSinceWrite": 60.9,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9421-1789087654734",
+   "mb": 19.2,
+   "minutesSinceWrite": 59.9,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9422-1789087661670",
+   "mb": 19.0,
+   "minutesSinceWrite": 59.8,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9423-1789087668376",
+   "mb": 19.0,
+   "minutesSinceWrite": 59.6,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9424-1789087675276",
+   "mb": 11.2,
+   "minutesSinceWrite": 59.5,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9441-1789087733205",
+   "mb": 19.0,
+   "minutesSinceWrite": 58.6,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9442-1789087740407",
+   "mb": 19.0,
+   "minutesSinceWrite": 58.4,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9443-1789087747306",
+   "mb": 19.0,
+   "minutesSinceWrite": 58.3,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9461-1789087825797",
+   "mb": 19.2,
+   "minutesSinceWrite": 57.0,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9462-1789087833482",
+   "mb": 19.1,
+   "minutesSinceWrite": 56.9,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9463-1789087840919",
+   "mb": 19.2,
+   "minutesSinceWrite": 56.8,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9464-1789087848090",
+   "mb": 19.2,
+   "minutesSinceWrite": 56.6,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9465-1789087855310",
+   "mb": 19.2,
+   "minutesSinceWrite": 56.5,
+   "removed": true
+  },
+  {
+   "name": "item-1164-chrome-9466-1789087862511",
+   "mb": 19.1,
+   "minutesSinceWrite": 56.4,
+   "removed": true
+  }
+ ],
+ "kept": [
+  {
+   "name": "item-1155-chrome-9345",
+   "mb": 20.5,
+   "minutesSinceWrite": 9.7,
+   "kept": "written to in the last ten minutes"
+  }
+ ],
+ "removedMb": 679.0
+}

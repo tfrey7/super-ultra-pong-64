@@ -13,8 +13,8 @@
 //      eased wipe, and one once the ring has gone (still inside the serve pause);
 //   3. what the page's own sound player took the point for (the Xbox's boot).
 // Writes the PNGs and sphere-capture.json beside this file.
-import { spawn } from 'node:child_process';
 import { writeFileSync, existsSync } from 'node:fs';
+import { launchChrome } from '../../../tools/chrome.mjs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -24,15 +24,15 @@ const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i > -1 
 const PORT = Number(arg('port', 9345));
 const CHROME = arg('chrome', ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p)));
-const PROFILE = path.join(process.env.TMP || 'G:/claude-tmp', `item-1155-chrome-${PORT}`);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const url = pathToFileURL(path.join(ROOT, 'index.html')).href + '?era=8';
 
-const chrome = spawn(CHROME, [
-  '--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
+// A fresh profile folder, deleted when Chrome exits (tools/chrome.mjs, item 1169).
+const chrome = launchChrome(CHROME, [
+  '--headless=new', `--remote-debugging-port=${PORT}`,
   '--mute-audio', '--autoplay-policy=no-user-gesture-required',
   '--no-first-run', '--no-default-browser-check', '--window-size=1000,760', url
-], { stdio: 'ignore' });
+], { name: 'sphere' });
 console.log(`chrome pid ${chrome.pid}`);
 
 let ws;
@@ -159,5 +159,5 @@ try {
   if (!fullRate || errors.length || eraAfter !== 9 || travel < 150) process.exitCode = 1;
 } finally {
   try { ws && ws.close(); } catch { /* gone */ }
-  chrome.kill();
+  await chrome.close();
 }
