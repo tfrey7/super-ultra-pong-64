@@ -68,7 +68,8 @@
         drawField(ctx, attract, { ink: ATTRACT_INK, card: false });
         PongRender.drawTitle(ctx, game);
       } else {
-        drawField(ctx, game);
+        // Game feel (src/feel.js): shake, squash, trail, flash, the rally counter.
+        if (root.PongFeel) root.PongFeel.draw(ctx, game, drawField); else drawField(ctx, game);
       }
     }
 
@@ -77,7 +78,8 @@
       last = now;
 
       // In the title phase this only advances the clock the blink reads.
-      Pong.step(game, dt, input.read());
+      // Through the feel layer, which owns hit-stop and match-point slow motion.
+      (root.PongFeel ? root.PongFeel.step : Pong.step)(game, dt, input.read());
       if (sound) sound.handle(game);
       if (game.phase === 'title') Pong.step(attract, dt, attractIntent(dt));
 
