@@ -66,7 +66,7 @@
     },
     'crt-rf': {
       scan: 0.38, soft: 1, gap: 0.6, glow: 0.4, glowShrink: 4,
-      fringe: 0.34, fringePx: 1.5, triad: 0.12, vignette: 0.4, corner: 0.07,
+      fringe: 0.28, fringePx: 1.5, triad: 0.12, vignette: 0.4, corner: 0.07,
       roll: 0.07, snow: 0.07, tint: null
     },
     'crt-composite': {
