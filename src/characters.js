@@ -129,14 +129,18 @@
     3:  { sheets: { left: 'era3-p1', right: 'era3-p2' }, frame: { w: 20, h: 25 },
           hand: { x: 20, y: 13 }, scale: 3.2, fps: 10,
           skin: '#eeaa88', body: '#222266', res: 1 },
-    // Super Nintendo (item 1227): two hover pilots, built from one pixellab pose
-    // each by assets/pixellab/era4-players-build.mjs. The glove is on the frame's
-    // right edge, so the figure stands wholly behind its paddle; at 1.2 a frame
-    // is 38 x 121 field units, the pad's back rim just past the wall. miss has
-    // two frames (the pad there and gone), so at fps 12 the conceding pad blinks.
+    // Super Nintendo (item 1281): two hover pilots drawn as text grids with
+    // tools/spritegen.mjs, not pixellab -- assets/spritegen/era4-pilot-red.json
+    // by hand, the blue pilot the same grid in a second OBJ palette
+    // (assets/spritegen/era4-pilots-compose.mjs, which builds both into
+    // assets/pixellab/ where the loader looks). One sheet pixel is one SNES
+    // pixel: 3.125 field units, 800 / 256. The glove is on the frame's right
+    // edge, so the figure stands wholly behind its paddle; a frame is 37.5 x
+    // 131 field units. miss has two frames (the pad lit, then dark), so at fps
+    // 12 the conceding pad blinks.
     4:  { skin: '#f8c8a0', body: '#384878', res: 2,
-          sheets: { left: 'era4-players-left', right: 'era4-players-right' },
-          frame: { w: 32, h: 101 }, hand: { x: 32, y: 41 }, scale: 1.2, fps: 12,
+          sheets: { left: 'era4-pilot-red', right: 'era4-pilot-blue' },
+          frame: { w: 12, h: 42 }, hand: { x: 12, y: 17 }, scale: 3.125, fps: 12,
           frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
     // PlayStation (item 1228): a STAND-IN only. Tim ruled flat sprites out of
     // the 3D eras; the real players are polygon models from item 1248's
