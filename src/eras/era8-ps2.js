@@ -226,16 +226,15 @@
     return sides;
   }
 
+  // No clip: a reflection of a paddle on the near wall hangs a few pixels over
+  // the flat lip, which reads as the mirror it is -- and the era tests' own
+  // stand-in canvases (era 4's climbs the ladder into this era) know no clip().
   function reflections(ctx, state, T, cam, P) {
-    ctx.save();
-    T.path(ctx, cam, [[0, 0, 0], [800, 0, 0], [800, 600, 0], [0, 600, 0]]);
-    ctx.clip();
     var sides = paddleOrder(state);
     for (var i = 0; i < sides.length; i++) {
       T.box(ctx, cam, state[sides[i]], 0, -PADDLE.z,
         { ink: P.paddleInk(state, sides[i]), shade: 'flat', light: PADDLE.light, alpha: PADDLE.reflection });
     }
-    ctx.restore();
   }
 
   function dust(ctx, t) {
@@ -388,6 +387,7 @@
     era: 8,
     name: '2000 PlayStation 2',
     like: 1,              // paddle colours: the ones the session earned on its first point
+    flourish: null,       // not era 1's CRT sweep: this era's arrival is a later card
     camera: CAMERA,
     drift: poseAt,
     card: { flash: '#9fc4ff', wipe: ['#000000', '#141c33', '#2d3e50'], box: '#0b1020', border: '#2d3e50',
