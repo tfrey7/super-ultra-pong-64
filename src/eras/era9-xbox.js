@@ -9,9 +9,10 @@
  *      strips, each strip lit in a hard band by how near it is to the moving
  *      light, then a specular pool under the light with a highlight-only tile
  *      clipped to it, so the emboss lights up where the light is;
- *   2. hard dynamic shadows: a light orbiting the table every 9 seconds casts
- *      each paddle's box and the ball onto the table as flat black shapes at
- *      0.45, lighter than the ball's true contact shadow (R5);
+ *   2. hard dynamic shadows: the light is the ball -- it rides 160 up over the
+ *      ball, a little ahead of it -- and casts each paddle's box and the ball
+ *      onto the table as flat black shapes at 0.45, lighter than the ball's
+ *      true contact shadow (R5);
  *   3. green on black: green rail tops with glow lines, paddles edged in green
  *      glow (the era's only shadowBlur), a faint green horizon;
  *   4. gamertags floating over both paddles;
@@ -43,8 +44,15 @@
   // casts a paddle's top only ~15 units past its footprint and the ball ~4:
   // invisible. At 160 a paddle's shadow reaches ~57 units and the ball's ~15,
   // so the hard shadows read at a glance, still at 0.45 over true footprints (R5).
-  var LIGHT = { cx: 400, rx: 300, cy: 300, ry: 180, z: 160, period: 9 };
+  // The light is the ball (item 1194): it rides 160 up over the ball's centre,
+  // led a little ahead along the ball's travel (0.1 s of its velocity, at most
+  // 44 units), and the lead eases round over about 0.08 s when the ball turns.
+  var LIGHT = { z: 160, leadS: 0.1, leadMax: 44, ease: 0.08 };
   var SHADOW_ALPHA = 0.45;               // R5: lighter than the 0.55 contact shadow
+  // The ball's cast shadow is drawn this many times the ball's radius: at true
+  // size a light this close lays it almost exactly under the ball and its
+  // contact shadow, where item 1149's still could not show it.
+  var BALL_SHADOW = 1.9;
   var POOL = { radius: 160, alpha: 0.35, tileAlpha: 0.6 };
   var TAGS = { left: 'PONG SLAYER', right: 'CPU 2001' };
   var TAG = { w: 104, h: 22, z: 60, cell: 2, gap: 2, alpha: 0.85 };
@@ -52,10 +60,37 @@
                  cell: 5, digitGap: 4, alarm: 0.3, recharge: 0.5 };
 
   // ------------------------------------------------------------ pure pieces
-  /** The orbiting light at a moment: one lap of the table every 9 seconds. */
-  function lightAt(t) {
-    var a = 2 * Math.PI * (t || 0) / LIGHT.period;
-    return { x: LIGHT.cx + LIGHT.rx * Math.cos(a), y: LIGHT.cy + LIGHT.ry * Math.sin(a), z: LIGHT.z };
+  /** How far ahead of the ball the light is led: 0.1 s of its velocity, at most 44 units. */
+  function leadFor(ball) {
+    var vx = (ball.vx || 0) * LIGHT.leadS, vy = (ball.vy || 0) * LIGHT.leadS;
+    var len = Math.sqrt(vx * vx + vy * vy);
+    if (len > LIGHT.leadMax) { vx *= LIGHT.leadMax / len; vy *= LIGHT.leadMax / len; }
+    return { x: vx, y: vy };
+  }
+
+  /** The light for a ball, with no easing: over its centre plus the lead, 160 up. */
+  function lightFor(ball, lead) {
+    lead = lead || leadFor(ball);
+    return { x: ball.x + ball.size / 2 + lead.x, y: ball.y + ball.size / 2 + lead.y, z: LIGHT.z };
+  }
+
+  // The lead's own memory, so it swings round rather than jumping when the ball
+  // turns. Keyed off state.time; a jump back or a gap over half a second snaps
+  // it (a new game, a test, a replayed frame). The ball is followed exactly.
+  var leadMemo = { time: -Infinity, x: 0, y: 0 };
+
+  /** The light the frame is lit by: over the ball, the lead eased toward where it is heading. */
+  function lightOf(state) {
+    var want = leadFor(state.ball), dt = state.time - leadMemo.time;
+    if (!(dt >= 0 && dt <= 0.5)) {
+      leadMemo.x = want.x; leadMemo.y = want.y;
+    } else if (dt > 0) {
+      var k = 1 - Math.exp(-dt / LIGHT.ease);
+      leadMemo.x += (want.x - leadMemo.x) * k;
+      leadMemo.y += (want.y - leadMemo.y) * k;
+    }
+    leadMemo.time = state.time;
+    return lightFor(state.ball, { x: leadMemo.x, y: leadMemo.y });
   }
 
   /** Where the point (x, y, z) falls on the table under light L: L + (P - L) * Lz / (Lz - Pz). */
@@ -135,7 +170,7 @@
   //   3. arrival: a green pulse as it settles.
   // Behind the sphere the table answers, read off the same engine moment: the
   // light sits in the orb while the sphere spreads, so the metal sheen and the
-  // hard shadows radiate out from it, then it snaps out to its orbit in the last
+  // hard shadows radiate out from it, then it snaps out to the ball in the last
   // beat; the gamertags fade in over the paddles. The boot thrum is the voice's
   // `boot` list below, played by the player -- the flourish never sounds a note.
   var ARRIVAL = { orb: 90, ignite: 0.38, reach: 56, shell: 48, band: 8, tendrils: 10,
@@ -155,9 +190,9 @@
     return m && m.wiping && m.era === 9 ? m : null;
   }
 
-  /** The light: in the orb while the sphere spreads, snapping out to its orbit over the last beat. */
-  function arrivalLight(t, m) {
-    var L = lightAt(t);
+  /** The light: in the orb while the sphere spreads, snapping out to the ball over the last beat. */
+  function arrivalLight(state, m) {
+    var L = lightOf(state);
     if (!m) return L;
     var k = clamp01((m.p - ARRIVAL.snap) / (1 - ARRIVAL.snap));
     k = 1 - Math.pow(1 - k, 3);                        // a snap, not a drift
@@ -503,7 +538,7 @@
       ctx.globalAlpha = SHADOW_ALPHA;
       ctx.fillStyle = '#000000';
       ctx.beginPath();
-      ctx.arc(0, 0, Math.max(0.5, r * p.scale), 0, Math.PI * 2);
+      ctx.arc(0, 0, Math.max(0.5, BALL_SHADOW * r * p.scale), 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.restore();
@@ -638,7 +673,7 @@
     if (!T) return P.drawBase(ctx, state, opts);
     var cam = cameraFor(T, P.eraLook(state.era).camera || CAMERA);
     var arrival = arrivalOf(state);                    // null except while the green sphere spreads
-    var L = arrivalLight(state.time, arrival);
+    var L = arrivalLight(state, arrival);
     var tile = tilesFor(T, ctx);
     remember(state);
 
@@ -715,7 +750,8 @@
       effects: { shape: 0.3, reverb: { seconds: 1.4, decay: 2, mix: 0.3 } }
     },
     // The pure pieces, for the era's own test.
-    xbox: { lightAt: lightAt, castPoint: castPoint, paddleShadow: paddleShadow, shieldView: shieldView,
+    xbox: { lightFor: lightFor, lightOf: lightOf, LIGHT: LIGHT, BALL_SHADOW: BALL_SHADOW,
+            castPoint: castPoint, paddleShadow: paddleShadow, shieldView: shieldView,
             SHADOW_ALPHA: SHADOW_ALPHA, TAGS: TAGS, PADDLE_Z: PADDLE_Z,
             ARRIVAL: ARRIVAL, orbRadius: orbRadius, arrivalLight: arrivalLight, tagFade: tagFade },
     // The arrival: the green sphere (docs/ERAS.md chapter 10), over the engine's ring.
