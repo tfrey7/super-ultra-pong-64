@@ -321,6 +321,8 @@
   function warmUp(ctx, state, opts) {
     warmed = true;
     if (typeof document === 'undefined' || !document.createElement || !ctx || !ctx.canvas) return;
+    var clock = root.performance && typeof root.performance.now === 'function' ? root.performance : Date;
+    var began = clock.now(), flourishesFrom = began;
     var P = root.Pong;
     var top = P && typeof P.TOP_ERA === 'number' ? P.TOP_ERA : 4;
     var origin = { x: -8, y: state.height / 4 };
@@ -342,10 +344,13 @@
         }
       }
       warmTurnedPicture(ctx);
+      flourishesFrom = clock.now();
       warmFlourishes(ctx, state, top);
     } catch (e) {
       // A warm-up is only ever an optimisation: never let it stop the page.
     } finally {
+      // What it cost, on the page's own thread, for a measurement to read.
+      R.ERA_CHANGE.warmMs = { total: +(clock.now() - began).toFixed(1), flourishes: +(clock.now() - flourishesFrom).toFixed(1) };
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.restore();
