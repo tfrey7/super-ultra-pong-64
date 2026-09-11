@@ -122,7 +122,14 @@
           sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
           frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3 },
-    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
+    // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
+    // cyborg, cut from pixellab by assets/pixellab/era9-derive.mjs; the hand on
+    // the shield at the paddle box's top (dz 24), 90 table units tall. A
+    // STAND-IN: Tim ruled sprite players out for the 3D eras (23:47 EDT,
+    // 2026-09-10); the polygon-model card swaps this block's sheets out.
+    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 1.667, res: 4, round: true,
+          sheets: { left: 'era9-armour-left', right: 'era9-armour-right' },
+          frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6 },
     10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
   };
 
