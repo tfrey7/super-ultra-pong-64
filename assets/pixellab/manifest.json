@@ -44,6 +44,316 @@
       }
     },
     {
+      "name": "era2-paddle-raw",
+      "file": "era2-paddle-raw.png",
+      "prompt": "a single vertical pong paddle, tall white rounded bar game sprite, light grey shading on its right side, NES 8-bit style, plain",
+      "size": {
+        "width": 16,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "seed": 1244512963,
+      "date": "2026-09-11T01:16:17.224Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 17.2,
+      "pixels": {
+        "width": 16,
+        "height": 64
+      },
+      "bytes": 84,
+      "sha256": "81ccd062fdaa0d1f5a49f749b8c9fed374d240797d521b20a50aba2e9b6904eb",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a single vertical pong paddle, tall white rounded bar game sprite, light grey shading on its right side, NES 8-bit style, plain",
+        "image_size": {
+          "width": 16,
+          "height": 64
+        },
+        "seed": 1244512963,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "card": "item 1178",
+      "verdict": "rejected: came back almost blank (84 bytes, a white sliver); retried once as era2-paddle-raw2"
+    },
+    {
+      "name": "era2-ball-raw",
+      "file": "era2-ball-raw.png",
+      "prompt": "a tiny round bright white ball game sprite, NES 8-bit style, light grey shade on the bottom right, plain",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "seed": 1574291590,
+      "date": "2026-09-11T01:16:31.217Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 12.5,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 158,
+      "sha256": "a1df8c2dff57aa93e65a04cf0abfb49cad1c17d57ba624ad2a3db2e7c111b778",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a tiny round bright white ball game sprite, NES 8-bit style, light grey shade on the bottom right, plain",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1574291590,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "card": "item 1178",
+      "verdict": "rejected: a tiny hollow ring, not a ball; retried once as era2-ball-raw2"
+    },
+    {
+      "name": "era2-court",
+      "file": "era2-court.png",
+      "prompt": "top-down view of a retro 8-bit NES sports arena floor, dark teal square floor tiles with thin black grout lines, flat and simple, empty, no players, no text",
+      "size": {
+        "width": 200,
+        "height": 148
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "high top-down"
+      },
+      "seed": 540635706,
+      "date": "2026-09-11T01:16:52.463Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "era2-court-raw.png",
+      "derivedBy": "node assets/pixellab/era2-nes-quantize.mjs",
+      "how": "quantized pixel by pixel to the nearest NES colour, every entry as bright as the ball held back (luma under 0.8)",
+      "card": "item 1178",
+      "verdict": "drawn by era 2 (src/eras/era2-nes.js, embedded there as a data: URI)",
+      "pixels": {
+        "width": 200,
+        "height": 148
+      },
+      "bytes": 1325,
+      "sha256": "72663cd2baf5b5a418054a357d09a3adda482d7c80be5b9e5a8ef34036c2100d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "top-down view of a retro 8-bit NES sports arena floor, dark teal square floor tiles with thin black grout lines, flat and simple, empty, no players, no text",
+        "image_size": {
+          "width": 200,
+          "height": 148
+        },
+        "seed": 540635706,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "high top-down"
+      }
+    },
+    {
+      "name": "era2-court-raw",
+      "file": "era2-court-raw.png",
+      "prompt": "top-down view of a retro 8-bit NES sports arena floor, dark teal square floor tiles with thin black grout lines, flat and simple, empty, no players, no text",
+      "size": {
+        "width": 200,
+        "height": 148
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "high top-down"
+      },
+      "seed": 540635706,
+      "date": "2026-09-11T01:16:52.463Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 9,
+      "pixels": {
+        "width": 200,
+        "height": 148
+      },
+      "bytes": 9857,
+      "sha256": "9837072a3504aaef461174512f8d46f369e29634da0085d478f9ef2bb5b88de1",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "top-down view of a retro 8-bit NES sports arena floor, dark teal square floor tiles with thin black grout lines, flat and simple, empty, no players, no text",
+        "image_size": {
+          "width": 200,
+          "height": 148
+        },
+        "seed": 540635706,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "high top-down"
+      },
+      "card": "item 1178",
+      "verdict": "used: quantized to the NES palette (entries as bright as the ball held back) as era2-court.png by era2-nes-quantize.mjs, the era 2 court backdrop"
+    },
+    {
+      "name": "era2-paddle-raw2",
+      "file": "era2-paddle-raw2.png",
+      "prompt": "a thick vertical pong paddle block that fills the whole image, solid bright white body, pale grey shaded right edge, rounded corners, chunky 8-bit NES game sprite",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "seed": 1192276432,
+      "date": "2026-09-11T01:17:35.387Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 12.4,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 290,
+      "sha256": "daa0a31a136ffe09a1430196c2f74871d78a02f452bb77f63fde4457ec921295",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a thick vertical pong paddle block that fills the whole image, solid bright white body, pale grey shaded right edge, rounded corners, chunky 8-bit NES game sprite",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 1192276432,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "card": "item 1178",
+      "verdict": "rejected: a featureless white slab; shrunk to the paddle box (4x21 NES sprite pixels) it is a plain bar, flatter than the hand-drawn paddle with its shading and grip bands, so era 2 keeps the hand-drawn paddle"
+    },
+    {
+      "name": "era2-ball",
+      "file": "era2-ball.png",
+      "prompt": "a solid filled bright white sphere that fills most of the image, pale grey shading at the bottom right, chunky 8-bit NES game ball sprite",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "seed": 1346483375,
+      "date": "2026-09-11T01:17:51.082Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "era2-ball-raw2.png",
+      "derivedBy": "node assets/pixellab/era2-nes-quantize.mjs",
+      "how": "shrunk to 12x12 (the ball box at the canvas pixels) by averaging, half-covered cells opaque, inked in NES $30/$10/$00/$0F",
+      "card": "item 1178",
+      "verdict": "drawn by era 2 (src/eras/era2-nes.js, embedded there as a data: URI)",
+      "pixels": {
+        "width": 12,
+        "height": 12
+      },
+      "bytes": 128,
+      "sha256": "cc51784de5b6ebed3a333134b6f7916f4138f6c1f1cb18c83b8c193b6a07c808",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a solid filled bright white sphere that fills most of the image, pale grey shading at the bottom right, chunky 8-bit NES game ball sprite",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1346483375,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era2-ball-raw2",
+      "file": "era2-ball-raw2.png",
+      "prompt": "a solid filled bright white sphere that fills most of the image, pale grey shading at the bottom right, chunky 8-bit NES game ball sprite",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "seed": 1346483375,
+      "date": "2026-09-11T01:17:51.082Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 14.2,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 528,
+      "sha256": "8052d8a7c7ff056ec097a235613b1940606b9a80316dc61544556a517f8fe50e",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a solid filled bright white sphere that fills most of the image, pale grey shading at the bottom right, chunky 8-bit NES game ball sprite",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1346483375,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "no_background": true
+      },
+      "card": "item 1178",
+      "verdict": "used: shrunk to the 12-unit ball box and inked in NES $30/$10/$00/$0F as era2-ball.png by era2-nes-quantize.mjs, the era 2 ball"
+    },
+    {
       "name": "genesis-court",
       "file": "genesis-court.png",
       "prompt": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
