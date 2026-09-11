@@ -42,7 +42,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const ERA_FILE = path.join(HERE, '..', '..', 'src', 'eras', 'era4-snes.js');
 export const PIECES = [
   { key: 'sky', from: 'snes-sky.png', to: 'era4-sky.png' },
-  { key: 'paddle', from: 'snes-paddle.png', to: 'era4-paddle.png' },
+  // The paddle is cropped to the pixels it draws (10x58 of its 16x64), so it
+  // fills the whole rectangle the rules collide with rather than two thirds of it.
+  { key: 'paddle', from: 'snes-paddle.png', to: 'era4-paddle.png', crop: true },
   { key: 'ball', from: 'snes-ball.png', to: 'era4-ball.png' }
 ];
 const BEGIN = '// BEGIN pixellab embeds';
@@ -65,6 +67,23 @@ export function toSnes(img) {
     rgba[i + 3] = 255;
   }
   return { width: img.width, height: img.height, rgba };
+}
+
+/** The smallest rectangle of an image holding every drawn pixel. */
+export function cropToOpaque(img) {
+  let x0 = img.width, y0 = img.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < img.height; y++) {
+    for (let x = 0; x < img.width; x++) {
+      if (!img.rgba[(y * img.width + x) * 4 + 3]) continue;
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+    }
+  }
+  if (x1 < 0) return img;
+  const width = x1 - x0 + 1, height = y1 - y0 + 1, rgba = Buffer.alloc(width * height * 4);
+  for (let y = 0; y < height; y++) {
+    img.rgba.copy(rgba, y * width * 4, ((y + y0) * img.width + x0) * 4, ((y + y0) * img.width + x1 + 1) * 4);
+  }
+  return { width, height, rgba };
 }
 
 /** The era file with its embed block rewritten, keeping the file's own line endings. */
@@ -95,7 +114,7 @@ export function withEntries(manifest, made) {
       cost: { type: 'derived', generations: 0 },
       derivedFrom: m.from,
       derivedBy: 'node assets/pixellab/era4-snes-embed.mjs',
-      how: `every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not; ${m.colours} colours`,
+      how: `every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not${m.crop ? ', cropped to the pixels it draws' : ''}; ${m.colours} colours`,
       card: 'item 1180',
       verdict: 'drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)',
       pixels: { width: m.width, height: m.height },
@@ -114,12 +133,13 @@ export function withEntries(manifest, made) {
 export function main(log = console.log) {
   const art = {}, made = [];
   for (const p of PIECES) {
-    const img = toSnes(decodePng(fs.readFileSync(path.join(HERE, p.from))));
+    let img = toSnes(decodePng(fs.readFileSync(path.join(HERE, p.from))));
+    if (p.crop) img = cropToOpaque(img);
     art[p.key] = encodePng(img.width, img.height, img.rgba);
     fs.writeFileSync(path.join(HERE, p.to), art[p.key]);
     const colours = new Set();
     for (let i = 0; i < img.rgba.length; i += 4) if (img.rgba[i + 3]) colours.add(img.rgba.readUInt32BE(i));
-    made.push({ from: p.from, to: p.to, width: img.width, height: img.height, colours: colours.size,
+    made.push({ from: p.from, to: p.to, crop: !!p.crop, width: img.width, height: img.height, colours: colours.size,
       bytes: art[p.key].length, sha256: crypto.createHash('sha256').update(art[p.key]).digest('hex') });
     log(`${p.to} ${img.width}x${img.height}, ${art[p.key].length} bytes, ${colours.size} SNES colours`);
   }

@@ -191,13 +191,14 @@ test('the embedded pictures are exactly the committed era4-*.png files', () => {
 });
 
 test('the embed script reproduces the committed pictures from the raw generations: 15-bit colour, one-bit transparency', async () => {
-  const { toSnes, snap5, embed, PIECES } = await embedder();
+  const { toSnes, cropToOpaque, snap5, embed, PIECES } = await embedder();
   const { decodePng: dec, encodePng } = await import(pathToFileURL(path.join(ART, 'era2-nes-quantize.mjs')).href);
   assert.strictEqual(snap5(255), 255, 'white stays white, so the ball keeps its #ffffff core (R1)');
   assert.strictEqual(snap5(0), 0);
   const art = {};
   for (const p of PIECES) {
-    const img = toSnes(dec(fs.readFileSync(path.join(ART, p.from))));
+    let img = toSnes(dec(fs.readFileSync(path.join(ART, p.from))));
+    if (p.crop) img = cropToOpaque(img);
     for (let i = 0; i < img.rgba.length; i += 4) {
       assert.ok(img.rgba[i + 3] === 0 || img.rgba[i + 3] === 255, `${p.to}: every pixel drawn or clear`);
       for (let c = 0; c < 3; c++) assert.strictEqual(snap5(img.rgba[i + c]), img.rgba[i + c], `${p.to}: a 15-bit colour`);
@@ -244,7 +245,7 @@ test('with the pictures decoded, era 4 draws the sky, both paddles and the ball 
   });
 });
 
-test('each paddle wears its own ink: the grey sprite multiplied by the ink and cut to its shape, once per ink', () => {
+test('each paddle wears its own ink: the ink overlaid on the grey sprite and cut to its shape, once per ink', () => {
   withDecoding(true, () => {
     const e = embeds();
     const g = rally();
@@ -262,11 +263,11 @@ test('each paddle wears its own ink: the grey sprite multiplied by the ink and c
     assert.strictEqual(made.length, before + 1, 'one new canvas for a new ink, across two frames');
     const dyed = made[made.length - 1];
     assert.deepStrictEqual(dyed.calls.map((x) => [x.op, x.comp]), [
-      ['drawImage', 'source-over'], ['fillRect', 'multiply'], ['drawImage', 'destination-in']
-    ], 'the picture, the ink multiplied over it, the picture\'s shape kept');
+      ['drawImage', 'source-over'], ['fillRect', 'overlay'], ['drawImage', 'destination-in']
+    ], 'the picture, the ink overlaid on it, the picture\'s shape kept');
     assert.strictEqual(dyed.calls[1].fillStyle, ink);
     assert.ok(srcOf(dyed.calls[0]) === e.paddle && srcOf(dyed.calls[2]) === e.paddle);
-    assert.deepStrictEqual([dyed.width, dyed.height], [16, 64]);
+    assert.deepStrictEqual([dyed.width, dyed.height], [10, 58], 'the paddle cropped to the pixels it draws');
   });
 });
 

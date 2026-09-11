@@ -541,11 +541,11 @@
         "generations": 0
       },
       "pixels": {
-        "width": 16,
-        "height": 64
+        "width": 10,
+        "height": 58
       },
-      "bytes": 455,
-      "sha256": "d5d1d0fca09c873850acdf49ea9afbd11c1959afcb7d18beee5939e26568a83b",
+      "bytes": 428,
+      "sha256": "7cc1804407bc5d62e7ef7dec5fef9326990b016448e324aef4ca676dce5e0616",
       "endpoint": "POST /v1/generate-image-pixflux",
       "request": {
         "description": "a vertical pill-shaped metal pong paddle, light grey shaded body with shiny chrome end caps, 16-bit Super Nintendo sprite, pixel art",
@@ -561,7 +561,7 @@
       },
       "derivedFrom": "snes-paddle.png",
       "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
-      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not; 23 colours",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not, cropped to the pixels it draws; 23 colours",
       "card": "item 1180",
       "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
     },
