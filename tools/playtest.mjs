@@ -547,6 +547,10 @@ async function main() {
       await s.key('keyDown', 'Space', ' ', 32);
       await s.key('keyUp', 'Space', ' ', 32);
       await sleep(150);
+      // Past the cabinet's held first serve (item 1207), so its CREDIT 1 /
+      // PLAYER 1 READY card is not over the film.
+      await playUntil(s, geo, 8000, (g) => g.height / 2, (g) => g.serveDelay <= 0);
+      await sleep(400);
       await curveShot(s);
       return summarise([path.join(SHOTS, 'curve-strip.png')]);
     }
