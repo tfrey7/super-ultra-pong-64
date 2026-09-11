@@ -159,6 +159,12 @@ game you open off disk has no build output and no service to bounce, and since t
 screenshots became ignored output there is no path a merge has to tread carefully around. If
 you ever add one of those things, this is the file that has to say so.
 
+Its one non-null extra is **`"stamp"`** (item 1276): `node tools/stamp.mjs --item {item} --title
+{title} --sha {sha}`, the command a landing runs to rewrite `src/version.js`, the checked-in stamp
+the title screen's small `NOW WITH: <feature> · <sha>` line reads (the date is the script's own).
+The page never works a version out at play time and never fetches one; `--out <path>` writes
+elsewhere, which is how `test/version.test.js` runs it without touching the real stamp.
+
 ## 6. What never to commit
 
 - **`node_modules/`** — nothing should ever create one here, and its appearance means something
