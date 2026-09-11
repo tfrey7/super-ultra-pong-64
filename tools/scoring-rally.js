@@ -38,7 +38,8 @@ function snapshotOf(g) {
     width: g.width, height: g.height, rules: g.rules,
     serveDelay: g.serveDelay, rally: g.rally,
     score: { left: g.score.left, right: g.score.right },
-    ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy },
+    ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy,
+      spin: g.ball.spin || 0, burst: g.ball.burst || 0 },
     leftY: g.left.y, rightY: g.right.y
   };
 }
@@ -51,6 +52,7 @@ function copyOf(Pong, snap, u) {
   });
   g.ball.x = snap.ball.x; g.ball.y = snap.ball.y;
   g.ball.vx = snap.ball.vx; g.ball.vy = snap.ball.vy;
+  g.ball.spin = snap.ball.spin || 0; g.ball.burst = snap.ball.burst || 0;   // item 1208
   g.left.y = snap.leftY; g.right.y = snap.rightY;
   g.serveDelay = snap.serveDelay; g.rally = snap.rally;
   return g;

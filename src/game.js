@@ -71,7 +71,9 @@
     // Spin. A paddle moving at the moment of contact bends the ball's flight
     // the way the paddle was going: this many radians a second of turn per
     // field unit a second of paddle speed, capped, fading as it flies.
-    spinFromPaddle: 0.0042,
+    spinFromPaddle: 0.004,
+    spinDeadZone: 250,      // a paddle slower than this -- a hand just following
+                            // the ball -- puts no spin on; only a real swing does
     maxSpin: 1.7,           // radians a second of bend, at the most
     spinDecay: 0.35,        // the bend fades by e every 1/spinDecay seconds
     maxFlightAngle: 1.2,    // a bend never turns the ball steeper than ~69 degrees
@@ -79,11 +81,12 @@
     // second; the keyboard's full speed counts) leaves with a burst of speed
     // on top of the rally speed, gone again at the next hit.
     smashPaddleSpeed: 460,
+    paddleSpeedSmoothing: 0.06,   // seconds a paddle's speed is averaged over
     smashBoost: 0.38,       // fraction of the rally speed added
     smashMaxSpeed: 940,
     hitStop: 0.03,          // seconds of hit-stop a plain hit suggests to a feel layer
     smashHitStop: 0.11,     // ...and a smash
-    cpuSpinRead: 0.55,      // how much of the coming bend the computer allows for
+    cpuSpinRead: 0.8,       // how much of the coming bend the computer allows for
                             // (0 ignores spin, 1 reads it perfectly); see spinBend
     serveDelay: 0.9,        // seconds the ball waits at the centre
     eraChangePause: 1.8,    // ...stretched to this after a point that moved the
@@ -370,7 +373,8 @@
 
     b.vx = Math.cos(angle) * speed * dirX;
     b.vy = Math.sin(angle) * speed;
-    b.spin = clamp(pv * r.spinFromPaddle, -r.maxSpin, r.maxSpin);
+    var swing = Math.max(0, Math.abs(pv) - (r.spinDeadZone || 0)) * sign(pv);
+    b.spin = clamp(swing * r.spinFromPaddle, -r.maxSpin, r.maxSpin);
     b.burst = burst;
     // Nudge clear of the paddle so the next frame cannot re-collide.
     b.x = dirX > 0 ? paddle.x + paddle.w : paddle.x - b.size;
@@ -424,17 +428,23 @@
     var b = state.ball;
     var r = state.rules;
     if (!b.spin || !b.vx) return 0;
-    var cx = b.x + b.size / 2;
-    if ((x - cx) * b.vx <= 0) return 0;
-    var m = { vx: b.vx, vy: b.vy, spin: b.spin };
-    var y = 0, straight = 0, dt = 1 / 30;
-    for (var t = 0; t < 4 && (x - cx) * b.vx > 0; t += dt) {
-      straight += b.vy * dt;
-      bend(m, dt, r);
-      cx += m.vx * dt;
-      y += m.vy * dt;
-    }
-    return y - straight;
+    if ((x - (b.x + b.size / 2)) * b.vx <= 0) return 0;
+    // Two balls flown side by side to column x, off the walls: this one, and
+    // the same one with no spin. The bend is how far apart they arrive.
+    var floor = state.height - b.size;
+    var fly = function (spin) {
+      var m = { x: b.x + b.size / 2, y: b.y, vx: b.vx, vy: b.vy, spin: spin };
+      var dt = 1 / 30;
+      for (var t = 0; t < 4 && (x - m.x) * b.vx > 0; t += dt) {
+        bend(m, dt, r);
+        m.x += m.vx * dt;
+        m.y += m.vy * dt;
+        if (m.y < 0) { m.y = -m.y; m.vy = Math.abs(m.vy); m.spin = -m.spin; }
+        else if (m.y > floor) { m.y = 2 * floor - m.y; m.vy = -Math.abs(m.vy); m.spin = -m.spin; }
+      }
+      return m.y;
+    };
+    return fly(b.spin) - fly(0);
   }
 
   function bounceOffWalls(state) {
@@ -514,9 +524,12 @@
     var leftWas = state.left.y, rightWas = state.right.y;
     stepPlayer(state, dt, intent);
     stepCpu(state, dt);
-    // How fast each paddle is moving, for spin and the smash.
-    state.left.vy = (state.left.y - leftWas) / dt;
-    state.right.vy = (state.right.y - rightWas) / dt;
+    // How fast each paddle is moving, for spin and the smash -- smoothed over
+    // paddleSpeedSmoothing seconds, so a hand is judged by its swing and not by
+    // one jittery frame of a mouse that reports in bursts.
+    var k = Math.min(1, dt / (state.rules.paddleSpeedSmoothing || dt));
+    state.left.vy += ((state.left.y - leftWas) / dt - state.left.vy) * k;
+    state.right.vy += ((state.right.y - rightWas) / dt - state.right.vy) * k;
 
     if (state.serveDelay > 0) {
       state.serveDelay -= dt;

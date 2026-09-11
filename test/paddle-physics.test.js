@@ -29,6 +29,7 @@ function hit(opts) {
   const p = g.left;
   const dt = 1 / 60;
   p.y = o.at - o.paddleSpeed * dt - p.h / 2;
+  p.vy = o.paddleSpeed;   // already swinging at that speed, not starting from rest
   g.ball.x = p.x + p.w + 2;
   g.ball.y = o.at + o.offset - g.ball.size / 2;
   g.ball.vx = -o.ballSpeed;
@@ -77,6 +78,11 @@ test('within one segment the angle does not change: it is a step, not a slope', 
 });
 
 // ---------------------------------------------------------------------- spin
+test('a hand only following the ball puts no spin on; a real swing does', () => {
+  assert.strictEqual(hit({ paddleSpeed: Pong.RULES.spinDeadZone - 10 }).g.ball.spin, 0);
+  assert.ok(hit({ paddleSpeed: Pong.RULES.spinDeadZone + 100 }).g.ball.spin > 0.3);
+});
+
 test('a still paddle puts no spin on: the ball flies dead straight', () => {
   const { g } = hit({ offset: 20 });
   assert.strictEqual(g.ball.spin, 0);
@@ -87,8 +93,8 @@ test('a still paddle puts no spin on: the ball flies dead straight', () => {
 });
 
 test('a paddle moving down as it strikes bends the flight downward -- a real bend, not a nudge', () => {
-  const { g } = hit({ paddleSpeed: 300 });
-  assert.ok(g.ball.spin > 0.8, `spin ${g.ball.spin}`);
+  const { g } = hit({ paddleSpeed: 450 });
+  assert.ok(g.ball.spin > 0.6, `spin ${g.ball.spin}`);
   // Flat off the middle segment, bent only by the rest of the frame it was hit in.
   assert.ok(Math.abs(g.ball.vy) < 12, `it left the flat middle segment flat (vy ${g.ball.vy})`);
   const { path, walls } = fly(g, 0.7);
@@ -100,8 +106,8 @@ test('a paddle moving down as it strikes bends the flight downward -- a real ben
 });
 
 test('a paddle moving up bends it upward, the mirror image', () => {
-  const down = hit({ paddleSpeed: 300 }).g;
-  const up = hit({ paddleSpeed: -300 }).g;
+  const down = hit({ paddleSpeed: 450 }).g;
+  const up = hit({ paddleSpeed: -450 }).g;
   assert.ok(Math.abs(up.ball.spin + down.ball.spin) < 1e-9);
   fly(down, 0.5);
   fly(up, 0.5);
@@ -139,7 +145,7 @@ test('the serve takes the spin and the burst away', () => {
 
 test('spin runs the same at any frame rate', () => {
   function run(fps) {
-    const { g } = hit({ paddleSpeed: 300 });
+    const { g } = hit({ paddleSpeed: 450 });
     const hand = g.left.y + g.left.h / 2;
     for (let i = 0; i < fps * 0.8; i++) Pong.step(g, 1 / fps, { pointerY: hand });
     return g.ball;
@@ -190,9 +196,12 @@ test('the ball speeds up through a rally and never past the smash cap', () => {
 
 // ------------------------------------------------------------- the spin read
 test('spinBend tells the computer where the spin will carry the ball', () => {
-  const { g } = hit({ paddleSpeed: 300 });
-  const bend = Pong.spinBend(g, g.right.x);
-  assert.ok(bend > 80, `bends ${bend.toFixed(1)} units down by the computer's paddle`);
+  const { g } = hit({ paddleSpeed: 450 });
+  // Mid-field, before any wall: the bend is downward, the way the paddle swung.
+  const bend = Pong.spinBend(g, 420);
+  assert.ok(bend > 40, `bends ${bend.toFixed(1)} units down by mid-field`);
+  // All the way over it meets the floor on the way, and the hook flies that too.
+  assert.ok(Math.abs(Pong.spinBend(g, g.right.x)) > 40);
   assert.strictEqual(Pong.spinBend(g, g.left.x - 100), 0, 'nothing for a column behind it');
   g.ball.spin = 0;
   assert.strictEqual(Pong.spinBend(g, g.right.x), 0);
@@ -200,11 +209,14 @@ test('spinBend tells the computer where the spin will carry the ball', () => {
 
 test('the computer reads the spin as much as cpuSpinRead says', () => {
   function cpuMove(read) {
-    const { g } = hit({ paddleSpeed: 300, rules: { cpuSpinRead: read } });
+    const { g } = hit({ paddleSpeed: 450, rules: { cpuSpinRead: read } });
     g.right.aimError = 0;
+    const bend = Pong.spinBend(g, g.right.x);
     const before = g.right.y;
     Pong.step(g, 1 / 60, { pointerY: g.left.y + g.left.h / 2 });
-    return g.right.y - before;
+    return { move: g.right.y - before, bend };
   }
-  assert.ok(cpuMove(1) > cpuMove(0), 'reading the spin moves it toward where the ball will bend');
+  const blind = cpuMove(0), reading = cpuMove(1);
+  assert.ok(Math.sign(reading.move - blind.move) === Math.sign(reading.bend) && reading.move !== blind.move,
+    'reading the spin moves it toward where the ball will bend');
 });

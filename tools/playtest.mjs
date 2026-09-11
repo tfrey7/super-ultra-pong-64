@@ -132,7 +132,7 @@ function check(name, ok, detail) {
 const state = (s) => s.eval(`(() => { const g = window.__pong; return {
   phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally, era: g.era, rules: g.rules,
   score: { left: g.score.left, right: g.score.right },
-  ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy },
+  ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy, spin: g.ball.spin, burst: g.ball.burst },
   leftY: g.left.y, rightY: g.right.y, h: g.left.h, height: g.height, width: g.width
 }; })()`);
 
