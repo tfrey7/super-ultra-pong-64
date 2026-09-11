@@ -1,0 +1,18 @@
+{
+  "label": "branch",
+  "playtest": "G:\\Claude Stuff\\super-ultra-pong-64-item-1182\\tools\\playtest.mjs",
+  "port": 9411,
+  "chromePid": 35732,
+  "pidFrom": "printed by the playtest",
+  "killNote": "killed pid 35732",
+  "secondsFromStartToKill": 4.6,
+  "secondsFromKillToExit": 0.3,
+  "exitCode": 1,
+  "signal": null,
+  "printedSummary": true,
+  "failLines": [
+    "FAIL  Chrome's DevTools connection stays open until the run ends  -- Chrome's DevTools connection dropped (closed with code 1006, socket error); request 62 (Runtime.evaluate) never got a reply"
+  ],
+  "lastLine": "1/2 checks passed",
+  "lineCount": 6
+}

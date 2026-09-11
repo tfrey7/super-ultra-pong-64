@@ -35,13 +35,17 @@ export class CdpConnection {
       this.pending.delete(msg.id);
       msg.error ? p.reject(new Error(JSON.stringify(msg.error))) : p.resolve(msg.result);
     });
+    // Node's socket fires 'error' and then 'close' (code 1006) when Chrome dies,
+    // so an error waits a moment for the close, whose code says more.
+    this.errorWhy = '';
     ws.addEventListener('close', (ev) => {
-      this.drop(`Chrome's DevTools connection closed (code ${ev && ev.code !== undefined ? ev.code : '?'}` +
-        `${ev && ev.reason ? ', ' + ev.reason : ''})`);
+      const code = ev && ev.code !== undefined ? ev.code : '?';
+      const why = [ev && ev.reason, this.errorWhy].filter(Boolean).join('; ');
+      this.drop(`Chrome's DevTools connection dropped (closed with code ${code}${why ? ', ' + why : ''})`);
     });
     ws.addEventListener('error', (ev) => {
-      const why = ev && (ev.message || (ev.error && ev.error.message));
-      this.drop(`Chrome's DevTools connection failed${why ? ': ' + why : ''}`);
+      this.errorWhy = (ev && (ev.message || (ev.error && ev.error.message))) || 'socket error';
+      setTimeout(() => this.drop(`Chrome's DevTools connection dropped (${this.errorWhy}, and no close followed)`), 250);
     });
   }
 

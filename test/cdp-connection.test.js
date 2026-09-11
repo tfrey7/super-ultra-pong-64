@@ -40,7 +40,7 @@ test('a close rejects every waiting request, naming the dropped connection', asy
   ws.closeWith(1006);
   for (const p of waiting) {
     await assert.rejects(p, (e) => e instanceof DroppedConnection &&
-      /DevTools connection closed \(code 1006\)/.test(e.message));
+      /DevTools connection dropped \(closed with code 1006\)/.test(e.message));
   }
   assert.strictEqual(c.pending.size, 0);
 });
@@ -55,11 +55,23 @@ test('after a close, a new send is refused rather than left hanging', async () =
   assert.strictEqual(ws.sent.length, 0, 'nothing is written to a closed socket');
 });
 
-test('a socket error drops the connection the same way', async () => {
+test('an error then a close, as Node\'s socket does when Chrome dies, names both', async () => {
   const { CdpConnection, DroppedConnection } = await load();
   const ws = fakeSocket();
   const c = new CdpConnection(ws);
   const p = c.send('Page.captureScreenshot');
   ws.dispatchEvent(Object.assign(new Event('error'), { message: 'socket hang up' }));
-  await assert.rejects(p, (e) => e instanceof DroppedConnection && /failed: socket hang up/.test(e.message));
+  ws.closeWith(1006);
+  await assert.rejects(p, (e) => e instanceof DroppedConnection &&
+    /dropped \(closed with code 1006, socket hang up\)/.test(e.message));
+});
+
+test('an error with no close after it still drops the connection', async () => {
+  const { CdpConnection, DroppedConnection } = await load();
+  const ws = fakeSocket();
+  const c = new CdpConnection(ws);
+  const p = c.send('Page.captureScreenshot');
+  ws.dispatchEvent(Object.assign(new Event('error'), { message: 'socket hang up' }));
+  await assert.rejects(p, (e) => e instanceof DroppedConnection &&
+    /dropped \(socket hang up, and no close followed\)/.test(e.message));
 });
