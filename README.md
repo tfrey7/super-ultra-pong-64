@@ -299,6 +299,18 @@ straight onto the page as before. All eleven side by side:
 `docs/shots/eras/contact-sheet-native.png` (from
 `docs/measure/item1198/contact-sheet.html`).
 
+**The 3D machines' screens** (`src/display-tv.js`, item 1200). The PlayStation and
+the N64 play on a 1990s TV over composite -- soft scanlines, colour bleeding
+sideways, a touch of blur, and on the PlayStation its 4 x 4 dither in the flat
+shading; the PS2 on a late TV over component, cleaner lines and a faint bloom; the
+Dreamcast and the Xbox sharp, only a faint line structure and a little edge glow;
+the Xbox 360 on a 720p flat panel, no lines, a hint of LCD softness and a slight
+smear behind fast movement. Every layer is a pre-drawn canvas or the frame drawn
+again at low alpha in a mode that only brightens, so the ball stays the brightest,
+sharpest thing on screen. Before and after, each era:
+`docs/shots/item1200/before-after-5-7.png` and `before-after-8-10.png` (from
+`docs/measure/item1200/before-after.html`).
+
 ### Each era change, step by step
 
 Every rung arrives with its own flourish riding the ring. The playtest's ladder

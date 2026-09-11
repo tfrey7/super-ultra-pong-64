@@ -344,6 +344,12 @@ his emulator — never touch either.**
   worked example). `index.html?display=off` draws straight onto the page as before, and the
   playtest's pixel check reads the native frame through `PongDisplay.canvas()` and draws its
   comparisons through `PongDisplay.render()`.
+- **A screen overlay blends on the native picture, never on the page** (item 1200). The playtest's
+  Chrome draws without a GPU, and `'lighten'`, `'color'` or `'soft-light'` over the page's million
+  pixels, seven times a frame, held eras 5-10 to 10-20 frames a second. `src/display-tv.js` does
+  every blend on a copy of the native picture and gives the page two plain draws, scaled with
+  `imageSmoothingQuality = 'low'` (`'high'` alone cost about 20 ms a frame there). Measure a new
+  overlay with the ladder's "holds full frame rate" lines, screens on against `overlay: 'none'`.
 
 - **Six "holds full frame rate in ordinary play" FAILs, eras 5 to 10, are card 1216's, not yours**
   (until 1216 lands). The playtest's Chrome runs `--disable-gpu`, so every canvas is drawn on the
