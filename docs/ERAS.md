@@ -1042,8 +1042,8 @@ voice: {
             { wave: 'sine', freq: 55, at: 1.15, dur: 0.8, gain: 0.35 },
             { wave: 'sine', freq: 1760, at: 1.2, dur: 0.9, gain: 0.10 },
             { wave: 'sine', freq: 2637, at: 1.25, dur: 0.7, gain: 0.05 },
-            { wave: 'sine', freq: 1175, at: 2.0, attack: 0.003, dur: 0.07, gain: 0.18 },
-            { wave: 'sine', freq: 1568, at: 2.07, dur: 0.18, gain: 0.16 } ],
+            { wave: 'sine', freq: 1175, at: 0.95, attack: 0.003, dur: 0.07, gain: 0.18 },
+            { wave: 'sine', freq: 1568, at: 1.02, dur: 0.18, gain: 0.16 } ],
   effects: { reverb: { seconds: 2.5, decay: 2.5, mix: 0.4 } }
 }
 ```
@@ -1064,6 +1064,16 @@ chime), from memory. They are not transcriptions.
 3. *Arrival (p 0.8 to 1).* **The blades slide in and the toast pops.** The 4 blade tabs sweep in
    from `x` 800 to their places, 0.06 of `p` apart, and the `50G - WELCOME TO HD` toast drops in.
    The boot sting's blip lands with it.
+
+*As built (item 1156), the finale of the ladder:* beat 1 is the white-out above. Beat 2 carries
+the Blades dashboard instead of the ribbons: five tall slanted panels (blade green, silver, blade
+green dark, green, silver, at 0.55 fading back) ride just inside the ring's edge across the field,
+each with a silver hairline on its leading edge, and behind them bloom pours in (a `'lighter'`
+annulus 200 units deep) with the grain at 0.3 over the look's own grade. Beat 3 fades the panels,
+slides the HUD blades home, and pops the toast at 0.95 s after the point, reading
+`100G · Top of the Ladder` (a page opened at era 10 still says `50G - WELCOME TO HD`). The ring has
+passed the centre by 0.74 s from any origin, so the toast always follows the name card. The boot
+list's closing blip moved from 2.0 s to 0.95 s so it sounds with the pop, inside the serve pause.
 
 ---
 

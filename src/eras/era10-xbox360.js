@@ -51,7 +51,15 @@
   var FONT_FAMILY = '"Segoe UI", "Helvetica Neue", Arial, sans-serif';
   var HUD_PX = 20;                     // '600 20px "Segoe UI", ...': the one system font on the ladder
   var TOAST = { x: 230, y: 8, w: 340, h: 52, rise: 0.25, hold: 2.0, fall: 0.25, alpha: 0.92 };
-  var TOAST_TEXT = { welcome: '50G - WELCOME TO HD', point: '10G - POINT SCORED' };
+  var TOAST_TEXT = { welcome: '50G - WELCOME TO HD', point: '10G - POINT SCORED',
+                     ladder: '100G · Top of the Ladder' };
+  // The arrival (item 1156), on the ring's clock: seconds after the point.
+  // The toast pops at 0.95 s, beat 3 (p 0.8): the ring has passed the centre
+  // by 0.74 s from any origin on the field, so it always comes after the card.
+  // The HUD blades slide in from x 800 one after another from the same beat.
+  var ARRIVAL = { toastAt: 0.95, bladesAt: 0.95, bladeStagger: 0.09, bladeSlide: 0.25,
+                  burst: 260, sweep: 5, sweepW: 46, sweepGap: 16, sweepLean: 110, sweepAlpha: 0.55,
+                  pour: 200, pourAlpha: 0.3, grainAlpha: 0.3 };
   var BLADES = { x: 600, step: 44, w: 36, top: 14, bottom: 90, slant: 10 };
   var BLADE_FILLS = [C.green, C.silver, '#262626', '#1f1f1f'];
   var GRADE = { drain: '#6e6a60', drainAlpha: 0.55, tintAlpha: 0.35,
@@ -144,8 +152,10 @@
   var memo = { lastTime: null, total: 0, at: 0, kind: null, changedAt: null };
 
   /**
-   * Which achievement is showing, and how far through its 2.5 s. An arrival
-   * is WELCOME TO HD, timed from the era change when there was one: a new
+   * Which achievement is showing, and how far through its 2.5 s. Climbing
+   * here by a point is 100G · Top of the Ladder, popping 0.95 s after the
+   * change (item 1156); opening the page at era 10 is WELCOME TO HD. Either
+   * arrival is recognised by a new
    * era change stamped by the rules, or a frame that is not the next one
    * after the last this file drew (the first frame of the era, a new game, a
    * jump in time). Keying the arrival off the stamp matters: a page that drew
@@ -162,8 +172,11 @@
     memo.changedAt = changed;
     if (fresh) {
       var since = state.time - (state.eraChangedAt || 0);
-      memo.kind = 'welcome';
-      memo.at = state.eraChangedAt > 0 && since >= 0 && since < TOAST.rise + TOAST.hold ? state.eraChangedAt : state.time;
+      var arriving = state.eraChangedAt > 0 && since >= 0 && since < ARRIVAL.toastAt + TOAST.rise + TOAST.hold;
+      // Climbed here by a point: the top of the ladder, popping at beat 3.
+      // Opened here (?era=10, a new game at the top): welcome to HD, now.
+      memo.kind = arriving ? 'ladder' : 'welcome';
+      memo.at = arriving ? state.eraChangedAt + ARRIVAL.toastAt : state.time;
       memo.total = total;
     } else if (total > memo.total) {
       memo.kind = 'point';
@@ -176,6 +189,18 @@
     var t = state.time - memo.at;
     if (t < 0 || t >= TOAST.rise + TOAST.hold + TOAST.fall) return null;
     return { kind: memo.kind, text: TOAST_TEXT[memo.kind], t: t, y: toastY(t) };
+  }
+
+  /**
+   * The arrival's toast, from the state alone (the flourish draws it over the
+   * ring's edge and must not disturb the memo above): the same text and the
+   * same y the look draws, or null before it pops and after it has gone.
+   */
+  function ladderToast(state) {
+    if (!(state.eraChangedAt > 0)) return null;
+    var t = state.time - state.eraChangedAt - ARRIVAL.toastAt;
+    if (t < 0 || t >= TOAST.rise + TOAST.hold + TOAST.fall) return null;
+    return { kind: 'ladder', text: TOAST_TEXT.ladder, t: t, y: toastY(t) };
   }
 
   /** Slides down from above the frame into the band, holds, slides back up. */
@@ -496,8 +521,22 @@
   }
 
   // ---------------------------------------------------------------- HUD
-  function bladePath(c, i) {
-    var x = BLADES.x + i * BLADES.step;
+  /**
+   * How far right of its place blade i sits this frame: on an arrival by a
+   * point each one waits off the right edge, then slides home from x 800,
+   * one after another from beat 3. Zero at rest.
+   */
+  function bladeSlide(state, i) {
+    if (!(state.eraChangedAt > 0)) return 0;
+    var s = state.time - state.eraChangedAt - ARRIVAL.bladesAt - i * ARRIVAL.bladeStagger;
+    if (s >= ARRIVAL.bladeSlide || state.time < state.eraChangedAt) return 0;
+    var away = 810 - (BLADES.x + i * BLADES.step);
+    if (s <= 0) return away;
+    return away * Math.pow(1 - s / ARRIVAL.bladeSlide, 3);
+  }
+
+  function bladePath(c, i, dx) {
+    var x = BLADES.x + i * BLADES.step + (dx || 0);
     var lean = (BLADES.bottom - BLADES.top) * Math.tan(BLADES.slant * Math.PI / 180);
     c.beginPath();
     c.moveTo(x + lean, BLADES.top);
@@ -512,7 +551,9 @@
   function blades(c, state, P, glowOnly) {
     for (var i = 0; i < 4; i++) {
       if (glowOnly && i > 1) break;
-      var cx = bladePath(c, i);
+      var dx = bladeSlide(state, i);
+      if (dx >= 810 - (BLADES.x + i * BLADES.step)) continue;   // still waiting off the edge
+      var cx = bladePath(c, i, dx);
       c.fillStyle = BLADE_FILLS[i];
       c.fill();
       if (glowOnly) continue;
@@ -636,6 +677,134 @@
     ctx.restore();
   }
 
+  // ------------------------------------------------------ the arrival
+  /**
+   * The ring that brings the Xbox 360 in (docs/ERAS.md chapter 11, item 1156),
+   * the finale of the ladder, drawn over the ring's edge in three beats:
+   *
+   *   1 ignition  p 0 to 0.25   HDR white-out: a bloom-white burst at the
+   *                             origin and a full-frame 'screen' wash, both
+   *                             at 0.35 or less, fading as the eye adapts
+   *   2 the edge  p 0.1 to 1    dashboard blades: five tall slanted panels in
+   *                             blade green, silver and dark green ride just
+   *                             inside the ring's edge across the field, and
+   *                             behind them bloom pours in and the grain
+   *                             comes up, where the new era's grade has
+   *                             already taken the picture
+   *   3 arrival   p 0.8 to 1    the panels fade, the HUD blades slide in
+   *                             (the look does that), and the Achievement
+   *                             Unlocked toast pops: 100G · Top of the Ladder
+   *
+   * Everything but the washes is clipped to 40 units past the ring. The toast
+   * is drawn here only OUTSIDE the ring -- inside it the look draws the very
+   * same toast -- so it slides in whole while the ring is still crossing the
+   * band. The boot sting's blip is timed to that pop; the flourish plays no
+   * sound. Behind the title (info.dim) the plain ring plays.
+   */
+  function flourish(ctx, p, origin, fromEra, toEra, info) {
+    if (toEra !== 10 || !info || info.dim) return;
+    var r = Math.max(0, info.radius || 0);
+    var w = info.width || 800, h = info.height || 600;
+    var state = info.state;
+    var ox = origin.x, oy = origin.y;
+    var dir = ox <= w / 2 ? 1 : -1;
+    ctx.globalAlpha = 1;
+
+    // 1 -- the white-out.
+    if (p < 0.25) {
+      var fade = 1 - p / 0.25;
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = rgba(C.bloom, 0.35 * fade);
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalCompositeOperation = 'lighter';
+      var burst = ctx.createRadialGradient(ox, oy, 0, ox, oy, ARRIVAL.burst);
+      burst.addColorStop(0, rgba(C.bloom, 0.35 * fade));
+      burst.addColorStop(0.4, rgba(C.sun, 0.2 * fade));
+      burst.addColorStop(1, rgba(C.sun, 0));
+      ctx.fillStyle = burst;
+      ctx.beginPath();
+      ctx.arc(ox, oy, ARRIVAL.burst, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // 2 -- bloom and grain pouring in behind the blades, then the blades.
+    var fadeIn = Math.min(1, Math.max(0, (p - 0.05) / 0.1));
+    var fadeOut = p > 0.8 ? Math.max(0, (1 - p) / 0.2) : 1;
+    var k = fadeIn * fadeOut;
+    if (k > 0 && r > 1) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(ox, oy, r + 40, 0, Math.PI * 2);
+      ctx.clip();
+
+      var inner = Math.max(0, r - ARRIVAL.pour);
+      var pour = ctx.createRadialGradient(ox, oy, inner, ox, oy, r);
+      pour.addColorStop(0, rgba(C.bloom, 0));
+      pour.addColorStop(0.75, rgba(C.bloom, ARRIVAL.pourAlpha * k));
+      pour.addColorStop(1, rgba(C.sun, 0.15 * k));
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = pour;
+      ctx.beginPath();
+      ctx.arc(ox, oy, r, 0, Math.PI * 2);
+      ctx.arc(ox, oy, inner, 0, Math.PI * 2, true);
+      ctx.fill();
+
+      var list = R.table3d && grainTiles(R.table3d, ctx);
+      if (list) {
+        ctx.globalCompositeOperation = 'overlay';
+        ctx.globalAlpha = ARRIVAL.grainAlpha * k;
+        ctx.fillStyle = list[Math.floor((state ? state.time : 0) * GRAIN.fps) % GRAIN.tiles];
+        ctx.beginPath();
+        ctx.arc(ox, oy, r, 0, Math.PI * 2);
+        ctx.arc(ox, oy, inner, 0, Math.PI * 2, true);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.globalCompositeOperation = 'source-over';
+      var fills = [C.green, C.silver, C.greenDark, C.green, C.silver];
+      for (var i = 0; i < ARRIVAL.sweep; i++) {
+        // The leading panel sits at the edge; the rest trail back toward the origin.
+        var reach = r - 6 - i * (ARRIVAL.sweepW + ARRIVAL.sweepGap);
+        if (reach < ARRIVAL.sweepW) continue;   // not out of the origin yet
+        var lead = ox + dir * reach;
+        var tail = lead - dir * ARRIVAL.sweepW;
+        var lean = dir * ARRIVAL.sweepLean;
+        ctx.globalAlpha = ARRIVAL.sweepAlpha * k * (1 - i * 0.12);
+        ctx.fillStyle = fills[i];
+        ctx.beginPath();
+        ctx.moveTo(tail + lean, 0);
+        ctx.lineTo(lead + lean, 0);
+        ctx.lineTo(lead, h);
+        ctx.lineTo(tail, h);
+        ctx.closePath();
+        ctx.fill();
+        // A crisp hairline on each panel's leading edge: HD, not a smear.
+        ctx.globalAlpha = 0.8 * k;
+        ctx.strokeStyle = C.silver;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(lead + lean, 0);
+        ctx.lineTo(lead, h);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // 3 -- the toast, wherever the ring has not reached yet.
+    var toast = state ? ladderToast(state) : null;
+    if (toast) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, w, h);
+      ctx.arc(ox, oy, r, 0, Math.PI * 2, true);
+      ctx.clip('evenodd');
+      drawToast(ctx, R, toast);
+      ctx.restore();
+    }
+  }
+
   // The bible's Xbox 360 voice: big clean hits, and the achievement blip on every point.
   var VOICE = {
     paddle: [ { wave: 'sine', freq: 120, slideTo: 60, dur: 0.18, gain: 0.45 },
@@ -655,8 +824,8 @@
               { wave: 'sine', freq: 55, at: 1.15, dur: 0.8, gain: 0.35 },
               { wave: 'sine', freq: 1760, at: 1.2, dur: 0.9, gain: 0.10 },
               { wave: 'sine', freq: 2637, at: 1.25, dur: 0.7, gain: 0.05 },
-              { wave: 'sine', freq: 1175, at: 2.0, attack: 0.003, dur: 0.07, gain: 0.18 },
-              { wave: 'sine', freq: 1568, at: 2.07, dur: 0.18, gain: 0.16 } ],
+              { wave: 'sine', freq: 1175, at: 0.95, attack: 0.003, dur: 0.07, gain: 0.18 },
+              { wave: 'sine', freq: 1568, at: 1.02, dur: 0.18, gain: 0.16 } ],
     effects: { reverb: { seconds: 2.5, decay: 2.5, mix: 0.4 } }
   };
 
@@ -671,6 +840,10 @@
     card: { flash: '#fff8e7', wipe: ['#5dc21e', '#d9dcd6', '#3b342b'], box: '#1b1b1b', border: '#5dc21e',
             inner: null, year: '#5dc21e', name: '#ffffff', label: '#a8a296', dots: null },
     voice: VOICE,
-    draw: draw
+    arrival: ARRIVAL,
+    ladderToast: ladderToast,
+    bladeSlide: bladeSlide,
+    draw: draw,
+    flourish: flourish
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
