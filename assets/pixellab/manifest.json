@@ -931,6 +931,94 @@
         "shading": "medium shading",
         "detail": "low detail"
       }
+    },
+    {
+      "name": "era7-skater-right",
+      "file": "era7-skater-right.png",
+      "prompt": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1960749465,
+      "date": "2026-09-11T03:34:25.613Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 20.4,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 17458,
+      "sha256": "1ab8b9a7070d92c13a945dd73154b2b51d2246d784d62d76972d786777f25afe",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 1960749465,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era7-skater-left-action",
+      "file": "era7-skater-left-action.png",
+      "prompt": "three frames in one row of the same character side view facing right, a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates: frame 1 spinning swing with one arm flung out to the right, frame 2 stumbling with torso bent forward, frame 3 trick jump mid-air with both arms raised in celebration. cel-shaded Jet Set Radio style",
+      "size": {
+        "width": 108,
+        "height": 80
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 462531854,
+      "date": "2026-09-11T03:35:47.938Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 29.7,
+      "pixels": {
+        "width": 108,
+        "height": 80
+      },
+      "bytes": 4663,
+      "sha256": "c2637b48a75a9209cc7ecca58679ac1c7fbdae512fe136c053bd6d87e2368692",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "three frames in one row of the same character side view facing right, a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates: frame 1 spinning swing with one arm flung out to the right, frame 2 stumbling with torso bent forward, frame 3 trick jump mid-air with both arms raised in celebration. cel-shaded Jet Set Radio style",
+        "image_size": {
+          "width": 108,
+          "height": 80
+        },
+        "seed": 462531854,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
     }
   ]
 }

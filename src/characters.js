@@ -99,7 +99,12 @@
     4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
-    7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
+    // Dreamcast (item 1231): two Jet Set Radio-manner skaters, cut from pixflux by
+    // assets/pixellab/era7-skater-cut.py; each figure about 68 px tall, so 1.3 table
+    // units a pixel stands it about 90 tall, the hand on the paddle box's top (dz 24).
+    7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 1.3, res: 3, round: true,
+          sheets: { left: 'era7-skater-left-sheet', right: 'era7-skater-right-sheet' },
+          frame: { w: 44, h: 84 }, hand: { x: 44, y: 66 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 10 },
     8:  { skin: '#dcae8c', body: '#20242c', scale: 3.2, res: 4, round: true }, // PlayStation 2
     9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
     10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
@@ -360,7 +365,9 @@
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
-    var image = S.load(cfg.sheet);
+    // No Image to load with (node --test): the placeholder draws, as the bible says.
+    var image;
+    try { image = S.load(cfg.sheet); } catch (e) { return null; }
     if (!S.ready(cfg.sheet)) return null;
     var rects = {};
     for (var row = 0; row < BEATS.length; row++) {
