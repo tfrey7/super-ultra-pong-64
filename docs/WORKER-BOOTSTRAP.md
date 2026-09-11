@@ -204,7 +204,11 @@ his emulator — never touch either.**
   which is why the era-look loader and scenes live in `tools/eralooks.js`.
 - **The computer paddle is deliberately beatable** — it only chases once the ball heads its way,
   aims slightly off centre, and cannot match a really steep shot. If a change makes it perfect,
-  that is a regression in the game even when every test passes.
+  that is a regression in the game even when every test passes. Since item 1209 each era has its
+  own opponent in `src/opponents.js` (a row per rung: reaction, speed, aim, name, stepping,
+  reading ahead), and `test/opponents.test.js` holds every era between 30 and 65 percent of
+  tracking sessions scoring -- `node tools/beatability-sample.mjs --eras` prints the table. A test
+  that wants two eras to play identically (a look-only check) passes `cpuProfiles: false`.
 - **Fleet CI cannot run this repo yet** (item 1130). Every flourish card ran `node --test` by hand
   and said so in its note; do the same rather than waiting on a CI run that never starts.
 - **A flourish draws, and nothing else.** The hook is called from the renderer every frame of the
