@@ -135,9 +135,20 @@ match back on era 0. All five rungs are built:
 | 2 | 1985 NES | 8-bit sprites, the NES palette and a pixel score | square and triangle chiptune | [`era2-nes.png`](docs/shots/eras/era2-nes.png) |
 | 3 | 1989 Sega Genesis | 16-bit shading, parallax and a trail behind the ball | a bright FM bell | [`era3-genesis.png`](docs/shots/eras/era3-genesis.png) |
 | 4 | 1991 Super Nintendo | a Mode 7 floor and rich sprites | layered chords with a short echo | [`era4-snes.png`](docs/shots/eras/era4-snes.png) |
+| 5 | 1994 Sony PlayStation | planned: wobbling snapped polygons, swimming affine textures, dithered 320x240 | plucky CD notes in a room reverb | not built yet |
+| 6 | 1996 Nintendo 64 | planned: blurred textures, heavy fog, round toybox shapes, rumble shake | muffled, springy samples | not built yet |
+| 7 | 1999 Sega Dreamcast | planned: crisp cel shading, thick ink outlines, graffiti score, speed lines | punchy synth-funk, the modem | not built yet |
+| 8 | 2000 PlayStation 2 | planned: letterbox, sparks, glow trail, lens flare, slow camera drift | taiko, orchestral pads, a big hit | not built yet |
+| 9 | 2001 Xbox | planned: bump-mapped metal, hard moving shadows, gamertags, shield-bar score | sub-heavy metallic clangs | not built yet |
+| 10 | 2005 Xbox 360 | planned: bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked | big clean hits, the achievement blip | not built yet |
 
 The reference frames in `docs/shots/eras/` are each era in play, taken by the
 playtest as it walks one match up the ladder (see *Run the tests*).
+
+Eras 5 to 10 are specified in **`docs/ERAS.md`**, the era bible: every rung's name
+card, palette, camera on the shared 3D table, the look to exaggerate, its sounds
+and its arrival flourish, plus the readability rules that keep it playable. They
+join the ladder when their cards land; until then it stops on the Super Nintendo.
 
 The rules (`Pong.ERAS` in `src/game.js`) carry only the number: `state.era`,
 and `state.eraChangedAt`, the game time it last moved, for a transition to read.

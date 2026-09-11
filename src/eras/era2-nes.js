@@ -21,10 +21,19 @@
  * Like every renderer here it only sets fillStyle and calls fillRect, so the
  * headless suite can record a frame without a browser.
  *
- * Arrival flourish: none yet, so the plain ring brings this era in. An era
- * brings its own by adding `flourish: function (ctx, p, origin, fromEra, toEra,
- * info)` to its look -- called every frame of the ring that brings THIS era in,
- * drawn over the ring's edge; the header of src/erachange.js is the contract.
+ * Arrival flourish: the CONSOLE SWAP (consoleSwap below). The ring that brings
+ * this era in is a cartridge reset: on its first frame the picture blinks black
+ * for one frame, as a power switch does; then just ahead of the ring the old
+ * picture breaks into the court's own 40-unit tiles, which turn over one by one
+ * from the miss outward -- the old era on their front, the NES on their back --
+ * so the mosaic IS the wipe's leading edge; and in a band just inside the edge
+ * the new picture rolls, vertical hold slipping, and settles as the ring
+ * covers the field. A short NES power-on chime plays in this era's voice (the
+ * square and triangle channels of item 1125) once the point's arpeggio is done.
+ * Drawn only, inside the pause: the engine's ring still decides which era
+ * draws where, and a turning tile is a sub-rectangle copy of a whole frame
+ * scaled horizontally -- no per-pixel work. The dimmed rally behind the title
+ * keeps the plain ring and makes no sound. src/erachange.js is the contract.
  */
 (function (root) {
   'use strict';
@@ -249,6 +258,180 @@
     drawBall(ctx, state);
   }
 
+  // ------------------------------------------------------------ the arrival
+  var FLIP_TILE = TILE;         // the tiles that turn are the court's own grid
+  var FLIP_LEAD = 120;          // how far ahead of the ring a tile starts to turn
+  var FLIP_JITTER = 26;         // per-tile scatter, so they go one by one, not in circles
+  var ROLL_W = 64;              // the rolling band just inside the ring's edge
+  var ROLL_TURNS = 2;           // whole rolls of the picture over the wipe; it settles square
+  var SYNC_BAR = 14;            // the black blanking bar that rolls with it
+  var CHIME_TYPE = 'powerOn';
+  // B5 then E6 on the pulse channel over an E on the triangle: a bright little
+  // NES "on". It starts at 0.45 s, after the point's own arpeggio (0.40 s), and
+  // is over by 0.85 s, well inside the 1.8 s pause.
+  var CHIME = [
+    { wave: 'square', freq: 988, at: 0.45, dur: 0.07, gain: 0.12 },
+    { wave: 'square', freq: 1319, at: 0.52, dur: 0.30, gain: 0.12 },
+    { wave: 'triangle', freq: 330, at: 0.45, dur: 0.40, gain: 0.3 }
+  ];
+
+  /** A fixed scatter in -1..1 for a tile: no Math.random, the same every frame. */
+  function tileJitter(col, row) {
+    var n = Math.sin(col * 12.9898 + row * 78.233) * 43758.5453;
+    return (n - Math.floor(n)) * 2 - 1;
+  }
+
+  /**
+   * How far a tile has turned for a ring of `radius` from `origin`: 0 still
+   * showing the old era, 1 flat on the new one. A tile starts FLIP_LEAD ahead of
+   * the ring and lands as the ring reaches its (scattered) centre.
+   */
+  function flipPhase(col, row, origin, radius) {
+    var dx = (col + 0.5) * FLIP_TILE - origin.x;
+    var dy = (row + 0.5) * FLIP_TILE - origin.y;
+    var d = Math.sqrt(dx * dx + dy * dy) + tileJitter(col, row) * FLIP_JITTER;
+    var f = (radius + FLIP_LEAD - d) / FLIP_LEAD;
+    return f <= 0 ? 0 : (f >= 1 ? 1 : f);
+  }
+
+  /** Where the picture has rolled to, 0..h, settling back to 0 as the wipe ends. */
+  function rollOffset(raw, h) {
+    var r = raw > 0 ? (raw < 1 ? raw : 1) : 0;
+    var turns = ROLL_TURNS * (1 - (1 - r) * (1 - r));
+    return (turns - Math.floor(turns)) * h;
+  }
+
+  // Two offscreen copies of the whole frame, made once, on the page only.
+  var swapLayers = [];
+  function swapLayer(i, w, h) {
+    if (typeof document === 'undefined' || !document.createElement) return null;
+    var c = swapLayers[i] || (swapLayers[i] = document.createElement('canvas'));
+    if (c.width !== w) c.width = w;
+    if (c.height !== h) c.height = h;
+    var x = c.getContext('2d');
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.clearRect(0, 0, w, h);
+    return x;
+  }
+
+  function frameOf(layerCtx, state, era) {
+    layerCtx.save();
+    R.draw(layerCtx, era === state.era ? state : Object.assign({}, state, { era: era }), null);
+    layerCtx.restore();
+    return layerCtx.canvas;
+  }
+
+  // Which change each game has already blinked and chimed for.
+  var announced = typeof WeakMap === 'function' ? new WeakMap() : null;
+
+  /** The power-on chime, in this era's voice, through the page's player. */
+  function chime() {
+    var S = root.PongSound;
+    var player = root.__pongSound;
+    if (!S || !S.VOICES || !S.VOICES[2] || !player || typeof player.play !== 'function') return false;
+    if (!S.VOICES[2][CHIME_TYPE]) S.VOICES[2][CHIME_TYPE] = CHIME;
+    try {
+      return !!player.play({ type: CHIME_TYPE, era: 2 });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /** One turning tile: black behind it, its face squeezed about its middle. */
+  function drawTile(ctx, x, y, f, before, after) {
+    var T = FLIP_TILE;
+    var sx = Math.abs(Math.cos(f * Math.PI));
+    ctx.fillStyle = MORTAR;
+    ctx.fillRect(x, y, T, T);
+    var w = T * sx;
+    if (w < 1) return;
+    var dx = x + (T - w) / 2;
+    var face = f < 0.5 ? before : after;
+    if (face) {
+      ctx.drawImage(face, x, y, T, T, dx, y, w, T);
+    } else {
+      // Headless (no canvas to copy): the face as a flat panel of its era.
+      ctx.fillStyle = f < 0.5 ? '#202020' : COURT;
+      ctx.fillRect(dx, y, w, T);
+    }
+    // Turned away from the light: darker the more edge-on, with a lit rim.
+    ctx.fillStyle = 'rgba(0,0,0,' + (0.6 * (1 - sx)).toFixed(3) + ')';
+    ctx.fillRect(dx, y, w, T);
+    ctx.fillStyle = 'rgba(252,252,252,' + (0.55 * (1 - sx)).toFixed(3) + ')';
+    ctx.fillRect(f < 0.5 ? dx : dx + w - Math.min(PX, w), y, Math.min(PX, w), T);
+  }
+
+  /** The rolling band just inside the ring's edge: the new picture, vertical hold slipping. */
+  function drawRoll(ctx, m, after) {
+    var r = m.radius;
+    if (!(r > 1)) return;
+    var inner = Math.max(0, r - ROLL_W);
+    var h = m.height;
+    var y = rollOffset(m.raw, h);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(m.origin.x, m.origin.y, r, 0, Math.PI * 2);
+    ctx.arc(m.origin.x, m.origin.y, inner, 0, Math.PI * 2, true);
+    ctx.clip();
+    ctx.drawImage(after, 0, y);
+    ctx.drawImage(after, 0, y - h);
+    ctx.fillStyle = MORTAR;
+    ctx.fillRect(0, y - SYNC_BAR, m.width, SYNC_BAR);
+    ctx.fillStyle = 'rgba(252,252,252,0.25)';
+    ctx.fillRect(0, y, m.width, 2);
+    ctx.restore();
+  }
+
+  /**
+   * The flourish hook (src/erachange.js): called every frame of the ring that
+   * brings era 2 in. Reads the state, writes nothing to it.
+   */
+  function consoleSwap(ctx, p, origin, fromEra, toEra, info) {
+    if (!info || info.dim) return;           // the title's rally keeps the plain ring
+    var state = info.state;
+    var w = info.width, h = info.height;
+
+    // The first frame of this change: power off for one frame, and the chime.
+    if (announced && state && announced.get(state) !== state.eraChangedAt) {
+      announced.set(state, state.eraChangedAt);
+      chime();
+      ctx.fillStyle = MORTAR;
+      ctx.fillRect(0, 0, w, h);
+      return;
+    }
+
+    var radius = info.radius;
+    var raw = info.duration > 0 ? Math.min(1, Math.max(0, info.t / info.duration)) : 1;
+    var a = swapLayer(0, w, h);
+    var b = a && swapLayer(1, w, h);
+    var before = b ? frameOf(a, state, fromEra) : null;
+    var after = b ? frameOf(b, state, toEra) : null;
+
+    if (after) {
+      drawRoll(ctx, { radius: radius, raw: raw, origin: origin, width: w, height: h }, after);
+    }
+
+    // The tiles just ahead of the ring, and any the ring has reached but not yet covered.
+    var reach = radius + FLIP_LEAD + FLIP_JITTER;
+    var half = FLIP_TILE * Math.SQRT1_2;
+    var c0 = Math.max(0, Math.floor((origin.x - reach) / FLIP_TILE));
+    var c1 = Math.min(Math.ceil(w / FLIP_TILE) - 1, Math.floor((origin.x + reach) / FLIP_TILE));
+    var r0 = Math.max(0, Math.floor((origin.y - reach) / FLIP_TILE));
+    var r1 = Math.min(Math.ceil(h / FLIP_TILE) - 1, Math.floor((origin.y + reach) / FLIP_TILE));
+    for (var row = r0; row <= r1; row++) {
+      for (var col = c0; col <= c1; col++) {
+        var f = flipPhase(col, row, origin, radius);
+        if (f <= 0) continue;
+        if (f >= 1) {
+          var dx = (col + 0.5) * FLIP_TILE - origin.x;
+          var dy = (row + 0.5) * FLIP_TILE - origin.y;
+          if (Math.sqrt(dx * dx + dy * dy) + half <= radius) continue;   // wholly inside: the ring drew it
+        }
+        drawTile(ctx, col * FLIP_TILE, row * FLIP_TILE, f, before, after);
+      }
+    }
+  }
+
   R.registerEra({
     era: 2,
     name: '1985 NES',
@@ -258,6 +441,12 @@
     paddleInk: function (state, side) {
       return spriteInks(state, side).body;
     },
-    draw: draw
+    draw: draw,
+    flourish: consoleSwap,
+    consoleSwap: {
+      tile: FLIP_TILE, lead: FLIP_LEAD, jitter: FLIP_JITTER,
+      flipPhase: flipPhase, rollOffset: rollOffset,
+      chimeType: CHIME_TYPE, chime: CHIME
+    }
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
