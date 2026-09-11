@@ -101,7 +101,15 @@
     3:  { sheets: { left: 'era3-p1', right: 'era3-p2' }, frame: { w: 20, h: 25 },
           hand: { x: 20, y: 13 }, scale: 3.2, fps: 10,
           skin: '#eeaa88', body: '#222266', res: 1 },
-    4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
+    // Super Nintendo (item 1227): two hover pilots, built from one pixellab pose
+    // each by assets/pixellab/era4-players-build.mjs. The glove is on the frame's
+    // right edge, so the figure stands wholly behind its paddle; at 1.2 a frame
+    // is 38 x 121 field units, the pad's back rim just past the wall. miss has
+    // two frames (the pad there and gone), so at fps 12 the conceding pad blinks.
+    4:  { skin: '#f8c8a0', body: '#384878', res: 2,
+          sheets: { left: 'era4-players-left', right: 'era4-players-right' },
+          frame: { w: 32, h: 101 }, hand: { x: 32, y: 41 }, scale: 1.2, fps: 12,
+          frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
