@@ -177,12 +177,28 @@ test('the sound ladder has a rung for every era the rules know', () => {
 test('a rung above the VOICES rows keeps its voice on its look, and one with no voice yet plays the top row', () => {
   const path = require('node:path');
   const { R } = require('../tools/eralooks.js').loadRenderer(path.join(__dirname, '..'));
-  // Any rung whose era card has not landed yet; a built rung carries its own voice.
-  const waiting = [6, 7, 8, 9, 10].find((e) => R.eraLook(e).placeholder && !R.eraLook(e).voice);
-  if (waiting !== undefined) {
-    assert.deepStrictEqual(waves(waiting, 'paddle'), waves(4, 'paddle'), 'a placeholder rung borrows the Super Nintendo');
-    assert.deepStrictEqual(PongSound.echoFor(waiting), PongSound.echoFor(4));
+  // Which rungs are still placeholders is read from the looks themselves (item 1186),
+  // so an era card that lands never edits this test. A placeholder plays the voice of
+  // the look it is `like`. Once every rung is built, a stand-in placeholder on the top
+  // rung keeps the fact pinned, and the real look goes back afterwards.
+  const waiting = [];
+  for (let e = 0; e <= Pong.TOP_ERA; e++) if (R.eraLook(e).placeholder) waiting.push(e);
+  const top = R.eraLook(Pong.TOP_ERA);
+  if (!waiting.length) {
+    R.registerEra({ era: Pong.TOP_ERA, name: top.name, card: top.card, like: 5, placeholder: true });
+    waiting.push(Pong.TOP_ERA);
   }
+  for (const e of waiting) {
+    const like = R.eraLook(e).like;
+    assert.ok(like !== undefined && like < e, `placeholder rung ${e} names the look it borrows`);
+    assert.deepStrictEqual(waves(e, 'paddle'), waves(like, 'paddle'), `placeholder rung ${e} borrows the voice of era ${like}`);
+    assert.deepStrictEqual(PongSound.echoFor(e), PongSound.echoFor(like));
+  }
+  if (R.eraLook(Pong.TOP_ERA) !== top) R.registerEra(top);
+  // A rung whose look has no voice at all plays the Super Nintendo's row and echo.
+  R.registerEra(Object.assign({}, R.eraLook(9), { era: 9, voice: undefined }));
+  assert.deepStrictEqual(waves(9, 'paddle'), waves(4, 'paddle'), 'a voiceless rung borrows the Super Nintendo');
+  assert.deepStrictEqual(PongSound.echoFor(9), PongSound.echoFor(4));
   const voice = { paddle: [{ wave: 'sine', freq: 659, dur: 0.1, gain: 0.2 }], effects: { echo: { time: 0.12, feedback: 0.25, mix: 0.2 } } };
   R.registerEra(Object.assign({}, R.eraLook(7), { era: 7, voice }));
   assert.deepStrictEqual(PongSound.voicesFor(7, 'paddle'), voice.paddle);

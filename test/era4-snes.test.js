@@ -37,6 +37,10 @@ function canvas() {
     arc(x, y, r) { subpaths.push([[x - r, y - r], [x + r, y - r], [x + r, y + r], [x - r, y + r]]); },
     closePath() {},
     translate() {}, scale() {}, rotate() {}, setTransform() {},
+    // Since the ladder climbs past 4, the every-frame play test below reaches the
+    // 3D eras, which use the rest of the bible's toolkit (docs/ERAS.md rule 1.8).
+    transform() {}, resetTransform() {}, clip() {}, arcTo() {}, bezierCurveTo() {}, ellipse() {},
+    rect() {}, strokeRect() {}, drawImage() {}, setLineDash() {}, createPattern() { return null; },
     stroke() { ops.push({ op: 'stroke', style: st.strokeStyle, alpha: st.globalAlpha }); },
     fill() { ops.push({ op: 'fill', style: st.fillStyle, alpha: st.globalAlpha, subpaths: subpaths.map((p) => p.slice()) }); },
     fillRect(x, y, w, h) { ops.push({ op: 'fillRect', style: st.fillStyle, alpha: st.globalAlpha, rect: [x, y, w, h] }); },

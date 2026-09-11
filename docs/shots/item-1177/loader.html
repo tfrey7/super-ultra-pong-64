@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>item 1177: PongSprites draws a named pixellab image off disk</title>
+<style>
+  body { margin: 0; background: #111; color: #ddd; font: 14px/1.4 monospace; padding: 12px; }
+  canvas { display: block; background: #000; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+  <!-- Opened off disk like index.html. The loader is the real src/sprites.js,
+       pointed at the real assets/pixellab/ from here. -->
+  <canvas id="c" width="420" height="200"></canvas>
+  <p id="status">loading...</p>
+  <script src="../../../src/sprites.js"></script>
+  <script>
+    var S = PongSprites.create({ dir: '../../../assets/pixellab/' });
+    var ctx = document.getElementById('c').getContext('2d');
+    var frames = 0;
+    function tick() {
+      frames++;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, 420, 200);
+      var native = S.draw(ctx, 'test-ball', 20, 84);          // its own 32x32
+      var big = S.draw(ctx, 'test-ball', 80, 20, 160, 160);   // 5x, smoothing off
+      var el = document.getElementById('status');
+      if (native && big) {
+        el.textContent = 'test-ball: ' + S.status('test-ball') + ', drawn native and at 5x after ' +
+          frames + ' frame(s); src ' + S.path('test-ball');
+        return;
+      }
+      if (S.status('test-ball') === 'failed') { el.textContent = 'test-ball: FAILED to load'; return; }
+      requestAnimationFrame(tick);
+    }
+    tick();
+  </script>
+</body>
+</html>
