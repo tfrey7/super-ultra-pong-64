@@ -24,6 +24,7 @@ const ROOT = path.resolve(HERE, '..', '..', '..');
 const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : dflt; };
 const LABEL = arg('--label', 'run');
 const RUNS = Number(arg('--runs', 3));
+const PROBE = process.argv.includes('--probe');
 let port = Number(arg('--port', 9361));
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
@@ -78,10 +79,19 @@ async function leg(plain) {
     await send('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
     await sleep(1500);
 
-    const timing = (ms) => evalJs(`new Promise((done) => { const stamps = [], ring = [], raws = []; const t0 = performance.now();
+    // --probe: split each frame's work into the rules' step, the sound player and
+    // the era renderers (wrapped on the page), plus the whole rAF callback's busy time.
+    if (PROBE) await evalJs(`(() => { let cur = { step: 0, sound: 0, draw: 0 };
+      const wrap = (obj, name, key) => { const f = obj[name]; obj[name] = function () { const t = performance.now();
+        try { return f.apply(this, arguments); } finally { cur[key] += performance.now() - t; } }; };
+      wrap(window.Pong, 'step', 'step'); if (window.__pongSound) wrap(window.__pongSound, 'handle', 'sound');
+      wrap(window.PongRender, 'draw', 'draw');
+      window.__wrapReset = () => { const c = cur; cur = { step: 0, sound: 0, draw: 0 }; return c; }; return 1; })()`);
+    const timing = (ms) => evalJs(`new Promise((done) => { const stamps = [], ring = [], raws = [], busy = [], parts = []; const t0 = performance.now();
       function tick(now) { const m = window.PongRender.eraChangeMoment(window.__pong);
         stamps.push(now); ring.push(!!(m && m.wiping)); raws.push(m ? m.raw : null);
-        if (now - t0 < ${ms}) requestAnimationFrame(tick); else done({ stamps, ring, raws }); }
+        busy.push(performance.now() - now); parts.push(window.__wrapReset ? window.__wrapReset() : null);
+        if (now - t0 < ${ms}) requestAnimationFrame(tick); else done({ stamps, ring, raws, busy, parts }); }
       requestAnimationFrame(tick); })`);
     const stats = (d) => {
       const s = [...d].sort((a, b) => a - b);
@@ -91,7 +101,8 @@ async function leg(plain) {
     };
     const deltas = (stamps) => { const d = []; for (let k = 1; k < stamps.length; k++) d.push(stamps[k] - stamps[k - 1]); return d; };
 
-    const baseline = stats(deltas((await timing(1000)).stamps));
+    const baseRun = await timing(1000);
+    const baseline = stats(deltas(baseRun.stamps));
     if (plain) await evalJs('(() => { delete window.PongRender.eraLook(4).flourish; return 1; })()');
     await evalJs(`(() => { const g = window.__pong; g.era = 3; g.startEra = 0;
       g.serveDelay = 0; g.ball.x = -8; g.ball.y = 150; g.ball.vx = -600; g.ball.vy = 0; return g.era; })()`);
@@ -99,13 +110,23 @@ async function leg(plain) {
     // Every frame interval that touches the ring: the one INTO its first frame counts.
     const ring = [];
     for (let k = 1; k < run.stamps.length; k++) {
-      if (run.ring[k] || run.ring[k - 1]) ring.push({ ms: run.stamps[k] - run.stamps[k - 1], rawBefore: run.raws[k - 1], rawAfter: run.raws[k] });
+      if (run.ring[k] || run.ring[k - 1]) ring.push({ ms: run.stamps[k] - run.stamps[k - 1], rawBefore: run.raws[k - 1], rawAfter: run.raws[k],
+        busyBefore: run.busy[k - 1], partsBefore: run.parts[k - 1], busyAfter: run.busy[k], partsAfter: run.parts[k] });
     }
+    const r1 = (v) => (typeof v === 'number' ? +v.toFixed(1) : v);
+    const r1parts = (p) => (p ? { step: r1(p.step), sound: r1(p.sound), draw: r1(p.draw) } : p);
     const ringStats = stats(ring.map((f) => f.ms));
     const longFrames = ring.filter((f) => f.ms > 3 * ringStats.medianMs)
-      .map((f) => ({ ms: +f.ms.toFixed(1), rawBefore: f.rawBefore, rawAfter: f.rawAfter }));
+      .map((f) => ({ ms: +f.ms.toFixed(1), rawBefore: f.rawBefore, rawAfter: f.rawAfter,
+        busyBefore: r1(f.busyBefore), partsBefore: r1parts(f.partsBefore), busyAfter: r1(f.busyAfter), partsAfter: r1parts(f.partsAfter) }));
+    // Long frames in ordinary play before the point, with the same breakdown.
+    const baselineLong = [];
+    for (let k = 1; k < baseRun.stamps.length; k++) {
+      const ms = baseRun.stamps[k] - baseRun.stamps[k - 1];
+      if (ms > 3 * baseline.medianMs) baselineLong.push({ ms: +ms.toFixed(1), busyBefore: r1(baseRun.busy[k - 1]), partsBefore: r1parts(baseRun.parts[k - 1]) });
+    }
     const era = await evalJs('window.__pong.era');
-    return { leg: plain ? 'plain ring' : 'era 4 flourish on', port: PORT, baseline, ring: ringStats, longFrames, eraAfter: era, errors };
+    return { leg: plain ? 'plain ring' : 'era 4 flourish on', port: PORT, baseline, baselineLong, ring: ringStats, longFrames, eraAfter: era, errors };
   } finally {
     try { ws && ws.close(); } catch { /* gone */ }
     chrome.kill();
@@ -120,7 +141,9 @@ for (let r = 0; r < RUNS; r++) {
     results.push({ run: r + 1, ...res });
     console.log(`run ${r + 1} ${res.leg.padEnd(18)} ring ${res.ring.frames} frames, median ${res.ring.medianMs} ms, ` +
       `mean ${res.ring.meanMs} ms, max ${res.ring.maxMs} ms, long frames: ` +
-      (res.longFrames.length ? res.longFrames.map((f) => `${f.ms} ms at raw ${f.rawAfter === null ? '-' : f.rawAfter.toFixed(3)}`).join(', ') : 'none') +
+      (res.longFrames.length ? res.longFrames.map((f) => `${f.ms} ms at raw ${f.rawAfter === null ? '-' : f.rawAfter.toFixed(3)}` +
+        (PROBE ? ` [busy before ${f.busyBefore} ${JSON.stringify(f.partsBefore)}]` : '')).join(', ') : 'none') +
+      (res.baselineLong.length ? `; ordinary play long frames: ${JSON.stringify(res.baselineLong)}` : '') +
       (res.errors.length ? `  ERRORS: ${res.errors.join(' | ')}` : ''));
   }
 }
