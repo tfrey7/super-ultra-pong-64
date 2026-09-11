@@ -55,8 +55,9 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 // --scoring runs only the rally and the scoring check (section 6), about ten
 // seconds -- the quick way to ask "can the player still score?" many times.
 const SCORING_ONLY = process.argv.includes('--scoring');
-// --reference also copies the five era frames the walk takes, and the four
-// frames it catches mid-change (change-era0-to-era1.png to change-era3-to-era4.png),
+// --reference also copies the eleven era frames the walk takes (era0-arcade.png to
+// era10-xbox360.png), and the ten frames it catches mid-change (change-era0-to-era1.png
+// to change-era9-to-era10.png),
 // into the TRACKED docs/shots/eras/, the reference pictures a reader opens. Off by default,
 // because every walk's frames differ and a plain playtest must leave git clean.
 const REFERENCE = process.argv.includes('--reference');
@@ -256,7 +257,12 @@ async function filmChange(s, clip, from) {
       }
     }
     const m = R.eraChangeMoment(g);
-    done({ era: g.era, ring: !!(m && m.wiping), asNew: asNew, asOld: asOld, counted: counted });
+    // A rung that borrows its neighbour's whole look (a like: N stand-in with no
+    // draw of its own) draws the same frame as the era it replaces, so "closer to
+    // the new era than the old" cannot hold; for that change the live canvas only
+    // has to match the new era exactly (items 1145-1150, 1179).
+    const same = R.eraLook(${from + 1}).draw === R.eraLook(${from}).draw;
+    done({ era: g.era, ring: !!(m && m.wiping), asNew: asNew, asOld: asOld, counted: counted, same: same });
   })))`);
   return out;
 }
@@ -347,13 +353,14 @@ async function walkLadder(s, baseUrl) {
   for (const c of changes) {
     const e = c.end, d = c.drawn;
     const reached = !!e && e.radius >= e.corner;
-    const newDraws = d.era === c.from + 1 && !d.ring && d.asNew < d.asOld;
+    const newDraws = d.era === c.from + 1 && !d.ring && (d.same ? d.asNew === 0 : d.asNew < d.asOld);
     check(`the change to the ${eras[c.from + 1]} ran from the ${sideOf(c)} edge: the ring reached the far corner and the new era draws afterwards`,
       !!c.file && reached && newDraws,
       (e ? `ring from ${e.origin.x.toFixed(0)},${e.origin.y.toFixed(0)} ended at radius ` +
         `${e.radius.toFixed(0)}, far corner ${e.corner.toFixed(0)}` : 'the ring was never seen to finish') +
       `; afterwards on era ${d.era}, ${d.asNew} of ${d.counted} pixels differ from era ${c.from + 1} ` +
-      `drawn offscreen, ${d.asOld} from era ${c.from}`);
+      `drawn offscreen, ${d.asOld} from era ${c.from}` +
+      (d.same ? ' (the two rungs draw the same look, so only an exact match with the new era is asked)' : ''));
   }
 
   if (REFERENCE) {
@@ -367,7 +374,7 @@ async function walkLadder(s, baseUrl) {
 function summarise(shots) {
   console.log('\nscreenshots:');
   for (const f of shots) console.log('  ' + f);
-  if (REFERENCE) console.log(`the five era frames and the four mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
+  if (REFERENCE) console.log(`the era frames and the mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
   process.exitCode = failed.length ? 1 : 0;
