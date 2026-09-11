@@ -89,3 +89,62 @@ Look file: [src/eras/era6-n64.js](../../src/eras/era6-n64.js). Chapter 7 of [doc
 4. Delete the other era files, `src/display-crt.js`, `src/erachange.js`, `src/signboards.js`,
    `src/match.js`, and `advanceEra`'s call.
 5. Judge the fog at a glance: can you see the far rail? If yes, it is too gentle.
+
+## LESSONS
+
+*Item 1230 made this era 1996's flagship game that happens to be Pong (docs/ART.md, Era 6): two
+toy mascots hold the paddles, the table sits in a toy park, and the score wears a round
+power meter. Pictures: [the rally at the first look](../shots/item1230/rally-era6-first-look.png)
+and [after the fixes it called for](../shots/item1230/era6-after-fixes.png).*
+
+### What sold 1996's flagship look here
+
+- **Chunky mascots, drawn soft and fogged.** A penguin in a red scarf holds the player's paddle
+  and a frog in a yellow cap holds the computer's. They read as *Super Mario 64*-era toys, not as
+  sprites pasted on a 3D table, because of two things done in the players' own draw
+  (`src/characters.js`, block fields `smooth` and `fogCap`): the sheet is drawn with smoothing ON,
+  so the figure smears like the blurred world behind it, and the era's fog colour is laid over the
+  figure only, at its paddle's depth, capped at 0.35 exactly like the paddles.
+- **Squash and stretch is in the frames**: every beat's second frame is 5% shorter and wider, the
+  swing lunges 6 table units at the paddle, the win jumps 12 and lands squashed.
+- **Set dressing that moves on its own**: pennants waving on toy-yellow poles past the table's
+  ends, butterflies over the horizon. Drawn into the half-resolution world, so the blur takes them
+  too and they never compete with the crisp ball.
+- **A round, toy HUD**: the outlined toy score plus an eight-slice pie power meter that fills with
+  the rally, and five toy-yellow stars popping from the scorer's paddle on a point.
+
+### What did not work
+
+- **pixflux does not draw sprite sheets.** Asked for "3 columns and 6 rows" at 60 x 270, it drew
+  the frog as one pose repeated seven times down a single column, and the penguin as fourteen
+  10-pixel figures in two columns. Two generations for nothing usable as a sheet
+  (`assets/pixellab/era6-frog-sheet-raw.png`, `era6-penguin-sheet-raw.png`). **What worked: one
+  figure per generation** (32 x 40, "full body, three quarter view facing right"), and the six rows
+  built offline from it by transforms ([era6-n64-sheets.py](../../assets/pixellab/era6-n64-sheets.py)):
+  bob, squash, a 12-degree lean, a lunge, an edge-on spin-out with stars, a jump. A pose a
+  transform cannot make (arms up for the win) needs its own generation. Five generations in all,
+  of the twelve allowed.
+- **Two pixellab runs at once lose a manifest entry.** Each reads the manifest, generates, and
+  writes it back, so the slower run overwrote the faster one's entry. Run generations one after
+  another.
+- **Fogged "at their depth like the rails", the poles vanished.** At y 150 the fog is 0.9, and the
+  first browser look showed two faint lines and no cloth. Capped at 0.45, like the paddles' cap,
+  they read. The butterflies had the same fate under the pale wall; they fly over it now.
+- **The bible's meter "under each score" crosses R8 on this camera**: the far edge is at y 102 and
+  the score ends at 80, so a radius-14 meter under it breaks the line at 96. It sits beside the
+  score, on the inner side, because the computer's name is written on the outer side of the
+  right-hand score.
+- **The rig could not smooth or fog a figure**, and it threw under `node --test` once an era named
+  a sheet (no `Image` in Node). Both are fixed in the rig for every 3D era, not just this one.
+
+### What a one-era game would copy
+
+1. **The player recipe**: one pixflux figure per pose you cannot transform, the rows built offline
+   by `era6-n64-sheets.py`, embedded as data: URIs by `tex3d-embed.mjs`, and the sprite loader
+   handed the embedded picture (`primeSheets` in the era file).
+2. **The draw order that keeps play readable**: the blurred world, then the crisp paddles and ball,
+   then the players smoothed and fogged, then the stars, and the HUD last, not shaking.
+3. **The block**: frame 32 x 44, hand (29, 28) on the figure's chest, `scale` 2.6 (about 88 table
+   units tall), `anchor.dz` 24, `smooth: true`, `fogCap: 0.35`.
+4. **Cap every fog you put on something the player should see** (paddles, figures, dressing); let
+   only the world itself go fully into the wall.
