@@ -1,0 +1,264 @@
+{
+  "when": "2026-09-11T02:35:24.495Z",
+  "results": [
+    {
+      "name": "era 0: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 0,
+        "scheduled": 5,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 132,
+        "rally": 0,
+        "gameEra": 0,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 1: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 1,
+        "scheduled": 17,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 132,
+        "rally": 0,
+        "gameEra": 1,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 2: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 2,
+        "scheduled": 57,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 132,
+        "rally": 0,
+        "gameEra": 2,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 3: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 3,
+        "scheduled": 48,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 132,
+        "rally": 0,
+        "gameEra": 3,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 4: its loop books notes",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 4,
+        "scheduled": 19,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 132,
+        "rally": 0,
+        "gameEra": 4,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "era 5: an empty slot books nothing",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 5,
+        "scheduled": 0,
+        "crossfades": 0,
+        "ducks": 1,
+        "muted": false,
+        "off": false,
+        "errors": 0,
+        "tempo": 133.6,
+        "rally": 1,
+        "gameEra": 5,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "an era change cross-fades at the same bar and beat (the tune never restarts)",
+      "ok": true,
+      "detail": {
+        "positionBefore": {
+          "bar": 1,
+          "step": 9
+        },
+        "positionAtChange": {
+          "from": 1,
+          "to": 2,
+          "bar": 1,
+          "step": 9
+        },
+        "after": {
+          "available": true,
+          "audio": "running",
+          "era": 2,
+          "scheduled": 46,
+          "crossfades": 1,
+          "ducks": 1,
+          "muted": false,
+          "off": false,
+          "errors": 0,
+          "tempo": 133.6,
+          "rally": 1,
+          "gameEra": 2,
+          "sfx": "running"
+        }
+      }
+    },
+    {
+      "name": "one session climbs arcade to Super Nintendo, every change keeping its place",
+      "ok": true,
+      "detail": {
+        "out": [
+          {
+            "era": 0,
+            "scheduled": 75,
+            "at": {
+              "from": 2,
+              "to": 0,
+              "bar": 1,
+              "step": 13
+            }
+          },
+          {
+            "era": 1,
+            "scheduled": 109,
+            "at": {
+              "from": 0,
+              "to": 1,
+              "bar": 2,
+              "step": 3
+            }
+          },
+          {
+            "era": 2,
+            "scheduled": 139,
+            "at": {
+              "from": 1,
+              "to": 2,
+              "bar": 2,
+              "step": 9
+            }
+          },
+          {
+            "era": 3,
+            "scheduled": 185,
+            "at": {
+              "from": 2,
+              "to": 3,
+              "bar": 3,
+              "step": 0
+            }
+          },
+          {
+            "era": 4,
+            "scheduled": 234,
+            "at": {
+              "from": 3,
+              "to": 4,
+              "bar": 3,
+              "step": 6
+            }
+          }
+        ],
+        "errors": 0,
+        "crossfades": 6
+      }
+    },
+    {
+      "name": "a 15-hit rally raises the tempo",
+      "ok": true,
+      "detail": {
+        "tempoAtRally0": 133.6,
+        "tempoAtRally15": 155.8
+      }
+    },
+    {
+      "name": "M mutes the music, and M again brings it back",
+      "ok": true,
+      "detail": {
+        "afterFirstM": true,
+        "afterSecondM": false
+      }
+    },
+    {
+      "name": "the music ducks under paddle hits in real play",
+      "ok": true,
+      "detail": {
+        "ducks": 1,
+        "scheduled": 223
+      }
+    },
+    {
+      "name": "?music=off opens no music audio; the effects still unlock",
+      "ok": true,
+      "detail": {
+        "available": false,
+        "audio": "none",
+        "era": null,
+        "scheduled": 0,
+        "crossfades": 0,
+        "ducks": 0,
+        "muted": false,
+        "off": true,
+        "errors": 0,
+        "tempo": 132,
+        "rally": 0,
+        "gameEra": 2,
+        "sfx": "running"
+      }
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "detail": []
+    }
+  ]
+}

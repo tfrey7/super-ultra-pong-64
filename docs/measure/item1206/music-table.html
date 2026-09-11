@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Super Ultra Pong 64 -- one theme, arranged per era</title>
+<style>
+  body { margin: 0; padding: 28px 36px; background: #101216; color: #e8e6e1;
+         font: 15px/1.45 "Segoe UI", system-ui, sans-serif; }
+  h1 { margin: 0 0 4px; font-size: 24px; letter-spacing: 0.02em; }
+  .sub { color: #9aa0a8; margin-bottom: 22px; }
+  .era { display: grid; grid-template-columns: 260px 1fr; gap: 18px; padding: 14px 0;
+         border-top: 1px solid #262a31; }
+  .era h2 { margin: 0; font-size: 17px; }
+  .era .n { color: #7d8590; font-weight: 600; margin-right: 6px; }
+  .meta { color: #9aa0a8; font-size: 12.5px; margin-top: 4px; }
+  .about { margin-top: 8px; font-size: 14px; }
+  .trait { margin-top: 3px; font-size: 13px; color: #c9b27a; }
+  .voices { font: 12px/1.5 Consolas, monospace; color: #b9c0c8; margin-top: 6px; }
+  canvas { width: 100%; background: #181b21; border-radius: 6px; display: block; }
+  .empty { color: #6b727c; font-style: italic; }
+  .slot { border: 1px dashed #333a44; border-radius: 6px; height: 30px; display: flex; align-items: center;
+          padding: 0 12px; color: #6b727c; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>One theme, arranged per era</h1>
+<div class="sub" id="sub"></div>
+<div id="rows"></div>
+<script src="../../../src/music.js"></script>
+<script>
+  var M = window.PongMusic, T = M.THEME;
+  var COLORS = ['#f4b942', '#5ec2e8', '#ef6f8a', '#8fd26b', '#b48cf2', '#f08c4a', '#6fd6c5'];
+  var NAMES = ['1972 arcade', 'Atari 2600', 'NES', 'Genesis', 'Super Nintendo',
+               'PlayStation', 'Nintendo 64', 'Dreamcast', 'PlayStation 2', 'Xbox', 'Xbox 360'];
+  document.getElementById('sub').textContent = 'Drawn from the live table in src/music.js. The theme is written once: ' +
+    T.key + ', ' + T.bpm + ' bpm, ' + T.bars + ' bars (A section bars 1-4, B section bars 5-8), the same length, key and tempo in every era. ' +
+    'Each lane is one player in that era\'s arrangement; each mark is a note at its pitch and length, or a drum hit. Eras 5 to 10 are the slots the next card fills.';
+  var rows = document.getElementById('rows');
+  M.ARRANGEMENTS.forEach(function (arr, era) {
+    var div = document.createElement('div');
+    div.className = 'era';
+    var left = document.createElement('div');
+    var right = document.createElement('div');
+    div.appendChild(left); div.appendChild(right);
+    rows.appendChild(div);
+    if (!arr) {
+      left.innerHTML = '<h2><span class="n">' + era + '</span>' + NAMES[era] + '</h2><div class="meta empty">empty slot</div>';
+      right.innerHTML = '<div class="slot">no arrangement yet -- another arrangement of the same theme goes here</div>';
+      return;
+    }
+    var fx = arr.effects ? Object.keys(arr.effects).join(' + ') : 'dry';
+    var vs = arr.parts.map(function (p, i) {
+      var v = p.voice;
+      return '<span style="color:' + COLORS[i % COLORS.length] + '">' + p.play + (p.rule ? ' ' + p.rule : '') +
+        (p.sections ? ' [' + p.sections.join('') + ']' : '') + '</span> ' + v.wave + (v.fm ? ' fm' : '') +
+        (v.unison ? ' x' + (v.unison.length + 1) : '') + (p.steals ? ' steals ' + p.steals : '');
+    });
+    if (arr.drone) vs = vs.concat(arr.drone.map(function (d) { return 'drone ' + d.wave + ' ' + d.freq + ' Hz' + (d.wobble ? ' flicker' : ''); }));
+    if (arr.detune) vs.push('detuned scale (TIA dividers)');
+    left.innerHTML = '<h2><span class="n">' + era + '</span>' + arr.name + '</h2><div class="meta">effects: ' + fx +
+      '</div><div class="voices">' + vs.join('<br>') + '</div>';
+    var cv = document.createElement('canvas');
+    var lanes = arr.parts.length + (arr.drone ? 1 : 0);
+    var laneH = 30;
+    cv.width = 1060; cv.height = lanes * laneH + 8;
+    cv.style.height = cv.height + 'px';
+    right.appendChild(cv);
+    var about = document.createElement('div'); about.className = 'about'; about.textContent = arr.about;
+    var trait = document.createElement('div'); trait.className = 'trait'; trait.textContent = 'Chip trait: ' + arr.trait;
+    right.appendChild(about); right.appendChild(trait);
+    var g = cv.getContext('2d');
+    var total = T.steps * T.bars, w = (cv.width - 20) / total;
+    var score = M.arrange(arr);
+    for (var li = 0; li < lanes; li++) { g.fillStyle = li % 2 ? '#1c2027' : '#1a1d23'; g.fillRect(10, 4 + li * laneH, cv.width - 20, laneH - 2); }
+    for (var b = 0; b <= T.bars; b++) { g.fillStyle = b === 4 ? '#5a6270' : '#2a2f37'; g.fillRect(10 + b * T.steps * w, 0, b === 4 ? 2 : 1, cv.height); }
+    arr.parts.forEach(function (p, pi) {
+      var lo = Infinity, hi = -Infinity;
+      score.forEach(function (list) { list.forEach(function (e) { if (e.part === pi) e.midis.forEach(function (m) { lo = Math.min(lo, m); hi = Math.max(hi, m); }); }); });
+      var y0 = 4 + pi * laneH;
+      g.fillStyle = COLORS[pi % COLORS.length];
+      score.forEach(function (list, s) {
+        list.forEach(function (e) {
+          if (e.part !== pi) return;
+          var x = 10 + (s + e.at) * w;
+          if (!e.midis.length) {
+            var hh = e.accent ? laneH - 8 : (laneH - 8) * 0.55;
+            g.fillRect(x + 1, y0 + laneH - 4 - hh, Math.max(2, w * 0.35), hh);
+            return;
+          }
+          e.midis.forEach(function (m) {
+            var y = y0 + 3 + (1 - (m - lo) / Math.max(1, hi - lo)) * (laneH - 10);
+            g.fillRect(x + 0.5, y, Math.max(1.5, e.len * w - 1), 4);
+          });
+        });
+      });
+    });
+    if (arr.drone) {
+      var y = 4 + arr.parts.length * laneH;
+      g.strokeStyle = '#9aa0a8'; g.lineWidth = 1.5; g.beginPath();
+      for (var x = 10; x < cv.width - 10; x += 2) g.lineTo(x, y + 10 + Math.sin(x * 0.9) * 3 * (0.6 + 0.4 * Math.sin(x * 0.05)));
+      g.stroke();
+      g.strokeStyle = COLORS[2]; g.lineWidth = 3; g.beginPath(); g.moveTo(10, y + 22); g.lineTo(cv.width - 10, y + 22); g.stroke();
+    }
+  });
+</script>
+</body>
+</html>
