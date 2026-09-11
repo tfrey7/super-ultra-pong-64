@@ -22,11 +22,20 @@ Open **`index.html`** in a browser. That is the whole install: no `npm install`,
 no build step, no dev server. Double-clicking the file off disk works, because
 everything is a plain script and there is nothing to compile.
 
-It opens on the **title screen**, with a demo rally playing itself behind the
-name the way an idle cabinet did. Nothing counts there: the ball is held still
-and no point can be scored until you press any key or click. All of it is drawn
-on the canvas out of the score's own block font — there is no HTML text on the
-page at all.
+It opens on the **cabinet powering on** (item 1207, `src/attract.js`): the tube
+warms up -- a dot of light blooms in the middle of the black glass, stretches
+into a line, and the line opens into the picture -- and then the attract screen:
+**PONG** in the machine's block lettering, **INSERT COIN** blinking under it,
+CREDIT 0 in the corner, and behind it the machine playing itself, computer
+against computer, score ticking, the way an idle cabinet in a bar did. Nothing
+counts there: the ball is held still and no point can be scored. **A click or any
+key is a coin**: the quarter clunks into the box with the cabinet's hum under it,
+CREDIT 1 flashes up, then PLAYER 1 READY, and the ball serves on the 1972
+machine about two seconds later. When a match is over, `Pong.backToTitle(game)`
+is the one call that puts the cabinet back on INSERT COIN. All of it is drawn on
+the canvas out of the score's own block font — there is no HTML text on the page
+at all. (Browsers allow no sound before the first click, so the hum is heard
+with the coin, not while the tube warms up.)
 
 - **Your paddle is on the left.** Move the mouse over the field to place it, or
   use the **arrow keys** / **W** and **S**. Whichever you touched last is the one
@@ -210,9 +219,11 @@ new file, one `<script>` line in `index.html`, and one entry in `Pong.ERAS`.
 **Open the page at any era** with a query, so you can look at one machine
 without playing up to it: `index.html?era=0` is the arcade machine (the same as
 no query), `?era=2` the NES, `?era=10` the Xbox 360. Anything above 10 opens
-on 10, and anything that is not a number opens on 0. The match still starts on
-the title screen, its score at 0-0, and climbs from that era -- so `?era=9` is
-one point from the top -- and a reload comes back to the era in the address.
+on 10, and anything that is not a number opens on 0. A page opened with an era
+skips the cabinet and goes **straight into play** at that era, its score at 0-0
+-- so `?era=9` is one point from the top -- and a reload comes back to the era in
+the address. `?title=off` goes straight into play at era 0, and `?title=on` keeps
+the cabinet even with an era (the playtest's `--era` uses it).
 The playtest takes `--era 3` for the same thing, and `--ladder` walks the whole
 ladder from era 0 instead.
 

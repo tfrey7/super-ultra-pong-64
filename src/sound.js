@@ -65,7 +65,19 @@
     {
       paddle: [{ wave: 'square', freq: 490, dur: 0.05, gain: 0.22 }],
       wall:   [{ wave: 'square', freq: 245, dur: 0.04, gain: 0.22 }],
-      score:  [{ wave: 'square', freq: 245, dur: 0.30, gain: 0.22 }]
+      score:  [{ wave: 'square', freq: 245, dur: 0.30, gain: 0.22 }],
+      // The coin drop (item 1207, src/attract.js): the quarter's bright ring
+      // down the chute, the heavy clunk into the box, the credit relay's click,
+      // and the cabinet's 60-cycle hum swelling under it as the set wakes up.
+      coin: [
+        { wave: 'square', freq: 1760, slideTo: 1320, at: 0.00, dur: 0.05, gain: 0.08 },
+        { wave: 'square', freq: 2349, slideTo: 1760, at: 0.04, dur: 0.06, gain: 0.06 },
+        { wave: 'square', freq: 110, slideTo: 55, at: 0.10, dur: 0.14, gain: 0.3 },
+        { wave: 'triangle', freq: 82, slideTo: 41, at: 0.10, dur: 0.20, gain: 0.4 },
+        { wave: 'square', freq: 980, at: 0.34, dur: 0.02, gain: 0.1 },
+        { wave: 'sawtooth', freq: 60, at: 0.12, dur: 1.60, gain: 0.07, fm: { ratio: 0.05, index: 0.02 } },
+        { wave: 'sawtooth', freq: 120, at: 0.12, dur: 1.40, gain: 0.03 }
+      ]
     },
     // 1 -- 1977 Atari 2600: still a single square, but the TIA's coarse,
     // slightly flat pitches and a buzzier, longer point.
