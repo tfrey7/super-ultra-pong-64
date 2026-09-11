@@ -22,6 +22,7 @@ import path from 'node:path';
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const Rally = require('./scoring-rally.js');
 
 function arg(name, fallback) {
   const i = process.argv.indexOf('--' + name);
@@ -29,7 +30,10 @@ function arg(name, fallback) {
 }
 
 const TRIALS = Number(arg('trials', 300));
-const WINDOW = Number(arg('seconds', 22));   // the harness's tracking window
+const WINDOW = Number(arg('seconds', 22));   // the old 22 s tracking window: the design measure
+// The playtest's scripted hand may play this long before its check gives up;
+// the 'scripted' row is sampled over this window, not WINDOW.
+const CHECK_WINDOW = Number(arg('check-seconds', 45));
 const POLL = Number(arg('poll', 0.045));     // it re-aims the mouse every 45ms
 const DT = 1 / 60;
 const CORNER = Number(arg('corner', 0.8)); // how near the paddle tip to take it
@@ -46,16 +50,17 @@ function seeded(seed) {
 }
 
 /** One 22-second session of tracking play. Returns the player's score. */
-function trial(Pong, seed, aimStyle) {
+function trial(Pong, seed, aimStyle, seconds) {
   const rng = seeded(seed);
   // Either shape of the module: an older one has no phase and no startGame.
   const g = Pong.createGame({ rng, phase: 'playing' });
   if (g.phase === 'title' && Pong.startGame) Pong.startGame(g);
   g.aimStyle = aimStyle;   // read by aim(); the rules themselves ignore it
+  if (aimStyle === 'scripted') g.scorer = Rally.createScorer(Pong);
 
   let hand = g.height / 2;
   let sincePoll = 0;
-  for (let t = 0; t < WINDOW; t += DT) {
+  for (let t = 0; t < seconds; t += DT) {
     sincePoll += DT;
     if (sincePoll >= POLL) {
       sincePoll = 0;
@@ -63,7 +68,8 @@ function trial(Pong, seed, aimStyle) {
     }
     Pong.step(g, DT, { pointerY: hand, up: false, down: false });
   }
-  return g.score.left;
+  return { points: g.score.left, planned: g.scorer ? g.scorer.planned : 0,
+    certain: g.scorer ? g.scorer.certain : 0 };
 }
 
 /**
@@ -71,8 +77,12 @@ function trial(Pong, seed, aimStyle) {
  * done. 'corner' still intercepts, but off centre, so the ball leaves at a
  * steep angle AWAY from where the computer is standing -- the play the
  * bootstrap doc says scores roughly every 20 seconds instead of every 32.
+ * 'scripted' is the playtest's own hand (tools/scoring-rally.js): it plans
+ * each shot against the rules so the computer cannot return it. The two rows
+ * above measure how beatable the game is; this one measures the check.
  */
 function aim(g) {
+  if (g.aimStyle === 'scripted') return g.scorer(Rally.snapshotOf(g));
   const centre = g.ball.y + g.ball.size / 2;
   if (g.aimStyle !== 'corner') return centre;
   const away = (g.right.y + g.right.h / 2) < g.height / 2 ? 1 : -1;  // +1 = downwards
@@ -83,20 +93,27 @@ function sample(modulePath, label, aimStyle) {
   const Pong = require(modulePath);
   let scored = 0;
   let points = 0;
+  let planned = 0;
+  let certain = 0;
+  const seconds = aimStyle === 'scripted' ? CHECK_WINDOW : WINDOW;
   for (let i = 1; i <= TRIALS; i++) {
-    const s = trial(Pong, i * 2654435761, aimStyle);
-    points += s;
-    if (s > 0) scored += 1;
+    const s = trial(Pong, i * 2654435761, aimStyle, seconds);
+    points += s.points;
+    planned += s.planned;
+    certain += s.certain;
+    if (s.points > 0) scored += 1;
   }
   return {
     label,
     aim: aimStyle,
     module: modulePath,
     trials: TRIALS,
-    windowSeconds: WINDOW,
+    windowSeconds: seconds,
     sessionsThatScored: scored,
     passRate: scored / TRIALS,
-    pointsPerMinute: (points / TRIALS) * (60 / WINDOW)
+    pointsPerMinute: (points / TRIALS) * (60 / seconds),
+    // scripted only: incoming balls planned, and how many had a certain shot
+    ...(aimStyle === 'scripted' ? { ballsPlanned: planned, ballsWithCertainShot: certain } : {})
   };
 }
 
@@ -105,14 +122,17 @@ const against = arg('against', null);
 if (against) modules.push([path.resolve(against), 'comparison']);
 
 const runs = [];
-for (const style of ['track', 'corner']) {
+const STYLES = (arg('styles', 'track,corner,scripted')).split(',');
+for (const style of STYLES) {
   for (const [mod, label] of modules) runs.push(sample(mod, label, style));
 }
 
 for (const r of runs) {
   console.log(`${r.aim.padEnd(6)} ${r.label}: ${r.sessionsThatScored}/${r.trials} ` +
     `sessions scored in ${r.windowSeconds}s (${(r.passRate * 100).toFixed(1)}%), ` +
-    `${r.pointsPerMinute.toFixed(2)} player points per minute`);
+    `${r.pointsPerMinute.toFixed(2)} player points per minute` +
+    (r.ballsPlanned !== undefined
+      ? `; ${r.ballsWithCertainShot} of ${r.ballsPlanned} incoming balls had a certain shot` : ''));
 }
 
 const out = path.join(HERE, 'beatability-sample.json');

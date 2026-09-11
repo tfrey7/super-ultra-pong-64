@@ -277,16 +277,17 @@ test('behind the title era 5 keeps the stock dimmed frame', () => {
   assert.deepStrictEqual(got.calls, want.calls);
 });
 
-test('eras 6 to 10 are placeholders drawing era 5\'s table under their own name cards, until their own cards land', () => {
+test('every 3D rung still waiting on its card draws era 5\'s table, and every 3D rung wears its own name card', () => {
   const cards = new Set();
-  for (let era = 6; era <= 10; era++) {
+  for (let era = 6; era <= Pong.TOP_ERA; era++) {
     const look = R.eraLook(era);
     assert.strictEqual(look.era, era);
     cards.add(JSON.stringify(look.card));
-    // A built rung (its era card landed) draws its own frame; its own test file pins it.
-    if (!look.placeholder) { assert.notStrictEqual(look.draw, R.eraLook(5).draw); continue; }
-    assert.strictEqual(look.draw, R.eraLook(5).draw);
+    // Read from the look itself (item 1186): an era card that has landed brings its own
+    // draw (and its own test file); only the rungs still waiting are pinned to era 5's table.
+    if (look.placeholder) assert.strictEqual(look.draw, R.eraLook(5).draw, `era ${era} placeholder`);
+    else assert.notStrictEqual(look.draw, R.eraLook(5).draw, `era ${era} is built and draws its own frame`);
   }
   cards.add(JSON.stringify(R.eraLook(5).card));
-  assert.strictEqual(cards.size, 6, 'six different name cards');
+  assert.strictEqual(cards.size, Pong.TOP_ERA - 4, 'a different name card on every 3D rung');
 });

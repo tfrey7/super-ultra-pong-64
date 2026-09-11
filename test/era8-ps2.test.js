@@ -320,11 +320,15 @@ test('era 8 plays exactly like era 1: drawing it every frame changes nothing abo
     const g = Pong.createGame({ rng: seeded(), phase: 'playing', era, rules: { eraChangePause: 0 } });
     const trail = [];
     let hits = 0;
+    // The run climbs past era 8 into rungs other cards build (item 1186: the Xbox's
+    // ctx.transform broke this test's strict recorder), so draw on the shared
+    // recorder that takes any canvas call; this test is about the physics.
+    const rec = eralooks.recorder();
     for (let i = 0; i < 2400; i++) {
       const pointerY = i < 1200 ? 300 + 220 * Math.sin(i / 35) : 20;
       Pong.step(g, 1 / 60, { pointerY, up: false, down: false });
       hits += g.events.filter((e) => e.type === 'paddle').length;
-      if (drawEachFrame) R.draw(canvas().ctx, g);
+      if (drawEachFrame) { rec.calls.length = 0; R.draw(rec.ctx, g); }
       trail.push([g.ball.x, g.ball.y, g.ball.vx, g.ball.vy, g.left.y, g.right.y, g.score.left, g.score.right, g.serveDelay]);
     }
     return { trail, hits };
