@@ -238,6 +238,12 @@ his emulator — never touch either.**
 - **Proof paths in a report must survive the landing.** The integrator deletes your worktree, so
   a picture cited at `G:/Claude Stuff/super-ultra-pong-64-<name>/...` is a dead link the moment the
   branch lands (item 1138). Cite the path the file will have in the main checkout.
+- **A debugging port another run's Chrome already holds hands you THAT run's page.** Item 1196
+  ran the full playtest on `--port 9347` while another worker was on it: the first checks read
+  a page already in play at 3-4 with its sound unlocked ("phase is playing"), and the DevTools
+  connection dropped (code 1006) when the other run finished -- 2 of 6, none of it the game.
+  The same command on a port nobody was using passed 44/44. A playtest that fails its opening
+  title-screen checks with a score already on the board is this; move to another `--port`.
 - **The ladder walk's "new era draws afterwards" check leaves out the name card's band.** It
   compares the live canvas with each era drawn offscreen, and the card covers the middle 180 rows
   of both until the serve; a look that draws something important only there would pass unseen.
