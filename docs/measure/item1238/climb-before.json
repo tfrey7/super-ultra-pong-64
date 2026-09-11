@@ -1,0 +1,669 @@
+{
+ "taken": "2026-09-11T03:05:35.126Z",
+ "label": "before",
+ "gpu": false,
+ "fresh": [
+  {
+   "era": 0,
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.8,
+   "max": 16.8,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 47.3,
+   "taskMsPerSec": 497.5,
+   "heapMB": 3.4,
+   "nodes": 190,
+   "jsListeners": 19,
+   "counts": {
+    "raf": 302,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 57,
+    "audioNodes": 19,
+    "sourcesLive": 5,
+    "sourcesStarted": 7
+   },
+   "music": {
+    "era": 0,
+    "scheduled": 5,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 1,
+   "frames": 49,
+   "total": 1033.3,
+   "mean": 21.09,
+   "p95": 33.3,
+   "max": 33.4,
+   "rafPerFrame": 3.06,
+   "scriptMsPerSec": 44.8,
+   "taskMsPerSec": 998.3,
+   "heapMB": 4.3,
+   "nodes": 411,
+   "jsListeners": 48,
+   "counts": {
+    "raf": 247,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 63,
+    "audioNodes": 42,
+    "sourcesLive": 4,
+    "sourcesStarted": 16
+   },
+   "music": {
+    "era": 1,
+    "scheduled": 17,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 2,
+   "frames": 59,
+   "total": 1016.7,
+   "mean": 17.23,
+   "p95": 16.8,
+   "max": 33.3,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 98.5,
+   "taskMsPerSec": 997.5,
+   "heapMB": 5,
+   "nodes": 631,
+   "jsListeners": 123,
+   "counts": {
+    "raf": 297,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 62,
+    "audioNodes": 154,
+    "sourcesLive": 13,
+    "sourcesStarted": 60
+   },
+   "music": {
+    "era": 2,
+    "scheduled": 59,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 3,
+   "frames": 58,
+   "total": 1016.7,
+   "mean": 17.53,
+   "p95": 33.3,
+   "max": 33.4,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 123.7,
+   "taskMsPerSec": 996.3,
+   "heapMB": 3.7,
+   "nodes": 217,
+   "jsListeners": 91,
+   "counts": {
+    "raf": 284,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 62,
+    "audioNodes": 212,
+    "sourcesLive": 17,
+    "sourcesStarted": 76
+   },
+   "music": {
+    "era": 3,
+    "scheduled": 50,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 4,
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 275.8,
+   "taskMsPerSec": 673.7,
+   "heapMB": 3.8,
+   "nodes": 214,
+   "jsListeners": 65,
+   "counts": {
+    "raf": 292,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 60,
+    "audioNodes": 147,
+    "sourcesLive": 23,
+    "sourcesStarted": 52
+   },
+   "music": {
+    "era": 4,
+    "scheduled": 19,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 5,
+   "frames": 39,
+   "total": 1016.6,
+   "mean": 26.07,
+   "p95": 33.4,
+   "max": 50,
+   "rafPerFrame": 3.08,
+   "scriptMsPerSec": 239.1,
+   "taskMsPerSec": 997.9,
+   "heapMB": 6.2,
+   "nodes": 439,
+   "jsListeners": 153,
+   "counts": {
+    "raf": 201,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 67,
+    "audioNodes": 300,
+    "sourcesLive": 46,
+    "sourcesStarted": 93
+   },
+   "music": {
+    "era": 5,
+    "scheduled": 36,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 6,
+   "frames": 31,
+   "total": 1033.3,
+   "mean": 33.33,
+   "p95": 33.4,
+   "max": 66.6,
+   "rafPerFrame": 3.1,
+   "scriptMsPerSec": 398.1,
+   "taskMsPerSec": 998.6,
+   "heapMB": 4.4,
+   "nodes": 213,
+   "jsListeners": 131,
+   "counts": {
+    "raf": 163,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 59,
+    "audioNodes": 330,
+    "sourcesLive": 77,
+    "sourcesStarted": 118
+   },
+   "music": {
+    "era": 6,
+    "scheduled": 24,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 7,
+   "frames": 36,
+   "total": 1016.7,
+   "mean": 28.24,
+   "p95": 33.4,
+   "max": 33.4,
+   "rafPerFrame": 3.08,
+   "scriptMsPerSec": 302.1,
+   "taskMsPerSec": 998.4,
+   "heapMB": 4.6,
+   "nodes": 213,
+   "jsListeners": 100,
+   "counts": {
+    "raf": 182,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 59,
+    "audioNodes": 313,
+    "sourcesLive": 28,
+    "sourcesStarted": 104
+   },
+   "music": {
+    "era": 7,
+    "scheduled": 47,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 8,
+   "frames": 29,
+   "total": 1016.6,
+   "mean": 35.06,
+   "p95": 50,
+   "max": 83.3,
+   "rafPerFrame": 3.1,
+   "scriptMsPerSec": 428.9,
+   "taskMsPerSec": 998.7,
+   "heapMB": 4.2,
+   "nodes": 219,
+   "jsListeners": 110,
+   "counts": {
+    "raf": 153,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 65,
+    "audioNodes": 281,
+    "sourcesLive": 51,
+    "sourcesStarted": 97
+   },
+   "music": {
+    "era": 8,
+    "scheduled": 28,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 9,
+   "frames": 29,
+   "total": 1016.6,
+   "mean": 35.06,
+   "p95": 50,
+   "max": 50,
+   "rafPerFrame": 3.1,
+   "scriptMsPerSec": 407.8,
+   "taskMsPerSec": 998.1,
+   "heapMB": 6.5,
+   "nodes": 436,
+   "jsListeners": 312,
+   "counts": {
+    "raf": 153,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 59,
+    "audioNodes": 843,
+    "sourcesLive": 60,
+    "sourcesStarted": 205
+   },
+   "music": {
+    "era": 9,
+    "scheduled": 64,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 10,
+   "frames": 13,
+   "total": 1050,
+   "mean": 80.77,
+   "p95": 83.4,
+   "max": 83.4,
+   "rafPerFrame": 3.23,
+   "scriptMsPerSec": 839.5,
+   "taskMsPerSec": 983.1,
+   "heapMB": 4,
+   "nodes": 213,
+   "jsListeners": 110,
+   "counts": {
+    "raf": 87,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 59,
+    "audioNodes": 364,
+    "sourcesLive": 29,
+    "sourcesStarted": 99
+   },
+   "music": {
+    "era": 10,
+    "scheduled": 51,
+    "crossfades": 0,
+    "errors": 0
+   }
+  }
+ ],
+ "climb": [
+  {
+   "era": 0,
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 38.2,
+   "taskMsPerSec": 225.2,
+   "heapMB": 2.8,
+   "nodes": 223,
+   "jsListeners": 29,
+   "counts": {
+    "raf": 550,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 57,
+    "audioNodes": 37,
+    "sourcesLive": 5,
+    "sourcesStarted": 16
+   },
+   "music": {
+    "era": 0,
+    "scheduled": 7,
+    "crossfades": 0,
+    "errors": 0
+   }
+  },
+  {
+   "era": 1,
+   "frames": 61,
+   "total": 1016.5,
+   "mean": 16.66,
+   "p95": 16.8,
+   "max": 16.8,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 45.7,
+   "taskMsPerSec": 581.9,
+   "heapMB": 3.1,
+   "nodes": 232,
+   "jsListeners": 58,
+   "counts": {
+    "raf": 958,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 66,
+    "audioNodes": 105,
+    "sourcesLive": 4,
+    "sourcesStarted": 45
+   },
+   "music": {
+    "era": 1,
+    "scheduled": 32,
+    "crossfades": 1,
+    "errors": 0
+   }
+  },
+  {
+   "era": 2,
+   "frames": 56,
+   "total": 1000,
+   "mean": 17.86,
+   "p95": 33.3,
+   "max": 33.4,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 101,
+   "taskMsPerSec": 997.9,
+   "heapMB": 3.7,
+   "nodes": 236,
+   "jsListeners": 135,
+   "counts": {
+    "raf": 1313,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 70,
+    "audioNodes": 350,
+    "sourcesLive": 9,
+    "sourcesStarted": 122
+   },
+   "music": {
+    "era": 2,
+    "scheduled": 119,
+    "crossfades": 2,
+    "errors": 0
+   }
+  },
+  {
+   "era": 3,
+   "frames": 50,
+   "total": 1016.6,
+   "mean": 20.33,
+   "p95": 33.4,
+   "max": 33.4,
+   "rafPerFrame": 3.06,
+   "scriptMsPerSec": 143.8,
+   "taskMsPerSec": 996.6,
+   "heapMB": 3.1,
+   "nodes": 240,
+   "jsListeners": 285,
+   "counts": {
+    "raf": 1630,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 73,
+    "audioNodes": 760,
+    "sourcesLive": 16,
+    "sourcesStarted": 270
+   },
+   "music": {
+    "era": 3,
+    "scheduled": 224,
+    "crossfades": 3,
+    "errors": 0
+   }
+  },
+  {
+   "era": 4,
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 302.1,
+   "taskMsPerSec": 731.2,
+   "heapMB": 4.1,
+   "nodes": 247,
+   "jsListeners": 445,
+   "counts": {
+    "raf": 1988,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 80,
+    "audioNodes": 1195,
+    "sourcesLive": 48,
+    "sourcesStarted": 433
+   },
+   "music": {
+    "era": 4,
+    "scheduled": 298,
+    "crossfades": 4,
+    "errors": 0
+   }
+  },
+  {
+   "era": 5,
+   "frames": 38,
+   "total": 1033.2,
+   "mean": 27.19,
+   "p95": 33.4,
+   "max": 33.4,
+   "rafPerFrame": 3.08,
+   "scriptMsPerSec": 231.4,
+   "taskMsPerSec": 998.4,
+   "heapMB": 4.9,
+   "nodes": 263,
+   "jsListeners": 617,
+   "counts": {
+    "raf": 2275,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 96,
+    "audioNodes": 1696,
+    "sourcesLive": 42,
+    "sourcesStarted": 602
+   },
+   "music": {
+    "era": 5,
+    "scheduled": 367,
+    "crossfades": 5,
+    "errors": 0
+   }
+  },
+  {
+   "era": 6,
+   "frames": 31,
+   "total": 1033.2,
+   "mean": 33.33,
+   "p95": 33.5,
+   "max": 49.9,
+   "rafPerFrame": 3.1,
+   "scriptMsPerSec": 379.7,
+   "taskMsPerSec": 998.8,
+   "heapMB": 4.6,
+   "nodes": 265,
+   "jsListeners": 835,
+   "counts": {
+    "raf": 2483,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 98,
+    "audioNodes": 2310,
+    "sourcesLive": 43,
+    "sourcesStarted": 820
+   },
+   "music": {
+    "era": 6,
+    "scheduled": 426,
+    "crossfades": 6,
+    "errors": 0
+   }
+  },
+  {
+   "era": 7,
+   "frames": 35,
+   "total": 1033.3,
+   "mean": 29.52,
+   "p95": 33.4,
+   "max": 33.4,
+   "rafPerFrame": 3.09,
+   "scriptMsPerSec": 311.9,
+   "taskMsPerSec": 998.5,
+   "heapMB": 5.9,
+   "nodes": 266,
+   "jsListeners": 1085,
+   "counts": {
+    "raf": 2703,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 99,
+    "audioNodes": 3031,
+    "sourcesLive": 57,
+    "sourcesStarted": 1070
+   },
+   "music": {
+    "era": 7,
+    "scheduled": 523,
+    "crossfades": 7,
+    "errors": 0
+   }
+  },
+  {
+   "era": 8,
+   "frames": 28,
+   "total": 1000,
+   "mean": 35.71,
+   "p95": 50,
+   "max": 50,
+   "rafPerFrame": 3.11,
+   "scriptMsPerSec": 426.2,
+   "taskMsPerSec": 998.8,
+   "heapMB": 5.5,
+   "nodes": 267,
+   "jsListeners": 1289,
+   "counts": {
+    "raf": 2890,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 100,
+    "audioNodes": 3605,
+    "sourcesLive": 44,
+    "sourcesStarted": 1274
+   },
+   "music": {
+    "era": 8,
+    "scheduled": 602,
+    "crossfades": 8,
+    "errors": 0
+   }
+  },
+  {
+   "era": 9,
+   "frames": 30,
+   "total": 1050,
+   "mean": 35,
+   "p95": 50.1,
+   "max": 50.1,
+   "rafPerFrame": 3.1,
+   "scriptMsPerSec": 411.1,
+   "taskMsPerSec": 998.6,
+   "heapMB": 4.9,
+   "nodes": 268,
+   "jsListeners": 1678,
+   "counts": {
+    "raf": 3079,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 101,
+    "audioNodes": 5135,
+    "sourcesLive": 57,
+    "sourcesStarted": 1663
+   },
+   "music": {
+    "era": 9,
+    "scheduled": 732,
+    "crossfades": 9,
+    "errors": 0
+   }
+  },
+  {
+   "era": 10,
+   "frames": 12,
+   "total": 1016.6,
+   "mean": 84.72,
+   "p95": 100,
+   "max": 100,
+   "rafPerFrame": 3.25,
+   "scriptMsPerSec": 842.4,
+   "taskMsPerSec": 983.7,
+   "heapMB": 5,
+   "nodes": 233,
+   "jsListeners": 371,
+   "counts": {
+    "raf": 3204,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 103,
+    "audioNodes": 6338,
+    "sourcesLive": 21,
+    "sourcesStarted": 1979
+   },
+   "music": {
+    "era": 10,
+    "scheduled": 866,
+    "crossfades": 10,
+    "errors": 0
+   }
+  }
+ ]
+}
