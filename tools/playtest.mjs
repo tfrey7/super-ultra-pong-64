@@ -513,11 +513,12 @@ async function walkLadder(s, baseUrl) {
   // The 3D eras' field (item 1273): through WebGL unless --gl-off asked for the
   // canvas fallback, and counted in frames so a layer that silently declined shows.
   const gl3 = await s.eval(`(() => { const F = window.PongField3D; if (!F) return { ok: false, why: 'no PongField3D' };
-    return { ok: F.available(), why: F.why(), frames: F.stats().frames }; })()`);
+    const st = F.stats(); return { ok: F.available(), why: F.why(), frames: st.frames, ms: st.ms }; })()`);
   check(GL_OFF ? 'the 3D eras drew their field through the canvas fallback (--gl-off)'
       : 'the 3D eras drew their field through WebGL (software, headless)',
     GL_OFF ? !gl3.ok && gl3.frames === 0 : gl3.ok && gl3.frames > 0,
-    gl3.ok ? `${gl3.frames} frames through WebGL` : `fallback: ${gl3.why}`);
+    gl3.ok ? `${gl3.frames} frames through WebGL, ${(gl3.ms / Math.max(1, gl3.frames)).toFixed(1)} ms each (render and copy)`
+      : `fallback: ${gl3.why}`);
   check('each era is on screen when its frame is taken',
     frames.every((f) => f.era === f.rung),
     frames.map((f) => `frame ${f.rung}: era ${f.era}`).join('; '));
