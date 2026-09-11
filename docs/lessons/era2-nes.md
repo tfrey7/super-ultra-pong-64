@@ -121,7 +121,12 @@ North America), with the heft of *Super Mario Bros.* in the sprites.
 4. **The ball is a tennis ball.** It has a `$38` seam pixel on its lit side and a black 4 x 2
    shadow three NES pixels below it, one extra sprite, as *Tennis* drew it.
 5. **All of it is fillRect.** The band, the crowd and the umpire are in code, and each figure is
-   one `drawImage` a frame. The page never loops over pixels.
+   one `drawImage` a frame. The page never loops over pixels. In the playtest's software-drawn
+   Chrome (ladder walk, item 1225's branch), era 2 held **60 frames over 1.00 s: mean, p95 and
+   max all 16.7 ms**, under the 18.5 ms line, with the whole scene and both players on. Its
+   arrival still passed the pixel check: 0 of 43,008 pixels differ from era 2 drawn offscreen.
+   A rally: [docs/shots/item-1225/rally-era2.png](../shots/item-1225/rally-era2.png). Both
+   sheets at 8x: [docs/shots/item-1225/sheets-x8.png](../shots/item-1225/sheets-x8.png).
 
 ### What did not work
 
