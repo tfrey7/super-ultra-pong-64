@@ -351,6 +351,12 @@ his emulator — never touch either.**
   worked example). `index.html?display=off` draws straight onto the page as before, and the
   playtest's pixel check reads the native frame through `PongDisplay.canvas()` and draws its
   comparisons through `PongDisplay.render()`.
+- **A screen overlay blends on the native picture, never on the page** (item 1200). The playtest's
+  Chrome draws without a GPU, and `'lighten'`, `'color'` or `'soft-light'` over the page's million
+  pixels, seven times a frame, held eras 5-10 to 10-20 frames a second. `src/display-tv.js` does
+  every blend on a copy of the native picture and gives the page two plain draws, scaled with
+  `imageSmoothingQuality = 'low'` (`'high'` alone cost about 20 ms a frame there). Measure a new
+  overlay with the ladder's "holds full frame rate" lines, screens on against `overlay: 'none'`.
 
 - **Six "holds full frame rate in ordinary play" FAILs, eras 5 to 10, are card 1216's, not yours**
   (until 1216 lands). The playtest's Chrome runs `--disable-gpu`, so every canvas is drawn on the
@@ -359,6 +365,16 @@ his emulator — never touch either.**
   hold 16.7 ms, and with the GPU allowed every era runs at 4.2 ms:
   `node docs/measure/item1192/eraspeed.mjs` re-takes all four setups in about two minutes. A FAIL
   on eras 0 to 4, or one far above those numbers, is new and is yours to look at.
+
+- **The ball carries more than its position and velocity** (item 1208): `ball.spin` bends its
+  flight and `ball.burst` is a smash's extra speed, and each paddle has a smoothed `vy`. Anything
+  that copies the ball to replay it -- the scripted scoring hand's `snapshotOf`/`copyOf`, the
+  playtest's `state()` -- must copy spin and burst too, or it plans against a straight ball that
+  is not coming. The spin read for the computer is `Pong.spinBend(state, x)` times
+  `rules.cpuSpinRead`, left on `state.right.spinRead` every step for whichever opponent moves
+  the paddle (the era profiles in `src/opponents.js` add it to their target). A spin or paddle
+  change is re-measured with `node tools/beatability-sample.mjs` (its `track` row between 35
+  and 60 percent: 58.3 after item 1208) and `--eras` (every era 30 to 65, the top the hardest).
 
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.

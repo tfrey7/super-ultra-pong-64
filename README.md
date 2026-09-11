@@ -43,8 +43,17 @@ with the coin, not while the tube warms up.)
 - The **computer plays the right paddle**. It is beatable on purpose: it only
   chases the ball once the ball is heading its way, it aims slightly off centre,
   and it cannot move as fast as a really steep shot travels. Aim for the corners.
-- **Where the ball hits your paddle decides the angle.** Dead centre sends it
-  straight back; the tips send it steep. Every hit makes the ball a little faster.
+- **Where the ball hits your paddle decides the angle.** The face is cut into
+  eight segments the way the 1972 machine's was: the middle two send it straight
+  back, and each segment out towards a tip sends it steeper. Every hit makes the
+  ball a little faster, and a point puts it back to the serving speed.
+- **Swing the paddle as you hit and the ball bends.** A paddle moving at contact
+  puts spin on the ball, and its flight curves the way you swung -- a real
+  banana, fading as it flies (a hand that only follows the ball puts none on).
+  Swing hard and it is a **smash**: a burst of speed for that one flight and a
+  heavier hit in the era's own voice. The computer reads spin, but not
+  perfectly. [`curve-strip.png`](docs/shots/paddle-physics/curve-strip.png) is
+  one curved smash, frame by frame, its path traced in red on the last frame.
 - A point scores when the ball leaves either side, and the next serve starts from
   the centre after a short pause. The score is drawn across the top.
 
@@ -98,6 +107,7 @@ walk, in about a minute:
 node tools/playtest.mjs --ladder              # just the walk up the ladder
 node tools/playtest.mjs --ladder --reference  # and re-take the tracked era frames
 node tools/playtest.mjs --scoring             # just a rally and a point against the computer
+node tools/playtest.mjs --curve               # just the curved shot (--reference re-takes its film strip)
 ```
 
 The point against the computer is played by a scripted hand
@@ -288,6 +298,18 @@ them). `src/display-tv.js` is where the TV overlays of eras 5-10 plug in. `index
 straight onto the page as before. All eleven side by side:
 `docs/shots/eras/contact-sheet-native.png` (from
 `docs/measure/item1198/contact-sheet.html`).
+
+**The 3D machines' screens** (`src/display-tv.js`, item 1200). The PlayStation and
+the N64 play on a 1990s TV over composite -- soft scanlines, colour bleeding
+sideways, a touch of blur, and on the PlayStation its 4 x 4 dither in the flat
+shading; the PS2 on a late TV over component, cleaner lines and a faint bloom; the
+Dreamcast and the Xbox sharp, only a faint line structure and a little edge glow;
+the Xbox 360 on a 720p flat panel, no lines, a hint of LCD softness and a slight
+smear behind fast movement. Every layer is a pre-drawn canvas or the frame drawn
+again at low alpha in a mode that only brightens, so the ball stays the brightest,
+sharpest thing on screen. Before and after, each era:
+`docs/shots/item1200/before-after-5-7.png` and `before-after-8-10.png` (from
+`docs/measure/item1200/before-after.html`).
 
 ### Each era change, step by step
 

@@ -48,8 +48,10 @@
    *              walls and all
    */
   var PROFILES = [
-    { era: 0,  name: 'COMPUTER',     reaction: 0.22, speed: 250, home: 0.45, aim: 58, tick: 0.12, anticipate: 0 },
-    { era: 1,  name: 'CPU',          reaction: 0.30, speed: 285, home: 0.50, aim: 58, tick: 0,    anticipate: 0 },
+    // Eras 0 and 1 aim 50 and 52, not 58 (item 1208): the eight-segment paddle and spin
+    // give the player sharper shots, and at 58 these two scored 72 and 68 percent.
+    { era: 0,  name: 'COMPUTER',     reaction: 0.22, speed: 250, home: 0.45, aim: 50, tick: 0.12, anticipate: 0 },
+    { era: 1,  name: 'CPU',          reaction: 0.30, speed: 285, home: 0.50, aim: 52, tick: 0,    anticipate: 0 },
     { era: 2,  name: 'PLAYER 2',     reaction: 0.20, speed: 297, home: 0.55, aim: 56, tick: 0,    anticipate: 0 },
     { era: 3,  name: 'BLAST PROCESSOR', reaction: 0.16, speed: 300, home: 0.60, aim: 56, tick: 0, anticipate: 0 },
     { era: 4,  name: 'MODE 7',       reaction: 0.15, speed: 296, home: 0.60, aim: 55, tick: 0,    anticipate: 0.35 },
@@ -131,7 +133,8 @@
     if (incoming) {
       var here = b.y + b.size / 2;
       var there = prof.anticipate > 0 ? predictY(state) : here;
-      target = here + (there - here) * prof.anticipate + (p.aimError || 0) * aimScale;
+      target = here + (there - here) * prof.anticipate + (p.aimError || 0) * aimScale +
+        (p.spinRead || 0);   // item 1208: the spin read, filled in by the rules each step
     } else {
       target = state.height / 2;
     }
