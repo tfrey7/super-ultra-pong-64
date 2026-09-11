@@ -247,16 +247,18 @@
       shadow: T.rgba(PALETTE.ink, 0.35),
       outline: { width: 2, colour: PALETTE.ink }
     });
-    // The shade band: the same circle offset down and right, clipped to the ball.
-    ctx.save();
+    // The shade band: the same circle offset (+0.35r, +0.35r), inside the ball.
+    // Drawn as the lens where the two circles overlap -- two arcs, no clip.
+    var d = 0.35 * Math.SQRT2;                 // centre offset, in radii
+    var half = Math.acos(d / 2);               // half the lens's angle on each circle
+    var dir = Math.PI / 4;                     // down and to the right
+    var bx = s.x + 0.35 * s.r, by = s.y + 0.35 * s.r;
     ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.beginPath();
-    ctx.arc(s.x + 0.35 * s.r, s.y + 0.35 * s.r, s.r, 0, Math.PI * 2);
+    ctx.arc(s.x, s.y, s.r, dir - half, dir + half);
+    ctx.arc(bx, by, s.r, dir + Math.PI - half, dir + Math.PI + half);
+    ctx.closePath();
     ctx.fillStyle = PALETTE.ballShade;
     ctx.fill();
-    ctx.restore();
     return s;
   }
 
@@ -295,52 +297,69 @@
     return { cells: cells, drips: drips, cx: cx, cy: SCORE.top + 2.5 * cell, width: width };
   }
 
+  /**
+   * A point of a tag, sprayed: skewed (x leans with height) and tilted 6
+   * degrees about the number's centre. Applied to each corner, so the frame
+   * needs no canvas transform. Pure.
+   */
+  function sprayPoint(tag, x, y) {
+    var qx = x - tag.cx, qy = y - tag.cy;
+    qx += SCORE.skew * qy;
+    var a = SCORE.tilt * RAD;
+    return { x: tag.cx + qx * Math.cos(a) - qy * Math.sin(a), y: tag.cy + qx * Math.sin(a) + qy * Math.cos(a) };
+  }
+
+  /** One path through every rectangle, each grown by pad and shifted by off, sprayed. */
+  function tracePath(ctx, tag, rects, off, pad) {
+    ctx.beginPath();
+    for (var i = 0; i < rects.length; i++) {
+      var c = rects[i];
+      var x0 = c.x + off - pad, y0 = c.y + off - pad, x1 = c.x + c.w + off + pad, y1 = c.y + c.h + off + pad;
+      var p = [sprayPoint(tag, x0, y0), sprayPoint(tag, x1, y0), sprayPoint(tag, x1, y1), sprayPoint(tag, x0, y1)];
+      ctx.moveTo(p[0].x, p[0].y);
+      ctx.lineTo(p[1].x, p[1].y);
+      ctx.lineTo(p[2].x, p[2].y);
+      ctx.lineTo(p[3].x, p[3].y);
+      ctx.closePath();
+    }
+  }
+
   function drawGraffiti(ctx, tag) {
-    var i, k, c;
-    ctx.save();
-    ctx.translate(tag.cx, tag.cy);
-    ctx.rotate(SCORE.tilt * RAD);
-    ctx.transform(1, 0, SCORE.skew, 1, 0, 0);
-    ctx.translate(-tag.cx, -tag.cy);
     // The extrusion, deepest first.
     ctx.fillStyle = PALETTE.magenta;
-    for (k = 0; k < SCORE.extrude.length; k++) {
-      var o = SCORE.extrude[k];
-      for (i = 0; i < tag.cells.length; i++) {
-        c = tag.cells[i];
-        ctx.fillRect(c.x + o, c.y + o, c.w, c.h);
-      }
+    for (var k = 0; k < SCORE.extrude.length; k++) {
+      tracePath(ctx, tag, tag.cells, SCORE.extrude[k], 0);
+      ctx.fill();
     }
     // The fat ink outline round every cell and drip, then the yellow over it.
     ctx.strokeStyle = PALETTE.ink;
     ctx.lineJoin = 'miter';
     ctx.lineWidth = SCORE.outline;
-    for (i = 0; i < tag.cells.length; i++) {
-      c = tag.cells[i];
-      ctx.strokeRect(c.x, c.y, c.w, c.h);
-    }
+    tracePath(ctx, tag, tag.cells, 0, 0);
+    ctx.stroke();
     ctx.lineWidth = SCORE.dripOutline;
-    for (i = 0; i < tag.drips.length; i++) {
-      c = tag.drips[i];
-      ctx.strokeRect(c.x, c.y, c.w, c.h);
-    }
+    tracePath(ctx, tag, tag.drips, 0, 0);
+    ctx.stroke();
     ctx.fillStyle = PALETTE.yellow;
-    for (i = 0; i < tag.cells.length; i++) {
-      c = tag.cells[i];
-      ctx.fillRect(c.x, c.y, c.w, c.h);
-    }
-    for (i = 0; i < tag.drips.length; i++) {
-      c = tag.drips[i];
-      ctx.fillRect(c.x, c.y, c.w, c.h);
-    }
-    ctx.restore();
+    tracePath(ctx, tag, tag.cells.concat(tag.drips), 0, 0);
+    ctx.fill();
   }
 
-  /** The lowest screen y any part of a tag can reach, tilt and outline included. */
+  /** The lowest screen y any part of a tag reaches: extrusion, outline and drips, sprayed. Pure. */
   function tagBottom(tag) {
-    var low = SCORE.top + 5 * SCORE.cell + Math.max(SCORE.extrude[0] + SCORE.outline / 2,
-      SCORE.dripMax + SCORE.dripOutline / 2);
-    return low + Math.abs(Math.sin(SCORE.tilt * RAD)) * (tag.width / 2 + Math.abs(SCORE.skew) * 5 * SCORE.cell);
+    var low = -Infinity;
+    function reach(rects, off, pad) {
+      for (var i = 0; i < rects.length; i++) {
+        var c = rects[i];
+        var xs = [c.x + off - pad, c.x + c.w + off + pad];
+        var ys = [c.y + off - pad, c.y + c.h + off + pad];
+        for (var a = 0; a < 2; a++) for (var b = 0; b < 2; b++) low = Math.max(low, sprayPoint(tag, xs[a], ys[b]).y);
+      }
+    }
+    reach(tag.cells, SCORE.extrude[0], 0);
+    reach(tag.cells, 0, SCORE.outline / 2);
+    reach(tag.drips, 0, SCORE.dripOutline / 2);
+    return low;
   }
 
   // ------------------------------------------------------------------ frame
@@ -431,6 +450,7 @@
     SKYLINE: SKYLINE,
     speedLines: speedLines,
     graffiti: graffiti,
+    sprayPoint: sprayPoint,
     tagBottom: tagBottom
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
