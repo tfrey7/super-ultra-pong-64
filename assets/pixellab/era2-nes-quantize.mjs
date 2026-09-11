@@ -10,8 +10,9 @@
  *
  *   era2-court-raw.png  (200x148)  -> era2-court.png  (200x148, one NES colour
  *       per pixel; every entry as bright as the ball's core is held back, so
- *       the court can never out-shine the ball -- ERAS.md R1; then PAINT_OUT
- *       takes out the two marks that read as a 3 and the pitch's halfway line)
+ *       the court can never out-shine the ball -- ERAS.md R1; then paintOut
+ *       keeps only the floor and its tile grid: the generation was a football
+ *       pitch, and every pitch marking goes, item 1259)
  *   era2-ball-raw2.png  (32x32)    -> era2-ball.png   (12x12, the ball's own box
  *       at the canvas's real pixels, inked only in NES $30/$10/$00/$0F, each
  *       pixel either opaque or clear)
@@ -192,33 +193,60 @@ export function inkCounts(img) {
 }
 
 /*
- * What the generator drew that the game must not show (item 1191), in court
- * pixels. Two small light-grey boxes with a dark glyph sat against each goal
- * line, level with the paddles, and both read as the digit 3 beside the real
- * score; the box is painted back to the floor, keeping the goal line it leans
- * on (x 14 and x 184). And the pitch's own halfway line, column 99, ran just
- * left of the game's dotted centre line: its lone pixels inside the pitch go
- * to the floor too, so only the game's line shows. Where another line crosses
- * it (the centre circle, the centre spot's rim, the pitch outlines) the
- * crossing pixel has a dark neighbour and stays.
+ * What the generator drew is a football pitch laid over a tiled floor (item
+ * 1259): a double outer border, two penalty boxes with their arcs, goal boxes,
+ * a centre circle and grey dashes along the lines -- and era 2 is Nintendo's
+ * Tennis. So only two things are kept from the generation: the floor's ink and
+ * the tile grid it drew under the pitch, a dark line about every 22 court
+ * pixels each way. The grid is read off the margins the pitch never covered
+ * (a column dark down all of TOP_MARGIN rows, a row dark across all of
+ * SIDE_MARGIN columns), and each grid line is then drawn whole, because the
+ * pitch had painted over most of it. The grid column under the net is left
+ * out: a dark line beside the game's dotted centre line read as a halfway
+ * line (item 1191). Every other pixel goes to the floor, so no pitch mark,
+ * no grey dash and no scrap of a glyph is left. The tennis lines themselves
+ * are drawn by the era in code (drawLines in src/eras/era2-nes.js).
+ *
+ * Until item 1259 this step painted out only the marks that read as a 3 and
+ * the pitch's halfway line (item 1191) and kept the rest of the pitch.
  */
-export const PAINT_OUT = [
-  { x: 15, y: 69, w: 7, h: 8 },   // the left "3", inside the left goal mouth
-  { x: 177, y: 69, w: 7, h: 8 }   // the right "3", inside the right goal mouth
-];
-export const HALFWAY = { x: 99, y0: 40, y1: 106 };
+export const TOP_MARGIN = 12;     // rows 0-11: above the pitch's outer border
+export const SIDE_MARGIN = 7;     // columns 0-6: left of it
+export const NET_CLEAR = 3;       // no grid column within this of the court's centre column
 
-/** The court with PAINT_OUT and the pitch's halfway line put back to its floor colour. */
+/** The generator's tile grid, as the court columns and rows it runs down. */
+export function tileGrid(img) {
+  const at = (x, y) => (y * img.width + x) * 4;
+  const dark = (x, y) => { const i = at(x, y); return luma(hexOf(img.rgba[i], img.rgba[i + 1], img.rgba[i + 2])) < 0.3; };
+  const cols = [], rows = [];
+  for (let x = 0; x < img.width; x++) {
+    let all = true;
+    for (let y = 0; y < TOP_MARGIN && all; y++) all = dark(x, y);
+    if (all && Math.abs(x - (img.width - 1) / 2) > NET_CLEAR) cols.push(x);
+  }
+  for (let y = 0; y < img.height; y++) {
+    let all = true;
+    for (let x = 0; x < SIDE_MARGIN && all; x++) all = dark(x, y);
+    if (all) rows.push(y);
+  }
+  return { cols, rows };
+}
+
+/** The court as floor and tile grid only: every pitch marking painted out. */
 export function paintOut(img) {
-  const out = { width: img.width, height: img.height, rgba: Buffer.from(img.rgba) };
+  const out = { width: img.width, height: img.height, rgba: Buffer.alloc(img.rgba.length) };
   const counts = inkCounts(img);
   const floor = rgbOf(Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0]);
-  const at = (x, y) => (y * out.width + x) * 4;
-  const set = (x, y) => { const i = at(x, y); out.rgba[i] = floor[0]; out.rgba[i + 1] = floor[1]; out.rgba[i + 2] = floor[2]; };
-  const dark = (x, y) => { const i = at(x, y); return luma(hexOf(img.rgba[i], img.rgba[i + 1], img.rgba[i + 2])) < 0.3; };
-  for (const r of PAINT_OUT) for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) set(x, y);
-  const { x, y0, y1 } = HALFWAY;
-  for (let y = y0; y <= y1; y++) if (dark(x, y) && !dark(x - 1, y) && !dark(x + 1, y)) set(x, y);
+  const { cols, rows } = tileGrid(img);
+  const i0 = cols.length ? cols[0] * 4 : 0;
+  const tile = [img.rgba[i0], img.rgba[i0 + 1], img.rgba[i0 + 2]];   // the grid's own ink, top row
+  for (let y = 0; y < out.height; y++) {
+    for (let x = 0; x < out.width; x++) {
+      const i = (y * out.width + x) * 4;
+      const ink = cols.includes(x) || rows.includes(y) ? tile : floor;
+      out.rgba[i] = ink[0]; out.rgba[i + 1] = ink[1]; out.rgba[i + 2] = ink[2]; out.rgba[i + 3] = 255;
+    }
+  }
   return out;
 }
 
