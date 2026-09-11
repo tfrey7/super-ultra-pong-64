@@ -92,3 +92,63 @@ Look file: [src/eras/era1-atari2600.js](../../src/eras/era1-atari2600.js).
    only plays on a ring), `src/signboards.js` and `src/match.js`.
 5. For a real 2600 palette, replace the dozen colours with the NTSC table. That was never done
    here, so `isLegible()` is your first check.
+
+## LESSONS
+
+What item 1224 learned making this era look like a AAA game of 1977 that happens to be Pong (the
+art bible's era 1 page, [docs/ART.md](../ART.md)). A rally at this era:
+[rally-era1-atari2600.png](../shots/item-1224/rally-era1-atari2600.png).
+
+**What sold the flagship look here**
+
+- **Everything on the chip's own grid.** The frame is laid out in 2600 units -- one pixel is 5
+  field units across and one scanline 3.125 down -- so the wall is 4 lines, a stand block is 4
+  pixels by 6 lines, the ball is 2 pixels by 4 lines and a digit block is 4 by 4. When the display
+  samples the frame down to 160 x 192, nothing lands between two pixels, and the picture reads as
+  a cartridge instead of a blurry Pong.
+- **A Combat arena instead of a blank field.** A dark blue playfield wall along the top and bottom,
+  and a stand of mirrored blocks along the top with every other block missing. That is the whole
+  scene, and it is enough: two colours of playfield turn a black screen into a place.
+- **The crowd is a flicker.** The stand's two block patterns swap every 16 frames, and every 4
+  for a second after a point. It is the cheapest "living" background there is, and it is exactly
+  what 2600 crowds did.
+- **People holding the paddles.** Each player is a 6 x 28 one-colour sprite drawn 5 units a pixel,
+  in its own paddle's ink, so a figure and its bat read as one object. That is how a 2600 player
+  and its missile shared one colour register.
+- **Playfield-block digits.** The score is the old 3 x 5 font, but each block is a playfield block
+  (4 pixels by 4 lines), so the numbers come out wide and squat, like Combat's. Under each number,
+  a 1-line meter grows a pixel for every hit that side makes this serve.
+
+**What did not work**
+
+- **pixflux cannot draw a 2600 sprite sheet.** Asked for 3 x 6 frames of 6 x 28 at 18 x 168 (two
+  generations, one a side), it drew a column of crawling shapes and a smear of grey noise --
+  [pixflux-sheets-rejected.png](../shots/item-1224/pixflux-sheets-rejected.png). At this size a
+  single row is too small to ask for at all: 18 x 28 is under the tool's 1,024-pixel minimum area.
+  So the players are painted in code by
+  [era1-sheets.mjs](../../assets/pixellab/era1-sheets.mjs), pixel by pixel, from the bible's
+  silhouette rows, for 0 generations. **At 2600 sizes, write the pixels yourself; a generator is
+  slower and worse.** The two rejected images stay in the manifest, marked rejected.
+- **The bible's torso does not fit.** A 6-wide torso in a 6-wide frame leaves no column for the
+  arm. The torso is 4 wide and the arm takes the last two columns.
+- **The rig draws a PNG as it is, and this era's colours are earned.** The session picks each
+  paddle's ink at its first point, one of twelve, and the rig has no way to tint a sheet. So every
+  ink has its own pair of sheets (24 files of about 200 bytes), and era 1's look names the pair a
+  frame wears: its `playerSheets()`, which the rig's era 1 block asks through a getter. A tint
+  option in the rig would replace all of this with two sheets.
+- **The win pose's arms merged with the head.** A 6-pixel-wide figure has no room for arms beside
+  a 4-wide head. The arms go straight up above the head (a `\o/` of two columns), and the hop is
+  the feet tucking up two rows rather than the whole body rising, which would push the head off
+  the frame.
+
+**What a one-era game would copy**
+
+1. `src/eras/era1-atari2600.js`, the `draw` function: the black field, the match-point stripe, the
+   flickering stand, the wall, the one-pixel dashed net, the block digits with their meter and
+   flash, the paddles, and the ball, in that order. Every number in it is in pixels and lines.
+2. [era1-sheets.mjs](../../assets/pixellab/era1-sheets.mjs): `pose(side, beat, i)` is the whole
+   figure -- five beats in one small function -- and `sheet(side, ink)` writes it in any colour.
+3. The rig block: frame 6 x 28, hand (6, 14), scale 5, fps 7.5 (a swap every 8 frames, the
+   kernel's rate).
+4. [rally.mjs](../shots/item-1224/rally.mjs): plays a real rally in headless Chrome by following
+   the ball with the mouse, and times two seconds of it (16.7 ms a frame, mean and p95).

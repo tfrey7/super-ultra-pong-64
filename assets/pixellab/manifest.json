@@ -153,15 +153,15 @@
       },
       "derivedFrom": "era2-court-raw.png",
       "derivedBy": "node assets/pixellab/era2-nes-quantize.mjs",
-      "how": "quantized pixel by pixel to the nearest NES colour, every entry as bright as the ball held back (luma under 0.8); then the two light-grey boxes that read as a 3 beside each paddle and the pitch's own halfway line painted back to the floor colour (PAINT_OUT, item 1191)",
-      "card": "item 1178, item 1191",
+      "how": "quantized pixel by pixel to the nearest NES colour, every entry as bright as the ball held back (luma under 0.8); then every football-pitch marking the generation drew (outer border, penalty boxes, arcs, goal boxes, centre circle, grey dashes) painted back to the floor colour, keeping only the floor and its tile grid, read off the margins the pitch never covered and drawn whole, less the grid column under the net (paintOut, item 1259; until then item 1191 painted out only the two boxes that read as a 3 and the halfway line)",
+      "card": "item 1178, item 1191, item 1259",
       "verdict": "drawn by era 2 (src/eras/era2-nes.js, embedded there as a data: URI)",
       "pixels": {
         "width": 200,
         "height": 148
       },
-      "bytes": 1233,
-      "sha256": "27a0b2a9108c79a60187f1c61992bea6f2177b63daae914b5c3d09d9a3e0a211",
+      "bytes": 718,
+      "sha256": "5fee08858473b397e9e189a68d3e3e865d0f45243aae39b630a63ccf60d44421",
       "endpoint": "POST /v1/generate-image-pixflux",
       "request": {
         "description": "top-down view of a retro 8-bit NES sports arena floor, dark teal square floor tiles with thin black grout lines, flat and simple, empty, no players, no text",
@@ -3675,6 +3675,1087 @@
         "outline": "selective outline",
         "shading": "medium shading",
         "no_background": true
+      }
+    },
+    {
+      "name": "era5-fighter-right",
+      "file": "era5-fighter-right.png",
+      "prompt": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, blue sleeveless top and grey trousers, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+      "size": {
+        "width": 60,
+        "height": 270
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1995,
+      "date": "2026-09-11T03:22:34.444Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 37,
+      "pixels": {
+        "width": 60,
+        "height": 270
+      },
+      "bytes": 4862,
+      "sha256": "25f5880850fc1d431aa9e23bc51a1713ad2c9ffbefe26c29bdd04cb129918c79",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, blue sleeveless top and grey trousers, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+        "image_size": {
+          "width": 60,
+          "height": 270
+        },
+        "seed": 1995,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era5-fighter-left",
+      "file": "era5-fighter-left.png",
+      "prompt": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, red gi with a black belt, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+      "size": {
+        "width": 60,
+        "height": 270
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1994,
+      "date": "2026-09-11T03:22:00.000Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 0,
+      "pixels": {
+        "width": 60,
+        "height": 270
+      },
+      "bytes": 10683,
+      "sha256": "b293f258569599ddd5eab51e60eb10c212d3309e32d441f0cce58e1bc6e7701d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, red gi with a black belt, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+        "image_size": {
+          "width": 60,
+          "height": 270
+        },
+        "seed": 1994,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "note": "item 1228: this entry was lost when the run that generated the image was ended by the account's usage limit mid-write (only the right-hand entry was committed). Rebuilt by the next attempt from the right-hand entry and the art bible's era 5 description; the prompt and seed are a reconstruction, the pixels, bytes and sha256 are the file's own. It was billed 1 generation (the WIP commit's count)."
+    },
+    {
+      "name": "era5-left",
+      "file": "era5-left.png",
+      "prompt": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, red gi with a black belt, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+      "size": {
+        "width": 60,
+        "height": 270
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1994,
+      "date": "2026-09-11T03:22:00.000Z",
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "seconds": 0,
+      "pixels": {
+        "width": 60,
+        "height": 180
+      },
+      "bytes": 2915,
+      "sha256": "92c6afad30e638505dc733b2752acdfdcd46a9ca86cbe2fa6fdc9c5f110ae1a4",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, red gi with a black belt, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+        "image_size": {
+          "width": 60,
+          "height": 270
+        },
+        "seed": 1994,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derived": {
+        "from": "era5-fighter-left.png",
+        "by": "assets/pixellab/era5-fighters-cut.mjs",
+        "what": "the figures pixflux drew, packed one a frame into the rig's 3 x 6 order (20 x 30 frames); 0 generations"
+      }
+    },
+    {
+      "name": "era5-right",
+      "file": "era5-right.png",
+      "prompt": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, blue sleeveless top and grey trousers, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+      "size": {
+        "width": 60,
+        "height": 270
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1995,
+      "date": "2026-09-11T03:22:34.444Z",
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "seconds": 0,
+      "pixels": {
+        "width": 60,
+        "height": 180
+      },
+      "bytes": 2087,
+      "sha256": "98b1655d840a2a948070f97937e2d9c6073d68389c262212ed405f84de799082",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, blue sleeveless top and grey trousers, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+        "image_size": {
+          "width": 60,
+          "height": 270
+        },
+        "seed": 1995,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derived": {
+        "from": "era5-fighter-right.png",
+        "by": "assets/pixellab/era5-fighters-cut.mjs",
+        "what": "the figures pixflux drew, packed one a frame into the rig's 3 x 6 order (20 x 30 frames); 0 generations"
+      }
+    },
+    {
+      "name": "era1-players-left",
+      "file": "era1-players-left.png",
+      "prompt": "Atari 2600 1977 sprite sheet, tiny blocky one-colour athlete, 3 columns by 6 rows of 6x28 pixel frames facing right, solid white figure on transparent: row 1 idle standing legs together, row 2 running upward legs apart, row 3 running downward legs apart, row 4 swinging arm raised, row 5 slumped head dropped, row 6 cheering both arms raised above head",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1501391548,
+      "date": "2026-09-11T03:23:57.266Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 21.7,
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 465,
+      "sha256": "9b9c9f0027894b59b8ce233304aee635900f6189912ddd34117d7bf287873f01",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "Atari 2600 1977 sprite sheet, tiny blocky one-colour athlete, 3 columns by 6 rows of 6x28 pixel frames facing right, solid white figure on transparent: row 1 idle standing legs together, row 2 running upward legs apart, row 3 running downward legs apart, row 4 swinging arm raised, row 5 slumped head dropped, row 6 cheering both arms raised above head",
+        "image_size": {
+          "width": 18,
+          "height": 168
+        },
+        "seed": 1501391548,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "verdict": "rejected (item 1224): pixflux did not lay out a 3 x 6 sprite sheet at 18 x 168 -- see docs/shots/item-1224/pixflux-sheets-rejected.png; the players are painted in code by assets/pixellab/era1-sheets.mjs instead"
+    },
+    {
+      "name": "era1-players-right",
+      "file": "era1-players-right.png",
+      "prompt": "Atari 2600 1977 sprite sheet, tiny blocky one-colour athlete, 3 columns by 6 rows of 6x28 pixel frames facing right, solid white figure on transparent, short neck head low on shoulders: row 1 idle standing legs together, row 2 running upward legs apart, row 3 running downward legs apart, row 4 swinging arm raised, row 5 slumped head dropped, row 6 cheering both arms raised above head",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 915340210,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 16.5,
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 885,
+      "sha256": "2d76711abc1f92a0b2d4a4b1e5ac63fa94a9bb7a8b6a35c3f1d9bfd5ffcac001",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "Atari 2600 1977 sprite sheet, tiny blocky one-colour athlete, 3 columns by 6 rows of 6x28 pixel frames facing right, solid white figure on transparent, short neck head low on shoulders: row 1 idle standing legs together, row 2 running upward legs apart, row 3 running downward legs apart, row 4 swinging arm raised, row 5 slumped head dropped, row 6 cheering both arms raised above head",
+        "image_size": {
+          "width": 18,
+          "height": 168
+        },
+        "seed": 915340210,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "verdict": "rejected (item 1224): pixflux did not lay out a 3 x 6 sprite sheet at 18 x 168 -- see docs/shots/item-1224/pixflux-sheets-rejected.png; the players are painted in code by assets/pixellab/era1-sheets.mjs instead"
+    },
+    {
+      "name": "era1-left-0",
+      "file": "era1-left-0.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 0 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 253,
+      "sha256": "45b88b73104761270ceef25e74242f0e4e3b533b9cf8f13fb2c9d7f39a4fb2ad",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-1",
+      "file": "era1-left-1.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 1 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 253,
+      "sha256": "64246ac055d4adbbf3817595ae3cf4f91cd9d891bbb331228c1f11ee8eff3899",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-2",
+      "file": "era1-left-2.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 2 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 254,
+      "sha256": "82d26e02e4eb9de731b5380cd65d2d7edbd775f26d9422c214785f586769e17f",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-3",
+      "file": "era1-left-3.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 3 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 253,
+      "sha256": "44283cbd1f41e834869b706c0f38a551ef49f0dd4b519592ff93b76b7a7c6762",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-4",
+      "file": "era1-left-4.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 4 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 253,
+      "sha256": "71cacc115a7dafaa0271e4a4c7106f1d5f20b4a3ac4ae47e7d81271c1b0222ae",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-5",
+      "file": "era1-left-5.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 5 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 253,
+      "sha256": "80ade40a7cfbbb7adf0fae96d9bf5bc1dd06350373513cbc06a441bbaf6f703d",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-6",
+      "file": "era1-left-6.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 6 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 253,
+      "sha256": "158399ce001f66d48e8f0d4cab55ea2d07a0944aad2594406e08ccfd3d0708c1",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-7",
+      "file": "era1-left-7.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 7 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 253,
+      "sha256": "962e162b28e7a459d2b24026ab2b26e6aba0453a1e96b6ff0bcc21c7479fb42c",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-8",
+      "file": "era1-left-8.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 8 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 253,
+      "sha256": "3c921505b2f7fc3c17a6a9aaa8134313e5abb45cd9e4d0ed34046e9371812e6c",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-9",
+      "file": "era1-left-9.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 9 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 251,
+      "sha256": "65b6f7532a227b0bb43eef0f0973c9f83ab778effdcbe0d3f3c81c6f05986be4",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-10",
+      "file": "era1-left-10.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 10 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 253,
+      "sha256": "3aa28e630a7ed5e477d2bd1cab239c157d76da8f967abf418ed956c831e1fee4",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-left-11",
+      "file": "era1-left-11.png",
+      "prompt": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 11 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 254,
+      "sha256": "216b1c8fda1584d3b44792aeb44066769325d63cb2e8eb35d87c0cf6de846e5a",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's player, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-0",
+      "file": "era1-right-0.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 0 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 242,
+      "sha256": "3076ccb1b15858c58b3454df94442865557d0490765bfbe1c6b2d46512b9b3db",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-1",
+      "file": "era1-right-1.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 1 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 242,
+      "sha256": "9c2d4c66d47dfad939d5985196693321f4d6188d2323d268f29d1414c877f872",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-2",
+      "file": "era1-right-2.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 2 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 243,
+      "sha256": "2305444b3ee62fd3fc3325bce1189b78c46f210875022f778bed42c0e55d9924",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-3",
+      "file": "era1-right-3.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 3 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 242,
+      "sha256": "e353649dd76b6e5410b655b19ded1b7d0a4b239f81e5f3c943b1c789b1acca17",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-4",
+      "file": "era1-right-4.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 4 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 242,
+      "sha256": "57f65ae52670b3b9202eea992c81e29389b277522d5d6f6e45a80447d3604b38",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-5",
+      "file": "era1-right-5.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 5 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 242,
+      "sha256": "d60c16032e7bc86b0e41cf23efa1c714de94bb59dfb37338a5b6e8e5a283fcfd",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-6",
+      "file": "era1-right-6.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 6 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 242,
+      "sha256": "3efcb3e8980d928e46b0c501c9a81525538b5d64c471167338c8c5e227b35ac5",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-7",
+      "file": "era1-right-7.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 7 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 242,
+      "sha256": "4bf5ad1fa82486d1b781a4b1862c095d318591e4ee29fde51eff89048489890f",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-8",
+      "file": "era1-right-8.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 8 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 242,
+      "sha256": "f30f74db8b7096829e3fb2c9bb2ebee2366ca534125bfd6fd7faa5d223eb7d8c",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-9",
+      "file": "era1-right-9.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 9 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 240,
+      "sha256": "793a4c328f818b8cd6ad75078c97019cbff69a64649bba5e433249674b8237b0",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-10",
+      "file": "era1-right-10.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 10 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 242,
+      "sha256": "fca93c6c3ea751838af08e579272545aeebeec8cde94de94c31ba01900c81c84",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
+      }
+    },
+    {
+      "name": "era1-right-11",
+      "file": "era1-right-11.png",
+      "prompt": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+      "size": {
+        "width": 18,
+        "height": 168
+      },
+      "style": {
+        "painted": "pixel by pixel from docs/ART.md, Era 1, PLAYERS"
+      },
+      "seed": 0,
+      "date": "2026-09-11T03:24:14.406Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedBy": "node assets/pixellab/era1-sheets.mjs",
+      "how": "the bible's silhouette rows painted into a grid, one ink index 11 of era 1's palette",
+      "card": "item 1224",
+      "verdict": "drawn by src/characters.js for era 1, the pair named by era 1's look (playerSheets)",
+      "pixels": {
+        "width": 18,
+        "height": 168
+      },
+      "bytes": 243,
+      "sha256": "3fa0e39191d883bee036a9d86760ee5eb68b6a29e7b39b779c035364a2687a90",
+      "endpoint": "none",
+      "request": {
+        "description": "painted in code, no generation: era 1's computer, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
+        "seed": 0
       }
     }
   ]

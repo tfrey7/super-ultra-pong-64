@@ -1,0 +1,4 @@
+calm  era 10, score 0-0: intensity 0, 49 notes booked in 3 s, audio running, errors 0
+peak  era 10, score 5-5 (match point), rally 12: intensity 1, 69 notes booked in 3 s, errors 0
+hot   master +18 dB: loudest sample into the limiter 1.048, out of it 0.803 (ceiling 0.89), 0 samples over it in 53 reads, compressor reduction down to -5.398 dB | DynamicsCompressorNode into WaveShaperNode
+wrote G:\Claude Stuff\super-ultra-pong-64-item-1241\docs\measure\item1241\engine-live.json

@@ -136,350 +136,41 @@
   //            type, freq, q, sweep?: { to, time } (the cutoff glides there
   //            as the note starts), lfo?: { perBeat, depth, wave? } (the
   //            cutoff wobbles `perBeat` times a beat, by depth x freq) },
-  //            fm?: { ratio, index }, vibrato?: { rate, cents, delay } }
+  //            fm?: { ratio, index }, vibrato?: { rate, cents, delay },
+  //            drop?: { ratio, time } (a pitched hit falls to ratio x its freq
+  //            over time seconds: a tom, a timpani, an 808 kick),
+  //            bursts?: n (n spikes 11 ms apart before the decay: a hand clap) }
   // Gains are on src/sound.js's scale; the whole soundtrack then sits
   // MUSIC_DB under it.
+  //
+  // Since item 1241 an era's file also carries its hardware (docs/MUSIC.md,
+  // "How the engine reads this sheet"):
+  //   voices   the chip's simultaneous notes; past it the latest-listed part
+  //            is dropped for that step (a pad or a kit piece counts as one)
+  //   kit      { kick, snare, hat, open, tom, crash, clap, timpani, ... }: each
+  //            a voice or a list of voices layered; a drum part names one with
+  //            `hit: 'snare'` instead of carrying a voice
+  //   chain    the period's production between the effects and the bus:
+  //            tone (a low-pass, Hz), tape: { wow, flutter, sat }, chorus:
+  //            { rate, depth, mix }, hall: { seconds, decay, mix, gate? }
+  //   from     on any part: the intensity (0..1, intensityOf) it joins at; the
+  //            engine adds its own LIFT layers (tom roll 0.7, crash 0.9) to any
+  //            era with those kit pieces
 
-  var ARRANGEMENTS = [
-    // 0 -- 1972 arcade: no sound chip, no music. The theme is only hinted.
-    {
-      name: '1972 arcade',
-      about: 'The melody\'s bones tapped as lonely square beeps, two a bar, over the cabinet\'s 60-cycle hum and a flickering fluorescent buzz.',
-      trait: 'No sound chip at all: one beeper and the mains hum is all the board had.',
-      parts: [
-        { play: 'melody', rule: 'bones',
-          voice: { wave: 'square', gain: 0.075, env: { a: 0.001, d: 0.07, s: 0, r: 0.01 } } }
-      ],
-      drone: [
-        { wave: 'sine', freq: 60, gain: 0.07 },
-        { wave: 'sine', freq: 120, gain: 0.035 },
-        { wave: 'sawtooth', freq: 120, gain: 0.02,
-          filter: { type: 'bandpass', freq: 3100, q: 6 }, wobble: { rate: 7.3, depth: 0.5 } }
-      ]
-    },
-
-    // 1 -- 1977 Atari 2600: the TIA's two channels.
-    {
-      name: 'Atari 2600',
-      about: 'The whole tune on two buzzy squares, sour and wobbly, with a thumping eighth-note bass that drops out whenever the snare hiss takes its channel.',
-      trait: 'Two channels and coarse pitch dividers: every note lands off true, and a drum has to steal the bass voice to sound.',
-      detune: [0, 31, -18, 12, -27, 8, 40, -9, 22, -35, 15, -22],
-      parts: [
-        { play: 'melody', rule: 'full',
-          voice: { wave: 'square', gain: 0.09, env: { a: 0.002, d: 0.05, s: 0.75, r: 0.02 }, legato: 0.8 } },
-        { play: 'bass', rule: 'eighths',
-          voice: { wave: 'square', gain: 0.08, env: { a: 0.002, d: 0.06, s: 0.5, r: 0.01 }, legato: 0.7 } },
-        { play: 'drum', pattern: '. . . . x . . . . . . . x . . .', fill: '. . . . x . . . x . x . x x x x',
-          steals: 'bass',
-          voice: { wave: 'noise', gain: 0.12, env: { a: 0.001, d: 0.09, s: 0, r: 0.01 },
-                   filter: { type: 'bandpass', freq: 1400, q: 0.8 } } }
-      ]
-    },
-
-    // 2 -- 1985 NES: two pulses, a triangle, a noise channel.
-    {
-      name: 'NES',
-      about: 'Brisk and bright: a pulse lead that narrows and sharpens for the B section, chords faked by a whirring arpeggio, a triangle bass leaping octaves and ticking noise hats; in the B section the second pulse echoes the tune back, quieter.',
-      trait: 'Pulse channels with a changing duty cycle, chords only as fast arpeggios, and a volume-less triangle bass.',
-      parts: [
-        { play: 'melody', rule: 'full', sections: ['A'],
-          voice: { wave: 'pulse25', gain: 0.1, env: { a: 0.002, d: 0.06, s: 0.75, r: 0.03 },
-                   vibrato: { rate: 5.5, cents: 18, delay: 0.14 } } },
-        { play: 'melody', rule: 'full', sections: ['B'],
-          voice: { wave: 'pulse12', gain: 0.11, env: { a: 0.002, d: 0.06, s: 0.75, r: 0.03 },
-                   vibrato: { rate: 6, cents: 22, delay: 0.12 } } },
-        { play: 'chords', rule: 'arp', speed: 2, octave: 1, sections: ['A'],
-          voice: { wave: 'pulse50', gain: 0.045, env: { a: 0.001, d: 0.02, s: 0.8, r: 0.005 }, legato: 0.95 } },
-        { play: 'echo', of: 'melody', delay: 3, sections: ['B'],
-          voice: { wave: 'pulse50', gain: 0.045, env: { a: 0.002, d: 0.06, s: 0.7, r: 0.03 } } },
-        { play: 'bass', rule: 'octaves',
-          voice: { wave: 'triangle', gain: 0.22, env: { a: 0.002, d: 0.01, s: 1, r: 0.005 }, legato: 0.9 } },
-        { play: 'drum', pattern: 'x . x . x . x . x . x . x . x .', fill: 'x . x . x . x . x x x x x x x x',
-          voice: { wave: 'noise', gain: 0.06, env: { a: 0.001, d: 0.035, s: 0, r: 0.005 },
-                   filter: { type: 'highpass', freq: 7000, q: 0.7 } } },
-        { play: 'drum', pattern: '. . . . x . . . . . . . x . . .', fill: '. . . . x . . . . . x . x . x x',
-          voice: { wave: 'noise', gain: 0.1, env: { a: 0.001, d: 0.1, s: 0, r: 0.01 },
-                   filter: { type: 'bandpass', freq: 1800, q: 0.8 } } }
-      ]
-    },
-
-    // 3 -- 1989 Genesis: the YM2612's FM channels and the PSG square on top.
-    {
-      name: 'Genesis',
-      about: 'A driving FM groove: a growling slap bass in sixteenths, the melody on a brassy FM horn, a thin square stabbing the chords on the off-beats, and a hard kick and snare with a gritty edge on everything.',
-      trait: 'FM synthesis: punchy metallic bass and brass patches, the PSG square riding on top, and that slightly crunchy output.',
-      parts: [
-        { play: 'bass', rule: 'sixteenths',
-          voice: { wave: 'sine', gain: 0.2, fm: { ratio: 1, index: 3.4 },
-                   env: { a: 0.002, d: 0.09, s: 0.4, r: 0.02 }, legato: 0.7 } },
-        { play: 'melody', rule: 'full',
-          voice: { wave: 'sine', gain: 0.12, fm: { ratio: 1, index: 2.4 },
-                   env: { a: 0.012, d: 0.2, s: 0.65, r: 0.06 }, vibrato: { rate: 6, cents: 14, delay: 0.18 } } },
-        { play: 'chords', rule: 'offbeat', octave: 1,
-          voice: { wave: 'square', gain: 0.03, env: { a: 0.001, d: 0.06, s: 0.3, r: 0.02 }, legato: 0.6 } },
-        { play: 'drum', pattern: 'X . . . . . . x x . . . . . . .', fill: 'X . . . . . . x x . . . . x x x',
-          voice: { wave: 'kick', freq: 170, gain: 0.45, env: { a: 0.001, d: 0.16, s: 0, r: 0.02 } } },
-        { play: 'drum', pattern: '. . . . X . . . . . . . X . . .', fill: '. . . . X . . . . . . . X x X X',
-          voice: { wave: 'noise', gain: 0.18, env: { a: 0.001, d: 0.11, s: 0, r: 0.02 },
-                   filter: { type: 'bandpass', freq: 2200, q: 0.9 } } },
-        { play: 'drum', pattern: 'x x X x x x X x x x X x x x X x',
-          voice: { wave: 'noise', gain: 0.045, env: { a: 0.001, d: 0.03, s: 0, r: 0.01 },
-                   filter: { type: 'highpass', freq: 8000, q: 0.7 } } }
-      ],
-      effects: { grit: 0.35 }
-    },
-
-    // 4 -- 1991 Super Nintendo: eight sampled channels and the echo.
-    {
-      name: 'Super Nintendo',
-      about: 'The warm orchestral version: the melody on a soft brass, strings holding the chords, a plucked bass, and for the B section a marimba climbing the chords and a choir swelling in, all rounded off and ringing in the echo.',
-      trait: 'Sampled orchestral instruments, a soft low-pass on the output and the built-in echo everyone remembers.',
-      parts: [
-        { play: 'melody', rule: 'full',
-          voice: { wave: 'sawtooth', gain: 0.07, unison: [7],
-                   env: { a: 0.035, d: 0.25, s: 0.75, r: 0.2 }, legato: 0.92,
-                   filter: { type: 'lowpass', freq: 1700, q: 1.6 },
-                   vibrato: { rate: 5, cents: 20, delay: 0.2 } } },
-        { play: 'chords', rule: 'pad',
-          voice: { wave: 'sawtooth', gain: 0.03, unison: [-9, 8],
-                   env: { a: 0.3, d: 0.4, s: 0.8, r: 0.5 }, legato: 0.98,
-                   filter: { type: 'lowpass', freq: 1400, q: 0.8 } } },
-        { play: 'chords', rule: 'pad', octave: 1, sections: ['B'],
-          voice: { wave: 'triangle', gain: 0.05, unison: [-6, 6],
-                   env: { a: 0.45, d: 0.3, s: 0.85, r: 0.6 }, legato: 0.98,
-                   filter: { type: 'lowpass', freq: 1900, q: 0.7 },
-                   vibrato: { rate: 4.2, cents: 10, delay: 0.3 } } },
-        { play: 'chords', rule: 'broken', octave: 1, sections: ['B'],
-          voice: { wave: 'sine', gain: 0.07, env: { a: 0.002, d: 0.18, s: 0, r: 0.05 },
-                   fm: { ratio: 4, index: 1.2 } } },
-        { play: 'bass', rule: 'pizz',
-          voice: { wave: 'triangle', gain: 0.24, env: { a: 0.004, d: 0.22, s: 0.2, r: 0.06 }, legato: 0.8,
-                   filter: { type: 'lowpass', freq: 700, q: 0.7 } } },
-        { play: 'drum', pattern: 'X . . . . . . . x . x . . . . .',
-          voice: { wave: 'kick', freq: 120, gain: 0.28, env: { a: 0.002, d: 0.22, s: 0, r: 0.03 } } },
-        { play: 'drum', pattern: '. . . . x . . . . . . . x . . .', fill: '. . . . x . . . . . . . x . x x',
-          voice: { wave: 'noise', gain: 0.07, env: { a: 0.002, d: 0.16, s: 0, r: 0.05 },
-                   filter: { type: 'bandpass', freq: 1600, q: 0.7 } } }
-      ],
-      effects: { lowpass: 5200, echo: { time: 0.23, feedback: 0.38, mix: 0.35 } }
-    },
-
-    // 5 -- 1995 PlayStation: the SPU's 24 voices of compressed samples, and
-    // its hardware reverb.
-    {
-      name: 'PlayStation',
-      about: 'Ambient techno: a soft four-on-the-floor under lush seventh-chord pads, squelchy off-beat stabs and a rolling bass, the melody on a smooth sampled lead, the whole mix breathing through a slow resonant filter sweep and washing out in reverb and a dotted-eighth delay.',
-      trait: 'CD-era sequenced samples: a slightly grainy compressed edge, real chords for the first time, resonant filter sweeps and the SPU\'s built-in reverb.',
-      parts: [
-        { play: 'melody', rule: 'full',
-          voice: { wave: 'triangle', gain: 0.085, unison: [6],
-                   env: { a: 0.012, d: 0.3, s: 0.65, r: 0.25 }, legato: 0.9,
-                   filter: { type: 'lowpass', freq: 3200, q: 0.9 },
-                   vibrato: { rate: 5, cents: 10, delay: 0.25 } } },
-        { play: 'chords', rule: 'pad', voicing: 'seventh',
-          voice: { wave: 'sawtooth', gain: 0.03, unison: [-10, 10], spread: 0.6,
-                   env: { a: 0.6, d: 0.5, s: 0.85, r: 0.8 }, legato: 0.98,
-                   filter: { type: 'lowpass', freq: 1700, q: 0.8 } } },
-        { play: 'chords', rule: 'rhythm', pattern: '. . x . . . x . . . x . . . x .',
-          voice: { wave: 'sawtooth', gain: 0.03, env: { a: 0.001, d: 0.16, s: 0, r: 0.04 },
-                   filter: { type: 'lowpass', freq: 3400, q: 9, sweep: { to: 380, time: 0.13 } } } },
-        { play: 'bass', rule: 'octaves',
-          voice: { wave: 'sawtooth', gain: 0.12, env: { a: 0.002, d: 0.1, s: 0.45, r: 0.03 }, legato: 0.8,
-                   filter: { type: 'lowpass', freq: 900, q: 7, sweep: { to: 200, time: 0.11 } } } },
-        { play: 'drum', pattern: 'X . . . x . . . X . . . x . . .',
-          voice: { wave: 'kick', freq: 115, gain: 0.3, env: { a: 0.001, d: 0.2, s: 0, r: 0.02 } } },
-        { play: 'drum', pattern: '. . x . . . x . . . x . . . x .', fill: '. . x . . . x . . . x . x x x x',
-          voice: { wave: 'noise', gain: 0.04, pan: 0.3, env: { a: 0.001, d: 0.05, s: 0, r: 0.01 },
-                   filter: { type: 'highpass', freq: 8500, q: 0.7 } } },
-        { play: 'drum', pattern: '. . . . x . . . . . . . x . . .',
-          voice: { wave: 'noise', gain: 0.06, pan: -0.2, env: { a: 0.001, d: 0.14, s: 0, r: 0.04 },
-                   filter: { type: 'bandpass', freq: 1500, q: 0.8 } } }
-      ],
-      effects: { crush: 8, sweep: { freq: 2600, depth: 2100, bars: 4, q: 5 },
-                 echo: { time: 0.34, feedback: 0.32, mix: 0.22 },
-                 reverb: { seconds: 2.2, decay: 3, mix: 0.3 } }
-    },
-
-    // 6 -- 1996 Nintendo 64: samples squeezed onto a cartridge, played by the
-    // RSP, so everything sounds muffled and bathed in reverb.
-    {
-      name: 'Nintendo 64',
-      about: 'Synth-orchestral: a fat, slowly vibrating string pad, brassy stabs punching the chords, the melody on a breathy flute in the A section and a proud horn in the B, bowed basses, timpani and a crash at each section, all a little muffled and swimming in a big hall reverb.',
-      trait: 'Cartridge-squeezed samples: the whole mix rolled off above about 9 kHz, orchestral pads and brass, and a big reverb over everything.',
-      parts: [
-        { play: 'melody', rule: 'full', sections: ['A'],
-          voice: { wave: 'triangle', gain: 0.085, env: { a: 0.04, d: 0.25, s: 0.75, r: 0.2 }, legato: 0.92,
-                   filter: { type: 'lowpass', freq: 2600, q: 0.7 },
-                   vibrato: { rate: 5.2, cents: 16, delay: 0.18 } } },
-        { play: 'melody', rule: 'full', sections: ['B'],
-          voice: { wave: 'sawtooth', gain: 0.065, unison: [6], env: { a: 0.05, d: 0.25, s: 0.8, r: 0.2 }, legato: 0.92,
-                   filter: { type: 'lowpass', freq: 1500, q: 1.2 },
-                   vibrato: { rate: 5, cents: 14, delay: 0.25 } } },
-        { play: 'chords', rule: 'pad',
-          voice: { wave: 'sawtooth', gain: 0.028, unison: [-13, -5, 6, 12], spread: 0.6,
-                   env: { a: 0.45, d: 0.4, s: 0.85, r: 0.7 }, legato: 0.98,
-                   filter: { type: 'lowpass', freq: 2100, q: 0.7 },
-                   vibrato: { rate: 4.4, cents: 8, delay: 0.3 } } },
-        { play: 'chords', rule: 'rhythm', pattern: 'X . . x . . x . . . . . x . . .', fill: 'X . . x . . x . . . x . X . X .',
-          voice: { wave: 'sawtooth', gain: 0.04, unison: [8],
-                   env: { a: 0.015, d: 0.16, s: 0.45, r: 0.1 }, legato: 0.8,
-                   filter: { type: 'lowpass', freq: 850, q: 1.5, sweep: { to: 2700, time: 0.07 } } } },
-        { play: 'bass', rule: 'held',
-          voice: { wave: 'sawtooth', gain: 0.1, env: { a: 0.08, d: 0.3, s: 0.8, r: 0.25 }, legato: 0.95,
-                   filter: { type: 'lowpass', freq: 420, q: 0.8 } } },
-        { play: 'drum', pattern: 'X . . . . . . . x . . . . . . .', fill: 'X . . . . . . . x . . . x . x x',
-          voice: { wave: 'kick', freq: 95, gain: 0.26, env: { a: 0.002, d: 0.4, s: 0, r: 0.05 } } },
-        { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
-          voice: { wave: 'noise', gain: 0.06, env: { a: 0.002, d: 1.2, s: 0, r: 0.1 },
-                   filter: { type: 'highpass', freq: 4500, q: 0.6 } } }
-      ],
-      effects: { lowpass: 9000, reverb: { seconds: 3.2, decay: 2.5, mix: 0.42 } }
-    },
-
-    // 7 -- 1998 Dreamcast: the AICA's 64 voices at full CD quality, and a
-    // proper effects DSP.
-    {
-      name: 'Dreamcast',
-      about: 'Bright and upbeat: jazzy ninth chords comped on an electric piano, a funky bass popping octaves, the melody on a crisp synth lead, a vibraphone climbing the chords in the B section, over a swung breakbeat with ghost-note snares, a sizzling ride and a crash at each section.',
-      trait: 'Crisp, full-band sound for the first time: clean bright chords with real extensions, a breakbeat with real cymbals, and no filter muffling the top end.',
-      swing: 0.12,
-      parts: [
-        { play: 'melody', rule: 'full',
-          voice: { wave: 'sawtooth', gain: 0.06, unison: [5], env: { a: 0.004, d: 0.2, s: 0.7, r: 0.1 }, legato: 0.85,
-                   filter: { type: 'lowpass', freq: 5200, q: 0.8 },
-                   vibrato: { rate: 6, cents: 14, delay: 0.15 } } },
-        { play: 'chords', rule: 'rhythm', voicing: 'ninth', pattern: 'x - . . . . x - . . x . . . . .',
-          fill: 'x - . . . . x - . . x . x . x .',
-          voice: { wave: 'sine', gain: 0.07, fm: { ratio: 1, index: 1.3 },
-                   env: { a: 0.002, d: 0.45, s: 0.3, r: 0.18 }, legato: 0.9 } },
-        { play: 'chords', rule: 'broken', voicing: 'seventh', octave: 1, sections: ['B'],
-          voice: { wave: 'sine', gain: 0.045, pan: 0.35, fm: { ratio: 3.5, index: 0.8 },
-                   env: { a: 0.002, d: 0.35, s: 0, r: 0.1 } } },
-        { play: 'bass', rule: 'octaves',
-          voice: { wave: 'sine', gain: 0.18, fm: { ratio: 1, index: 2 },
-                   env: { a: 0.002, d: 0.14, s: 0.35, r: 0.03 }, legato: 0.75 } },
-        { play: 'drum', pattern: 'X . x . . . . . . . x x . . . .', fill: 'X . x . . . . . . . x . x . x .',
-          voice: { wave: 'kick', freq: 140, gain: 0.38, env: { a: 0.001, d: 0.15, s: 0, r: 0.02 } } },
-        { play: 'drum', pattern: '. . . . X . . x . x . . X . . x', fill: '. . . . X . . x . x . . X x X X',
-          voice: { wave: 'noise', gain: 0.13, env: { a: 0.001, d: 0.12, s: 0, r: 0.03 },
-                   filter: { type: 'bandpass', freq: 2100, q: 0.7 } } },
-        { play: 'drum', pattern: 'X . x x X . x x X . x x X . x x',
-          voice: { wave: 'noise', gain: 0.03, pan: -0.35, env: { a: 0.001, d: 0.2, s: 0, r: 0.04 },
-                   filter: { type: 'highpass', freq: 6500, q: 0.6 } } },
-        { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
-          voice: { wave: 'noise', gain: 0.06, pan: 0.4, env: { a: 0.001, d: 1.1, s: 0, r: 0.1 },
-                   filter: { type: 'highpass', freq: 5000, q: 0.5 } } }
-      ],
-      effects: { reverb: { seconds: 1.2, decay: 4, mix: 0.16 } }
-    },
-
-    // 8 -- 2000 PlayStation 2: streamed film-score audio, wide and dark.
-    {
-      name: 'PlayStation 2',
-      about: 'Cinematic: slow, wide strings singing the melody over a dark string bed, a low A drone that never lets go, a deep eighth-note pulse under it and a heartbeat of distant drums that swell into taiko hits at the end of each section.',
-      trait: 'Film-score texture: slow strings spread wide across the stereo field, a low drone and a deep pulse, dark and rolled off, in a long hall.',
-      parts: [
-        { play: 'melody', rule: 'full',
-          voice: { wave: 'sawtooth', gain: 0.06, unison: [-8, 7], spread: 0.7,
-                   env: { a: 0.22, d: 0.3, s: 0.9, r: 0.5 }, legato: 0.98,
-                   filter: { type: 'lowpass', freq: 1500, q: 0.8 },
-                   vibrato: { rate: 4.6, cents: 12, delay: 0.3 } } },
-        { play: 'chords', rule: 'pad', octave: -1,
-          voice: { wave: 'sawtooth', gain: 0.03, unison: [-14, 13], spread: 1,
-                   env: { a: 0.9, d: 0.4, s: 0.9, r: 1.2 }, legato: 0.99,
-                   filter: { type: 'lowpass', freq: 900, q: 0.7 } } },
-        { play: 'bass', rule: 'eighths', octave: -1,
-          voice: { wave: 'triangle', gain: 0.22, env: { a: 0.004, d: 0.14, s: 0.25, r: 0.05 }, legato: 0.7,
-                   filter: { type: 'lowpass', freq: 320, q: 0.9 } } },
-        { play: 'drum', pattern: 'X . . x . . . . X . . x . . . .', fill: 'X . . x . . . . X . . . X . X X',
-          voice: { wave: 'kick', freq: 70, gain: 0.34, env: { a: 0.002, d: 0.35, s: 0, r: 0.05 } } }
-      ],
-      drone: [
-        { wave: 'sawtooth', freq: 55, gain: 0.045, filter: { type: 'lowpass', freq: 240, q: 1 },
-          wobble: { rate: 0.13, depth: 0.4 } },
-        { wave: 'sine', freq: 110, gain: 0.025 }
-      ],
-      effects: { lowpass: 4200, reverb: { seconds: 4, decay: 2, mix: 0.45 } }
-    },
-
-    // 9 -- 2001 Xbox: a PC sound chip in a box, streaming real recordings;
-    // the soundtrack goes guitar.
-    {
-      name: 'Xbox',
-      about: 'Drop-tuned rock: low palm-muted power-chord chugs double-tracked hard left and right, the melody screamed out on an overdriven lead guitar, a growling bass an octave down, a heavy kick and a cracking snare that rolls into each new section, with a crash to open it.',
-      trait: 'A guitar amp in software: a saw through a heavy drive, power chords tuned down low, a heavy kick and snare and wide stereo.',
-      parts: [
-        { play: 'melody', rule: 'full',
-          voice: { wave: 'sawtooth', gain: 0.055, drive: 0.6, env: { a: 0.004, d: 0.2, s: 0.8, r: 0.1 }, legato: 0.92,
-                   filter: { type: 'lowpass', freq: 3600, q: 1 },
-                   vibrato: { rate: 6.2, cents: 28, delay: 0.14 } } },
-        // The riff double-tracked: two takes, one hard left and one hard right,
-        // a few cents apart, so the chugs fill the sides and leave the middle
-        // to the kick, the bass and the lead.
-        { play: 'chords', rule: 'rhythm', voicing: 'power', octave: -1,
-          pattern: 'X - x x X - x x X - x x X x X x', fill: 'X - x x X - x x X - X - X - X -',
-          voice: { wave: 'sawtooth', gain: 0.11, unison: [-7], pan: -1, drive: 0.85,
-                   env: { a: 0.002, d: 0.08, s: 0.55, r: 0.03 }, legato: 0.8,
-                   filter: { type: 'lowpass', freq: 3000, q: 0.9 } } },
-        { play: 'chords', rule: 'rhythm', voicing: 'power', octave: -1,
-          pattern: 'X - x x X - x x X - x x X x X x', fill: 'X - x x X - x x X - X - X - X -',
-          voice: { wave: 'sawtooth', gain: 0.11, unison: [8], pan: 1, drive: 0.85,
-                   env: { a: 0.003, d: 0.08, s: 0.55, r: 0.03 }, legato: 0.78,
-                   filter: { type: 'lowpass', freq: 2800, q: 0.9 } } },
-        { play: 'bass', rule: 'eighths', octave: -1,
-          voice: { wave: 'sawtooth', gain: 0.12, drive: 0.25, env: { a: 0.002, d: 0.1, s: 0.6, r: 0.03 }, legato: 0.85,
-                   filter: { type: 'lowpass', freq: 520, q: 1 } } },
-        { play: 'drum', pattern: 'X . . . . . x . X . x . . . . .', fill: 'X . . . . . x . X x X x X x X x',
-          voice: { wave: 'kick', freq: 125, gain: 0.45, env: { a: 0.001, d: 0.14, s: 0, r: 0.02 } } },
-        { play: 'drum', pattern: '. . . . X . . . . . . . X . . .', fill: '. . . . X . . . . . X . X X X X',
-          voice: { wave: 'noise', gain: 0.2, env: { a: 0.001, d: 0.15, s: 0, r: 0.03 },
-                   filter: { type: 'bandpass', freq: 1900, q: 0.8 } } },
-        { play: 'drum', pattern: 'x . x . x . x . x . x . x . x .',
-          voice: { wave: 'noise', gain: 0.04, pan: 0.45, env: { a: 0.001, d: 0.05, s: 0, r: 0.01 },
-                   filter: { type: 'highpass', freq: 8000, q: 0.7 } } },
-        { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
-          voice: { wave: 'noise', gain: 0.07, pan: -0.45, env: { a: 0.001, d: 1.0, s: 0, r: 0.1 },
-                   filter: { type: 'highpass', freq: 4500, q: 0.5 } } }
-      ],
-      effects: { reverb: { seconds: 1, decay: 4, mix: 0.12 } }
-    },
-
-    // 10 -- 2005 Xbox 360: the big-room era; the soundtrack is a festival.
-    {
-      name: 'Xbox 360',
-      about: 'Big-room: a huge four-on-the-floor kick, a wobbling bass whose filter throbs twice a beat, supersaw pads pumping against the kick, the melody spun into bright plucked arpeggios the whole way through, and for the B section a wide supersaw lead on the tune itself, with a snare roll building into each section.',
-      trait: 'Big-room production: a bass filter driven by a tempo-locked LFO, side-chain pumping on the pads, arpeggios and a huge kick, wide and loud.',
-      parts: [
-        { play: 'melody', rule: 'arp', speed: 1, shape: [0, 12, 7, 12],
-          voice: { wave: 'sawtooth', gain: 0.055, unison: [8], spread: 0.5,
-                   env: { a: 0.001, d: 0.12, s: 0.25, r: 0.05 }, legato: 0.85,
-                   filter: { type: 'lowpass', freq: 3000, q: 3, sweep: { to: 900, time: 0.1 } } } },
-        { play: 'melody', rule: 'full', sections: ['B'],
-          voice: { wave: 'sawtooth', gain: 0.045, unison: [-15, -7, 7, 15], spread: 0.9,
-                   env: { a: 0.01, d: 0.2, s: 0.8, r: 0.15 }, legato: 0.92,
-                   filter: { type: 'lowpass', freq: 5000, q: 0.8 } } },
-        { play: 'chords', rule: 'pad',
-          voice: { wave: 'sawtooth', gain: 0.03, unison: [-12, -5, 5, 12], spread: 0.8, pump: 0.8,
-                   env: { a: 0.05, d: 0.3, s: 0.9, r: 0.3 }, legato: 0.98,
-                   filter: { type: 'lowpass', freq: 3500, q: 0.7 } } },
-        { play: 'bass', rule: 'held', octave: -1,
-          voice: { wave: 'sawtooth', gain: 0.13, unison: [-10, 10], drive: 0.3,
-                   env: { a: 0.005, d: 0.1, s: 0.9, r: 0.05 }, legato: 0.97,
-                   filter: { type: 'lowpass', freq: 900, q: 8, lfo: { perBeat: 2, depth: 0.88 } } } },
-        { play: 'bass', rule: 'held', octave: -1,
-          voice: { wave: 'sine', gain: 0.1, pump: 0.6, env: { a: 0.005, d: 0.1, s: 0.9, r: 0.05 }, legato: 0.97 } },
-        { play: 'drum', pattern: 'X . . . X . . . X . . . X . . .',
-          voice: { wave: 'kick', freq: 165, gain: 0.6, env: { a: 0.001, d: 0.3, s: 0, r: 0.03 } } },
-        { play: 'drum', pattern: '. . . . X . . . . . . . X . . .', fill: '. . . . X . . . X . X . X X X X',
-          voice: { wave: 'noise', gain: 0.16, env: { a: 0.001, d: 0.11, s: 0, r: 0.03 },
-                   filter: { type: 'bandpass', freq: 1250, q: 1 } } },
-        { play: 'drum', pattern: '. . x . . . x . . . x . . . x .',
-          voice: { wave: 'noise', gain: 0.05, pan: -0.3, env: { a: 0.001, d: 0.06, s: 0, r: 0.01 },
-                   filter: { type: 'highpass', freq: 9000, q: 0.7 } } }
-      ],
-      effects: { reverb: { seconds: 1.8, decay: 3, mix: 0.2 } }
+  var ERA_FILES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes', 'era5-playstation', 'era6-n64', 'era7-dreamcast', 'era8-ps2', 'era9-xbox', 'era10-xbox360'];
+  // ======================================================== ARRANGEMENTS
+  // ONE FILE PER ERA since item 1241: src/music/eraN-<name>.js holds that era's
+  // voices, kit, chain and arrangement, and registers itself on
+  // window.PongMusicEras before this file loads (index.html lists them first).
+  // Under node they are required here. An arrangement card edits only its own
+  // era's file; the vocabulary is above.
+  var ARRANGEMENTS = ERA_FILES.map(function (file, i) {
+    if (typeof module === 'object' && module.exports && typeof require === 'function') {
+      return require('./music/' + file + '.js');
     }
-  ];
+    var list = root.PongMusicEras || [];
+    return list[i] || null;
+  });
 
   // ============================================================ the numbers
   var MUSIC_DB = -12;          // the music, under the effects' master (0.5)
@@ -491,6 +182,23 @@
   var TICK_MS = 50;            // how often the page's timer books more
   var RALLY_STEP = 0.012;      // each paddle hit in a rally: +1.2% tempo...
   var RALLY_MAX = 0.18;        // ...up to +18%
+
+  // The master limiter (item 1241): a fast, hard compressor, then a ceiling no
+  // sample can pass, so the climax can stack every layer and never clip.
+  var LIMIT = { threshold: -6, knee: 0, ratio: 20, attack: 0.002, release: 0.12 };
+  var CEILING = 0.89;          // about -1 dBFS: the loudest sample the page can send
+  var CEILING_KNEE = 0.6;      // straight through below this, bent softly above it
+
+  // The intensity (item 1241): 0 at the first serve, climbing with the rally
+  // and the score, 0.9 and up at match point, 1 through the finale. A part (or
+  // one of the engine's lift layers) with `from: f` joins once it reaches f.
+  var INTENSITY = {
+    rallyFull: 12,             // a rally this long gives the rally's whole share
+    rallyShare: 0.45,          // how much of the build a long rally is worth...
+    scoreShare: 0.35,          // ...and how much the points played so far are
+    beforeMatchPoint: 0.89,    // the ordinary game never reaches the match-point layers
+    matchPoint: 0.9            // match point starts here and the rally takes it to 1
+  };
 
   var NOTE_INDEX = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
   var PLAYS = { melody: 1, bass: 1, chords: 1, echo: 1, drum: 1 };
@@ -577,8 +285,9 @@
    * THEME.bars steps, each a list of { part, voice, midis, len (steps), at
    * (fraction of a step), accent }. Pure data; the player books it.
    */
-  function arrange(arr, theme) {
+  function arrange(arr, theme, opts) {
     theme = theme || THEME;
+    opts = opts || {};
     var S = theme.steps, total = S * theme.bars;
     var out = [];
     for (var s = 0; s < total; s++) out.push([]);
@@ -587,13 +296,17 @@
     var chords = theme.chords.map(function (c) { return c.split('+').map(noteMidi); });
     var half = S / 2;
     var stolen = {};   // steps where a stealing drum sounds -> the part it steals
+    // The engine's own climax layers ride after the arrangement's parts, from
+    // the Atari up (item 1241): only when asked (the player asks), so the
+    // arrangement's own score stays exactly what its file says.
+    var parts = opts.lift && arr.kit ? arr.parts.concat(liftParts(arr)) : arr.parts;
 
-    function add(step, part, pi, midis, len, at, accent) {
+    function add(step, part, pi, midis, len, at, accent, voice) {
       var sh = 12 * (part.octave || 0);
       var late = arr.swing && (step % 2) ? arr.swing : 0;   // the off-16ths, played late
       out[step % total].push({
-        part: pi, voice: part.voice, midis: midis.map(function (m) { return m + sh; }),
-        len: len, at: (at || 0) + late, accent: !!accent
+        part: pi, voice: voice || part.voice, midis: midis.map(function (m) { return m + sh; }),
+        len: len, at: (at || 0) + late, accent: !!accent, from: part.from || 0
       });
     }
     function inSection(part, bar) {
@@ -605,7 +318,7 @@
       return part.pattern;
     }
 
-    arr.parts.forEach(function (part, pi) {
+    parts.forEach(function (part, pi) {
       for (var bar = 0; bar < theme.bars; bar++) {
         if (!inSection(part, bar)) continue;
         var b0 = bar * S;
@@ -663,9 +376,10 @@
           }
         } else if (part.play === 'drum') {
           var pat = parseBar(patternFor(part, bar));
+          var hits = drumVoices(part, arr);   // a kit piece may be several layers
           pat.forEach(function (e, k) {
             if (!e) return;
-            add(b0 + k, part, pi, [], 1, 0, e.accent);
+            for (var hv = 0; hv < hits.length; hv++) add(b0 + k, part, pi, [], 1, 0, e.accent, hits[hv]);
             if (part.steals) stolen[b0 + k] = part.steals;
           });
         }
@@ -678,7 +392,7 @@
     if (steps.length) {
       for (var s2 = 0; s2 < total; s2++) {
         out[s2] = out[s2].filter(function (ev) {
-          var p = arr.parts[ev.part];
+          var p = parts[ev.part];
           if (p.play === 'drum') return true;
           for (var i = 0; i < steps.length; i++) {
             if (stolen[steps[i]] !== p.play) continue;
@@ -690,7 +404,97 @@
         });
       }
     }
+    if (arr.voices > 0) limitVoices(out, parts, arr.voices);
     return out;
+  }
+
+  // ================================================ voices, kits and lifts
+  // (item 1241) The era's own hardware, read from its file in src/music/.
+
+  /** The voices a drum part plays: its own voice, or its kit piece (one voice or a list of layers). */
+  function drumVoices(part, arr) {
+    if (part.voice) return [part.voice];
+    var piece = part.hit && arr && arr.kit ? arr.kit[part.hit] : null;
+    if (!piece) return [];
+    return Array.isArray(piece) ? piece : [piece];
+  }
+
+  /**
+   * The engine's climax on top of any arrangement with a kit: a tom roll into
+   * every section from intensity 0.7, and the era's crash on every bar's
+   * downbeat from 0.9 (match point). They come last, so a full chip drops them first.
+   */
+  var LIFT = [
+    { play: 'drum', hit: 'tom', from: 0.7, lift: true,
+      pattern: '. . . . . . . . . . . . . . . .', fill: '. . . . . . . . x . x . x x X X' },
+    { play: 'drum', hit: 'crash', from: 0.9, lift: true,
+      pattern: 'X . . . . . . . . . . . . . . .' }
+  ];
+  function liftParts(arr) {
+    return LIFT.filter(function (p) { return arr.kit && arr.kit[p.hit]; });
+  }
+
+  /**
+   * How many of the chip's voices a part holds on a step: the most notes any
+   * of its events covering that step sounds. A pad counts once (a sampled
+   * chord: how the sample chips stretched their channels) and so does a kit
+   * piece however many layers it has (one sample, one channel).
+   */
+  function partLoad(ev, part) {
+    if (!part || part.rule === 'pad' || part.play === 'drum' || !ev.midis.length) return 1;
+    return ev.midis.length;
+  }
+
+  /** Per step, the voices sounding: { part index: load }, from events covering it. */
+  function loadMap(score, parts) {
+    var total = score.length, map = [];
+    for (var s = 0; s < total; s++) map.push({});
+    for (var s2 = 0; s2 < total; s2++) {
+      score[s2].forEach(function (ev) {
+        var n = partLoad(ev, parts[ev.part]);
+        var span = Math.max(1, Math.ceil(ev.len - 1e-9));
+        for (var k = 0; k < span && k < total; k++) {
+          var m = map[(s2 + k) % total];
+          m[ev.part] = Math.max(m[ev.part] || 0, n);
+        }
+      });
+    }
+    return map;
+  }
+
+  /** The most voices the score ever sounds at once. */
+  function peakVoices(score, arr) {
+    var parts = (arr && arr.parts) || [];
+    var peak = 0;
+    loadMap(score, parts).forEach(function (m) {
+      var n = 0;
+      for (var p in m) n += m[p];
+      if (n > peak) peak = n;
+    });
+    return peak;
+  }
+
+  /**
+   * The chip is full: a note that would start past `voices` is dropped, the
+   * latest-listed part first -- so the arrangement lists its parts in the
+   * order they matter. The existing loops all fit their chips and lose nothing.
+   */
+  function limitVoices(score, parts, voices) {
+    var map = loadMap(score, parts);
+    var dropped = 0;
+    for (var s = 0; s < score.length; s++) {
+      var m = map[s], used = 0, keep = {};
+      Object.keys(m).map(Number).sort(function (a, b) { return a - b; }).forEach(function (p) {
+        if (used + m[p] <= voices) { used += m[p]; keep[p] = true; }
+      });
+      score[s] = score[s].filter(function (ev) {
+        if (keep[ev.part]) return true;
+        dropped += 1;
+        return false;
+      });
+    }
+    score.dropped = dropped;
+    return dropped;
   }
 
   /** The table's own check, the one the suite runs: every problem, as sentences. */
@@ -723,7 +527,10 @@
       var tag = 'part ' + (i + 1) + ' (' + p.play + ')';
       if (!PLAYS[p.play]) bad.push(tag + ': unknown play');
       if (RULES[p.play] && !RULES[p.play][p.rule]) bad.push(tag + ': unknown rule ' + p.rule);
-      if (!p.voice || !(p.voice.gain > 0) || !p.voice.wave) bad.push(tag + ': needs a voice with a wave and a gain');
+      if (p.play === 'drum' && p.hit && !p.voice) {
+        if (!arr.kit || !arr.kit[p.hit]) bad.push(tag + ': the kit has no ' + p.hit);
+      } else if (!p.voice || !(p.voice.gain > 0) || !p.voice.wave) bad.push(tag + ': needs a voice with a wave and a gain');
+      if (p.from !== undefined && !(p.from >= 0 && p.from <= 1)) bad.push(tag + ': from is an intensity from 0 to 1');
       if (p.play === 'drum' || p.rule === 'rhythm') {
         if (p.pattern === undefined) bad.push(tag + ': needs a pattern');
         [p.pattern, p.fill, p.open].forEach(function (pat) {
@@ -733,9 +540,20 @@
         });
       }
       if (p.play === 'drum' && p.voice && p.voice.wave !== 'noise' && !(p.voice.freq > 0)) bad.push(tag + ': a pitched drum needs a freq');
+      if (p.play === 'drum' && !p.voice && !p.hit) bad.push(tag + ': a drum needs a voice or a kit hit');
       if (p.voicing && !VOICINGS[p.voicing]) bad.push(tag + ': unknown voicing ' + p.voicing);
       (p.sections || []).forEach(function (s) { if (!theme.sections[s]) bad.push(tag + ': no section ' + s); });
     });
+    Object.keys(arr.kit || {}).forEach(function (name) {
+      [].concat(arr.kit[name]).forEach(function (v) {
+        if (!v || !(v.gain > 0) || !v.wave) bad.push('kit ' + name + ': needs a voice with a wave and a gain');
+        else if (v.wave !== 'noise' && !(v.freq > 0)) bad.push('kit ' + name + ': a pitched hit needs a freq');
+      });
+    });
+    if (arr.voices !== undefined) {
+      var peak = peakVoices(arrange(Object.assign({}, arr, { voices: 0 }), theme), arr);
+      if (peak > arr.voices) bad.push('sounds ' + peak + ' voices at once, the chip has ' + arr.voices);
+    }
     if (arr.detune && arr.detune.length !== 12) bad.push('detune needs 12 offsets');
     if (arr.swing !== undefined && !(arr.swing >= 0 && arr.swing < 0.5)) bad.push('swing is a share of a step under 0.5');
     return bad;
@@ -754,6 +572,50 @@
     theme = theme || THEME;
     var speed = 1 + Math.min(RALLY_MAX, Math.max(0, rally || 0) * RALLY_STEP);
     return (60 / (theme.bpm * speed)) * 4 / theme.steps;
+  }
+
+  /**
+   * How big the music is right now, 0..1, read off the game and never written
+   * to it. The build ADDS layers (parts with `from`), it never swaps the loop:
+   *   title screen             0
+   *   a rally                  up to rallyShare, at rallyFull hits
+   *   the points played        up to scoreShare, at the point before match point
+   *   match point (item 1211)  matchPoint, plus the rally's share of what is left
+   *   the finale and rewind    1: the whole orchestra, all the way down the ladder
+   * A game that never ends (matchPoints 0) counts its points against ten.
+   */
+  function intensityOf(game) {
+    if (!game || game.phase === 'title') return 0;
+    if (game.phase === 'over') return 1;
+    var I = INTENSITY;
+    var rallyPart = Math.min(1, Math.max(0, game.rally || 0) / I.rallyFull);
+    var score = game.score || {};
+    var played = (score.left || 0) + (score.right || 0);
+    var mp = game.rules && game.rules.matchPoints > 0 ? game.rules.matchPoints : 0;
+    if (mp > 0 && played >= mp - 1) {
+      return I.matchPoint + (1 - I.matchPoint) * rallyPart;
+    }
+    var scorePart = Math.min(1, played / Math.max(1, mp > 0 ? mp - 1 : 10));
+    var i = I.scoreShare * scorePart + I.rallyShare * rallyPart;
+    return Math.round(Math.min(I.beforeMatchPoint, i) * 1000) / 1000;
+  }
+
+  /**
+   * The limiter's ceiling as a transfer curve: straight through up to
+   * CEILING_KNEE, then bent so it approaches CEILING and never passes it --
+   * inputs past full scale are held at the curve's end, under CEILING too.
+   */
+  var ceilingCache = null;
+  function ceilingCurve() {
+    if (ceilingCache) return ceilingCache;
+    var n = 2048, c = new Float32Array(n), room = CEILING - CEILING_KNEE;
+    for (var i = 0; i < n; i++) {
+      var x = i * 2 / (n - 1) - 1, ax = Math.abs(x);
+      var y = ax <= CEILING_KNEE ? ax : CEILING_KNEE + room * Math.tanh((ax - CEILING_KNEE) / room);
+      c[i] = x < 0 ? -y : y;
+    }
+    ceilingCache = c;
+    return c;
   }
 
   /** ?music=off (or =0, =no, =false) keeps the soundtrack silent. */
@@ -783,8 +645,11 @@
     var pos = 0;                // THE song position, in steps: shared by every era
     var nextTime = 0;           // audio time of step `pos`
     var rally = 0;
+    var intensity = 0;          // 0..1: which `from` layers play (item 1241)
 
     var music = {
+      intensityNow: 0,          // the intensity the last update read off the game
+      limiter: null,            // { compressor, ceiling } after the master (item 1241)
       off: !!opts.off,
       unlocked: false,
       available: false,
@@ -820,7 +685,7 @@
         duck = ctx.createGain();
         duck.gain.value = 1;
         duck.connect(master);
-        master.connect(ctx.destination);
+        master.connect(limiterChain());
         music.available = true;
         resume();
       } catch (e) {
@@ -851,6 +716,120 @@
     }
     function toggleMute() { setMuted(!music.muted); return music.muted; }
 
+    // ----------------------------------------------- the output (item 1241)
+    /**
+     * The master limiter: a hard, fast compressor and then a soft ceiling that
+     * never lets a sample past CEILING, so the climax can stack every layer
+     * without the output clipping. A context with no compressor keeps the ceiling.
+     */
+    function limiterChain() {
+      var ceiling = ctx.createWaveShaper();
+      ceiling.curve = ceilingCurve();
+      ceiling.connect(ctx.destination);
+      var comp = null;
+      if (typeof ctx.createDynamicsCompressor === 'function') {
+        comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = LIMIT.threshold;
+        comp.knee.value = LIMIT.knee;
+        comp.ratio.value = LIMIT.ratio;
+        comp.attack.value = LIMIT.attack;
+        comp.release.value = LIMIT.release;
+        comp.connect(ceiling);
+      }
+      music.limiter = { compressor: comp, ceiling: ceiling };
+      return comp || ceiling;
+    }
+
+    /**
+     * An era's period production, between its arrangement's effects and its
+     * bus: `tone` (a gentle low-pass: the speaker, the cartridge), `tape`
+     * (saturation, and a short delay whose time wanders: wow and flutter),
+     * `chorus` (a swirling copy under the dry sound) and `hall` (a generated
+     * reverb; with `gate` it is the 1980s gated sound, full and then cut).
+     * Every node is kept on the track so retiring it can let go of all of them.
+     */
+    function eraChain(ch, bus, track) {
+      var made = track.fx || (track.fx = []);
+      function keep(n) { made.push(n); return n; }
+      function wander(param, rate, depth) {
+        var lfo = keep(ctx.createOscillator());
+        lfo.frequency.value = rate;
+        var dg = keep(ctx.createGain());
+        dg.gain.value = depth;
+        lfo.connect(dg);
+        dg.connect(param);
+        lfo.start(ctx.currentTime);
+        track.drones.push(lfo);
+      }
+      var input = keep(ctx.createGain());
+      var node = input;
+      if (ch.tone) {
+        var lp = keep(ctx.createBiquadFilter());
+        lp.type = 'lowpass';
+        lp.frequency.value = ch.tone;
+        lp.Q.value = 0.5;
+        node.connect(lp);
+        node = lp;
+      }
+      if (ch.tape) {
+        if (ch.tape.sat) {
+          var sat = keep(ctx.createWaveShaper());
+          sat.curve = driveCurve(Math.round(ch.tape.sat * 20) / 200);
+          node.connect(sat);
+          node = sat;
+        }
+        var tape = keep(ctx.createDelay(0.1));
+        tape.delayTime.value = 0.012;
+        if (ch.tape.wow) wander(tape.delayTime, 0.55, ch.tape.wow * 0.002);
+        if (ch.tape.flutter) wander(tape.delayTime, 7, ch.tape.flutter * 0.0004);
+        node.connect(tape);
+        node = tape;
+      }
+      if (ch.chorus) {
+        var sum = keep(ctx.createGain());
+        node.connect(sum);
+        var cd = keep(ctx.createDelay(0.1));
+        cd.delayTime.value = 0.018;
+        wander(cd.delayTime, ch.chorus.rate, ch.chorus.depth);
+        var cw = keep(ctx.createGain());
+        cw.gain.value = ch.chorus.mix;
+        node.connect(cd);
+        cd.connect(cw);
+        cw.connect(sum);
+        node = sum;
+      }
+      node.connect(bus);
+      if (ch.hall) {
+        var conv = keep(ctx.createConvolver());
+        conv.buffer = hallImpulse(ch.hall);
+        var wet = keep(ctx.createGain());
+        wet.gain.value = ch.hall.mix;
+        node.connect(conv);
+        conv.connect(wet);
+        wet.connect(bus);
+      }
+      return input;
+    }
+
+    /** A hall's impulse, built once per spec: decaying noise, or with `gate` level noise cut dead. */
+    var halls = [];
+    function hallImpulse(spec) {
+      for (var i = 0; i < halls.length; i++) if (halls[i].spec === spec) return halls[i].buffer;
+      var sr = ctx.sampleRate, len = Math.max(1, Math.floor(sr * (spec.gate || spec.seconds)));
+      var ir = ctx.createBuffer(2, len, sr);
+      var seed = 11;
+      for (var ch = 0; ch < 2; ch++) {
+        var d = ir.getChannelData(ch);
+        for (var j = 0; j < len; j++) {
+          seed = (seed * 16807) % 2147483647;
+          var amp = spec.gate ? 1 - 0.25 * j / len : Math.pow(1 - j / len, spec.decay || 2);
+          d[j] = (seed / 1073741823.5 - 1) * amp;
+        }
+      }
+      halls.push({ spec: spec, buffer: ir });
+      return ir;
+    }
+
     /**
      * The whole of the per-frame work, handed the real game: follow the era,
      * duck under a paddle hit, book the next LOOKAHEAD seconds. Plays nothing
@@ -873,6 +852,8 @@
           for (var i = 0; i < evs.length; i++) if (evs[i] && evs[i].type === 'paddle') { duckNow(); break; }
         }
         rally = game.rally || 0;
+        intensity = intensityOf(game);
+        music.intensityNow = intensity;
         retireFaded();
         return book();
       } catch (e) {
@@ -910,7 +891,10 @@
       music.era = era;
       if (arr) {
         current.score = scoreOf(arr);
-        if (arr.effects) current.fxIn = effectsChain(arr.effects, bus, current);
+        // effects (the arrangement's) -> chain (the era's period production) -> bus
+        var into = arr.chain ? eraChain(arr.chain, bus, current) : bus;
+        current.fxIn = into;
+        if (arr.effects) current.fxIn = effectsChain(arr.effects, into, current);
         if (arr.drone) startDrones(current);
       }
     }
@@ -925,7 +909,7 @@
     }
 
     function scoreOf(arr) {
-      if (!arr._score || arr._scoreTheme !== theme) { arr._score = arrange(arr, theme); arr._scoreTheme = theme; }
+      if (!arr._score || arr._scoreTheme !== theme) { arr._score = arrange(arr, theme, { lift: true }); arr._scoreTheme = theme; }
       return arr._score;
     }
 
@@ -970,6 +954,7 @@
           if (!tr || !tr.score || (tr.until && nextTime > tr.until)) continue;
           var list = tr.score[pos];
           for (var n = 0; n < list.length; n++) {
+            if (list[n].from > intensity) continue;   // a layer the build has not reached yet
             note(list[n], tr.arr, nextTime + list[n].at * dt, dt, tr.fxIn);
             booked += 1;
           }
@@ -998,7 +983,8 @@
         var end = t + held + (env.s > 0 ? env.r : env.d) + 0.03;
         // osc -> drive -> filter -> envelope -> pump -> pan -> the era's bus
         var g = ctx.createGain();
-        shape(g.gain, t, held, peak / Math.sqrt(freqs.length), env);
+        if (v.bursts) burstShape(g.gain, t, peak, env, v.bursts);
+        else shape(g.gain, t, held, peak / Math.sqrt(freqs.length), env);
         var tail = g;
         if (v.pump) {
           var pg = ctx.createGain();
@@ -1092,6 +1078,17 @@
       }
     }
 
+    /** A hand clap: `n` quick spikes 11 ms apart, then the decay (item 1241). */
+    function burstShape(param, t, peak, env, n) {
+      param.setValueAtTime(0.0001, t);
+      for (var b = 0; b < n; b++) {
+        var bt = t + b * 0.011;
+        param.linearRampToValueAtTime(peak, bt + 0.001);
+        param.exponentialRampToValueAtTime(Math.max(0.0001, peak * 0.25), bt + 0.01);
+      }
+      param.exponentialRampToValueAtTime(0.0001, t + n * 0.011 + Math.max(0.005, env.d));
+    }
+
     function osc(v, f, cents, into, t, held, end, layers) {
       var o = ctx.createOscillator();
       var wave = v.wave === 'kick' ? 'sine' : v.wave;
@@ -1100,7 +1097,9 @@
       else o.type = wave;
       o.detune.value = cents;
       o.frequency.setValueAtTime(f, t);
-      if (v.wave === 'kick') o.frequency.exponentialRampToValueAtTime(Math.max(20, f / 4), t + 0.12);
+      // A pitched hit falls: a kick to a quarter in 0.12 s, a kit's tom or timpani as its `drop` says.
+      var drop = v.drop || (v.wave === 'kick' ? { ratio: 0.25, time: 0.12 } : null);
+      if (drop) o.frequency.exponentialRampToValueAtTime(Math.max(20, f * drop.ratio), t + Math.max(0.005, drop.time));
       var node = o;
       if (layers > 1) {
         var share = ctx.createGain();
@@ -1354,6 +1353,14 @@
     arrangementProblems: arrangementProblems,
     arrangementFor: arrangementFor,
     stepSeconds: stepSeconds,
+    intensityOf: intensityOf,
+    INTENSITY: INTENSITY,
+    LIMIT: LIMIT,
+    CEILING: CEILING,
+    ceilingCurve: ceilingCurve,
+    peakVoices: peakVoices,
+    drumVoices: drumVoices,
+    LIFT: LIFT,
     offFromQuery: offFromQuery,
     createMusic: createMusic,
     attachToPage: attachToPage

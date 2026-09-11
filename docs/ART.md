@@ -285,8 +285,14 @@ America) and *Duck Hunt* (1985). What the era borrows:
 
 ### SCENE
 
-- **Where:** a floodlit night tennis court, the court era 2 already draws (the pixellab court
-  tiles, `era2-court.png`, the white border and the dotted net between two posts).
+- **Where:** a floodlit night tennis court. The floor is `era2-court.png`: the pixellab
+  generation's teal floor and its dark tile grid, and nothing else. The generation was a football
+  pitch, and item 1259 painted out every pitch marking offline. Over it, drawn in code in `$10`
+  (darker than the ball's `$30` core), are Tennis's court lines: a baseline at each end in front of
+  the paddles, doubles sidelines along the top and bottom walls with the singles sidelines inside
+  them, a service line on each side of the net, the centre service line between them, and a centre
+  mark on each baseline. The white border and the dotted net between two posts stay. The net is
+  still the game's centre line.
 - **What fills the frame:** the court, plus a **crowd** of 8 x 8 tiles in the top 2 tile rows
   behind the top wall line: 32 tiles, 3 crowd patterns, in `$0C`, `$1C`, `$2D` (dark cyan, teal,
   grey) so it stays under the 0.35 luminance line; an **umpire's chair** at top centre, 2 x 3

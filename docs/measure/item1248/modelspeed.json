@@ -1,0 +1,149 @@
+{
+ "taken": "2026-09-11T04:16:01.221Z",
+ "rows": [
+  {
+   "setup": "sprites",
+   "gpu": false,
+   "display": "&models=off",
+   "era": 5,
+   "native": "320x240",
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8
+  },
+  {
+   "setup": "sprites",
+   "gpu": false,
+   "display": "&models=off",
+   "era": 6,
+   "native": "320x240",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8
+  },
+  {
+   "setup": "sprites",
+   "gpu": false,
+   "display": "&models=off",
+   "era": 7,
+   "native": "640x480",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8
+  },
+  {
+   "setup": "sprites",
+   "gpu": false,
+   "display": "&models=off",
+   "era": 8,
+   "native": "512x448",
+   "frames": 29,
+   "total": 1016.5,
+   "mean": 35.05,
+   "p95": 50.1,
+   "max": 66.6
+  },
+  {
+   "setup": "sprites",
+   "gpu": false,
+   "display": "&models=off",
+   "era": 9,
+   "native": "640x480",
+   "frames": 30,
+   "total": 1033.3,
+   "mean": 34.44,
+   "p95": 50,
+   "max": 50
+  },
+  {
+   "setup": "sprites",
+   "gpu": false,
+   "display": "&models=off",
+   "era": 10,
+   "native": "960x720",
+   "frames": 12,
+   "total": 1016.6,
+   "mean": 84.72,
+   "p95": 116.7,
+   "max": 116.7
+  },
+  {
+   "setup": "models",
+   "gpu": false,
+   "display": "",
+   "era": 5,
+   "native": "320x240",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.8,
+   "max": 16.8
+  },
+  {
+   "setup": "models",
+   "gpu": false,
+   "display": "",
+   "era": 6,
+   "native": "320x240",
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8
+  },
+  {
+   "setup": "models",
+   "gpu": false,
+   "display": "",
+   "era": 7,
+   "native": "640x480",
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8
+  },
+  {
+   "setup": "models",
+   "gpu": false,
+   "display": "",
+   "era": 8,
+   "native": "512x448",
+   "frames": 49,
+   "total": 1016.7,
+   "mean": 20.75,
+   "p95": 33.4,
+   "max": 50
+  },
+  {
+   "setup": "models",
+   "gpu": false,
+   "display": "",
+   "era": 9,
+   "native": "640x480",
+   "frames": 28,
+   "total": 1016.6,
+   "mean": 36.31,
+   "p95": 50,
+   "max": 50
+  },
+  {
+   "setup": "models",
+   "gpu": false,
+   "display": "",
+   "era": 10,
+   "native": "960x720",
+   "frames": 13,
+   "total": 1099.9,
+   "mean": 84.61,
+   "p95": 100,
+   "max": 100
+  }
+ ]
+}

@@ -77,6 +77,10 @@
   <script src="src/eras/era8-ps2.js"></script>
   <script src="src/eras/era9-xbox.js"></script>
   <script src="src/eras/era10-xbox360.js"></script>
+  <!-- The 3D eras' polygon players (item 1248): Blender-built models from
+       assets/models/, each loaded as its own small script when first asked for,
+       lit, sorted and shaded per era with canvas 2D: window.PongModels3D. -->
+  <script src="src/models3d.js"></script>
   <!-- The players who hold the paddles, from era 1 up (item 1223): wraps the
        renderer's draw, reads the state and its events, writes nothing. -->
   <script src="src/characters.js"></script>
@@ -98,6 +102,17 @@
   <script src="src/input.js"></script>
   <script src="src/main.js"></script>
   <!-- The soundtrack: one theme, arranged per era, on the same first click. -->
+  <script src="src/music/era0-arcade.js"></script>
+  <script src="src/music/era1-atari2600.js"></script>
+  <script src="src/music/era2-nes.js"></script>
+  <script src="src/music/era3-genesis.js"></script>
+  <script src="src/music/era4-snes.js"></script>
+  <script src="src/music/era5-playstation.js"></script>
+  <script src="src/music/era6-n64.js"></script>
+  <script src="src/music/era7-dreamcast.js"></script>
+  <script src="src/music/era8-ps2.js"></script>
+  <script src="src/music/era9-xbox.js"></script>
+  <script src="src/music/era10-xbox360.js"></script>
   <script src="src/music.js"></script>
   </template>
   <script>
