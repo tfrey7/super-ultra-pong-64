@@ -53,7 +53,7 @@
    */
   var KINDS = {
     'tv-composite': { scan: 0.34, scanShape: [0, 0, 0.35, 1], bleed: 0.4, chroma: 0.45,
-                      glow: 0.12, glowScale: 0.25, soft: 0, smear: 0, dither: 0.55 },
+                      glow: 0.07, glowScale: 0.25, soft: 0, smear: 0, dither: 0.55 },
     'tv-component': { scan: 0.24, scanShape: [0, 0, 0, 0.2, 1], bleed: 0.14, chroma: 0,
                       glow: 0.24, glowScale: 0.2, soft: 0, smear: 0, dither: 0 },
     'tv-vga':       { scan: 0.1, scanShape: [0, 0, 0, 1], bleed: 0, chroma: 0,
