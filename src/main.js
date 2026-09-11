@@ -20,7 +20,8 @@
     ballMaxSpeed: 300,
     cpuSpeed: 240,
     cpuMaxAimError: 34,
-    serveDelay: 1.3
+    serveDelay: 1.3,
+    matchPoints: 0          // the demo never finishes a match
   };
   var ATTRACT_INK = '#3a3a3a';   // lit phosphor, well behind the title
   var ATTRACT_LAG = 3.0;         // how loosely the demo hand follows the ball

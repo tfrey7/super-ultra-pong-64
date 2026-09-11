@@ -72,6 +72,9 @@
                             // The rules pick an INDEX; the hex lives in
                             // src/render.js, which is the only place that
                             // knows what a colour looks like.
+    matchPoints: ERAS.length, // a match is eleven points, one per era (item 1211):
+                            // the last lands on the Xbox 360 and ends it. 0 never
+                            // ends (the attract rally behind the title).
     titleBlink: 0.62,       // seconds the 'press any key' line stays on, then off
     maxSubstep: 6           // never move the ball further than this in one go
   };
@@ -148,6 +151,11 @@
       // moves: the ball holds still and no point can be scored until
       // startGame() is called. 'playing' is the game proper.
       phase: opts.phase === 'playing' ? 'playing' : 'title',
+      // 'over' is the finished match (src/match.js plays the finale over it):
+      // nothing moves, and `winner` ('left' | 'right') and `overAt` (game time)
+      // say who took it and when.
+      winner: null,
+      overAt: 0,
       time: 0,                // seconds of simulated play
       // Evolution step one: the machine boots in black and white and turns
       // colour the instant the first point of the session lands. `colour` is
@@ -211,6 +219,7 @@
     if (state.phase !== 'title') return false;
     state.phase = 'playing';
     state.time = 0;
+    state.winner = null;
     state.score.left = 0;
     state.score.right = 0;
     state.left.y = (state.height - state.left.h) / 2;
@@ -419,6 +428,20 @@
     emit(state, 'score', side);
     serve(state, direction);
     if (moved) state.serveDelay = Math.max(state.serveDelay, state.rules.eraChangePause || 0);
+    var mp = state.rules.matchPoints;
+    if (mp > 0 && state.score.left + state.score.right >= mp) {
+      // The last point of the match: the ball waits at the centre for good.
+      state.phase = 'over';
+      state.winner = state.score.left > state.score.right ? 'left' : 'right';
+      state.overAt = state.time;
+    }
+  }
+
+  /** Is the next point the last of the match? (The eleventh: it ends it.) */
+  function isMatchPoint(state) {
+    var mp = state.rules && state.rules.matchPoints;
+    return state.phase === 'playing' && mp > 0 &&
+      state.score.left + state.score.right === mp - 1;
   }
 
   /**
@@ -437,7 +460,7 @@
     // The title screen is a real state, not a paused game. The clock above
     // keeps running -- the blinking prompt reads it -- and nothing else
     // happens at all until startGame() is called.
-    if (state.phase === 'title') return state;
+    if (state.phase === 'title' || state.phase === 'over') return state;
 
     stepPlayer(state, dt, intent);
     stepCpu(state, dt);
@@ -464,6 +487,7 @@
     createGame: createGame,
     startGame: startGame,
     backToTitle: backToTitle,
+    isMatchPoint: isMatchPoint,
     flipToColour: flipToColour,
     advanceEra: advanceEra,
     clampEra: clampEra,
