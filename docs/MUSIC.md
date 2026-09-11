@@ -25,11 +25,13 @@ arrangement side by side:
 | `year` | the year the rung stands for |
 | `voices` | the chip's simultaneous notes: the engine plays at most this many at once and drops the rest, latest part first (unison layers of one voice count as one) |
 | `kit` | the era's drum kit: `kick`, `snare`, `hat`, `open`, `crash`, `tom`, `clap` and, from the SNES on, `timpani` or `taiko`; each a voice (or a list of voices layered) |
-| `chain` | the period's production over the whole era: `tape` (wow, flutter and saturation), `chorus`, and `hall` (a generated reverb with `gate` for the 1980s gated drum sound) |
+| `chain` | the period's production over the whole era: `tone` (a low-pass: the speaker, the cartridge), `tape` (wow, flutter and saturation), `chorus`, and `hall` (a generated reverb with `gate` for the 1980s gated drum sound) |
 | `parts`, `effects`, `swing`, `detune`, `drone` | the arrangement, as before (the vocabulary is at the head of `src/music.js`) |
 
 A drum part names a kit piece instead of spelling out a voice: `{ play: 'drum', hit: 'snare',
 pattern: '. . . . X ...' }`. **Any part may carry `from: 0..1`**, the intensity at which it joins.
+Two voice fields exist for kits: `drop: { ratio, time }` makes a pitched hit fall (a tom, a
+timpani, an 808 kick) and `bursts: n` gives n quick spikes before the decay (a hand clap).
 
 **Intensity** is one number from 0 to 1 that the engine reads off the game every frame
 (`PongMusic.intensityOf(game)`): the rally adds up to 0.45 over twelve hits, the score up to 0.35

@@ -136,9 +136,26 @@
   //            type, freq, q, sweep?: { to, time } (the cutoff glides there
   //            as the note starts), lfo?: { perBeat, depth, wave? } (the
   //            cutoff wobbles `perBeat` times a beat, by depth x freq) },
-  //            fm?: { ratio, index }, vibrato?: { rate, cents, delay } }
+  //            fm?: { ratio, index }, vibrato?: { rate, cents, delay },
+  //            drop?: { ratio, time } (a pitched hit falls to ratio x its freq
+  //            over time seconds: a tom, a timpani, an 808 kick),
+  //            bursts?: n (n spikes 11 ms apart before the decay: a hand clap) }
   // Gains are on src/sound.js's scale; the whole soundtrack then sits
   // MUSIC_DB under it.
+  //
+  // Since item 1241 an era's file also carries its hardware (docs/MUSIC.md,
+  // "How the engine reads this sheet"):
+  //   voices   the chip's simultaneous notes; past it the latest-listed part
+  //            is dropped for that step (a pad or a kit piece counts as one)
+  //   kit      { kick, snare, hat, open, tom, crash, clap, timpani, ... }: each
+  //            a voice or a list of voices layered; a drum part names one with
+  //            `hit: 'snare'` instead of carrying a voice
+  //   chain    the period's production between the effects and the bus:
+  //            tone (a low-pass, Hz), tape: { wow, flutter, sat }, chorus:
+  //            { rate, depth, mix }, hall: { seconds, decay, mix, gate? }
+  //   from     on any part: the intensity (0..1, intensityOf) it joins at; the
+  //            engine adds its own LIFT layers (tom roll 0.7, crash 0.9) to any
+  //            era with those kit pieces
 
   var ERA_FILES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes', 'era5-playstation', 'era6-n64', 'era7-dreamcast', 'era8-ps2', 'era9-xbox', 'era10-xbox360'];
   // ======================================================== ARRANGEMENTS
@@ -177,8 +194,8 @@
   // one of the engine's lift layers) with `from: f` joins once it reaches f.
   var INTENSITY = {
     rallyFull: 12,             // a rally this long gives the rally's whole share
-    rallyShare: 0.4,           // how much of the build a long rally is worth...
-    scoreShare: 0.5,           // ...and how much the points played so far are
+    rallyShare: 0.45,          // how much of the build a long rally is worth...
+    scoreShare: 0.35,          // ...and how much the points played so far are
     beforeMatchPoint: 0.89,    // the ordinary game never reaches the match-point layers
     matchPoint: 0.9            // match point starts here and the rally takes it to 1
   };
