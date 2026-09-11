@@ -220,7 +220,9 @@ async function climb(s) {
       requestAnimationFrame(tick);
     })`);
     pauseS = pause.s; ringMax = pause.max; ringLong = pause.long;
-    if (tracing) out.trace = await endTrace(s, rung, pause);
+    // The one traced run on this card wrote its trace and then never finished the
+    // climb (stopped by hand after five minutes), so a traced climb ends here.
+    if (tracing) { out.trace = await endTrace(s, rung, pause); break; }
   }
   return rows;
 }
