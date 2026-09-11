@@ -94,3 +94,78 @@ Look file: [src/eras/era2-nes.js](../../src/eras/era2-nes.js).
    `src/signboards.js`, `src/match.js`, and `advanceEra`'s call.
 5. `node --test` (the NES tests are `test/era2-nes.test.js` and `test/era2-pixellab.test.js`), then
    `node tools/playtest.mjs --era 2`.
+
+## LESSONS (item 1225: the AAA pass, Nintendo's Tennis that happens to be Pong)
+
+Tim's direction for this pass: not a Pong of 1985 but the flagship game of 1985 that happens to
+be Pong, with "Characters hold the paddles". The model was *Tennis* (a 1985 launch title in
+North America), with the heft of *Super Mario Bros.* in the sprites.
+
+### What sold the flagship look
+
+1. **People.** A boy in a red headband holds the left bat two-handed, and a rival in a blue cap
+   and green shirt holds the right. They are drawn behind the paddles by the player rig
+   (`src/characters.js`, the NES block's `sheets`). Two figures standing there turn it from a
+   bat-and-ball demo into a sports game before the ball moves.
+2. **Tennis's status band.** A black band across the top with a grey rule under it. P1 and CPU
+   are in their paddles' colours, the scores in white over the era's black drop shadow, and
+   `RALLY 00` in the middle. For a second after a point, the middle shows the umpire's call
+   instead (`FIFTEEN`, `THIRTY`, `FORTY`, `GAME`, by the scorer's points modulo 4). On a match
+   point it reads `MATCH POINT` in red, blinking. The big mid-court digits of the first NES pass
+   are gone, and that alone makes it read as a console game rather than an arcade one.
+3. **A place with people watching.** Two rows of 32 spectators in three dark inks (`$0C`, `$1C`,
+   `$2D`) sit in the stands. Their three poses (sitting, leaning, arms up) ripple along the stand
+   every 16 frames, every 4 for a second after a point, and all arms go up at match point. The
+   umpire sits on a high chair at the net and turns his head toward the ball's travel. Nothing in
+   the backdrop moves faster than the crowd's ripple.
+4. **The ball is a tennis ball.** It has a `$38` seam pixel on its lit side and a black 4 x 2
+   shadow three NES pixels below it, one extra sprite, as *Tennis* drew it.
+5. **All of it is fillRect.** The band, the crowd and the umpire are in code, and each figure is
+   one `drawImage` a frame. The page never loops over pixels.
+
+### What did not work
+
+- **Asking pixflux for a sprite sheet.** The bible's plan was one generation per player: the
+  whole 30 x 264 sheet (3 frames by 6 rows of 10 x 44), prompted row by row. Both sheets came back
+  almost empty, a dozen stray pixels down a clear strip (`era2-players-left.png` and
+  `-right.png`, kept with their verdicts in the manifest). **pixflux does not draw a grid of
+  animation frames from a prompt. Do not spend a generation on it.**
+- **Shrinking a good pose to fit.** A single 32 x 64 standing pose per player came back well (red
+  headband, big *Mario* head, fists out). But the figure is 28 pixels wide and the room behind a
+  paddle is 10 NES pixels (32 field units at 3.125 a pixel). Squeezed by 2.8 across and 1.4 down,
+  the arms and the face turn to mush. The poses became the reference instead.
+- **What worked:** drawing the sheets in a script. `assets/pixellab/era2-players-sheet.mjs` paints
+  every frame from the bible's proportions: head 8 x 9, torso 8 x 14 with the arms, legs 3 x 16,
+  a black outline on the back edge only, hand at (10, 22). The frames are parts moved per beat:
+  the body drops a pixel for the knee bend, the legs go apart and together for the shuffle, the
+  fists jump 6 up the bat on the swing, the head mirrors for the miss, and one fist goes in the
+  air behind the head for the win. It costs 0 generations and can be edited like any code, and
+  4 of the 12 generations went on learning this.
+- **The ball's white is the figures' problem.** `$30` is the ball's colour, and the bible caps a
+  figure at 4 pixels of it. So the left player's "white shorts" are `$10` grey, and the white is
+  only on the shoes.
+- **The rig had never drawn a real sheet headless.** Under `node --test` there is no `Image`, and
+  the sprite loader threw rather than answering "not loaded", so every era with a sheet dropped
+  its players in the test recorder. The rig now treats that throw as not loaded
+  (`sheetFrames` in `src/characters.js`).
+- **The stands sit over the play area.** The court fills the frame and the wall is the top edge,
+  so the band and the crowd are drawn behind the play and the ball flies over them. They stay
+  dark (the crowd's inks are the bible's three under-0.35 colours) so the ball still reads.
+  The rule for any 2D era: HUD and stands go over the court, never beside it, and dark.
+- **Not done here:** the shirts do not take the paddle's earned hue (a PNG sheet has one set of
+  colours, and recolouring per ink would need one sheet per slot, or a palette swap in code). No
+  crowd or umpire art was generated: both are drawn in code, and the generations were better
+  kept.
+
+### What a one-era NES game would copy
+
+1. **The band, the crowd and the umpire** from `src/eras/era2-nes.js`: `drawBand`, `drawCrowd`,
+   `drawUmpire`, and the `LETTERS` capitals (5 x 7, one cell per NES pixel). They are generic
+   sports-HUD pieces with no Pong in them.
+2. **The sheet script** `assets/pixellab/era2-players-sheet.mjs`, for any 10 x 44 NES figure. Change
+   the parts in `paintFrame` and the inks in `PLAYERS`, then run it. It writes the PNGs and their
+   manifest entries.
+3. **The rig's beat machine** (`src/characters.js`). Idle, move up and down, swing, miss and win
+   come from events the rules already emit, so the art never touches play.
+4. **The order:** court, border, net, crowd, umpire, band, paddles, ball shadow, ball, seam, then
+   the players over the frame. The ball is the last thing but its own seam.
