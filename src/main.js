@@ -39,6 +39,11 @@
     canvas.width = game.width;
     canvas.height = game.height;
 
+    // The cabinet (src/attract.js): power-on, INSERT COIN, the coin moment.
+    // ?title=off or ?era=N skips it and opens straight into play.
+    var cabinet = root.PongAttract ? root.PongAttract.create() : null;
+    if (cabinet && cabinet.straightIn(root.location && root.location.search)) Pong.startGame(game);
+
     var attract = Pong.createGame({ phase: 'playing', rules: ATTRACT_RULES });
     var attractHand = attract.height / 2;
 
@@ -86,7 +91,7 @@
         if (game.phase === 'title') drawField(native, attract, { ink: ATTRACT_INK, card: false });
         else drawField(native, game);
         display.present(ctx, era, game.time);
-        if (game.phase === 'title') {
+        if (game.phase === 'title' || (cabinet && cabinet.stage(game) !== 'play')) {
           // The title is the cabinet's own lettering, kept sharp over the
           // machine's picture rather than squeezed into its pixels: drawn at
           // field size and scaled up hard, so its blocks have no seams.
@@ -97,7 +102,11 @@
           }
           var tctx = titleCanvas.getContext('2d');
           tctx.clearRect(0, 0, game.width, game.height);
-          PongRender.drawTitle(tctx, game);
+          // The cabinet's warm-up, attract screen and coin moment ride this
+          // layer; with paint null it leaves the picture to the display.
+          if (!cabinet) PongRender.drawTitle(tctx, game);
+          else if (game.phase === 'title') cabinet.drawTitle(tctx, game, null);
+          else cabinet.drawOver(tctx, game);
           ctx.save();
           ctx.setTransform(1, 0, 0, 1, 0, 0);
           ctx.imageSmoothingEnabled = false;
@@ -109,10 +118,12 @@
       if (game.phase === 'title') {
         // The demo rally climbs the ladder too: its ring plays, dimmed, with no
         // card under the title.
-        drawField(ctx, attract, { ink: ATTRACT_INK, card: false });
-        PongRender.drawTitle(ctx, game);
+        var paint = function () { drawField(ctx, attract, { ink: ATTRACT_INK, card: false }); };
+        if (cabinet) cabinet.drawTitle(ctx, game, paint);
+        else { paint(); PongRender.drawTitle(ctx, game); }
       } else {
         drawField(ctx, game);
+        if (cabinet) cabinet.drawOver(ctx, game);   // CREDIT 1, PLAYER 1 READY
       }
     }
 
@@ -133,7 +144,9 @@
     function begin() {
       // Browsers only let a page make sound from inside a gesture like this one.
       if (sound) sound.unlock();
-      Pong.startGame(game);
+      // On the cabinet, a click or key is a quarter in the slot.
+      if (cabinet) cabinet.coin(game, sound);
+      else Pong.startGame(game);
     }
 
     root.addEventListener('keydown', begin);
@@ -148,6 +161,7 @@
     root.__pong = game;
     root.__pongStart = begin;
     root.__pongSound = sound;
+    root.__pongCabinet = cabinet;
   }
 
   if (document.readyState === 'loading') {

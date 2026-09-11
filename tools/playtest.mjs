@@ -79,7 +79,12 @@ class Session extends CdpConnection {
     const r = await this.send('Runtime.evaluate', {
       expression, returnByValue: true, awaitPromise: true
     });
-    if (r.exceptionDetails) throw new Error(r.exceptionDetails.text);
+    // The exception's own description carries the message and the page's stack;
+    // the bare text is only ever "Uncaught" (item 1187 lost a climb to that).
+    if (r.exceptionDetails) {
+      const e = r.exceptionDetails;
+      throw new Error((e.exception && e.exception.description) || e.text);
+    }
     return r.result.value;
   }
   mouseTo(x, y) {
@@ -139,7 +144,7 @@ const state = (s) => s.eval(`(() => { const g = window.__pong; return {
 /** What the page's sound player has done so far. It never changes the game. */
 const sound = (s) => s.eval(`(() => { const p = window.__pongSound; return p ? {
   exists: true, unlocked: p.unlocked, available: p.available, played: p.played,
-  errors: p.errors, last: p.last, audio: p.audioState(),
+  errors: p.errors, skipped: p.skipped, last: p.last, audio: p.audioState(),
   hasAudioContext: typeof (window.AudioContext || window.webkitAudioContext) === 'function'
 } : { exists: false }; })()`);
 
@@ -379,7 +384,9 @@ function summarise(shots) {
 async function main() {
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
   const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') +
-    (ERA ? '?era=' + encodeURIComponent(ERA) : '');
+    // ?era=N alone opens straight into play (item 1207); title=on keeps the
+    // cabinet so the title checks below still have a title to check.
+    (ERA ? '?era=' + encodeURIComponent(ERA) + '&title=on' : '');
   // The profile is a fresh folder under the temp directory, deleted when Chrome
   // exits -- on success, on an error and on Ctrl+C (tools/chrome.mjs, item 1169) --
   // so two playtests on two ports never share one and none is left behind.
@@ -453,6 +460,12 @@ async function main() {
       `score ${t1.score.left}-${t1.score.right}`);
     // Catch the invitation lit rather than mid-blink: a title shot without it
     // shows the reader a screen that never says how to start.
+    // ...and past the cabinet's power-on warm-up (item 1207), so the shot is
+    // the attract screen and not the tube still opening.
+    for (let i = 0; i < 40; i++) {
+      if (await s.eval('!window.__pongCabinet || window.__pongCabinet.stage(window.__pong) === "attract"')) break;
+      await sleep(60);
+    }
     for (let i = 0; i < 40; i++) {
       if (await s.eval('window.PongRender.promptLit(window.__pong)')) break;
       await sleep(60);
@@ -487,7 +500,8 @@ async function main() {
       'pressed the space bar on the title screen');
     // Far enough past the serve pause that the ball is on its way: a shot
     // taken on the very first frame is an empty field, which proves nothing.
-    await sleep(1200);
+    // The coin moment (CREDIT 1, PLAYER 1 READY) holds the first serve too.
+    await sleep(1200 + 1000 * (await s.eval('window.PongAttract ? window.PongAttract.COIN_HOLD : 0')));
     const firstFrameShot = await s.shot('first-frame');
 
     // 3. The loop is running at all.
@@ -532,16 +546,30 @@ async function main() {
       `${qr.played} sounds, errors ${qr.errors}` +
         (qr.last ? `, last: ${qr.last.type} on era ${qr.last.era} (${qr.last.waves.join('+')}` +
           `${qr.last.echo ? ' + echo' : ''})` : ''));
+    // Every sound each era has -- hit, wall, point and, where the voice carries
+    // one, the arrival sting -- so every note field and effect of the 3D eras'
+    // grammar (noise, filters, unison, tremolo, drive, reverb, bus) is built on
+    // the real Web Audio API, and none of it is skipped for want of a node.
     const voices = await s.eval(`(() => { const p = window.__pongSound; const out = [];
+      const S = window.PongSound;
       for (let era = 0; era <= window.Pong.TOP_ERA; era++) {
-        const ok = p.play({ type: 'paddle', era: era });
-        out.push({ era: era, ok: ok, last: ok ? p.last : null });
+        const types = ['paddle', 'wall', 'score'];
+        let ok = true; let n = 0;
+        for (const type of types) { if (p.play({ type: type, era: era })) n += 1; else ok = false; }
+        const last = p.last;
+        if (S.voicesFor(era, 'boot').length) {
+          p.handle({ era: era, eraChangedAt: 1e9 + era, events: [{ type: 'score', era: era, time: 1e9 + era }] });
+          if (p.last && p.last.type === 'boot') n += 1; else ok = false;
+        }
+        out.push({ era: era, ok: ok, n: n, last: ok ? last : null });
       }
-      return { out: out, errors: p.errors }; })()`);
-    check(NO_AUDIO ? 'and no era tries to sound' : 'every era\'s voice schedules in the browser',
-      voices.errors === 0 && voices.out.every((v) => v.ok === !NO_AUDIO),
-      voices.out.map((v) => `era ${v.era}: ` +
-        (v.last ? v.last.waves.join('+') + (v.last.echo ? '+echo' : '') : 'silent')).join('; '));
+      return { out: out, errors: p.errors, skipped: p.skipped }; })()`);
+    check(NO_AUDIO ? 'and no era tries to sound' : 'every era\'s voice schedules in the browser, every sound, nothing skipped',
+      voices.errors === 0 && voices.skipped === 0 &&
+        voices.out.every((v) => v.ok === !NO_AUDIO),
+      `errors ${voices.errors}, skipped ${voices.skipped}; ` + voices.out.map((v) => `era ${v.era}: ` +
+        (v.last ? v.n + ' sounds, ' + [...new Set(v.last.waves)].join('+') + (v.last.echo ? '+echo' : '') +
+          (v.last.reverb ? '+reverb' : '') + (v.last.bus ? '+bus' : '') : 'silent')).join('; '));
 
     // 7. Miss on purpose: park the paddle in a corner and let one through.
     const missDeadline = Date.now() + 15000;
