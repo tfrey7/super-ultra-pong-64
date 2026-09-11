@@ -321,7 +321,7 @@ test('the voice is the bible\'s PlayStation voice, to the letter, and the sound 
 test('era 5 plays exactly like era 1: drawing it every frame changes nothing about the game', () => {
   const seeded = () => { let s = 7; return () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; };
   const play = (era, drawEachFrame) => {
-    const g = Pong.createGame({ rng: seeded(), phase: 'playing', era, rules: { eraChangePause: 0 } });
+    const g = Pong.createGame({ rng: seeded(), phase: 'playing', era, rules: { eraChangePause: 0, cpuProfiles: false } });
     const trail = [];
     const rec = eralooks.recorder();
     for (let i = 0; i < 2400; i++) {

@@ -188,7 +188,8 @@
     memo.lastTime = state.time;
     var t = state.time - memo.at;
     if (t < 0 || t >= TOAST.rise + TOAST.hold + TOAST.fall) return null;
-    return { kind: memo.kind, text: TOAST_TEXT[memo.kind], t: t, y: toastY(t) };
+    var O = memo.kind === 'point' && root.PongOpponents;   // the computer's point is its taunt (item 1209)
+    return { kind: memo.kind, text: O ? O.toastText(state, TOAST_TEXT.point) : TOAST_TEXT[memo.kind], t: t, y: toastY(t) };
   }
 
   /**

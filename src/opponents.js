@@ -112,6 +112,16 @@
 
     var incoming = b.vx > 0 && state.serveDelay <= 0;
     p.watch = incoming ? (p.watch || 0) + dt : 0;
+    // A stepping machine saves its movement up and spends it in one jump, on
+    // its own clock, which keeps ticking while it waits to react.
+    var budget = dt;
+    if (prof.tick > 0) {
+      p.tickLeft = (p.tickLeft === undefined ? prof.tick : p.tickLeft) - dt;
+      if (p.tickLeft > 0) return;
+      budget = prof.tick;
+      p.tickLeft += prof.tick;
+      if (p.tickLeft < 0) p.tickLeft = 0;
+    }
     // It has not seen the ball turn yet: it stays where it was.
     if (incoming && p.watch < prof.reaction) return;
 
@@ -127,15 +137,6 @@
     }
     var speed = prof.speed * scale * (incoming ? 1 : prof.home);
 
-    // A stepping machine saves its movement up and spends it in one jump.
-    var budget = dt;
-    if (prof.tick > 0) {
-      p.tickLeft = (p.tickLeft === undefined ? prof.tick : p.tickLeft) - dt;
-      if (p.tickLeft > 0) return;
-      budget = prof.tick;
-      p.tickLeft += prof.tick;
-      if (p.tickLeft < 0) p.tickLeft = 0;
-    }
 
     var centre = p.y + p.h / 2;
     var diff = target - centre;
@@ -155,9 +156,14 @@
     if (mine > p.seenScore) {
       p.seenScore = mine;
       if ((state.era || 0) >= TAUNT_FROM_ERA) {
-        p.taunt = { text: TAUNTS[(mine - 1) % TAUNTS.length], at: state.time };
+        p.taunt = { text: tauntLine(mine), at: state.time };
       }
     }
+  }
+
+  /** The taunt for the computer's n-th point: the list in turn, by the score itself. */
+  function tauntLine(n) {
+    return TAUNTS[((n - 1) % TAUNTS.length + TAUNTS.length) % TAUNTS.length];
   }
 
   /** The taunt showing this instant, or null. */
@@ -178,8 +184,12 @@
    * achievement for you, so its toast is the computer's taunt, worth nothing.
    */
   function toastText(state, fallback) {
-    var line = tauntFor(state);
-    return line ? '0G - ' + line : fallback;
+    // Read from the state alone, so it holds for the toast's whole life: the
+    // last ball out went past the player's edge, so the last point was the
+    // computer's.
+    var theirs = state && state.missAt && state.missAt.x === 0 && state.score && state.score.right > 0;
+    if (!theirs || (state.era || 0) < TAUNT_FROM_ERA) return fallback;
+    return '0G - ' + tauntLine(state.score.right);
   }
 
   // ------------------------------------------------------------- the name
@@ -271,6 +281,7 @@
     predictY: predictY,
     stepCpu: stepCpu,
     tauntFor: tauntFor,
+    tauntLine: tauntLine,
     tagText: tagText,
     toastText: toastText,
     drawName: drawName

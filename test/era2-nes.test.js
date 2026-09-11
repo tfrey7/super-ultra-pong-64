@@ -192,7 +192,8 @@ test('plays exactly the same as era 1: same seed, same hands, same match', () =>
   // eraChangePause 0: the two machines climb the ladder at different points
   // (era 1 has further to go), and the longer pause after an era change is a
   // rule about the ladder, not about the look -- this test is about the look.
-  const rules = { eraChangePause: 0 };
+  // cpuProfiles false: each era's opponent (item 1209) is a rule of the ladder too.
+  const rules = { eraChangePause: 0, cpuProfiles: false };
   const one = Pong.createGame({ rng: seeded(7), phase: 'playing', era: 1, rules });
   const two = Pong.createGame({ rng: seeded(7), phase: 'playing', era: 2, rules });
   const play = (g) => ({ ball: g.ball, left: g.left, right: g.right, score: g.score,

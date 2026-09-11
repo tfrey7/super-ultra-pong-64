@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-09-11T02:22:37.884Z",
+  "measuredAt": "2026-09-11T02:25:45.379Z",
   "runs": [
     {
       "label": "this checkout",
@@ -8,8 +8,8 @@
       "trials": 300,
       "windowSeconds": 22,
       "era": 0,
-      "sessionsThatScored": 183,
-      "passRate": 0.61,
+      "sessionsThatScored": 184,
+      "passRate": 0.6133333333333333,
       "pointsPerMinute": 2.0818181818181816
     },
     {

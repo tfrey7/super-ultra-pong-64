@@ -622,7 +622,8 @@
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.fillStyle = C.tagText;
-    P.drawText(ctx, TAGS[side], x + TAG.w / 2, y + (TAG.h - 5 * TAG.cell) / 2, TAG.cell, TAG.gap);
+    var O = root.PongOpponents;   // the opponent's taunt, for a moment after its point (item 1209)
+    P.drawText(ctx, O ? O.tagText(state, side, TAGS[side]) : TAGS[side], x + TAG.w / 2, y + (TAG.h - 5 * TAG.cell) / 2, TAG.cell, TAG.gap);
     ctx.restore();
   }
 
