@@ -142,4 +142,4 @@ function createScorer(Pong) {
   return aim;
 }
 
-module.exports = { createScorer, plan, snapshotOf };
+module.exports = { createScorer, plan, snapshotOf, arrivalY };

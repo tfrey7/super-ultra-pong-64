@@ -384,8 +384,13 @@ async function walkLadder(s, baseUrl) {
   // Stand at the edge away from the ball so it goes past -- but stop choosing
   // once it is close, or the paddle sweeps across its path at the last moment.
   let edge = 30;
+  // A ball with spin on it bends (item 1208), so the edge is chosen from where the
+  // rules say it will ARRIVE, not from where it is now.
   const dodge = (g) => {
-    if (g.ball.x > g.width * 0.35) edge = g.ball.y < g.height / 2 ? g.height - 30 : 30;
+    if (g.ball.x > g.width * 0.35) {
+      const at = g.ball.vx < 0 ? Rally.arrivalY(Pong, g) : null;
+      edge = (at === null ? g.ball.y : at) < g.height / 2 ? g.height - 30 : 30;
+    }
     return edge;
   };
 
