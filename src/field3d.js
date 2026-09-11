@@ -99,7 +99,8 @@
   // -------------------------------------------------------------- the page
   var state3 = { tried: false, ok: false, why: '', gl: null, three: null, scene: null, camera: null,
     parts: null, lighting: null, fogKey: '' };
-  var switchedOff = !!(root.location && /[?&]gl=off\b/.test(String(root.location.search || '')));
+  var switchedOff = !!(root.__pongGlOff ||
+    (root.location && /[?&]gl=off\b/.test(String(root.location.search || ''))));
   var stats = { frames: 0, ms: 0 };
 
   function isHex(v) { return typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v); }

@@ -51,6 +51,9 @@ const ERA = arg('era', '');
 // --no-audio takes AudioContext away from the page before it loads, the way a
 // browser with no audio device would, and checks the game still plays silently.
 const NO_AUDIO = process.argv.includes('--no-audio');
+// --gl-off: the 3D eras draw their field through the canvas fallback instead of
+// WebGL (item 1273), for timing the two paths against each other.
+const GL_OFF = process.argv.includes('--gl-off');
 // --ladder runs only the walk up the era ladder (section 8), about a minute: a
 // frame and a second of timed ordinary play at every rung, and every era change.
 const LADDER_ONLY = process.argv.includes('--ladder');
@@ -507,6 +510,14 @@ async function walkLadder(s, baseUrl) {
     }
   }
 
+  // The 3D eras' field (item 1273): through WebGL unless --gl-off asked for the
+  // canvas fallback, and counted in frames so a layer that silently declined shows.
+  const gl3 = await s.eval(`(() => { const F = window.PongField3D; if (!F) return { ok: false, why: 'no PongField3D' };
+    return { ok: F.available(), why: F.why(), frames: F.stats().frames }; })()`);
+  check(GL_OFF ? 'the 3D eras drew their field through the canvas fallback (--gl-off)'
+      : 'the 3D eras drew their field through WebGL (software, headless)',
+    GL_OFF ? !gl3.ok && gl3.frames === 0 : gl3.ok && gl3.frames > 0,
+    gl3.ok ? `${gl3.frames} frames through WebGL` : `fallback: ${gl3.why}`);
   check('each era is on screen when its frame is taken',
     frames.every((f) => f.era === f.rung),
     frames.map((f) => `frame ${f.rung}: era ${f.era}`).join('; '));
@@ -979,7 +990,9 @@ async function main() {
     // counts every image as another origin, so one drawImage of the pixel art
     // in assets/pixellab/ taints the canvas and the ladder walk's getImageData
     // throws. With it, a file:// page may read back its own files (item 1179).
-    '--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
+    // --enable-unsafe-swiftshader: with the GPU off, WebGL runs on Chrome's
+    // software rasteriser, which newer Chromes only offer when asked (item 1273).
+    '--headless=new', '--disable-gpu', '--enable-unsafe-swiftshader', '--hide-scrollbars', '--mute-audio',
     '--allow-file-access-from-files',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
     '--no-first-run', '--no-default-browser-check',
@@ -1005,6 +1018,10 @@ async function main() {
       await s.send('Page.addScriptToEvaluateOnNewDocument', {
         source: 'delete window.AudioContext; delete window.webkitAudioContext;'
       });
+      await s.reload();
+    }
+    if (GL_OFF) {
+      await s.send('Page.addScriptToEvaluateOnNewDocument', { source: 'window.__pongGlOff = true;' });
       await s.reload();
     }
     // Wait for the page to actually be there -- the game and its field -- rather
