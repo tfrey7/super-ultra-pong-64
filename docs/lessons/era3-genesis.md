@@ -61,7 +61,11 @@ Look file: [src/eras/era3-genesis.js](../../src/eras/era3-genesis.js).
   - melody: a brassy FM horn (index 2.4) with delayed vibrato
   - chords: a thin square stabbing the off-beats, as the PSG
   - drums: a hard kick and snare, plus a 16th-note hat
-  - `grit: 0.35` on everything, for the crunchy output
+  - `grit: 0.35` on everything, for the crunchy output. Until item 1275 the grit curve also lifted
+    a quiet mix eight times (+18 dB), so the Genesis played 15 dB above the NES and the Super
+    Nintendo whatever its part gains said; the curve now divides out its own gain (same crunch),
+    and the era carries `level: 2.5` to sit with its neighbours. Measure a loudness change with
+    `docs/measure/item1275/render.mjs`, never by turning parts down under an effect that boosts.
 
 ## REUSABLE PIECES
 

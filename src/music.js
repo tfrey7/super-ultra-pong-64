@@ -153,6 +153,9 @@
   //   chain    the period's production between the effects and the bus:
   //            tone (a low-pass, Hz), tape: { wow, flutter, sat }, chorus:
   //            { rate, depth, mix }, hall: { seconds, decay, mix, gate? }
+  //   level    optional dB trim on the era's whole bus (item 1275): what keeps
+  //            every rung within about 4 dB of its neighbours at the same
+  //            stage of a match -- docs/measure/item1275/render.mjs measures it
   //   from     on any part: the intensity (0..1, intensityOf) it joins at; the
   //            engine adds its own LIFT layers (tom roll 0.7, crash 0.9) to any
   //            era with those kit pieces
@@ -618,6 +621,35 @@
     return c;
   }
 
+  /**
+   * A WaveShaper curve for an odd function f (f(-x) = -f(x)), sampled so that
+   * silence comes out as silence (item 1275). The curve's points run from -1
+   * to +1 inclusive, so they sit in +/- pairs and a zero input, which lands
+   * half way between the middle two, reads back exactly 0. Sampled as
+   * `i * 2 / n - 1` instead, zero landed on a point just below it and every
+   * shaper put out a small negative DC offset -- and a note's overdrive is
+   * wired up a moment before the note starts, while its envelope still sits
+   * at full gain, so each queued guitar chord leaked that offset straight
+   * into the mix: -5 dBFS RMS of thump under the Dreamcast's climax.
+   */
+  function oddCurve(f) {
+    var n = 1024, c = new Float32Array(n);
+    for (var i = 0; i < n; i++) c[i] = f(i * 2 / (n - 1) - 1);
+    return c;
+  }
+
+  /**
+   * The grit (an era's crunchy output: a soft clip, (1+k)x/(1+k|x|) with
+   * k = 20 x grit) divided by its own small-signal gain, 1+k, so the crunch
+   * keeps its shape and a quiet mix passes at the level it came in (item 1275).
+   * Without the division the Genesis's grit 0.35 lifted its quiet parts eight
+   * times (+18 dB), and it played 15 dB above the NES and the Super Nintendo.
+   */
+  function gritCurve(grit) {
+    var k = grit * 20;
+    return oddCurve(function (x) { return x / (1 + k * Math.abs(x)); });
+  }
+
   /** ?music=off (or =0, =no, =false) keeps the soundtrack silent. */
   function offFromQuery(search) {
     var m = /[?&]music=([^&#]*)/.exec(String(search || ''));
@@ -882,8 +914,11 @@
       if (current) { fadeOut(current); music.crossfades += 1; }
       var arr = arrangementFor(era);
       var bus = ctx.createGain();
-      bus.gain.setValueAtTime(first ? 1 : 0.0001, t);
-      if (!first) bus.gain.linearRampToValueAtTime(1, t + FADE_S);
+      // An era's `level` (dB) trims its whole bus, so every rung sits within a
+      // few dB of its neighbours at an era change (item 1275).
+      var top = arr && arr.level ? dbToGain(arr.level) : 1;
+      bus.gain.setValueAtTime(first ? top : 0.0001, t);
+      if (!first) bus.gain.linearRampToValueAtTime(top, t + FADE_S);
       bus.connect(duck);
       music.lastSwitch = { from: current ? current.era : null, to: era,
                            bar: Math.floor(pos / theme.steps), step: pos % theme.steps };
@@ -1057,10 +1092,8 @@
     /** An overdrive's transfer curve (a hard-ish tanh), cached per amount. */
     function driveCurve(amount) {
       if (driveCurves[amount]) return driveCurves[amount];
-      var n = 1024, c = new Float32Array(n), k = 1 + amount * 30, norm = Math.tanh(k);
-      for (var i = 0; i < n; i++) { var x = i * 2 / n - 1; c[i] = Math.tanh(k * x) / norm; }
-      driveCurves[amount] = c;
-      return c;
+      driveCurves[amount] = oddCurve(function (x) { var k = 1 + amount * 30; return Math.tanh(k * x) / Math.tanh(k); });
+      return driveCurves[amount];
     }
 
     function shape(param, t, held, peak, env) {
@@ -1171,9 +1204,7 @@
       var node = input;
       if (fx.grit) {
         var shaper = keep(ctx.createWaveShaper());
-        var n = 1024, curve = new Float32Array(n), k = fx.grit * 20;
-        for (var i = 0; i < n; i++) { var x = i * 2 / n - 1; curve[i] = (1 + k) * x / (1 + k * Math.abs(x)); }
-        shaper.curve = curve;
+        shaper.curve = gritCurve(fx.grit);
         node.connect(shaper);
         node = shaper;
       }
@@ -1358,6 +1389,8 @@
     LIMIT: LIMIT,
     CEILING: CEILING,
     ceilingCurve: ceilingCurve,
+    oddCurve: oddCurve,
+    gritCurve: gritCurve,
     peakVoices: peakVoices,
     drumVoices: drumVoices,
     LIFT: LIFT,

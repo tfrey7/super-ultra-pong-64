@@ -403,3 +403,30 @@ test('the ceiling curve is straight through when quiet and never lets a sample p
   assert.ok(peak <= M.CEILING, `the loudest the curve ever sends is ${peak}, the ceiling ${M.CEILING}`);
   assert.ok(peak > M.CEILING * 0.95, 'and the headroom is used, not thrown away');
 });
+
+// Item 1275: a WaveShaper reads a zero input half way between its two middle
+// points, so a curve sampled off-centre put out a DC offset on silence -- and
+// a note's overdrive leaked it into the mix while the note waited to start.
+test('the shaping curves pass silence as silence, and the grit adds no gain to a quiet mix', () => {
+  const zeroOf = (c) => (c[c.length / 2 - 1] + c[c.length / 2]) / 2;
+  const drive = M.oddCurve((x) => Math.tanh(25 * x) / Math.tanh(25));
+  assert.strictEqual(zeroOf(drive), 0, 'an overdrive curve reads 0 at 0');
+  const grit = M.gritCurve(0.35);
+  assert.strictEqual(zeroOf(grit), 0, 'the grit reads 0 at 0');
+  const i = Math.round((0.01 + 1) / 2 * (grit.length - 1));
+  const x = i * 2 / (grit.length - 1) - 1;
+  assert.ok(Math.abs(grit[i] / x - 1) < 0.1, `a quiet sample leaves the grit at ${(grit[i] / x).toFixed(3)}x, not the 8x it used to`);
+  assert.ok(grit[grit.length - 1] < 0.2, 'a full-scale sample is squashed, not lifted: the crunch is still there');
+});
+
+test('an era\'s level trims its whole bus (item 1275)', () => {
+  const { FakeContext, log } = recorder();
+  const music = M.createMusic({ AudioContext: FakeContext });
+  music.unlock();
+  const era = M.ARRANGEMENTS.findIndex((a) => a && a.level);
+  assert.ok(era >= 0, 'some era carries a level');
+  play(music, log, playingGame(era), 0.2);
+  const want = Math.pow(10, M.ARRANGEMENTS[era].level / 20);
+  assert.ok(log.gains.some((g) => g.gain.writes.some((w) => w[0] === 'set' && Math.abs(w[1] - want) < 1e-9)),
+    `era ${era}'s bus is set to ${want.toFixed(3)} (${M.ARRANGEMENTS[era].level} dB)`);
+});
