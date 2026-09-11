@@ -67,12 +67,24 @@
     ]
   };
   var PADDLE = { z: 24, reflection: 0.18, light: { top: 0.3, near: 0, side: -0.45 } };
+  // The pixellab tiles (item 1187), laid over the era's own fills through the
+  // shared table: brushed tread plate under the glossy slab, smooth-filtered
+  // and faded toward the far end so the glow, the reflections and the
+  // letterbox still own the frame.
+  var TEXTURE = {
+    court: { name: 'court-metal', alpha: 0.3, blend: 'soft-light', period: 70, strip: 2, fade: 0.6, smooth: true },
+    trim: { name: 'trim', alpha: 0.4, blend: 'soft-light', period: 26, smooth: true },
+    paddle: { name: 'paddle', alpha: 0.3, blend: 'soft-light', period: 18, smooth: true },
+    ball: { name: 'ball', alpha: 0.25, blend: 'soft-light', period: 12, smooth: true }
+  };
   var TABLE_STYLE = {
     surface: slab,
     line: 'rgba(201,214,232,0.300)',
     rail: C.slate,
     railTop: C.sheen,
-    nearLip: C.midnight
+    nearLip: C.midnight,
+    texture: TEXTURE.court,
+    trim: TEXTURE.trim
   };
 
   // --------------------------------------------------------- the camera drift
@@ -369,7 +381,7 @@
     var sides = paddleOrder(state);
     for (var i = 0; i < sides.length; i++) {
       T.box(ctx, cam, state[sides[i]], 0, PADDLE.z,
-        { ink: P.paddleInk(state, sides[i]), shade: 'flat', light: PADDLE.light });
+        { ink: P.paddleInk(state, sides[i]), shade: 'flat', light: PADDLE.light, texture: TEXTURE.paddle });
     }
     // 5. behind the ball: the glow trail and halo, the sparks
     trail(ctx, state, T, cam);
@@ -377,7 +389,7 @@
     // 6. post: the lens flare
     flare(ctx, T, cam);
     // 7. the ball, crisp and white over every glow; hidden in the serve pause
-    if (state.serveDelay <= 0) T.ball(ctx, cam, state.ball, { fill: C.core });
+    if (state.serveDelay <= 0) T.ball(ctx, cam, state.ball, { fill: C.core, texture: TEXTURE.ball });
     // 8. the letterbox over everything, the score as its subtitle
     letterbox(ctx, state, P);
     ctx.restore();

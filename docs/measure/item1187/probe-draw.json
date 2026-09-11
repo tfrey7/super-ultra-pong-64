@@ -1,0 +1,6 @@
+{
+  "about": "Median of 30 offscreen draws of each 3D era in headless Chrome, by probe-draw.mjs beside this file, 2026-09-10 ~22:40 EDT, one run each on the same machine. 'master' is 7712904 (the branch's base, textures absent); 'branch' is item-1187 at 67c0b5a (textures on, court cached). Every draw was also read back with getImageData without an exception on both.",
+  "unit": "ms",
+  "master": { "era5": 1.3, "era6": 4.9, "era7": 0.2, "era8": 0.2, "era9": 0.3, "era10": 14.1 },
+  "branch": { "era5": 1.1, "era6": 4.4, "era7": 0.1, "era8": 0.1, "era9": 0.3, "era10": 12.3 }
+}
