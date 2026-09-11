@@ -43,8 +43,17 @@ with the coin, not while the tube warms up.)
 - The **computer plays the right paddle**. It is beatable on purpose: it only
   chases the ball once the ball is heading its way, it aims slightly off centre,
   and it cannot move as fast as a really steep shot travels. Aim for the corners.
-- **Where the ball hits your paddle decides the angle.** Dead centre sends it
-  straight back; the tips send it steep. Every hit makes the ball a little faster.
+- **Where the ball hits your paddle decides the angle.** The face is cut into
+  eight segments the way the 1972 machine's was: the middle two send it straight
+  back, and each segment out towards a tip sends it steeper. Every hit makes the
+  ball a little faster, and a point puts it back to the serving speed.
+- **Swing the paddle as you hit and the ball bends.** A paddle moving at contact
+  puts spin on the ball, and its flight curves the way you swung -- a real
+  banana, fading as it flies (a hand that only follows the ball puts none on).
+  Swing hard and it is a **smash**: a burst of speed for that one flight and a
+  heavier hit in the era's own voice. The computer reads spin, but not
+  perfectly. [`curve-strip.png`](docs/shots/paddle-physics/curve-strip.png) is
+  one curved smash, frame by frame, its path traced in red on the last frame.
 - A point scores when the ball leaves either side, and the next serve starts from
   the centre after a short pause. The score is drawn across the top.
 
@@ -98,6 +107,7 @@ walk, in about a minute:
 node tools/playtest.mjs --ladder              # just the walk up the ladder
 node tools/playtest.mjs --ladder --reference  # and re-take the tracked era frames
 node tools/playtest.mjs --scoring             # just a rally and a point against the computer
+node tools/playtest.mjs --curve               # just the curved shot (--reference re-takes its film strip)
 ```
 
 The point against the computer is played by a scripted hand
@@ -272,9 +282,19 @@ lines of 720p for the Xbox 360. The 2D machines are scaled with hard pixel edges
 colour), the 3D ones with the soft scaling a television gave them. During an era
 change the display switches to the new machine the moment the ring passes the
 centre. Each row of the table also names the screen the machine was seen on --
-an overlay kind and its strength; this card ships only `none`, and
-`src/display-crt.js` and `src/display-tv.js`, already in the page's script list,
-are where the CRT and TV overlays plug in. `index.html?display=off` draws
+an overlay kind and its strength, drawn over the scaled-up picture on the page.
+`src/display-crt.js` puts the five 2D machines on the screen of their day (item
+1199): the arcade on a black-and-white monitor (heavy scanlines, phosphor glow),
+the Atari on a 1970s colour TV over RF (soft scanlines, colour bleed, a slow
+rolling band and a little snow), the NES and Genesis on a 1980s TV over
+composite (scanlines, phosphor-triad grain, red and blue fringes, a rounded
+tube with a vignette) and the Super Nintendo over S-video (fine scanlines, a
+mild glow). The tube is pre-drawn once per picture size and multiplied over
+each frame; the glow and fringes are the native frame drawn again, added at low
+alpha -- no per-pixel work. The playtest's pixel checks read the native picture
+from before the overlay; the reference frames show what the page shows, and
+`docs/shots/crt/` holds a before-and-after pair per era (`pairs.py` rebuilds
+them). `src/display-tv.js` is where the TV overlays of eras 5-10 plug in. `index.html?display=off` draws
 straight onto the page as before. All eleven side by side:
 `docs/shots/eras/contact-sheet-native.png` (from
 `docs/measure/item1198/contact-sheet.html`).

@@ -1,126 +1,126 @@
 {
-  "measuredAt": "2026-09-11T02:33:11.518Z",
+  "measuredAt": "2026-09-11T02:42:35.129Z",
   "runs": [
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 0,
-      "sessionsThatScored": 184,
-      "passRate": 0.6133333333333333,
-      "pointsPerMinute": 2.0818181818181816
+      "sessionsThatScored": 175,
+      "passRate": 0.5833333333333334,
+      "pointsPerMinute": 1.6909090909090907
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 1,
-      "sessionsThatScored": 167,
-      "passRate": 0.5566666666666666,
-      "pointsPerMinute": 1.9727272727272727
+      "sessionsThatScored": 161,
+      "passRate": 0.5366666666666666,
+      "pointsPerMinute": 1.6454545454545455
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 2,
-      "sessionsThatScored": 162,
-      "passRate": 0.54,
-      "pointsPerMinute": 1.8636363636363635
+      "sessionsThatScored": 185,
+      "passRate": 0.6166666666666667,
+      "pointsPerMinute": 2.036363636363636
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 3,
-      "sessionsThatScored": 151,
-      "passRate": 0.5033333333333333,
-      "pointsPerMinute": 1.718181818181818
+      "sessionsThatScored": 182,
+      "passRate": 0.6066666666666667,
+      "pointsPerMinute": 1.9909090909090907
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 4,
-      "sessionsThatScored": 152,
-      "passRate": 0.5066666666666667,
-      "pointsPerMinute": 1.6636363636363636
+      "sessionsThatScored": 149,
+      "passRate": 0.49666666666666665,
+      "pointsPerMinute": 1.6363636363636362
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 5,
-      "sessionsThatScored": 136,
-      "passRate": 0.4533333333333333,
-      "pointsPerMinute": 1.4454545454545453
+      "sessionsThatScored": 143,
+      "passRate": 0.4766666666666667,
+      "pointsPerMinute": 1.5636363636363635
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 6,
-      "sessionsThatScored": 126,
-      "passRate": 0.42,
-      "pointsPerMinute": 1.3363636363636362
+      "sessionsThatScored": 123,
+      "passRate": 0.41,
+      "pointsPerMinute": 1.2636363636363634
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 7,
-      "sessionsThatScored": 129,
-      "passRate": 0.43,
-      "pointsPerMinute": 1.3909090909090909
+      "sessionsThatScored": 121,
+      "passRate": 0.4033333333333333,
+      "pointsPerMinute": 1.209090909090909
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 8,
-      "sessionsThatScored": 122,
-      "passRate": 0.4066666666666667,
-      "pointsPerMinute": 1.3090909090909089
+      "sessionsThatScored": 118,
+      "passRate": 0.3933333333333333,
+      "pointsPerMinute": 1.1545454545454545
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 9,
-      "sessionsThatScored": 113,
-      "passRate": 0.37666666666666665,
-      "pointsPerMinute": 1.218181818181818
+      "sessionsThatScored": 106,
+      "passRate": 0.35333333333333333,
+      "pointsPerMinute": 1.0545454545454545
     },
     {
       "label": "this checkout",
       "aim": "track",
-      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1209\\src\\game.js",
+      "module": "G:\\Claude Stuff\\super-ultra-pong-64-item-1208\\src\\game.js",
       "trials": 300,
       "windowSeconds": 22,
       "era": 10,
-      "sessionsThatScored": 103,
-      "passRate": 0.3433333333333333,
-      "pointsPerMinute": 1.0454545454545454
+      "sessionsThatScored": 97,
+      "passRate": 0.3233333333333333,
+      "pointsPerMinute": 0.9454545454545454
     }
   ]
 }

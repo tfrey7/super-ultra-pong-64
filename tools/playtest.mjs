@@ -57,12 +57,17 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 // --scoring runs only the rally and the scoring check (section 6), about ten
 // seconds -- the quick way to ask "can the player still score?" many times.
 const SCORING_ONLY = process.argv.includes('--scoring');
+// --feel runs only the game-feel rallies (section 9), about a minute.
+const FEEL_ONLY = process.argv.includes('--feel');
 // --reference also copies the eleven era frames the walk takes (era0-arcade.png to
 // era10-xbox360.png), and the ten frames it catches mid-change (change-era0-to-era1.png
 // to change-era9-to-era10.png),
 // into the TRACKED docs/shots/eras/, the reference pictures a reader opens. Off by default,
 // because every walk's frames differ and a plain playtest must leave git clean.
 const REFERENCE = process.argv.includes('--reference');
+// --curve runs only the curved-shot check (item 1208), a few seconds; with
+// --reference it also writes its film strip to the tracked docs/shots/paddle-physics/.
+const CURVE_ONLY = process.argv.includes('--curve');
 const ERA_SHOTS = path.join(ROOT, 'docs', 'shots', 'eras');
 // One name per rung, the same as that era's file in src/eras/.
 const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes',
@@ -149,7 +154,7 @@ function check(name, ok, detail) {
 const state = (s) => s.eval(`(() => { const g = window.__pong; return {
   phase: g.phase, time: g.time, serveDelay: g.serveDelay, rally: g.rally, era: g.era, rules: g.rules,
   score: { left: g.score.left, right: g.score.right },
-  ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy },
+  ball: { x: g.ball.x, y: g.ball.y, vx: g.ball.vx, vy: g.ball.vy, spin: g.ball.spin, burst: g.ball.burst },
   leftY: g.left.y, rightY: g.right.y, h: g.left.h, height: g.height, width: g.width
 }; })()`);
 
@@ -251,6 +256,101 @@ async function playToScore(s, midX, toClientY) {
 }
 
 /**
+ * 7. A curved shot (item 1208). The ball is sent flat at the player's paddle,
+ * and the page's own mouse input swings the paddle down through it -- the
+ * pointer is moved every frame so the paddle meets the ball dead centre while
+ * travelling at `swing` units a second, which is a smash with spin on it. Then
+ * the ball's flight is recorded frame by frame to the far side: it must leave
+ * flat (the middle segment) and TURN, by at least 15 degrees, with no wall to
+ * help it, and end well off the straight line it left on. Five frames of the
+ * flight, the last with the path drawn over it, are stitched into a film strip.
+ */
+async function curveShot(s) {
+  const out = await s.eval(`new Promise((done) => {
+    const g = window.__pong, c = document.getElementById('field');
+    const box = () => c.getBoundingClientRect();
+    const point = (fy) => window.dispatchEvent(new MouseEvent('mousemove',
+      { clientY: box().top + (fy / g.height) * box().height, clientX: box().left + 40 }));
+    const Y = g.height / 2, swing = 520, face = g.left.x + g.left.w;
+    g.serveDelay = 0;
+    Object.assign(g.ball, { x: face + 150, y: Y - g.ball.size / 2, vx: -440, vy: 0, spin: 0, burst: 0 });
+    const path = [], shots = [], hits = [];
+    let t0 = null, walls = 0, frames = 0;
+    const strip = document.createElement('canvas');
+    const W = 320, H = 240, N = 5;
+    strip.width = W * N; strip.height = H;
+    const sx = strip.getContext('2d');
+    function frame(now) {
+      frames++;
+      const b = g.ball, cy = b.y + b.size / 2;
+      for (const e of g.events || []) { if (e.type === 'wall') walls++; if (e.type === 'paddle') hits.push(e); }
+      if (b.vx < 0 && !hits.length) {
+        // Before the hit: stand so the paddle arrives at Y exactly at contact.
+        const tau = Math.max(0, (b.x - face) / -b.vx);
+        point(Y - swing * Math.min(tau, 0.22));
+      } else if (hits.length) {
+        if (t0 === null) t0 = now;
+        const t = (now - t0) / 1000;
+        path.push({ t, x: b.x + b.size / 2, y: cy, vx: b.vx, vy: b.vy, spin: b.spin, walls });
+        if (shots.length < N - 1 && t >= shots.length * 0.18) {
+          sx.drawImage(c, shots.length * W, 0, W, H); shots.push(t);
+        }
+        if (b.vx < 0 || b.x > g.right.x - 30 || t > 1.6 || walls > 0) {
+          // The last panel: this frame with the flight traced over it, and the
+          // straight line it left on, dashed, for comparison.
+          const k = W / g.width, ox = (N - 1) * W;
+          sx.drawImage(c, ox, 0, W, H);
+          const p0 = path[0], a0 = Math.atan2(p0.vy, p0.vx);
+          sx.setLineDash([4, 4]); sx.strokeStyle = '#888'; sx.lineWidth = 2; sx.beginPath();
+          sx.moveTo(ox + p0.x * k, p0.y * k);
+          sx.lineTo(ox + (p0.x + Math.cos(a0) * 700) * k, (p0.y + Math.sin(a0) * 700) * k); sx.stroke();
+          sx.setLineDash([]); sx.strokeStyle = '#ff3b3b'; sx.beginPath();
+          path.forEach((p, i) => (i ? sx.lineTo : sx.moveTo).call(sx, ox + p.x * k, p.y * k)); sx.stroke();
+          sx.strokeStyle = '#555'; sx.lineWidth = 2;
+          for (let i = 1; i < N; i++) { sx.beginPath(); sx.moveTo(i * W, 0); sx.lineTo(i * W, H); sx.stroke(); }
+          return done({ path, hit: hits[0], shots, png: strip.toDataURL('image/png'), frames });
+        }
+      }
+      if (frames > 400) return done({ path, hit: hits[0] || null, shots, png: null, frames });
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })`);
+  const p = out.path;
+  const hit = out.hit;
+  check('a swinging paddle hits the ball: a smash with spin on it',
+    !!hit && hit.smash === true && Math.abs(hit.spin) > 0.5,
+    hit ? `smash ${hit.smash}, spin ${hit.spin.toFixed(2)} rad/s, speed ${hit.speed.toFixed(0)}` : 'the paddle never met the ball');
+  if (!p.length) { check('a curved shot: the flight bends', false, 'no flight recorded'); return out; }
+  // Measured up to the first wall, if the bend carried it into one.
+  const clear = p.filter((q) => q.walls === 0);
+  const first = p[0], last = clear.length ? clear[clear.length - 1] : p[0];
+  const deg = (v) => Math.atan2(v.vy, Math.abs(v.vx)) * 180 / Math.PI;
+  const a0 = Math.atan2(first.vy, first.vx);
+  const off = Math.abs((last.y - first.y) * Math.cos(a0) - (last.x - first.x) * Math.sin(a0));
+  const turned = Math.abs(deg(last) - deg(first));
+  check('a curved shot: the flight bends, with no wall to help it',
+    last.walls === 0 && turned >= 15 && off >= 40,
+    `left at ${deg(first).toFixed(1)} deg, ${last.t.toFixed(2)}s later heading ${deg(last).toFixed(1)} deg ` +
+    `(turned ${turned.toFixed(1)} deg), ${off.toFixed(0)} units off the straight line, ${last.walls} walls`);
+  if (out.png) {
+    const file = await (async () => {
+      mkdirSync(SHOTS, { recursive: true });
+      const f = path.join(SHOTS, 'curve-strip.png');
+      writeFileSync(f, Buffer.from(out.png.split(',')[1], 'base64'));
+      taken.push(f);
+      return f;
+    })();
+    if (REFERENCE) {
+      const dir = path.join(ROOT, 'docs', 'shots', 'paddle-physics');
+      mkdirSync(dir, { recursive: true });
+      copyFileSync(file, path.join(dir, 'curve-strip.png'));
+    }
+  }
+  return out;
+}
+
+/**
  * Film the era change a point has just started, and check that it ran. Three
  * readings of the page's own ring (PongRender.eraChangeMoment): a frame taken
  * with the ring about half way; the ring's radius once the wipe has finished,
@@ -334,8 +434,13 @@ async function walkLadder(s, baseUrl) {
   // Stand at the edge away from the ball so it goes past -- but stop choosing
   // once it is close, or the paddle sweeps across its path at the last moment.
   let edge = 30;
+  // A ball with spin on it bends (item 1208), so the edge is chosen from where the
+  // rules say it will ARRIVE, not from where it is now.
   const dodge = (g) => {
-    if (g.ball.x > g.width * 0.35) edge = g.ball.y < g.height / 2 ? g.height - 30 : 30;
+    if (g.ball.x > g.width * 0.35) {
+      const at = g.ball.vx < 0 ? Rally.arrivalY(Pong, g) : null;
+      edge = (at === null ? g.ball.y : at) < g.height / 2 ? g.height - 30 : 30;
+    }
     return edge;
   };
 
@@ -449,10 +554,97 @@ async function walkLadder(s, baseUrl) {
   return [...frames.map((f) => f.file), ...changes.filter((c) => c.file).map((c) => c.file)];
 }
 
+/**
+ * 9. Game feel (src/feel.js, item 1205). A real rally of twelve paddle hits on
+ * each of three eras -- the Genesis (shake and squash, no counter yet), the
+ * Nintendo 64 (the counter arrives) and the Xbox 360 (everything) -- played by
+ * the rules themselves: the computer's aim error is pinned to nothing so it
+ * returns every ball, and the hand follows the ball. A frame is taken on the
+ * tenth hit (its callout, the counter, the trail and the squash all showing),
+ * the counter is read on the twelfth, and the page's own rAF clock is timed
+ * over the rally, hit-stops and all, against the 16.7 ms of a 60 Hz frame.
+ */
+const FEEL_ERAS = [3, 6, 10];
+async function feelRallies(s, baseUrl) {
+  const shots = [];
+  for (const era of FEEL_ERAS) {
+    // A fresh machine, told on the title screen which rung to start the match on
+    // (startGame() puts it there), the same way ?era=N does.
+    await s.send('Page.navigate', { url: baseUrl });
+    await sleep(900);
+    await s.eval(`(() => { window.__pong.startEra = ${era}; return true; })()`);
+    const geo = await geometry(s);
+    const clip = { x: geo.left, y: geo.top, width: geo.width, height: geo.height };
+    const midX = geo.left + geo.width / 2;
+    const toClientY = (y) => geo.top + (y / 600) * geo.height;
+    await s.key('keyDown', 'Space', ' ', 32);
+    await s.key('keyUp', 'Space', ' ', 32);
+    await sleep(150);
+    await s.eval('(() => { const g = window.__pong; g.rules.cpuMaxAimError = 0; g.right.aimError = 0; return true; })()');
+    const timing = s.eval(`new Promise((done) => {
+      const stamps = []; const t0 = performance.now();
+      function tick(now) {
+        stamps.push(now);
+        const g = window.__pong;
+        if (g.rally < 12 && now - t0 < 40000) requestAnimationFrame(tick); else done(stamps);
+      }
+      requestAnimationFrame(tick);
+    })`).catch((e) => { if (e instanceof DroppedConnection) throw e; return [String(e.message || e)]; });
+    let g = await state(s);
+    let file = null;
+    const deadline = Date.now() + 40000;
+    while (Date.now() < deadline && g.rally < 12 && g.score.left + g.score.right === 0) {
+      await s.mouseTo(midX, toClientY(g.ball.y + 6));
+      if (!file && g.rally >= 10) file = await s.shot(`feel-era${era}-${ERA_NAMES[era].split('-')[1]}`, clip);
+      await sleep(25);
+      g = await state(s);
+    }
+    const m = await s.eval('window.PongFeel.moment(window.__pong)');
+    const stamps = await timing;
+    const stats = (list) => {
+      const d = [];
+      for (let i = 1; i < list.length; i++) d.push(list[i] - list[i - 1]);
+      d.sort((a, b) => a - b);
+      return { d, mean: d.reduce((a, b) => a + b, 0) / Math.max(1, d.length), p95: d[Math.floor(d.length * 0.95)] || 0 };
+    };
+    const { d, mean, p95 } = stats(stamps);
+    // The same era's play for two seconds with the feel layer taken out, as the
+    // yardstick: a 3D era's own look can cost more than a frame in headless,
+    // software-drawn Chrome, and that is the era's, not this layer's.
+    const offRun = s.eval(`new Promise((done) => {
+      const keep = window.PongFeel; window.PongFeel = undefined;
+      const stamps = []; const t0 = performance.now();
+      function tick(now) {
+        stamps.push(now);
+        if (now - t0 < 2000) requestAnimationFrame(tick); else { window.PongFeel = keep; done(stamps); }
+      }
+      requestAnimationFrame(tick);
+    })`);
+    for (let i = 0; i < 40; i++) {
+      const gg = await state(s);
+      await s.mouseTo(midX, toClientY(gg.ball.y + 6));
+      await sleep(40);
+    }
+    const off = stats(await offRun);
+    const counts = m.effects.counter;
+    check(`a twelve-hit rally on the ${ERA_NAMES[era]} ${counts ? 'shows the rally counter' : 'shows no counter yet'}`,
+      g.rally >= 12 && (counts ? m.counter === g.rally : m.counter === 0),
+      `${g.rally} hits, score ${g.score.left}-${g.score.right}, intensity ${m.intensity}, counter reads ` +
+      `${m.counter || 'nothing'}, effects on: ${Object.keys(m.effects).filter((k) => m.effects[k] === true).join(', ') || 'none'}`);
+    check(`and the ${ERA_NAMES[era]} rally keeps its frame rate with the feel layer on, hit-stops and all`,
+      d.length >= 60 && mean <= Math.max(18.5, off.mean * 1.15),
+      `${d.length} frames, mean ${mean.toFixed(1)} ms, p95 ${p95.toFixed(1)} ms; the same era with the layer ` +
+      `taken out: mean ${off.mean.toFixed(1)} ms, p95 ${off.p95.toFixed(1)} ms over ${off.d.length} frames`);
+    if (file) shots.push(file);
+  }
+  return shots;
+}
+
 function summarise(shots) {
   console.log('\nscreenshots:');
   for (const f of shots) console.log('  ' + f);
-  if (REFERENCE) console.log(`the era frames and the mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
+  if (REFERENCE && CURVE_ONLY) console.log('the film strip was also copied to docs/shots/paddle-physics/curve-strip.png (tracked)');
+  else if (REFERENCE) console.log(`the era frames and the mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
   process.exitCode = failed.length ? 1 : 0;
@@ -519,11 +711,24 @@ async function main() {
     }
     await sleep(400);
     if (LADDER_ONLY) return summarise(await walkLadder(s, url.split('?')[0]));
+    if (FEEL_ONLY) return summarise(await feelRallies(s, url.split('?')[0]));
 
     const geo = await geometry(s);
     const g0 = await state(s);
     const toClientY = (fieldY) => geo.top + (fieldY / g0.height) * geo.height;
     const midX = geo.left + geo.width / 2;
+
+    if (CURVE_ONLY) {
+      await s.key('keyDown', 'Space', ' ', 32);
+      await s.key('keyUp', 'Space', ' ', 32);
+      await sleep(150);
+      // Past the cabinet's held first serve (item 1207), so its CREDIT 1 /
+      // PLAYER 1 READY card is not over the film.
+      await playUntil(s, geo, 8000, (g) => g.height / 2, (g) => g.serveDelay <= 0);
+      await sleep(400);
+      await curveShot(s);
+      return summarise([path.join(SHOTS, 'curve-strip.png')]);
+    }
 
     if (SCORING_ONLY) {
       await s.key('keyDown', 'Space', ' ', 32);
@@ -657,6 +862,9 @@ async function main() {
         (v.last ? v.n + ' sounds, ' + [...new Set(v.last.waves)].join('+') + (v.last.echo ? '+echo' : '') +
           (v.last.reverb ? '+reverb' : '') + (v.last.bus ? '+bus' : '') : 'silent')).join('; '));
 
+    // 6c. A curved shot off a swinging paddle (curveShot, above; item 1208).
+    await curveShot(s);
+
     // 7. Miss on purpose: park the paddle in a corner and let one through.
     const missDeadline = Date.now() + 15000;
     const conceded = gp.score.right;
@@ -746,8 +954,10 @@ async function main() {
 
     // 8. One whole match up the ladder, era by era.
     const ladderShots = await walkLadder(s, url.split('?')[0]);
+    // 9. Game feel: a twelve-hit rally on three eras (feelRallies, above).
+    const feelShots = await feelRallies(s, url.split('?')[0]);
     summarise([titleShot, firstFrameShot,
-      ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots]);
+      ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots, ...feelShots]);
   } catch (e) {
     if (e instanceof ForeignPage) {
       // Not a failed check: no check ran. One line, and a non-zero exit.

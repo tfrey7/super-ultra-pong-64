@@ -65,6 +65,9 @@
     // era spreading across the field in a ring from where the ball went out,
     // then its name card, all inside the serve pause.
     var drawField = PongRender.drawEraFrame || PongRender.draw;
+    // The real game's frame goes through game feel (src/feel.js): shake, squash,
+    // trail, flash and the rally counter, drawn into the machine's own picture.
+    function drawGame(c, g) { if (root.PongFeel) root.PongFeel.draw(c, g, drawField); else drawField(c, g); }
 
     // The display (src/display.js): each era drawn at its own machine's
     // resolution, then scaled up onto this canvas. ?display=off skips it and
@@ -89,7 +92,7 @@
         var era = display.shownEra(shown);
         var native = display.begin(era, game.width, game.height);
         if (game.phase === 'title') drawField(native, attract, { ink: ATTRACT_INK, card: false });
-        else drawField(native, game);
+        else drawGame(native, game);
         display.present(ctx, era, game.time);
         if (game.phase === 'title' || (cabinet && cabinet.stage(game) !== 'play')) {
           // The title is the cabinet's own lettering, kept sharp over the
@@ -122,7 +125,7 @@
         if (cabinet) cabinet.drawTitle(ctx, game, paint);
         else { paint(); PongRender.drawTitle(ctx, game); }
       } else {
-        drawField(ctx, game);
+        drawGame(ctx, game);
         if (cabinet) cabinet.drawOver(ctx, game);   // CREDIT 1, PLAYER 1 READY
       }
     }
@@ -132,7 +135,8 @@
       last = now;
 
       // In the title phase this only advances the clock the blink reads.
-      Pong.step(game, dt, input.read());
+      // Through the feel layer, which owns hit-stop and match-point slow motion.
+      (root.PongFeel ? root.PongFeel.step : Pong.step)(game, dt, input.read());
       if (sound) sound.handle(game);
       if (game.phase === 'title') Pong.step(attract, dt, attractIntent(dt));
 
