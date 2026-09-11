@@ -9,13 +9,20 @@
  *   gpu          Chrome allowed its GPU, overlay on
  *   gpu-off      Chrome allowed its GPU, overlay 'none'
  *
- * The overlay is taken out by setting PongDisplay.ROWS[era].overlay = 'none'
- * after the page loads, so the native picture and its scale-up are unchanged
- * and the difference is the overlay's own cost.
+ * The overlay is taken out by setting every PongDisplay.ROWS[n].overlay to
+ * 'none' after the page loads, so the native picture and its scale-up are
+ * unchanged and the difference is the overlays' own cost.
  *
- *   node docs/measure/item1201/overlaycost.mjs [--port 9471]
+ * Then item 1155's reading: at eras 0 to 9 one point is forced and the ring's
+ * frames are timed against the second of ordinary play just taken, so each
+ * era change's ring is measured with its two screens on and off.
  *
- * Writes overlaycost.json beside itself.
+ *   node docs/measure/item1201/overlaycost.mjs [--port 9471] [--eras 3,5]
+ *        [--setups harness,harness-off] [--tweak "<js run after load>"] [--out name]
+ *
+ * Writes <name>.json beside itself (overlaycost.json by default). --tweak is how
+ * one layer of a screen is A/B'd without editing it: the kinds' tuning objects are
+ * live, e.g. --tweak "PongDisplay.CRT.KINDS['crt-composite'].fringe = 0".
  */
 import { writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -27,6 +34,11 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
 const i = process.argv.indexOf('--port');
 const PORT = Number(i !== -1 ? process.argv[i + 1] : 9471);
+const opt = (name, dflt) => { const j = process.argv.indexOf('--' + name); return j !== -1 ? process.argv[j + 1] : dflt; };
+const ERAS = opt('eras', '0,1,2,3,4,5,6,7,8,9,10').split(',').map(Number);
+const SETUPS = opt('setups', 'harness,harness-off,gpu,gpu-off').split(',');
+const TWEAK = opt('tweak', '');
+const OUT = opt('out', 'overlaycost');
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -69,14 +81,15 @@ async function measure(setup, gpu, overlay) {
     const s = new Session(ws);
     await s.send('Page.enable');
     await s.send('Runtime.enable');
-    for (let era = 0; era <= 10; era++) {
+    for (const era of ERAS) {
       await s.send('Page.navigate', { url: `${base}?era=${era}` });
       for (let t = 0; t < 100; t++) {
         if (await s.eval('!!(window.__pong && document.getElementById("field"))').catch(() => false)) break;
         await sleep(100);
       }
       await sleep(300);
-      const kind = await s.eval(`(() => { const r = window.PongDisplay.ROWS[${era}]; const k = r.overlay; ${overlay ? '' : "r.overlay = 'none';"} return k; })()`);
+      if (TWEAK) await s.eval(`(() => { ${TWEAK}; return 0; })()`);
+      const kind = await s.eval(`(() => { const r = window.PongDisplay.ROWS[${era}]; const k = r.overlay; ${overlay ? '' : "window.PongDisplay.ROWS.forEach((x) => { x.overlay = 'none'; });"} return k; })()`);
       await s.send('Input.dispatchKeyEvent', { type: 'keyDown', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
       await s.send('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
       for (let t = 0; t < 80; t++) {
@@ -102,11 +115,28 @@ async function measure(setup, gpu, overlay) {
         await sleep(30);
       }
       const d = await timing;
+      let ring = null;
+      if (era < 10) {
+        await s.eval(`(() => { const g = window.__pong; g.startEra = 0; g.serveDelay = 0;
+          g.ball.x = -8; g.ball.y = 150; g.ball.vx = -600; g.ball.vy = 0; return g.era; })()`);
+        await sleep(30);
+        ring = stats(await s.eval(`new Promise((done) => {
+          const d = []; let last = null; const t0 = performance.now();
+          function tick(now) {
+            const m = window.PongRender.eraChangeMoment(window.__pong), w = !!(m && m.wiping);
+            if (w && last !== null) d.push(now - last);
+            last = w ? now : null;
+            if (now - t0 < 1600) requestAnimationFrame(tick); else done(d);
+          }
+          requestAnimationFrame(tick);
+        })`));
+      }
       const native = await s.eval('(() => { const D = window.PongDisplay; const c = D && D.enabled && D.canvas(); ' +
         'return c ? c.width + "x" + c.height : "page"; })()');
-      rows.push({ setup, gpu, overlay: overlay ? kind : 'none', era, native, ...stats(d) });
+      rows.push({ setup, gpu, overlay: overlay ? kind : 'none', era, native, ...stats(d), ring });
       console.log(`${setup.padEnd(12)} era ${String(era).padStart(2)} (${native.padEnd(8)} ${(overlay ? kind : 'none').padEnd(14)}): ` +
-        `mean ${rows.at(-1).mean} ms, p95 ${rows.at(-1).p95} ms over ${rows.at(-1).frames} frames`);
+        `mean ${rows.at(-1).mean} ms, p95 ${rows.at(-1).p95} ms over ${rows.at(-1).frames} frames` +
+        (ring ? `; ring to era ${era + 1}: mean ${ring.mean} ms, p95 ${ring.p95} ms over ${ring.frames} frames` : ''));
     }
   } finally {
     try { ws && ws.close(); } catch { /* gone */ }
@@ -116,9 +146,7 @@ async function measure(setup, gpu, overlay) {
 }
 
 const all = [];
-all.push(...await measure('harness', false, true));
-all.push(...await measure('harness-off', false, false));
-all.push(...await measure('gpu', true, true));
-all.push(...await measure('gpu-off', true, false));
-writeFileSync(path.join(HERE, 'overlaycost.json'), JSON.stringify({ taken: new Date().toISOString(), rows: all }, null, 1) + '\n');
-console.log('wrote ' + path.join(HERE, 'overlaycost.json'));
+const SETUP = { harness: [false, true], 'harness-off': [false, false], gpu: [true, true], 'gpu-off': [true, false] };
+for (const name of SETUPS) all.push(...await measure(name, ...SETUP[name]));
+writeFileSync(path.join(HERE, OUT + '.json'), JSON.stringify({ taken: new Date().toISOString(), tweak: TWEAK, rows: all }, null, 1) + '\n');
+console.log('wrote ' + path.join(HERE, OUT + '.json'));
