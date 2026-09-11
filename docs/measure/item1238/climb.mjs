@@ -88,6 +88,29 @@ class Session extends CdpConnection {
     }
     return r.result.value;
   }
+  /** Chrome's own view of the audio graph (the WebAudio domain): live nodes, and the audio thread's load. */
+  watchAudio() {
+    this.audio = { created: 0, destroyed: 0, contexts: [] };
+    this.ws.addEventListener('message', (ev) => {
+      const msg = JSON.parse(ev.data);
+      if (msg.method === 'WebAudio.audioNodeCreated') this.audio.created++;
+      else if (msg.method === 'WebAudio.audioNodeWillBeDestroyed') this.audio.destroyed++;
+      else if (msg.method === 'WebAudio.contextCreated') this.audio.contexts.push(msg.params.context.contextId);
+      else if (msg.method === 'WebAudio.contextWillBeDestroyed') {
+        this.audio.contexts = this.audio.contexts.filter((c) => c !== msg.params.contextId);
+      }
+    });
+  }
+  async audioLoad() {
+    const out = [];
+    for (const id of this.audio.contexts) {
+      try {
+        const r = await this.send('WebAudio.getRealtimeData', { contextId: id });
+        out.push(+(r.realtimeData.renderCapacity * 100).toFixed(1));
+      } catch { /* an offline or closed context */ }
+    }
+    return out;
+  }
   async metrics() {
     const r = await this.send('Performance.getMetrics');
     const m = {};
@@ -138,6 +161,10 @@ async function reading(s, era) {
   const m1 = await s.metrics();
   const c1 = await s.eval('Object.assign({}, window.__leak)');
   const secs = Math.max(0.001, m1.Timestamp - m0.Timestamp);
+  // A collection first, so a node only counts as live if something still holds it.
+  await s.send('HeapProfiler.collectGarbage').catch(() => {});
+  await sleep(150);
+  const audioLoad = await s.audioLoad();
   const music = await s.eval(`(() => { const m = window.__pongMusic; return m ? { era: m.era, scheduled: m.scheduled,
     crossfades: m.crossfades, errors: m.errors } : null; })()`);
   return {
@@ -147,7 +174,9 @@ async function reading(s, era) {
     taskMsPerSec: +((m1.TaskDuration - m0.TaskDuration) * 1000 / secs).toFixed(1),
     heapMB: +(m1.JSHeapUsedSize / 1048576).toFixed(1),
     nodes: m1.Nodes, jsListeners: m1.JSEventListeners,
-    counts: c1, music
+    counts: c1, music,
+    audioLive: s.audio.created - s.audio.destroyed,
+    audioLoadPct: audioLoad
   };
 }
 
@@ -156,7 +185,8 @@ function line(kind, r) {
   return `${kind.padEnd(5)} era ${String(r.era).padStart(2)}: mean ${String(r.mean).padStart(6)} ms, p95 ${String(r.p95).padStart(6)}` +
     ` | script ${String(r.scriptMsPerSec).padStart(6)} ms/s, raf/frame ${r.rafPerFrame}, heap ${r.heapMB} MB,` +
     ` listeners ${c.listeners}, intervals ${c.intervals}, timeouts ${c.timeouts}, canvases ${c.canvases},` +
-    ` audio nodes ${c.audioNodes}, sources live ${c.sourcesLive}`;
+    ` audio nodes ${c.audioNodes}, sources live ${c.sourcesLive}, audio nodes alive ${r.audioLive},` +
+    ` audio thread ${r.audioLoadPct.join('/')}%`;
 }
 
 async function startGame(s) {
@@ -228,6 +258,8 @@ try {
   await s.send('Page.enable');
   await s.send('Runtime.enable');
   await s.send('Performance.enable');
+  s.watchAudio();
+  await s.send('WebAudio.enable');
   await s.send('Page.addScriptToEvaluateOnNewDocument', { source: WRAP });
   if (ONLY !== 'fresh') out.climb = await climb(s);
   if (ONLY !== 'climb') out.fresh = await fresh(s);
