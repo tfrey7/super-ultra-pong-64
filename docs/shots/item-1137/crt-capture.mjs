@@ -139,8 +139,8 @@ async function main() {
     out.secondRing = await timeRing(s);
     await sleep(300);
     out.after = await s.eval(`(() => { const p = window.__pongSound; return {
-      era: window.__pong.era, played: p.played, errors: p.errors, last: p.last,
-      audio: p.audioState(), stingVoices: window.PongSound.voicesFor(1, 'sting').length }; })()`);
+      era: window.__pong.era, played: p.played, errors: p.errors, last: p.last, boots: p.boots,
+      audio: p.audioState(), bootVoices: window.PongSound.voicesFor(1, 'boot').length }; })()`);
 
     // 2. frozen frames at fixed moments
     if (!LIVE_ONLY) {
