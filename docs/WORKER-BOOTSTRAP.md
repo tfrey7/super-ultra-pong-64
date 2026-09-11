@@ -109,6 +109,11 @@ canvas matches the new era drawn offscreen more closely than the old one -- or, 
 draw the very same frame (a `like: N` stand-in), matches the new era exactly.
 The changes alternate sides (item 1174): a change out of an even era (0 to 1, 2 to 3, ...) starts its ring at the left edge, a real miss past the player, and a change out of an odd era (1 to 2, 3 to 4, ...) starts it at the right edge, the player's own point put just past the computer's paddle -- and a check names the edge each ring came from.
 At every rung it also **times one second of ordinary play** on the page's own frame clock (item 1192), with the computer's paddle held on the ball so no point goes in mid-reading, and prints one check per era with its mean, p95 and max frame: an era whose mean is over 18.5 ms (the same line the ring check uses) FAILs, because the ring check alone lets an era that is already slow pass by comparing the ring with it.
+Last of all it plays **game feel** (`src/feel.js`, item 1205): a real twelve-hit rally on the
+Genesis, the Nintendo 64 and the Xbox 360, the computer's aim pinned so it returns everything,
+checking the rally counter shows where the era's intensity has it (N64 up) and that the frame rate
+with the layer on matches the same era with it taken out, with a frame of each on the tenth hit
+(`feel-era3-genesis.png`, `feel-era6-n64.png`, `feel-era10-xbox360.png`); `--feel` runs only that.
 `--ladder` runs only that walk (about a minute for all eleven rungs); `--scoring` runs only the
 rally and the scoring check (about fifteen seconds a run); `--reference` also copies its eleven era
 frames and ten change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
@@ -313,6 +318,23 @@ his emulator — never touch either.**
   9952. Trust the call's own `cost` in the manifest, not `generationsUsed` (which records 0 for
   that image), for what one image costs.
 
+- **Game feel is one layer over every era, and only its amount is per era.** `src/feel.js` holds the
+  intensity table (0 at the arcade, 1 at the Xbox 360) and the point each effect switches on; an era
+  that already draws an effect itself is listed in its `OWNED` table and left alone (the Genesis,
+  SNES, Dreamcast and PS2 trails, the N64 rumble). An era card that gives its era a new trail or
+  shake adds its rung there rather than drawing a second one. Hit-stop and match-point slow motion
+  work by handing the rules less time, never inside the serve pause.
+- **The 3D eras run slower than 16.7 ms a frame in the playtest's headless, software-drawn Chrome,
+  with or without the feel layer.** Item 1205 measured one rally each: before the display layer
+  and the 3D textures landed, the Xbox 360 at 31.3 ms with the layer and 33.1 ms without; on master
+  9cc6910 merged in, the Nintendo 64 at 27.6 against 28.6 ms and the Xbox 360 at 66.5 against 65.0
+  ms. A frame check on those eras has to compare against the era itself, not 16.7 ms -- and a
+  switch that takes a layer out must leave the loop running (item 1205's first A/B threw every
+  frame, killed the game loop and timed an idle page at a perfect 16.7 ms).
+- **Two playtests on one `--port` share one Chrome.** The harness does not refuse a port already
+  listening, so a second run attaches to the first run's page and drives it (item 1181 did, to
+  item 1205's, around 22:25 EDT on 2026-09-10): odd FAILs such as "Inspected target navigated or
+  closed" or a dropped connection early in a run can be the other run. Pick an unusual port.
 - **An era's `ctx.canvas` is not the page's canvas, and not always 800 x 600** (item 1198). The
   display (`src/display.js`) hands eras 0-4 a field-sized offscreen canvas, sampled down to the
   machine's pixels afterwards, and eras 5-10 the native one itself (320 x 240 and up) with a
