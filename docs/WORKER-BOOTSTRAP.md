@@ -197,9 +197,11 @@ his emulator — never touch either.**
 - **Fleet CI cannot run this repo yet** (item 1130). Every flourish card ran `node --test` by hand
   and said so in its note; do the same rather than waiting on a CI run that never starts.
 - **A flourish draws, and nothing else.** The hook is called from the renderer every frame of the
-  ring; a sound started from it (item 1138's NES chime did, for want of anywhere else) breaks that
-  contract and is queued to move onto the boot sting as item 1162. An arrival's sound belongs in
-  `src/sound.js`.
+  ring, and may be drawn twice in one frame (a recorder, a redraw), so a sound started from it
+  plays twice. An arrival's sound is the arriving voice's `boot` list in `src/sound.js`: the player
+  plays it in place of `score` for the point that moved the machine up (item 1162). Eras 1 and 2
+  are the worked examples, and each boot list starts with the era's own point note so the point is
+  still heard. Items 1137 and 1138 once patched the voice table from their flourishes; that is gone.
 - **The ring is under one field unit wide for its first frames.** The eased progress starts slow
   and the plain edge is skipped below a radius of 1, so a flourish that waits for the ring to have
   width misses the start of its own change -- item 1137's power-on line did until it keyed off

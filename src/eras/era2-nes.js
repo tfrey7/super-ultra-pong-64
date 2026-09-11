@@ -28,9 +28,9 @@
  * from the miss outward -- the old era on their front, the NES on their back --
  * so the mosaic IS the wipe's leading edge; and in a band just inside the edge
  * the new picture rolls, vertical hold slipping, and settles as the ring
- * covers the field. A short NES power-on chime plays in this era's voice (the
- * square and triangle channels of item 1125) once the point's arpeggio is done.
- * Drawn only, inside the pause: the engine's ring still decides which era
+ * covers the field. The NES power-on chime heard with it is not played from
+ * here: it is the NES voice's `boot` list in src/sound.js, which the player
+ * sounds for the point that brings this era in. Drawn only, inside the pause: the engine's ring still decides which era
  * draws where, and a turning tile is a sub-rectangle copy of a whole frame
  * scaled horizontally -- no per-pixel work. The dimmed rally behind the title
  * keeps the plain ring and makes no sound. src/erachange.js is the contract.
@@ -265,15 +265,6 @@
   var ROLL_W = 64;              // the rolling band just inside the ring's edge
   var ROLL_TURNS = 2;           // whole rolls of the picture over the wipe; it settles square
   var SYNC_BAR = 14;            // the black blanking bar that rolls with it
-  var CHIME_TYPE = 'powerOn';
-  // B5 then E6 on the pulse channel over an E on the triangle: a bright little
-  // NES "on". It starts at 0.45 s, after the point's own arpeggio (0.40 s), and
-  // is over by 0.85 s, well inside the 1.8 s pause.
-  var CHIME = [
-    { wave: 'square', freq: 988, at: 0.45, dur: 0.07, gain: 0.12 },
-    { wave: 'square', freq: 1319, at: 0.52, dur: 0.30, gain: 0.12 },
-    { wave: 'triangle', freq: 330, at: 0.45, dur: 0.40, gain: 0.3 }
-  ];
 
   /** A fixed scatter in -1..1 for a tile: no Math.random, the same every frame. */
   function tileJitter(col, row) {
@@ -321,21 +312,8 @@
     return layerCtx.canvas;
   }
 
-  // Which change each game has already blinked and chimed for.
+  // Which change each game has already blinked for.
   var announced = typeof WeakMap === 'function' ? new WeakMap() : null;
-
-  /** The power-on chime, in this era's voice, through the page's player. */
-  function chime() {
-    var S = root.PongSound;
-    var player = root.__pongSound;
-    if (!S || !S.VOICES || !S.VOICES[2] || !player || typeof player.play !== 'function') return false;
-    if (!S.VOICES[2][CHIME_TYPE]) S.VOICES[2][CHIME_TYPE] = CHIME;
-    try {
-      return !!player.play({ type: CHIME_TYPE, era: 2 });
-    } catch (e) {
-      return false;
-    }
-  }
 
   /** One turning tile: black behind it, its face squeezed about its middle. */
   function drawTile(ctx, x, y, f, before, after) {
@@ -391,10 +369,9 @@
     var state = info.state;
     var w = info.width, h = info.height;
 
-    // The first frame of this change: power off for one frame, and the chime.
+    // The first frame of this change: power off for one frame.
     if (announced && state && announced.get(state) !== state.eraChangedAt) {
       announced.set(state, state.eraChangedAt);
-      chime();
       ctx.fillStyle = MORTAR;
       ctx.fillRect(0, 0, w, h);
       return;
@@ -445,8 +422,7 @@
     flourish: consoleSwap,
     consoleSwap: {
       tile: FLIP_TILE, lead: FLIP_LEAD, jitter: FLIP_JITTER,
-      flipPhase: flipPhase, rollOffset: rollOffset,
-      chimeType: CHIME_TYPE, chime: CHIME
+      flipPhase: flipPhase, rollOffset: rollOffset
     }
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
