@@ -136,6 +136,13 @@ and [after the fixes it called for](../shots/item1230/era6-after-fixes.png).*
   the score ends at 80, so a radius-14 meter under it breaks the line at 96. It sits beside the
   score, on the inner side, because the computer's name is written on the outer side of the
   right-hand score.
+- **What it costs a frame** ([eraspeed.json](../measure/item1230/eraspeed.json) against master's
+  [eraspeed-master.json](../measure/item1230/eraspeed-master.json), taken back to back by
+  `docs/measure/item1230/eraspeed.mjs`): with the GPU, era 6 went from 4.37 to 6.07 ms a frame
+  (p95 4.3 to 8.6), well inside 16.7. In the playtest's GPU-less Chrome it reads 35.1 against
+  master's 37.7, which is noise on a loaded machine; both are over that harness's 18.5 ms line, as
+  every 3D era is there (card 1216). The figures' fog pass (three draws each) and the pennants'
+  curves are the new work, if a later card needs the 1.7 ms back.
 - **The rig could not smooth or fog a figure**, and it threw under `node --test` once an era named
   a sheet (no `Image` in Node). Both are fixed in the rig for every 3D era, not just this one.
 
