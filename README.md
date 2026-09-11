@@ -83,7 +83,13 @@ Super Nintendo. `--ladder` runs only that walk, in about half a minute:
 ```bash
 node tools/playtest.mjs --ladder              # just the walk up the ladder
 node tools/playtest.mjs --ladder --reference  # and re-take the tracked era frames
+node tools/playtest.mjs --scoring             # just a rally and a point against the computer
 ```
+
+The point against the computer is played by a scripted hand
+(`tools/scoring-rally.js`) that plans each return against the rules, so that
+check passes every run -- the computer itself stays exactly as beatable as it
+was, and `node tools/beatability-sample.mjs` is how to measure that.
 
 Every run rewrites the screenshots it drops in `docs/shots/playtest/` —
 `ladder-era0-arcade.png` to `ladder-era4-snes.png` among them. Those are ignored

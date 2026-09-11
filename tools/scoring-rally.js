@@ -7,10 +7,11 @@
  * computer being beatable BY DESIGN, not a fault -- but it made that playtest
  * check a coin flip. This hand does not chase. For every ball coming its way it
  * asks the real rules (src/game.js, the same file the page loads) where to
- * stand: each paddle position that could meet the ball is played forward, and
- * a position counts only if the computer misses the return whatever aim error
- * it rolls. It takes the middle of the widest such run of positions, so a few
- * units of browser timing either way still lands the same shot. What it
+ * stand: each paddle position that could meet the ball is played forward
+ * against a spread of the aim errors the computer can roll, and scored by how
+ * many of them it beats -- together with its neighbours, so a few units of
+ * browser timing either way still lands the same shot. It stands at the best
+ * one. What it
  * exploits is the computer's own documented weakness -- it only chases once the
  * ball heads its way, and cannot match a steep shot from the paddle tip.
  *
@@ -24,8 +25,9 @@
 
 const DT = 1 / 60;
 // The computer's aim error is (u * 2 - 1) * cpuMaxAimError; these span it.
-const AIM_ROLLS = [0, 0.25, 0.5, 0.75, 0.9999];
+const AIM_ROLLS = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.9999];
 const HAND_STEP = 3;   // field units between the paddle positions tried
+const SPREAD = 2;      // neighbours each side a position is judged with
 
 /**
  * The shape the playtest reads off the page. snapshotOf() makes the same shape
@@ -81,8 +83,8 @@ function scores(Pong, snap, hand, u) {
 
 /**
  * Where to stand for the ball now coming at the player. Returns
- * { hand, certain, width } -- certain is true when a run of `width` positions
- * all score against every aim the computer can roll.
+ * { hand, certain, chance } -- chance is the share of (aim roll, neighbouring
+ * position) pairs that score from there, and certain means all of them do.
  */
 function plan(Pong, snap) {
   const at = arrivalY(Pong, snap);
@@ -94,23 +96,22 @@ function plan(Pong, snap) {
   // mouse on the canvas.
   const lo = Math.max(at - reach, rules.paddleHeight / 2);
   const hi = Math.min(at + reach, snap.height - rules.paddleHeight / 2);
-  let best = null;
-  let run = [];
-  const close = () => {
-    if (run.length && (!best || run.length > best.length)) best = run;
-    run = [];
+  const hands = [];
+  for (let hand = lo; hand <= hi; hand += HAND_STEP) hands.push(hand);
+  // How many of the computer's possible aims each position beats...
+  const wins = hands.map((hand) => AIM_ROLLS.filter((u) => scores(Pong, snap, hand, u)).length);
+  // ...judged with its neighbours, because the browser meets the ball a few
+  // units either side of where the rules put it. Past the ends of the list the
+  // paddle is against a wall, which is the end position again.
+  const near = (i) => {
+    let sum = 0;
+    for (let j = i - SPREAD; j <= i + SPREAD; j++) sum += wins[Math.max(0, Math.min(wins.length - 1, j))];
+    return sum;
   };
-  for (let hand = lo; hand <= hi; hand += HAND_STEP) {
-    if (AIM_ROLLS.every((u) => scores(Pong, snap, hand, u))) run.push(hand);
-    else close();
-  }
-  close();
-  if (best) return { hand: best[Math.floor(best.length / 2)], certain: true, width: best.length };
-  // Nothing certain: take the ball on the tip away from where the computer
-  // stands, the steepest shot there is, and hope.
-  const away = (snap.rightY + rules.paddleHeight / 2) < snap.height / 2 ? 1 : -1;
-  const tip = at - away * rules.paddleHeight * 0.45;
-  return { hand: Math.max(lo, Math.min(hi, tip)), certain: false, width: 0 };
+  let best = 0;
+  for (let i = 1; i < hands.length; i++) if (near(i) > near(best)) best = i;
+  const full = AIM_ROLLS.length * (2 * SPREAD + 1);
+  return { hand: hands[best], certain: near(best) === full, chance: near(best) / full };
 }
 
 /**
