@@ -266,9 +266,11 @@ his emulator — never touch either.**
   `tools/playtest.mjs` compares the live canvas with each era drawn offscreen by calling
   `getImageData` in the page, and the page is opened from `file://`, where Chrome counts every
   image as another origin: one `drawImage` of a `assets/pixellab/*.png` taints the canvas, and the
-  read throws a SecurityError. The first era card that draws pixellab art has to deal with that
-  check (serve the repo over HTTP for it, or compare screenshots instead); item 1177, which built
-  the loader, measured none of this in a browser -- it is reasoned from the harness's own code.
+  read throws a SecurityError. **Handled since item 1179**: the harness starts Chrome with
+  `--allow-file-access-from-files`, which lets a `file://` page read back its own images, and the
+  ladder walk's pixel comparison passed with era 3's pixellab court and ball on the canvas
+  ("0 of 336000 pixels differ from era 3 drawn offscreen"). A page you open by hand off disk still
+  taints its canvas; nothing in the game reads pixels back, so only the harness cares.
 - **The pixellab balance lags the bill.** `node tools/pixellab.mjs` reads the subscription's
   generations left before and after a generation; on item 1177's test image the call was billed
   1 generation, the count read 9953 both times, and a `balance` run about two minutes later read

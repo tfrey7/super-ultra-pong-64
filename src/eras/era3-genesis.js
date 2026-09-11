@@ -18,9 +18,18 @@
  *    game plays exactly as it did in the eras below.
  *  - A bolder block score with a drop shadow.
  *
- * It paints with fillStyle and fillRect only, like the stock frame, so the
- * recording canvas in tools/eralooks.js can check it headless. A dimmed frame
- * (the attract rally behind the title) is the stock frame, as in every era.
+ *  - Generated pixel art (item 1179): the far plane is a pixellab.ai night
+ *    court and the ball a pixellab chrome sprite, both snapped offline to the
+ *    512 colours (assets/pixellab/manifest.json says how); the paddles stay
+ *    hand-drawn, after two generated ones read wrong (see drawShadedBar). They
+ *    are drawn with drawImage only, once each has decoded; until then -- and
+ *    always under node --test, which has no Image -- the hand-drawn pieces
+ *    below stand in, so the look never has a hole.
+ *
+ * The hand-drawn look paints with fillStyle and fillRect only, like the stock
+ * frame, so the recording canvas in tools/eralooks.js can check it headless.
+ * A dimmed frame (the attract rally behind the title) is the stock frame, as
+ * in every era.
  *
  * Arrival flourish: THE SHATTER. The old picture breaks like glass from the
  * spot where the ball went out. The field around that point is cut into a
@@ -185,7 +194,12 @@
   var TRAIL_DT = 0.016;   // seconds of flight between one ghost and the next
   var TRAIL_INK = '146,182,255';
 
-  function drawBall(ctx, state) {
+  /**
+   * The ball: the motion trail and the drop shadow as ever, then the generated
+   * chrome ball (24x24 art drawn at the 12-unit ball, an exact half, so it stays
+   * crisp) when S has it decoded, or the hand-drawn one while it has not.
+   */
+  function drawBall(ctx, state, S) {
     var b = state.ball;
     var s = b.size;
     for (var i = TRAIL; i >= 1; i--) {
@@ -197,6 +211,16 @@
     }
     var q = Math.max(1, Math.round(s / 4));
     ctx.fillStyle = SHADOW;
+    if (S && S.ready(ART.ball)) {
+      // A round ball casts a round shadow: three rects that never overlap (the
+      // shadow is half clear), so the corners are stepped off.
+      ctx.fillRect(b.x + 4 + q, b.y + 4, s - 2 * q, q);
+      ctx.fillRect(b.x + 4, b.y + 4 + q, s, s - 2 * q);
+      ctx.fillRect(b.x + 4 + q, b.y + 4 + s - q, s - 2 * q, q);
+      S.draw(ctx, ART.ball, Math.round(b.x), Math.round(b.y), s, s);
+      return;
+    }
+    if (S) S.load(ART.ball);
     ctx.fillRect(b.x + 4, b.y + 4, s, s);
     ctx.fillStyle = '#b6b6db';
     ctx.fillRect(b.x, b.y, s, s);
@@ -226,13 +250,68 @@
     R.drawText(ctx, text, centreX, top + SCORE.bevel, cell, gap);
   }
 
+  // ------------------------------------------------------- the pixel art
+  // Two pieces generated with tools/pixellab.mjs and snapped offline to the
+  // palette above by tools/palette-snap.mjs (assets/pixellab/manifest.json
+  // holds the request and the snap for each). Every piece is drawImage calls
+  // only -- nothing here reads or loops over pixels. Until an image has
+  // decoded, and always under node --test (there is no Image in Node), the
+  // hand-drawn piece is drawn in its place, so the look never has a hole.
+  var ART = { court: 'genesis-court', ball: 'genesis-ball' };
+
+  /** The sprite loader, when this page can decode images at all. */
+  function art() {
+    var S = root.PongSprites;
+    return S && typeof root.Image === 'function' ? S : null;
+  }
+
+  /**
+   * The far plane as the generated court: its 320x240 picture -- the
+   * Genesis's own 320-wide screen -- scaled to the field and scrolled with the
+   * far plane, every other copy flipped so the join is seamless. The near
+   * plane's hills still pass in front of it. False while it has not decoded.
+   */
+  function drawCourt(ctx, state, S, scroll) {
+    if (!S.ready(ART.court)) { S.load(ART.court); return false; }
+    var w = state.width;
+    var h = state.height;
+    var span = 2 * w;
+    var off = ((scroll % span) + span) % span;
+    for (var k = 0; k < 3; k++) {
+      var x = Math.floor(k * w - off);
+      if (x >= w || x + w <= 0) continue;
+      if (k % 2 === 0) {
+        S.draw(ctx, ART.court, x, 0, w, h);
+      } else {
+        ctx.save();
+        ctx.translate(x + w, 0);
+        ctx.scale(-1, 1);
+        S.draw(ctx, ART.court, 0, 0, w, h);
+        ctx.restore();
+      }
+    }
+    return true;
+  }
+
+  // The paddles stay hand-drawn (drawShadedBar). Two generated paddles were
+  // tried at 16x96 and both read wrong at play size: seed 393692841 ("vertical
+  // bat paddle ... chrome bar") came back a baseball bat, its bottom third a
+  // dark thin handle, so the paddle looked shorter than it hits; seed
+  // 1170815782 ("one plain vertical rectangular bar ... same width top to
+  // bottom", negative "handle, grip, bat") came back a battery -- a dark cap
+  // over the top quarter and a '+' near the foot. The brief allows one retry,
+  // so the stepped palette gradient below is the Genesis paddle.
+
   function draw(ctx, state, opts) {
     if (opts && opts.ink) return R.drawBase(ctx, state, opts);
     var p = planes(state.time);
+    var S = art();
 
-    drawSky(ctx, state);
-    drawStars(ctx, state, p.far);
-    drawRidge(ctx, state, p.far, 150, 70, 0.4, '#242449', '#49496d');
+    if (!(S && drawCourt(ctx, state, S, p.far))) {
+      drawSky(ctx, state);
+      drawStars(ctx, state, p.far);
+      drawRidge(ctx, state, p.far, 150, 70, 0.4, '#242449', '#49496d');
+    }
     drawRidge(ctx, state, p.near, 70, 40, 2.7, '#000024', '#242449');
 
     drawCentreLine(ctx, state);
@@ -243,7 +322,7 @@
     drawShadedBar(ctx, state.right, paddleInk(state, 'right'));
 
     // The ball blinks out while the serve waits, as in every era.
-    if (state.serveDelay <= 0) drawBall(ctx, state);
+    if (state.serveDelay <= 0) drawBall(ctx, state, S);
   }
 
   // ------------------------------------------------ the arrival: the shatter
