@@ -27,6 +27,7 @@ arrangement side by side:
 | `kit` | the era's drum kit: `kick`, `snare`, `hat`, `open`, `crash`, `tom`, `clap` and, from the SNES on, `timpani` or `taiko`; each a voice (or a list of voices layered) |
 | `chain` | the period's production over the whole era: `tone` (a low-pass: the speaker, the cartridge), `tape` (wow, flutter and saturation), `chorus`, and `hall` (a generated reverb with `gate` for the 1980s gated drum sound) |
 | `parts`, `effects`, `swing`, `detune`, `drone` | the arrangement, as before (the vocabulary is at the head of `src/music.js`) |
+| `level` | optional dB trim on the era's whole bus, so the rung sits within about 4 dB of its neighbours (item 1275; see *Every era at one level* below) |
 
 A drum part names a kit piece instead of spelling out a voice: `{ play: 'drum', hit: 'snare',
 pattern: '. . . . X ...' }`. **Any part may carry `from: 0..1`**, the intensity at which it joins.
@@ -53,6 +54,30 @@ top. Intensity lays a second, longer plan over it:
 
 A master limiter sits after everything (a hard compressor into a soft ceiling), so the climax can
 stack every layer without the output ever clipping.
+
+**Every era at one level (item 1275).** An era change must not jump in loudness: at each stage of
+a match (the serve, a long rally, a very long one, match point) every era sits within about 4 dB
+of the era below it. `node docs/measure/item1275/render.mjs --label <name>` renders all eleven
+offline through the real limiter and prints the step at every change, and
+`docs/measure/item1275/parts.mjs --era N --stage build` solos each part to find the loud one.
+Measured on master 032d429, 26 of the 40 steps were over 4 dB and the worst was 20.4; after the
+fix none is, the largest 3.7 (`render-before.json`, `render-after.json`). What it took:
+
+- **A shaping curve must pass silence as silence.** Every overdriven note and the grit used a
+  curve sampled off-centre, which put out a small DC offset on a zero input; a note is wired up
+  a moment before it starts, while its envelope still sits at full gain, so every queued
+  guitar chord leaked that offset into the mix. On the Dreamcast it was -5 dBFS RMS of thump
+  under the climax, 28 dB above the music. `oddCurve` in `src/music.js` builds every curve now.
+- **The grit divides out its own gain.** `(1+k)x/(1+k|x|)` lifts a quiet mix `1+k` times (8x,
+  +18 dB, at the Genesis's grit 0.35); `gritCurve` is the same crunch at unity small-signal gain.
+  That, not the arrangement, was the Genesis's 15 dB.
+- **`level` evens out what is left**: the arcade +3.5 dB, the Genesis +2.5, the Super Nintendo
+  -1.5, the PS2 -4.
+- **A climb has to be shaped like the neighbours'.** A single trim cannot fix an era whose serve
+  is thin and whose build is loud: the Xbox climbed 13 dB from the serve to a long rally, the PS2
+  4. The Xbox and 360 taiko came down 8 and 6 dB (on the Xbox it was -26 dBFS alone, louder than
+  the PS2's whole serve) and their serve's lead parts went up 4 dB (the Xbox choir lead, the 360's
+  plucked arpeggio and sub bass). An arrangement card that adds a loud part re-runs `render.mjs`.
 
 ---
 

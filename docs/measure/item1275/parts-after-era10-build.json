@@ -1,0 +1,184 @@
+{
+ "taken": "2026-09-11T04:51:51.309Z",
+ "era": 10,
+ "stage": "build",
+ "label": "after",
+ "rows": [
+  {
+   "solo": -1,
+   "count": 21,
+   "what": "the whole mix",
+   "notes": 519,
+   "rmsDb": -28,
+   "peak": 0.2996
+  },
+  {
+   "solo": 0,
+   "count": 21,
+   "what": "melody arp sawtooth",
+   "notes": 126,
+   "rmsDb": -48.7,
+   "peak": 0.0222
+  },
+  {
+   "solo": 1,
+   "count": 21,
+   "what": "chords arp sawtooth",
+   "notes": 130,
+   "rmsDb": -52.5,
+   "peak": 0.0094
+  },
+  {
+   "solo": 2,
+   "count": 21,
+   "what": "bass held sine",
+   "notes": 17,
+   "rmsDb": -40.3,
+   "peak": 0.0207
+  },
+  {
+   "solo": 3,
+   "count": 21,
+   "what": "drum kick from 0.3",
+   "notes": 33,
+   "rmsDb": -33.2,
+   "peak": 0.1513
+  },
+  {
+   "solo": 4,
+   "count": 21,
+   "what": "drum hat",
+   "notes": 32,
+   "rmsDb": -76.6,
+   "peak": 0.0065
+  },
+  {
+   "solo": 5,
+   "count": 21,
+   "what": "echo sawtooth from 0.3",
+   "notes": 58,
+   "rmsDb": -46.5,
+   "peak": 0.021
+  },
+  {
+   "solo": 6,
+   "count": 21,
+   "what": "chords rhythm sawtooth from 0.3 drive 0.3",
+   "notes": 13,
+   "rmsDb": -46.1,
+   "peak": 0.0207
+  },
+  {
+   "solo": 7,
+   "count": 21,
+   "what": "drum taiko from 0.3",
+   "notes": 82,
+   "rmsDb": -30.5,
+   "peak": 0.1398
+  },
+  {
+   "solo": 8,
+   "count": 21,
+   "what": "drum noise from 0.3",
+   "notes": 26,
+   "rmsDb": -59.8,
+   "peak": 0.0232
+  },
+  {
+   "solo": 9,
+   "count": 21,
+   "what": "drum sawtooth from 0.3",
+   "notes": 2,
+   "rmsDb": -88.1,
+   "peak": 0.0018
+  },
+  {
+   "solo": 10,
+   "count": 21,
+   "what": "melody full sawtooth from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 11,
+   "count": 21,
+   "what": "chords pad sawtooth from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 12,
+   "count": 21,
+   "what": "chords pad sawtooth from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 13,
+   "count": 21,
+   "what": "echo sawtooth from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 14,
+   "count": 21,
+   "what": "bass held sawtooth from 0.7 drive 0.3",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 15,
+   "count": 21,
+   "what": "drum taiko from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 16,
+   "count": 21,
+   "what": "drum clap from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 17,
+   "count": 21,
+   "what": "drum sine from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 18,
+   "count": 21,
+   "what": "drum sine from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 19,
+   "count": 21,
+   "what": "drum tom from 0.7 LIFT",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 20,
+   "count": 21,
+   "what": "drum crash from 0.9 LIFT",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  }
+ ]
+}

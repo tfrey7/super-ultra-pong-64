@@ -1,0 +1,14 @@
+Item 1244: the playtest's per-era frame lines, one ladder walk (node tools/playtest.mjs --ladder --port 9489) on branch item-1244 at master 95e7f22, headless Chrome with --disable-gpu, 2026-09-11 00:37 EDT.
+
+PASS  era 0, the 1972 arcade Pong, holds full frame rate in ordinary play  -- 61 frames over 1.02 s: mean 16.7 ms, p95 16.7 ms, max 16.7 ms (line: mean 18.5 ms)
+PASS  era 1, the 1977 Atari 2600, holds full frame rate in ordinary play  -- 60 frames over 1.00 s: mean 16.7 ms, p95 16.8 ms, max 16.8 ms (line: mean 18.5 ms)
+PASS  era 2, the 1985 NES, holds full frame rate in ordinary play  -- 61 frames over 1.02 s: mean 16.7 ms, p95 16.7 ms, max 16.8 ms (line: mean 18.5 ms)
+PASS  era 3, the 1989 Sega Genesis, holds full frame rate in ordinary play  -- 61 frames over 1.02 s: mean 16.7 ms, p95 16.8 ms, max 16.8 ms (line: mean 18.5 ms)
+PASS  era 4, the 1991 Super Nintendo, holds full frame rate in ordinary play  -- 60 frames over 1.00 s: mean 16.7 ms, p95 16.8 ms, max 16.8 ms (line: mean 18.5 ms)
+FAIL  era 5, the 1994 Sony PlayStation, holds full frame rate in ordinary play  -- 38 frames over 1.02 s: mean 26.8 ms, p95 33.4 ms, max 33.5 ms (line: mean 18.5 ms)
+FAIL  era 6, the 1996 Nintendo 64, holds full frame rate in ordinary play  -- 31 frames over 1.00 s: mean 32.3 ms, p95 33.4 ms, max 33.4 ms (line: mean 18.5 ms)
+FAIL  era 7, the 1999 Sega Dreamcast, holds full frame rate in ordinary play  -- 31 frames over 1.02 s: mean 32.8 ms, p95 33.4 ms, max 50.0 ms (line: mean 18.5 ms)
+FAIL  era 8, the 2000 PlayStation 2, holds full frame rate in ordinary play  -- 30 frames over 1.00 s: mean 33.3 ms, p95 50.0 ms, max 50.1 ms (line: mean 18.5 ms)
+FAIL  era 9, the 2001 Xbox, holds full frame rate in ordinary play  -- 28 frames over 1.00 s: mean 35.7 ms, p95 50.0 ms, max 50.1 ms (line: mean 18.5 ms)
+FAIL  era 10, the 2005 Xbox 360, holds full frame rate in ordinary play  -- 12 frames over 1.02 s: mean 84.7 ms, p95 100.0 ms, max 100.0 ms (line: mean 18.5 ms)
+35/41 checks passed

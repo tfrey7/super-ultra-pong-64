@@ -31,7 +31,7 @@
     hat: { wave: 'noise', gain: 0.04, env: { a: 0.001, d: 0.05, s: 0, r: 0.02 }, filter: { type: 'highpass', freq: 8000, q: 0.7 }, pan: 0.45 },
     crash: { wave: 'noise', gain: 0.07, env: { a: 0.001, d: 1.0, s: 0, r: 0.02 }, filter: { type: 'highpass', freq: 4500, q: 0.5 }, pan: -0.45 },
     tom: { wave: 'sine', freq: 115, gain: 0.28, env: { a: 0.001, d: 0.3, s: 0, r: 0.03 }, drop: { ratio: 0.55, time: 0.2 } },
-    taiko: [{ wave: 'sine', freq: 58, gain: 0.42, env: { a: 0.001, d: 0.8, s: 0, r: 0.03 }, drop: { ratio: 0.5, time: 0.3 } }, { wave: 'noise', gain: 0.09, env: { a: 0.001, d: 0.09, s: 0, r: 0.02 }, filter: { type: 'lowpass', freq: 380, q: 0.8 } }]
+    taiko: [{ wave: 'sine', freq: 58, gain: 0.17, env: { a: 0.001, d: 0.8, s: 0, r: 0.03 }, drop: { ratio: 0.5, time: 0.3 } }, { wave: 'noise', gain: 0.036, env: { a: 0.001, d: 0.09, s: 0, r: 0.02 }, filter: { type: 'lowpass', freq: 380, q: 0.8 } }]
   },
   chain: { tape: { wow: 0.05, flutter: 0.05, sat: 0.25 } },
 
@@ -53,7 +53,7 @@
     // The monk choir on "ah": one saw per note through the first formant
     // (about 750 Hz) here and the second (about 1150 Hz) on the echo below.
     { play: 'melody', rule: 'full',
-      voice: { wave: 'sawtooth', gain: 0.11, unison: [-6, 6],
+      voice: { wave: 'sawtooth', gain: 0.17, unison: [-6, 6],
                env: { a: 0.14, d: 0.3, s: 0.9, r: 0.35 }, legato: 0.97,
                filter: { type: 'bandpass', freq: 750, q: 3 },
                vibrato: { rate: 5, cents: 10, delay: 0.2 } } },

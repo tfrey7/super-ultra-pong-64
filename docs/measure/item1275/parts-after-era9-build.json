@@ -1,0 +1,136 @@
+{
+ "taken": "2026-09-11T04:51:43.971Z",
+ "era": 9,
+ "stage": "build",
+ "label": "after",
+ "rows": [
+  {
+   "solo": -1,
+   "count": 15,
+   "what": "the whole mix",
+   "notes": 418,
+   "rmsDb": -25,
+   "peak": 0.1833
+  },
+  {
+   "solo": 0,
+   "count": 15,
+   "what": "melody full sawtooth",
+   "notes": 58,
+   "rmsDb": -39.2,
+   "peak": 0.0556
+  },
+  {
+   "solo": 1,
+   "count": 15,
+   "what": "echo sawtooth",
+   "notes": 58,
+   "rmsDb": -47.9,
+   "peak": 0.0201
+  },
+  {
+   "solo": 2,
+   "count": 15,
+   "what": "chords pad sawtooth",
+   "notes": 9,
+   "rmsDb": -51.6,
+   "peak": 0.0134
+  },
+  {
+   "solo": 3,
+   "count": 15,
+   "what": "chords arp sawtooth from 0.3",
+   "notes": 130,
+   "rmsDb": -46.6,
+   "peak": 0.02
+  },
+  {
+   "solo": 4,
+   "count": 15,
+   "what": "drum taiko from 0.3",
+   "notes": 98,
+   "rmsDb": -26,
+   "peak": 0.172
+  },
+  {
+   "solo": 5,
+   "count": 15,
+   "what": "bass eighths sawtooth from 0.3 drive 0.25",
+   "notes": 65,
+   "rmsDb": -33.7,
+   "peak": 0.0611
+  },
+  {
+   "solo": 6,
+   "count": 15,
+   "what": "chords rhythm sawtooth from 0.7 drive 0.85",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 7,
+   "count": 15,
+   "what": "chords rhythm sawtooth from 0.7 drive 0.85",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 8,
+   "count": 15,
+   "what": "echo sawtooth from 0.7 drive 0.6",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 9,
+   "count": 15,
+   "what": "echo sawtooth from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 10,
+   "count": 15,
+   "what": "drum kick from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 11,
+   "count": 15,
+   "what": "drum snare from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 12,
+   "count": 15,
+   "what": "drum hat from 0.7",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 13,
+   "count": 15,
+   "what": "drum tom from 0.7 LIFT",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  },
+  {
+   "solo": 14,
+   "count": 15,
+   "what": "drum crash from 0.9 LIFT",
+   "notes": 0,
+   "rmsDb": -200,
+   "peak": 0
+  }
+ ]
+}
