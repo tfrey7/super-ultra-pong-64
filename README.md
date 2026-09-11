@@ -207,22 +207,27 @@ match back on era 0. All eleven rungs are built.
 - **2001, Xbox:** bump-mapped metal, hard moving shadows, gamertags and green light.
 - **2005, Xbox 360:** bloom, a brown grade, film grain, motion blur, the blades and an achievement -- the top of the ladder.
 
-| Era | Machine | Look | Voice | Reference frame |
-| --- | --- | --- | --- | --- |
-| 0 | 1972 arcade Pong | black and white: two white bars, a square ball, a dashed centre line | a bare square-wave blip | [`era0-arcade.png`](docs/shots/eras/era0-arcade.png) |
-| 1 | 1977 Atari 2600 | the turn to colour: each paddle and its score in its own colour | the same blip | [`era1-atari2600.png`](docs/shots/eras/era1-atari2600.png) |
-| 2 | 1985 NES | 8-bit sprites, the NES palette and a pixel score | square and triangle chiptune | [`era2-nes.png`](docs/shots/eras/era2-nes.png) |
-| 3 | 1989 Sega Genesis | 16-bit shading, parallax and a trail behind the ball | a bright FM bell | [`era3-genesis.png`](docs/shots/eras/era3-genesis.png) |
-| 4 | 1991 Super Nintendo | a Mode 7 floor and rich sprites | layered chords with a short echo | [`era4-snes.png`](docs/shots/eras/era4-snes.png) |
-| 5 | 1994 Sony PlayStation | wobbling snapped polygons, swimming affine textures, dithered 320x240 | plucky CD notes in a room reverb | [`era5-playstation.png`](docs/shots/eras/era5-playstation.png) |
-| 6 | 1996 Nintendo 64 | blurred textures, heavy fog, round toybox shapes, rumble shake | muffled, springy samples | [`era6-n64.png`](docs/shots/eras/era6-n64.png) |
-| 7 | 1999 Sega Dreamcast | crisp cel shading, thick ink outlines, graffiti score, speed lines | punchy synth-funk, the modem | [`era7-dreamcast.png`](docs/shots/eras/era7-dreamcast.png) |
-| 8 | 2000 PlayStation 2 | letterbox, sparks, glow trail, lens flare, slow camera drift | taiko, orchestral pads, a big hit | [`era8-ps2.png`](docs/shots/eras/era8-ps2.png) |
-| 9 | 2001 Xbox | bump-mapped metal, hard moving shadows, gamertags, shield-bar score | sub-heavy metallic clangs | [`era9-xbox.png`](docs/shots/eras/era9-xbox.png) |
-| 10 | 2005 Xbox 360 | bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked | big clean hits, the achievement blip | [`era10-xbox360.png`](docs/shots/eras/era10-xbox360.png) |
+| Era | Machine | Look | Voice | Drawn at | Seen on | Reference frame |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | 1972 arcade Pong | black and white: two white bars, a square ball, a dashed centre line | a bare square-wave blip | 200 x 120, hard edges | a black-and-white arcade monitor: heavy scanlines, phosphor glow | [`era0-arcade.png`](docs/shots/eras/era0-arcade.png) |
+| 1 | 1977 Atari 2600 | the turn to colour: each paddle and its score in its own colour | the same blip | 160 x 192, hard edges | a 1970s colour TV over RF: soft scanlines, colour bleed, a rolling band, snow | [`era1-atari2600.png`](docs/shots/eras/era1-atari2600.png) |
+| 2 | 1985 NES | 8-bit sprites, the NES palette and a pixel score | square and triangle chiptune | 256 x 240, hard edges | a 1980s TV over composite: scanlines, phosphor grain, colour fringes, a curved tube | [`era2-nes.png`](docs/shots/eras/era2-nes.png) |
+| 3 | 1989 Sega Genesis | 16-bit shading, parallax and a trail behind the ball | a bright FM bell | 320 x 224, hard edges | a 1980s TV over composite, a touch lighter than the NES | [`era3-genesis.png`](docs/shots/eras/era3-genesis.png) |
+| 4 | 1991 Super Nintendo | a Mode 7 floor and rich sprites | layered chords with a short echo | 256 x 224, hard edges | a TV over S-video: fine scanlines, a mild glow | [`era4-snes.png`](docs/shots/eras/era4-snes.png) |
+| 5 | 1994 Sony PlayStation | wobbling snapped polygons, swimming affine textures, dithered 320x240 | plucky CD notes in a room reverb | 320 x 240, soft | a 1990s TV over composite: soft lines, sideways bleed, the 4 x 4 dither | [`era5-playstation.png`](docs/shots/eras/era5-playstation.png) |
+| 6 | 1996 Nintendo 64 | blurred textures, heavy fog, round toybox shapes, rumble shake | muffled, springy samples | 320 x 240, soft | a 1990s TV over composite, no dither | [`era6-n64.png`](docs/shots/eras/era6-n64.png) |
+| 7 | 1999 Sega Dreamcast | crisp cel shading, thick ink outlines, graffiti score, speed lines | punchy synth-funk, the modem | 640 x 480, soft | a VGA box: sharp, faint lines, a little edge glow | [`era7-dreamcast.png`](docs/shots/eras/era7-dreamcast.png) |
+| 8 | 2000 PlayStation 2 | letterbox, sparks, glow trail, lens flare, slow camera drift | taiko, orchestral pads, a big hit | 512 x 448, soft | a late TV over component: clean lines, a faint bloom | [`era8-ps2.png`](docs/shots/eras/era8-ps2.png) |
+| 9 | 2001 Xbox | bump-mapped metal, hard moving shadows, gamertags, shield-bar score | sub-heavy metallic clangs | 640 x 480, soft | a TV over component: sharp, fainter lines than the Dreamcast | [`era9-xbox.png`](docs/shots/eras/era9-xbox.png) |
+| 10 | 2005 Xbox 360 | bloom, brown grade, grain, motion blur, Blades HUD, Achievement Unlocked | big clean hits, the achievement blip | 960 x 720 (720p), soft | a 720p flat panel: no lines, LCD softness, a slight smear | [`era10-xbox360.png`](docs/shots/eras/era10-xbox360.png) |
 
 The reference frames in `docs/shots/eras/` are each era in play, taken by the
-playtest as it walks one match up the ladder (see *Run the tests*).
+playtest as it walks one match up the ladder (see *Run the tests*), so they
+show what the page shows: the machine's own resolution, scaled up, on the
+screen of its day. *Drawn at* is the native picture (`src/display.js`), and
+*Seen on* the overlay drawn over it (`src/display-crt.js`, `src/display-tv.js`).
+All eleven on one sheet, two rows: `docs/shots/eras/contact-sheet.png`
+(`py -3.10 docs/shots/eras/contact-sheet.py` rebuilds it from the frames).
 
 Eras 5 to 10 are specified in **`docs/ERAS.md`**, the era bible: every rung's name
 card, palette, camera on the shared 3D table, the look to exaggerate, its sounds

@@ -1,19 +1,21 @@
 /*
- * Item 1192: where does a 3D era's frame time go? One second of ordinary play at
- * every era, opened with index.html?era=N, on the page's own rAF clock -- the
- * same reading tools/playtest.mjs takes on its climb -- under four setups:
+ * Item 1201: what does each era's screen overlay cost on its own? One second of
+ * ordinary play at every era, opened with index.html?era=N, on the page's own
+ * rAF clock -- item 1192's eraspeed.mjs reading, copied here -- with the display
+ * layer on in every setup and only the overlay switched:
  *
- *   harness   the playtest's own Chrome flags (--disable-gpu), display layer on
- *   nodisplay the same Chrome, with ?display=off (each era drawn straight onto
- *             the page, the way it was before item 1198)
- *   gpu       Chrome allowed its GPU (no --disable-gpu), display layer on
- *   gpu-nodisplay  both
+ *   harness      the playtest's own Chrome flags (--disable-gpu), overlay on
+ *   harness-off  the same Chrome, the era's row set to overlay 'none'
+ *   gpu          Chrome allowed its GPU, overlay on
+ *   gpu-off      Chrome allowed its GPU, overlay 'none'
  *
- * Both paddles are held on the ball while the clock runs, so no point goes in.
+ * The overlay is taken out by setting PongDisplay.ROWS[era].overlay = 'none'
+ * after the page loads, so the native picture and its scale-up are unchanged
+ * and the difference is the overlay's own cost.
  *
- *   node docs/measure/item1192/eraspeed.mjs [--port 9406]
+ *   node docs/measure/item1201/overlaycost.mjs [--port 9471]
  *
- * Writes eraspeed.json beside itself.
+ * Writes overlaycost.json beside itself.
  */
 import { writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -24,7 +26,7 @@ import { CdpConnection } from '../../../tools/cdp.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
 const i = process.argv.indexOf('--port');
-const PORT = Number(i !== -1 ? process.argv[i + 1] : 9406);
+const PORT = Number(i !== -1 ? process.argv[i + 1] : 9471);
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -44,12 +46,12 @@ function stats(d) {
     p95: +(s[Math.floor(s.length * 0.95)] || 0).toFixed(2), max: +(s[s.length - 1] || 0).toFixed(2) };
 }
 
-async function measure(setup, gpu, display) {
+async function measure(setup, gpu, overlay) {
   const flags = ['--headless=new', '--hide-scrollbars', '--mute-audio', '--allow-file-access-from-files',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT, '--no-first-run',
     '--no-default-browser-check', 'about:blank'];
   if (!gpu) flags.unshift('--disable-gpu');
-  const chrome = launchChrome(CHROME, flags, { name: 'eraspeed' });
+  const chrome = launchChrome(CHROME, flags, { name: 'overlaycost' });
   const rows = [];
   let ws;
   try {
@@ -68,12 +70,13 @@ async function measure(setup, gpu, display) {
     await s.send('Page.enable');
     await s.send('Runtime.enable');
     for (let era = 0; era <= 10; era++) {
-      await s.send('Page.navigate', { url: `${base}?era=${era}${display ? '' : '&display=off'}` });
+      await s.send('Page.navigate', { url: `${base}?era=${era}` });
       for (let t = 0; t < 100; t++) {
         if (await s.eval('!!(window.__pong && document.getElementById("field"))').catch(() => false)) break;
         await sleep(100);
       }
       await sleep(300);
+      const kind = await s.eval(`(() => { const r = window.PongDisplay.ROWS[${era}]; const k = r.overlay; ${overlay ? '' : "r.overlay = 'none';"} return k; })()`);
       await s.send('Input.dispatchKeyEvent', { type: 'keyDown', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
       await s.send('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
       for (let t = 0; t < 80; t++) {
@@ -101,8 +104,8 @@ async function measure(setup, gpu, display) {
       const d = await timing;
       const native = await s.eval('(() => { const D = window.PongDisplay; const c = D && D.enabled && D.canvas(); ' +
         'return c ? c.width + "x" + c.height : "page"; })()');
-      rows.push({ setup, gpu, display, era, native, ...stats(d) });
-      console.log(`${setup.padEnd(14)} era ${String(era).padStart(2)} (${native.padEnd(8)}): ` +
+      rows.push({ setup, gpu, overlay: overlay ? kind : 'none', era, native, ...stats(d) });
+      console.log(`${setup.padEnd(12)} era ${String(era).padStart(2)} (${native.padEnd(8)} ${(overlay ? kind : 'none').padEnd(14)}): ` +
         `mean ${rows.at(-1).mean} ms, p95 ${rows.at(-1).p95} ms over ${rows.at(-1).frames} frames`);
     }
   } finally {
@@ -114,8 +117,8 @@ async function measure(setup, gpu, display) {
 
 const all = [];
 all.push(...await measure('harness', false, true));
-all.push(...await measure('nodisplay', false, false));
+all.push(...await measure('harness-off', false, false));
 all.push(...await measure('gpu', true, true));
-all.push(...await measure('gpu-nodisplay', true, false));
-writeFileSync(path.join(HERE, 'eraspeed.json'), JSON.stringify({ taken: new Date().toISOString(), rows: all }, null, 1) + '\n');
-console.log('wrote ' + path.join(HERE, 'eraspeed.json'));
+all.push(...await measure('gpu-off', true, false));
+writeFileSync(path.join(HERE, 'overlaycost.json'), JSON.stringify({ taken: new Date().toISOString(), rows: all }, null, 1) + '\n');
+console.log('wrote ' + path.join(HERE, 'overlaycost.json'));
