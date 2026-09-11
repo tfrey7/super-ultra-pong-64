@@ -40,7 +40,7 @@
 
   // The bible's camera at rest (section 12 measures this pose), and the per-frame
   // wobble and vertex snap chapter 6 puts on top of it.
-  var CAMERA = { tilt: 30, height: 1550, fov: 26.5, screenY: 388 };   // the ladder camera (item 1266)
+  var CAMERA = { tilt: 30, height: 1675, fov: 24.5, screenY: 388 };   // the ladder camera (item 1266)
   var MOTION = { snap: 2.5, height: 6, heightRate: 1.3, pan: 1.5, panRate: 2.1 };
   var BUFFER = { key: 'ps1', w: 320, h: 240, scale: 0.4 };
 

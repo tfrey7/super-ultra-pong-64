@@ -14,6 +14,7 @@ const assert = require('node:assert');
 const path = require('node:path');
 const fs = require('node:fs');
 const eralooks = require('../tools/eralooks.js');
+const cameras = require('../tools/table3d-cameras.js');   // the ladder cameras (item 1266)
 
 const ROOT = path.join(__dirname, '..');
 const { Pong, R } = eralooks.loadRenderer(ROOT);
@@ -116,7 +117,7 @@ test('era 10 is the Xbox 360, built rather than a placeholder, on the bible\'s c
   assert.match(l.name, /Xbox 360/);
   assert.ok(!l.placeholder, 'no longer a placeholder');
   assert.strictEqual(typeof l.draw, 'function');
-  assert.deepStrictEqual(l.camera, { tilt: 32, height: 1600, fov: 20.5, screenY: 312 });
+  assert.deepStrictEqual(l.camera, cameras.LADDER[10], 'the ladder camera tools/table3d-cameras.js solved');
   assert.deepStrictEqual(l.card, { flash: '#fff8e7', wipe: ['#5dc21e', '#d9dcd6', '#3b342b'], box: '#1b1b1b',
     border: '#5dc21e', inner: null, year: '#5dc21e', name: '#ffffff', label: '#a8a296', dots: null });
   const g = rally();

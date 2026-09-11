@@ -13,6 +13,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const eralooks = require('../tools/eralooks.js');
+const cameras = require('../tools/table3d-cameras.js');   // the ladder cameras (item 1266)
 
 const ROOT = path.join(__dirname, '..');
 const { Pong, R } = eralooks.loadRenderer(ROOT);
@@ -97,7 +98,7 @@ const isPattern = (s) => s && typeof s === 'object' && s.pattern;
 test('era 5 is the PlayStation, built rather than a placeholder, on the bible\'s camera', () => {
   assert.match(look.name, /Sony PlayStation/);
   assert.ok(!look.placeholder);
-  assert.deepStrictEqual(look.camera, { tilt: 28, height: 1150, fov: 30, screenY: 306 }, 'at rest: the pose section 12 measures');
+  assert.deepStrictEqual(look.camera, cameras.LADDER[5], 'at rest: the ladder camera tools/table3d-cameras.js solved');
   assert.strictEqual(look.motion.snap, 2.5);
   assert.deepStrictEqual(look.buffer, { key: 'ps1', w: 320, h: 240, scale: 0.4 });
   assert.strictEqual(R.paddleInk(rally(), 'left'), R.eraLook(1).paddleInk(rally(), 'left'), 'wears the colours era 1 picked');
@@ -107,11 +108,12 @@ test('the camera wobbles every frame by the bible\'s amplitudes, and snaps to th
   const heights = new Set();
   for (let t = 0; t < 12; t += 0.37) {
     const cam = look.cameraAt(T, { time: t }, look.camera);
-    close(cam.height, 1150 + 6 * Math.sin(t * 1.3), `height at ${t}`);
+    const rest = look.camera.height;
+    close(cam.height, rest + 6 * Math.sin(t * 1.3), `height at ${t}`);
     close(cam.panX, 1.5 * Math.sin(t * 2.1), `panX at ${t}`);
     assert.strictEqual(cam.snap, 2.5);
-    assert.strictEqual(cam.tilt, 28);
-    assert.ok(cam.height >= 1144 && cam.height <= 1156 && Math.abs(cam.panX) <= 1.5, 'never past the measured poses');
+    assert.strictEqual(cam.tilt, look.camera.tilt);
+    assert.ok(cam.height >= rest - 6 && cam.height <= rest + 6 && Math.abs(cam.panX) <= 1.5, 'never past the measured poses');
     heights.add(cam.height.toFixed(3));
   }
   assert.ok(heights.size > 20, 'it moves');

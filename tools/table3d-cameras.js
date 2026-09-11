@@ -171,7 +171,9 @@ function solvePlayers(e) {
 // the arrival flourish; every one of them must pass R3 too.
 const BEFORE = [
   { era: 5, name: 'Sony PlayStation', tilt: 28, height: 1150, fov: 30, screenY: 306,
-    motion: [{ height: 1156, panX: 1.5 }, { height: 1144, panX: -1.5 }, { height: 1190 }] },
+    // (the arrival's 40-unit lift, and its 3-unit overshoot, each with the wobble on top: item 1266)
+    motion: [{ height: 1156, panX: 1.5 }, { height: 1144, panX: -1.5 }, { height: 1190 },
+      { height: 1196, panX: 1.5 }, { height: 1196, panX: -1.5 }, { height: 1141, panX: 1.5 }, { height: 1141, panX: -1.5 }] },
   { era: 6, name: 'Nintendo 64', tilt: 26, height: 900, fov: 39.5, screenY: 301,
     motion: [{ tilt: 28 }] },
   { era: 7, name: 'Sega Dreamcast', tilt: 22, height: 1500, fov: 23.5, screenY: 314, motion: [] },
@@ -189,7 +191,7 @@ const BEFORE = [
 // two 250-unit players stand whole behind the table ends, R3 still passing in
 // every pose. Each era file's CAMERA is its row here; a test holds them equal.
 const LADDER = {
-  5: { tilt: 30, height: 1550, fov: 26.5, screenY: 388 },
+  5: { tilt: 30, height: 1675, fov: 24.5, screenY: 388 },
   6: { tilt: 24, height: 1250, fov: 35, screenY: 382 },
   7: { tilt: 26, height: 2000, fov: 21, screenY: 383 },
   8: { tilt: 26, height: 1900, fov: 23.5, screenY: 333 },
