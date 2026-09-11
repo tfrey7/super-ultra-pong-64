@@ -1,6 +1,7 @@
 // Item 1252: six `node tools/playtest.mjs --ladder` runs in a row, one log each
-// beside this script (ladder-run1.log .. ladder-run6.log), then one summary line
-// per run naming its "era changes start from both edges" verdict.
+// beside this script (ladder-run1.txt .. ladder-run6.txt), then one summary line
+// per run naming its "era changes start from both edges" verdict. (The six
+// committed here were first written as .log and renamed .txt, so git keeps them.)
 //
 //   node docs/measure/item-1252/six-ladders.mjs [--port 9521] [--runs 6]
 //
@@ -27,7 +28,8 @@ for (let n = 1; n <= runs; n++) {
   const r = spawnSync(process.execPath, ['tools/playtest.mjs', '--ladder', '--port', String(port)],
     { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   const out = (r.stdout || '') + (r.stderr ? '\n--- stderr ---\n' + r.stderr : '');
-  const file = path.join(here, `ladder-run${n}.log`);
+  // .txt, not .log: the repo ignores *.log, and these are meant to be committed.
+  const file = path.join(here, `ladder-run${n}.txt`);
   writeFileSync(file, out);
   const line = out.split(/\r?\n/).find((l) => l.includes('era changes start from both edges')) || '(no both-edges line)';
   const verdict = /\bPASS\b/.test(line) ? 'PASS' : /\bFAIL\b/.test(line) ? 'FAIL' : '??';
