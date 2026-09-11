@@ -22,6 +22,10 @@
  * second run needs to ask for the same picture. An existing name is refused
  * unless --force, which replaces the file and its entry.
  *
+ * Several gens may run at once into one folder (item 1250): each takes
+ * <out>/manifest.json.lock, re-reads the manifest, adds its own entry and
+ * writes it back through a temp file and a rename, so no run's entry is lost.
+ *
  * Node 18+ (the built-in fetch), no dependencies, and nothing in it knows
  * about Pong: another game repo can copy this file as it is.
  *
@@ -43,7 +47,7 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-export const API = 'https://api.pixellab.ai';
+export const API = apiBase();
 export const GENERATE = '/v1/generate-image-pixflux';
 export const BALANCE = '/v2/balance';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -62,6 +66,17 @@ const USAGE = `usage:
   node tools/pixellab.mjs gen <name> "<prompt>" [--size 32x32] [--outline ...] [--shading ...]
        [--detail ...] [--view ...] [--direction ...] [--negative "..."] [--guidance 8]
        [--seed n] [--no-background] [--isometric] [--out <dir>] [--force]`;
+
+/**
+ * Where the API lives. PIXELLAB_API_BASE moves it, but only onto this machine
+ * (127.0.0.1 or localhost) -- that is for a test's stand-in server, and a
+ * stray variable can never send the real key to another host.
+ */
+export function apiBase(env = process.env) {
+  const base = (env.PIXELLAB_API_BASE || '').trim().replace(/\/+$/, '');
+  if (/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(base)) return base;
+  return 'https://api.pixellab.ai';
+}
 
 /** The key, or '' when there is none. Never printed. */
 export function apiKey(env = process.env, platform = process.platform) {
@@ -199,6 +214,79 @@ export function readManifest(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Run fn while holding <manifest>.lock, so two pixellab runs at once take
+ * turns at the manifest (item 1250). The lock is a file made with 'wx', which
+ * exactly one process can create; the others wait and try again. A lock older
+ * than staleMs belongs to a run that died mid-write and is taken over.
+ */
+export async function withManifestLock(manifestPath, fn, { staleMs = 30000, waitMs = 60000 } = {}) {
+  const lock = `${manifestPath}.lock`;
+  fs.mkdirSync(path.dirname(lock), { recursive: true });
+  const t0 = Date.now();
+  let fd;
+  for (;;) {
+    try {
+      fd = fs.openSync(lock, 'wx');
+      break;
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e;
+    }
+    let age = 0;
+    try { age = Date.now() - fs.statSync(lock).mtimeMs; } catch { continue; /* just released */ }
+    if (age > staleMs) { fs.rmSync(lock, { force: true }); continue; }
+    if (Date.now() - t0 > waitMs) {
+      throw new Error(`${lock} is still held after ${Math.round(waitMs / 1000)} s; if no pixellab run is going, delete it`);
+    }
+    await pause(20 + Math.floor(Math.random() * 40));
+  }
+  try {
+    fs.writeSync(fd, `${process.pid}\n`);
+  } finally {
+    fs.closeSync(fd);
+  }
+  try {
+    return await fn();
+  } finally {
+    fs.rmSync(lock, { force: true });
+  }
+}
+
+/** Write a file whole or not at all: a temp file beside it, then a rename over it. */
+export async function writeAtomic(file, text) {
+  const tmp = `${file}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
+  fs.writeFileSync(tmp, text);
+  for (let i = 0; ; i++) {
+    try {
+      fs.renameSync(tmp, file);
+      return;
+    } catch (e) {
+      // Windows refuses a rename while something (a scanner, an editor) holds the target.
+      if (i >= 20 || !['EPERM', 'EACCES', 'EBUSY'].includes(e.code)) {
+        fs.rmSync(tmp, { force: true });
+        throw e;
+      }
+      await pause(25);
+    }
+  }
+}
+
+/**
+ * Put one entry into the manifest on disk. It re-reads the file under the
+ * lock, immediately before writing, so an entry another run wrote while this
+ * one was generating is kept; an entry of the same name is replaced.
+ */
+export async function addManifestEntry(manifestPath, entry) {
+  return withManifestLock(manifestPath, async () => {
+    const manifest = readManifest(manifestPath);
+    manifest.images = (manifest.images || []).filter((e) => e.name !== entry.name).concat([entry]);
+    await writeAtomic(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    return manifest;
+  });
+}
+
 class KeyRefused extends Error {}
 
 async function call(method, route, key, body) {
@@ -275,8 +363,9 @@ export async function main(argv, log = console.log, warn = console.error) {
     name: a.name, body, png, cost: out.usage || null, seconds,
     date: new Date().toISOString(), before, after
   });
-  manifest.images = (manifest.images || []).filter((e) => e.name !== a.name).concat([entry]);
-  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  // Not the manifest read at the start: other runs may have added entries
+  // since, and writing that stale copy back is what lost them (item 1250).
+  await addManifestEntry(manifestPath, entry);
 
   log(`saved: ${pngPath} (${entry.pixels.width}x${entry.pixels.height}, ${entry.bytes} bytes, seed ${body.seed}, ${seconds} s)`);
   log(`this image cost: ${describeCost(entry.cost)}` +
