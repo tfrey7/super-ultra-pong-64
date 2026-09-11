@@ -9,6 +9,11 @@
  * tools/spritegen.mjs), each frame on its own with a gap, labelled by beat,
  * at game scale (5: one sheet pixel is one native 2600 pixel, 5 field units)
  * and at 4x. With --scale N it writes one strip of the new frames at N only.
+ *
+ * Reading contact.png: a grey bar at the left of a row is the old frames, an
+ * ink bar the new; rows go player old, player new, computer old, computer new;
+ * the top block is game scale (5), the bottom 4x. Frames run idle 0-1, up 0-1,
+ * down 0-1, swing 0-2, miss, win 0-1, a wider gap between beats.
  */
 import fs from 'node:fs';
 import path from 'node:path';
