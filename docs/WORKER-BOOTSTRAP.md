@@ -303,9 +303,13 @@ his emulator — never touch either.**
   SNES, Dreamcast and PS2 trails, the N64 rumble). An era card that gives its era a new trail or
   shake adds its rung there rather than drawing a second one. Hit-stop and match-point slow motion
   work by handing the rules less time, never inside the serve pause.
-- **The Xbox 360 era runs at about 31-33 ms a frame in the playtest's headless, software-drawn
-  Chrome, with or without the feel layer** (item 1205 measured 31.3 ms with it, 33.1 ms without,
-  on one rally). A frame check on that era has to compare against the era itself, not 16.7 ms.
+- **The 3D eras run slower than 16.7 ms a frame in the playtest's headless, software-drawn Chrome,
+  with or without the feel layer.** Item 1205 measured one rally each: before the display layer
+  and the 3D textures landed, the Xbox 360 at 31.3 ms with the layer and 33.1 ms without; on master
+  9cc6910 merged in, the Nintendo 64 at 27.6 against 28.6 ms and the Xbox 360 at 66.5 against 65.0
+  ms. A frame check on those eras has to compare against the era itself, not 16.7 ms -- and a
+  switch that takes a layer out must leave the loop running (item 1205's first A/B threw every
+  frame, killed the game loop and timed an idle page at a perfect 16.7 ms).
 - **Two playtests on one `--port` share one Chrome.** The harness does not refuse a port already
   listening, so a second run attaches to the first run's page and drives it (item 1181 did, to
   item 1205's, around 22:25 EDT on 2026-09-10): odd FAILs such as "Inspected target navigated or

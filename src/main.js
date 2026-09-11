@@ -67,7 +67,7 @@
     var drawField = PongRender.drawEraFrame || PongRender.draw;
     // The real game's frame goes through game feel (src/feel.js): shake, squash,
     // trail, flash and the rally counter, drawn into the machine's own picture.
-    var drawGame = root.PongFeel ? function (c, g) { root.PongFeel.draw(c, g, drawField); } : drawField;
+    function drawGame(c, g) { if (root.PongFeel) root.PongFeel.draw(c, g, drawField); else drawField(c, g); }
 
     // The display (src/display.js): each era drawn at its own machine's
     // resolution, then scaled up onto this canvas. ?display=off skips it and
