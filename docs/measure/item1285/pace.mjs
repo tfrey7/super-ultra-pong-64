@@ -53,6 +53,10 @@ const SIZE = arg('--size', '1920,1080');
 const LABEL = arg('--label', (GPU ? 'gpu-' : 'sw-') + SIZE.split(',')[0]);
 const ONLY = arg('--only', '');          // 'fresh' or 'climb'
 const QUERY = arg('--query', '');        // extra query string, e.g. '&display=off'
+// Item 1285: an expression run in the page once it has loaded, before the coin (an A/B switch),
+// and the last rung whose row is read (the climb stops after its change).
+const PRE = arg('--pre', '');
+const STOP_AFTER = Number(arg('--stop-after', 10));
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -188,6 +192,7 @@ async function climb(s) {
   await s.send('Page.navigate', { url: base + (QUERY ? '?' + QUERY.replace(/^&/, '') : '') });
   await waitFor(s, '!!(window.__pong && window.PongFeel && document.getElementById("field"))', 10000);
   await sleep(900);
+  if (PRE) console.log('pre: ' + JSON.stringify(await s.eval(PRE)));
   await startGame(s);
   await waitFor(s, 'window.__pong.phase === "playing"', 3000);
   let pauseS, ringMax, ringLong;
@@ -198,7 +203,7 @@ async function climb(s) {
     console.log(line('climb', x));
     if (x.longFrames.length) console.log('      long frames ' + JSON.stringify(x.longFrames));
     if (x.ringLongFrames && x.ringLongFrames.length) console.log('      ring long frames ' + JSON.stringify(x.ringLongFrames));
-    if (rung === 10) break;
+    if (rung === 10 || rung >= STOP_AFTER) break;
     // One point: the ball put just past the computer's paddle, heading out; then
     // the real time until the next serve leaves the centre.
     // Item 1264: the arrival itself (the ring and the name card, inside the serve
@@ -310,7 +315,7 @@ const flags = ['--headless=new', '--hide-scrollbars', '--mute-audio', '--allow-f
 if (!GPU) flags.unshift('--disable-gpu');
 const chrome = await launchChrome(CHROME, flags, { name: 'pace1247' }).catch(refusePortTaken);
 let ws;
-const out = { taken: new Date().toISOString(), label: LABEL, gpu: GPU, size: SIZE, seconds: SECONDS, query: QUERY, fresh: [], climb: [] };
+const out = { taken: new Date().toISOString(), label: LABEL, gpu: GPU, size: SIZE, seconds: SECONDS, query: QUERY, pre: PRE, stopAfter: STOP_AFTER, fresh: [], climb: [] };
 try {
   let wsUrl = null;
   for (let t = 0; t < 60 && !wsUrl; t++) {
