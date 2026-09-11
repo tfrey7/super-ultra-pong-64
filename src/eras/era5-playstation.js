@@ -229,9 +229,19 @@
     };
   }
 
+  // The pixellab tiles (item 1187), laid over the era's own fills through the
+  // shared table: coarse and blocky, never smoothed, one strip per buffer
+  // pixel, so the grain is as chunky and as affine as everything else here.
+  var TEXTURE = {
+    court: { name: 'court-grain', alpha: 0.55, blend: 'overlay', period: 96, strip: 1 },
+    trim: { name: 'trim', alpha: 0.5, blend: 'overlay', period: 24 },
+    paddle: { name: 'paddle', alpha: 0.45, blend: 'overlay', period: 18 },
+    ball: { name: 'ball', alpha: 0.5, blend: 'soft-light', period: 14 }
+  };
+
   /** 4. A paddle: a flat-shaded box, its top face given a stippled sheen. */
   function paddle(c, T, cam, sp, rect, ink) {
-    var faces = T.box(c, cam, rect, 0, PADDLE.z, { ink: ink, shade: 'flat', light: PADDLE.light });
+    var faces = T.box(c, cam, rect, 0, PADDLE.z, { ink: ink, shade: 'flat', light: PADDLE.light, texture: TEXTURE.paddle });
     var sheen = T.ditherTile(T.shade(ink, PADDLE.light.top), T.shade(ink, 0.6), 4, sp.px);
     if (sheen && faces.top) {
       trace(c, faces.top);
@@ -275,7 +285,9 @@
       line: PAL.line,
       rail: gouraud(PAL.rail, PAL.railShadow),
       railTop: gouraud(PAL.railShadow, PAL.rail),
-      nearLip: gouraud(PAL.rail, PAL.railShadow)
+      nearLip: gouraud(PAL.rail, PAL.railShadow),
+      texture: TEXTURE.court,
+      trim: TEXTURE.trim
     });
 
     // 3. the contact shadow at the ball's true footprint (R5); hidden with the ball
@@ -306,12 +318,24 @@
    * 8 facets from its centre -- the two upper-left facets white, the next two
    * light grey, the rest grey -- drawn darkest first so white is the last fill.
    */
-  function gem(c, s) {
+  function gem(c, s, T) {
     var pts = [];
     for (var i = 0; i < 8; i++) {
       var a = Math.PI + i * Math.PI / 4;       // from due left, clockwise on screen
       pts.push([s.x + s.r * Math.cos(a), s.y + s.r * Math.sin(a)]);
     }
+    if (T && T.textureReady && T.textureReady(TEXTURE.ball.name)) {
+      c.save();
+      gemFacets(c, s, pts);
+      var k = s.r / 7.2;                       // px per field unit: the 12-unit ball at radius 0.6
+      T.textureOver(c, pts.map(function (q) { return { x: q[0], y: q[1], scale: k }; }), TEXTURE.ball);
+      c.restore();
+      return;
+    }
+    gemFacets(c, s, pts);
+  }
+
+  function gemFacets(c, s, pts) {
     var order = [[3, PAL.facetDark], [4, PAL.facetDark], [5, PAL.facetDark], [6, PAL.facetDark],
       [7, PAL.facetLight], [2, PAL.facetLight], [0, PAL.ball], [1, PAL.ball]];
     for (var f = 0; f < order.length; f++) {
@@ -557,7 +581,7 @@
     }
 
     // 7. the ball, full resolution and last of everything (R1, R2); hidden in the serve pause
-    if (state.serveDelay <= 0) gem(ctx, T.ballScreen(cam, state));
+    if (state.serveDelay <= 0) gem(ctx, T.ballScreen(cam, state), T);
     ctx.restore();
   }
 

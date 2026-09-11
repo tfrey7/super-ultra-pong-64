@@ -22,11 +22,20 @@ Open **`index.html`** in a browser. That is the whole install: no `npm install`,
 no build step, no dev server. Double-clicking the file off disk works, because
 everything is a plain script and there is nothing to compile.
 
-It opens on the **title screen**, with a demo rally playing itself behind the
-name the way an idle cabinet did. Nothing counts there: the ball is held still
-and no point can be scored until you press any key or click. All of it is drawn
-on the canvas out of the score's own block font — there is no HTML text on the
-page at all.
+It opens on the **cabinet powering on** (item 1207, `src/attract.js`): the tube
+warms up -- a dot of light blooms in the middle of the black glass, stretches
+into a line, and the line opens into the picture -- and then the attract screen:
+**PONG** in the machine's block lettering, **INSERT COIN** blinking under it,
+CREDIT 0 in the corner, and behind it the machine playing itself, computer
+against computer, score ticking, the way an idle cabinet in a bar did. Nothing
+counts there: the ball is held still and no point can be scored. **A click or any
+key is a coin**: the quarter clunks into the box with the cabinet's hum under it,
+CREDIT 1 flashes up, then PLAYER 1 READY, and the ball serves on the 1972
+machine about two seconds later. When a match is over, `Pong.backToTitle(game)`
+is the one call that puts the cabinet back on INSERT COIN. All of it is drawn on
+the canvas out of the score's own block font — there is no HTML text on the page
+at all. (Browsers allow no sound before the first click, so the hum is heard
+with the coin, not while the tube warms up.)
 
 - **Your paddle is on the left.** Move the mouse over the field to place it, or
   use the **arrow keys** / **W** and **S**. Whichever you touched last is the one
@@ -130,7 +139,7 @@ The point of the layout is that later eras are additions, not rewrites.
 | `src/game.js` | **The rules.** Pure state plus one `step(state, dt, intent)`. No canvas, no DOM, no timers, no input devices — which is why the tests can run headless. |
 | `src/render.js` | **The look.** Draws a state onto a canvas. Reads the state; never changes it. |
 | `src/input.js` | **The hands.** Turns mouse and keyboard into a plain intent object (`pointerY`, `up`, `down`). Knows nothing about the rules. |
-| `src/sound.js` | **The voice.** Each era's notes (`VOICES`), and a player that plays the step's `state.events` through Web Audio. Reads the state; never changes it. Silent until the first click or key. |
+| `src/sound.js` | **The voice.** Each era's notes (`VOICES` for eras 0 to 4, each 3D look's `voice` above them), and a player that plays the step's `state.events` through Web Audio -- oscillators, FM, noise, filters, unison, tremolo and drive, through each era's own echo, reverb and filter bus. Reads the state; never changes it. Silent until the first click or key. |
 | `src/main.js` | The loop that ties them together and hands `step` the real elapsed time. |
 | `src/eras/` | **One file per era**, each registering that era's look with the renderer. |
 | `test/game.test.js` | The headless suite over `src/game.js`, plus the era-look checks. |
@@ -159,6 +168,18 @@ An existing name is refused unless `--force`. Sizes are 16 to 400 a side with an
 *generations* on a subscription, so `credits $0.00` is not "out of credit". An era file draws the
 result by name through `src/sprites.js`; it is loaded before the era files, so `root.PongSprites`
 is always there.
+
+**The 3D eras' textures** (item 1187) are five pixellab tiles, `assets/pixellab/tex3d-*.png`: a
+wood-grained court, a steel tread-plate court, paddle rubber, a ball skin and a riveted rail trim.
+`node assets/pixellab/tex3d-embed.mjs` writes them into `src/textures3d.js` as data: URIs, which
+keeps the canvas of a page opened off disk readable, the way era 2 embeds its art. The shared table draws
+them: an era hands `texture: { name, alpha, blend, period, strip, fade, smooth }` to `table()` for the
+court (`trim:` for the rails), and to `box()` and `ball()` for the paddles and the ball. The texture
+is laid **over** what the era painted, through a blend mode, so each era's palette and treatment
+stay in charge. The court is cut into horizontal screen strips, each an affine copy of one band of
+the flat texture (the PlayStation's own trick), built once per camera and canvas size and then
+drawn as one image a frame. Headless, or before a tile decodes, nothing is drawn and the era's plain
+surface stands.
 
 `step` takes a **delta time in seconds** and never assumes 60fps; long frames are
 cut into substeps so a fast ball cannot pass through a paddle. Randomness goes
@@ -220,9 +241,11 @@ new file, one `<script>` line in `index.html`, and one entry in `Pong.ERAS`.
 **Open the page at any era** with a query, so you can look at one machine
 without playing up to it: `index.html?era=0` is the arcade machine (the same as
 no query), `?era=2` the NES, `?era=10` the Xbox 360. Anything above 10 opens
-on 10, and anything that is not a number opens on 0. The match still starts on
-the title screen, its score at 0-0, and climbs from that era -- so `?era=9` is
-one point from the top -- and a reload comes back to the era in the address.
+on 10, and anything that is not a number opens on 0. A page opened with an era
+skips the cabinet and goes **straight into play** at that era, its score at 0-0
+-- so `?era=9` is one point from the top -- and a reload comes back to the era in
+the address. `?title=off` goes straight into play at era 0, and `?title=on` keeps
+the cabinet even with an era (the playtest's `--era` uses it).
 The playtest takes `--era 3` for the same thing, and `--ladder` walks the whole
 ladder from era 0 instead.
 
@@ -246,6 +269,25 @@ card with a `card` object (the fields of `STYLES` in that file), and give its
 arrival its own look with a `flourish(ctx, p, origin, fromEra, toEra, info)`
 hook, drawn over the ring's edge every frame of the ring that brings it in --
 the header of `src/erachange.js` is the contract.
+
+### Each era at its machine's own resolution
+
+Every frame is drawn at the resolution of the machine on screen and then scaled
+up to the page (`src/display.js`, item 1198): 200 x 120 tall blocks for the 1972
+arcade, 160 x 192 for the Atari 2600, 256 x 240 for the NES, 320 x 224 for the
+Genesis, 256 x 224 for the Super Nintendo, 320 x 240 for the PlayStation and the
+N64, 640 x 480 for the Dreamcast and the Xbox, 512 x 448 for the PS2 and the 720
+lines of 720p for the Xbox 360. The 2D machines are scaled with hard pixel edges
+(each is drawn at field size and sampled down, so every pixel is one whole
+colour), the 3D ones with the soft scaling a television gave them. During an era
+change the display switches to the new machine the moment the ring passes the
+centre. Each row of the table also names the screen the machine was seen on --
+an overlay kind and its strength; this card ships only `none`, and
+`src/display-crt.js` and `src/display-tv.js`, already in the page's script list,
+are where the CRT and TV overlays plug in. `index.html?display=off` draws
+straight onto the page as before. All eleven side by side:
+`docs/shots/eras/contact-sheet-native.png` (from
+`docs/measure/item1198/contact-sheet.html`).
 
 ### Each era change, step by step
 

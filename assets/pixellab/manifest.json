@@ -354,6 +354,128 @@
       "verdict": "used: shrunk to the 12-unit ball box and inked in NES $30/$10/$00/$0F as era2-ball.png by era2-nes-quantize.mjs, the era 2 ball"
     },
     {
+      "name": "genesis-court",
+      "file": "genesis-court.png",
+      "prompt": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
+      "size": {
+        "width": 320,
+        "height": 240
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 530743640,
+      "date": "2026-09-11T01:16:13.015Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 22.4,
+      "pixels": {
+        "width": 320,
+        "height": 240
+      },
+      "bytes": 3062,
+      "sha256": "ba0e3aef89bf03a775421b300f63bb4ca1ae2b1ef194835e56e3b3538d69e4e4",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis game background, night sky over distant purple mountain range and dark rolling hills, a few stars, deep blue and purple palette, side-scrolling platformer backdrop, no characters, no text",
+        "image_size": {
+          "width": 320,
+          "height": 240
+        },
+        "seed": 530743640,
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "4ad286a89080049decc3f353de7a4464de1ed516d53e325ffff0122f863d9dda"
+      }
+    },
+    {
+      "name": "genesis-ball",
+      "file": "genesis-ball.png",
+      "prompt": "shiny white chrome ball sprite, 16-bit Sega Genesis style, bright white core with a hard white highlight and pale blue shading at the edge",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 1527937682,
+      "date": "2026-09-11T01:16:30.804Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 17.1,
+      "pixels": {
+        "width": 24,
+        "height": 24
+      },
+      "bytes": 272,
+      "sha256": "283847bfafe01b5db4f7e126ac305e7ac6bf998645c860b1bd3342e345316694",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "shiny white chrome ball sprite, 16-bit Sega Genesis style, bright white core with a hard white highlight and pale blue shading at the edge",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1527937682,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "5f77f8760a3b897a8bd5c6d868c2c60bee9dc1d9ebe7c8195358559985749143",
+        "trim": {
+          "box": [
+            4,
+            4,
+            24,
+            24
+          ]
+        }
+      }
+    },
+    {
       "name": "snes-sky",
       "file": "snes-sky.png",
       "prompt": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",
@@ -609,6 +731,206 @@
       "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not; 13 colours",
       "card": "item 1180",
       "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
+      "name": "tex3d-court-grain",
+      "file": "tex3d-court-grain.png",
+      "prompt": "seamless tileable texture, sports court floor of long wooden boards with faint grain and a few knots, grey monochrome, top-down, flat, evenly lit, no objects",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "basic shading",
+        "detail": "medium detail"
+      },
+      "seed": 2021347630,
+      "date": "2026-09-11T02:13:28.881Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 13.2,
+      "pixels": {
+        "width": 64,
+        "height": 64
+      },
+      "bytes": 2031,
+      "sha256": "3c503021acbba8a2dbd99529509240cd23e965ae5c8d1fd4a3189cd165130251",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless tileable texture, sports court floor of long wooden boards with faint grain and a few knots, grey monochrome, top-down, flat, evenly lit, no objects",
+        "image_size": {
+          "width": 64,
+          "height": 64
+        },
+        "seed": 2021347630,
+        "outline": "lineless",
+        "shading": "basic shading",
+        "detail": "medium detail"
+      }
+    },
+    {
+      "name": "tex3d-court-metal",
+      "file": "tex3d-court-metal.png",
+      "prompt": "seamless tileable texture, steel diamond tread plate floor with raised diamond bumps, grey monochrome metal, top-down, flat, evenly lit",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "seed": 595107322,
+      "date": "2026-09-11T02:13:39.303Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 9.8,
+      "pixels": {
+        "width": 64,
+        "height": 64
+      },
+      "bytes": 8566,
+      "sha256": "d75425ea4e49f98cdc3eabbbc4b6f4458e0fb5878ec6aa372dd292bdf22e90fd",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless tileable texture, steel diamond tread plate floor with raised diamond bumps, grey monochrome metal, top-down, flat, evenly lit",
+        "image_size": {
+          "width": 64,
+          "height": 64
+        },
+        "seed": 595107322,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      }
+    },
+    {
+      "name": "tex3d-paddle",
+      "file": "tex3d-paddle.png",
+      "prompt": "seamless tileable texture, table tennis paddle rubber surface with tiny round pimples in a grid, grey monochrome, top-down, flat, evenly lit",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "basic shading",
+        "detail": "low detail"
+      },
+      "seed": 1786540576,
+      "date": "2026-09-11T02:13:55.535Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 15.6,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 960,
+      "sha256": "a20822d9971dfe141a5b16c3d4624247c9e1f0f662587ec7f4c0863be05fca11",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless tileable texture, table tennis paddle rubber surface with tiny round pimples in a grid, grey monochrome, top-down, flat, evenly lit",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1786540576,
+        "outline": "lineless",
+        "shading": "basic shading",
+        "detail": "low detail"
+      }
+    },
+    {
+      "name": "tex3d-ball",
+      "file": "tex3d-ball.png",
+      "prompt": "seamless tileable texture, white leather ball skin with stitched seams, grey monochrome, flat, evenly lit",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "basic shading",
+        "detail": "low detail"
+      },
+      "seed": 168532712,
+      "date": "2026-09-11T02:14:03.493Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 7.3,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 2009,
+      "sha256": "e6cb5dc2e684c5a5f30c57e0bd45f4a39b72d00313eea62c7facafa5fe82e623",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless tileable texture, white leather ball skin with stitched seams, grey monochrome, flat, evenly lit",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 168532712,
+        "outline": "lineless",
+        "shading": "basic shading",
+        "detail": "low detail"
+      }
+    },
+    {
+      "name": "tex3d-trim",
+      "file": "tex3d-trim.png",
+      "prompt": "seamless tileable texture, horizontal brushed aluminium strip with a row of round rivets, grey monochrome metal, flat, evenly lit",
+      "size": {
+        "width": 64,
+        "height": 32
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "low detail"
+      },
+      "seed": 1314688317,
+      "date": "2026-09-11T02:14:12.288Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 8.2,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 1801,
+      "sha256": "0f0ab83b7cccd1eeada91766d3abff1badd2f21e5b2919a3def70f73f7867497",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless tileable texture, horizontal brushed aluminium strip with a row of round rivets, grey monochrome metal, flat, evenly lit",
+        "image_size": {
+          "width": 64,
+          "height": 32
+        },
+        "seed": 1314688317,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "low detail"
+      }
     }
   ]
 }

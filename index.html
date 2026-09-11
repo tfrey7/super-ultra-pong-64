@@ -50,6 +50,15 @@
        them), for any era file to draw with one drawImage: window.PongSprites. -->
   <script src="src/sprites.js"></script>
   <script src="src/render.js"></script>
+  <!-- The display: each era drawn at its machine's own resolution and scaled
+       up to the page, then its screen's overlay. The CRT (eras 0-4) and the
+       TV/HDTV (eras 5-10) overlays each live in their own file. -->
+  <script src="src/display.js"></script>
+  <script src="src/display-crt.js"></script>
+  <script src="src/display-tv.js"></script>
+  <!-- The 3D eras' texture tiles from pixellab.ai, as data: URIs (item 1187;
+       assets/pixellab/tex3d-embed.mjs writes it): window.PongTextures3D. -->
+  <script src="src/textures3d.js"></script>
   <!-- The shared 3D table the eras from the PlayStation up stand on
        (docs/ERAS.md section 2); PongRender hands it to every era as table3d. -->
   <script src="src/table3d.js"></script>
@@ -75,6 +84,8 @@
   <!-- The voice: every era's notes, synthesised on the page, silent until the
        first click or key. -->
   <script src="src/sound.js"></script>
+  <!-- The cabinet: power-on warm-up, INSERT COIN, and the coin moment. -->
+  <script src="src/attract.js"></script>
   <script src="src/input.js"></script>
   <script src="src/main.js"></script>
   </template>
