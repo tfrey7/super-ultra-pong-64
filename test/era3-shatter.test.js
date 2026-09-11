@@ -52,7 +52,8 @@ const reachOf = (o) => R.ERA_CHANGE.ringReach(o, 800, 600);
 test('era 3 registers the shatter as its arrival flourish', () => {
   assert.strictEqual(typeof look.flourish, 'function');
   assert.ok(S && typeof S.shards === 'function' && typeof S.pose === 'function');
-  assert.ok(!R.eraLook(2).flourish, 'the NES, being left, brings no hook of its own');
+  assert.notStrictEqual(R.eraLook(2).flourish, look.flourish,
+    'the shatter is era 3\'s own arrival, not a hook the NES carries');
 });
 
 test('the same point shatters the same way; another point breaks differently', () => {
