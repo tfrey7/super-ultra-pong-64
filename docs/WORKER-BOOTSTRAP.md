@@ -96,8 +96,12 @@ saving `era-wipe.png` mid-ring -- and, last, it **walks one match up the whole l
 era-0 machine, one point let through per rung, a check that each point moved it up exactly one era,
 a screenshot of each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to
 `ladder-era4-snes.png`, cropped to the field) and one more point to prove it stops on era 4.
-`--ladder` runs only that walk (about half a minute); `--reference` also copies its five frames into
-the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
+On the way up it **films each of the four era changes**: a frame caught mid-ring
+(`change-era0-to-era1.png` to `change-era3-to-era4.png`), a check that the ring's radius reached
+the farthest corner from where the ball went out, and a check that once the ring has gone the live
+canvas matches the new era drawn offscreen more closely than the old one.
+`--ladder` runs only that walk (about half a minute); `--reference` also copies its five era frames
+and four change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
 `index.html?era=N` (N is 0 to 4) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
 plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
@@ -188,6 +192,31 @@ his emulator — never touch either.**
 - **The computer paddle is deliberately beatable** — it only chases once the ball heads its way,
   aims slightly off centre, and cannot match a really steep shot. If a change makes it perfect,
   that is a regression in the game even when every test passes.
+- **Fleet CI cannot run this repo yet** (item 1130). Every flourish card ran `node --test` by hand
+  and said so in its note; do the same rather than waiting on a CI run that never starts.
+- **A flourish draws, and nothing else.** The hook is called from the renderer every frame of the
+  ring; a sound started from it (item 1138's NES chime did, for want of anywhere else) breaks that
+  contract and is queued to move onto the boot sting as item 1162. An arrival's sound belongs in
+  `src/sound.js`.
+- **The ring is under one field unit wide for its first frames.** The eased progress starts slow
+  and the plain edge is skipped below a radius of 1, so a flourish that waits for the ring to have
+  width misses the start of its own change -- item 1137's power-on line did until it keyed off
+  the time instead.
+- **A look borrowed is a flourish borrowed.** An era that reuses another era's drawing (the Super
+  Nintendo draws parts of era 1's) replays that era's arrival effect unless the effect checks
+  `toEra` -- item 1137 caught its CRT sweep replaying on era 4.
+- **A test that pins "era N has no flourish" goes stale when a sibling card gives it one.** Item
+  1161 had to rewrite era 3's shatter test after era 2 grew a flourish; pin that the effect is your
+  era's own hook, not that the others have none.
+- **The first ring on a cold page has one long frame** (about 110-120 ms at raw progress 0.006).
+  It is the ring engine's (item 1164), not your flourish's: item 1140 proved it by A/B with its
+  flourish removed. Do not chase it in an era file.
+- **Proof paths in a report must survive the landing.** The integrator deletes your worktree, so
+  a picture cited at `G:/Claude Stuff/super-ultra-pong-64-<name>/...` is a dead link the moment the
+  branch lands (item 1138). Cite the path the file will have in the main checkout.
+- **The ladder walk's "new era draws afterwards" check leaves out the name card's band.** It
+  compares the live canvas with each era drawn offscreen, and the card covers the middle 180 rows
+  of both until the serve; a look that draws something important only there would pass unseen.
 
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
