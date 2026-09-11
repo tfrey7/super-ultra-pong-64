@@ -17,6 +17,8 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
 const i = process.argv.indexOf('--port');
 const PORT = i > 0 ? Number(process.argv[i + 1]) : 9341;
+// --no-flourish: the A/B leg -- era 4 arrives on the plain ring (its flourish removed before the point), timing only.
+const PLAIN = process.argv.includes('--no-flourish');
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
 const PROFILE = path.join(process.env.TEMP || 'G:/claude-tmp', `item-1140-chrome-${PORT}`);
@@ -95,11 +97,18 @@ try {
 
   // 1. Frame timing: ordinary play at era 3, then over one forced ring.
   const baseline = stats((await timing(1000)).stamps);
+  if (PLAIN) await evalJs('(() => { delete window.PongRender.eraLook(4).flourish; return 1; })()');
   await evalJs(force);
   const run = await timing(1700);
   const ringFrames = stats(run.stamps.filter((_, k) => run.ring[k]));
   const hitches = longFrames(run);
   const after = await evalJs(probe);
+  if (PLAIN) {
+    const ab = { url, leg: 'plain ring, era 4 flourish removed', baseline, ringFrames, hitches, afterRing: after, errors };
+    writeFileSync(path.join(HERE, 'mode7-ab-plain.json'), JSON.stringify(ab, null, 1) + '\n');
+    console.log(JSON.stringify(ab, null, 1));
+    process.exit(0);
+  }
   await sleep(1500);
 
   // 2. The pictures: a second forced point, captured at chosen raw progress.
