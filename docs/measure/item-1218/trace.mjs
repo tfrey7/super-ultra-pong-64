@@ -1,4 +1,11 @@
 /*
+ * Item 1218: item 1203's recorder (docs/measure/item-1203/trace.mjs), copied so
+ * its output lands here, with three additions: every ring tick is also marked
+ * with its raw progress ('raw 0.122'), so a long frame in the trace is named by
+ * where in the ring it fell; --at-raw <r> analyses the long frame nearest raw r
+ * instead of the worst one; and each leg's timing keeps the ticks around the
+ * point, so a long frame at raw 0 can be told apart from the point's own frame.
+ *
  * Item 1203: a Chrome performance trace of the first era-change ring's long
  * frame on a freshly opened page.
  *
@@ -27,7 +34,7 @@ import { writeFileSync, existsSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
-import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
+import { launchChrome } from '../../../tools/chrome.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
@@ -42,6 +49,8 @@ const FROM_LOAD = process.argv.includes('--from-load');
 // page's own rAF clock, long = over 3x the median frame across the ring, the
 // same rule as item 1164's firstring.mjs.
 const TIMING = process.argv.includes('--timing');
+const NO_FLOURISH = process.argv.includes('--no-flourish');
+const AT_RAW =process.argv.includes('--at-raw') ? Number(arg('--at-raw', 0.12)) : null;
 let port = Number(arg('--port', 9391));
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
@@ -59,8 +68,8 @@ const CATEGORIES = [
 
 async function leg(n) {
   const PORT = port++;
-  const chrome = await launchChrome(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`,
-    '--mute-audio', '--no-first-run', '--window-size=1000,760', 'about:blank'], { name: 'item1203' }).catch(refusePortTaken);
+  const chrome = launchChrome(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`,
+    '--mute-audio', '--no-first-run', '--window-size=1000,760', 'about:blank'], { name: 'item1218' });
   let ws;
   try {
     let wsUrl = null;
@@ -105,6 +114,9 @@ async function leg(n) {
     if (FROM_LOAD && !TIMING) await send('Tracing.start', { transferMode: 'ReportEvents', traceConfig });
     await send('Page.navigate', { url });
     await sleep(900);
+    // --no-flourish (item 1218): the arriving era's flourish taken off its look, so
+    // the ring plays plain -- the A/B that says whether a frame is the flourish's.
+    if (NO_FLOURISH) await evalJs(`(() => { const l = window.PongRender.eraLook(4); if (l) l.flourish = null; return !!l; })()`);
     await send('Input.dispatchKeyEvent', { type: 'keyDown', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
     await send('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
     await sleep(1500);
@@ -116,6 +128,7 @@ async function leg(n) {
       window.__ticks = []; let wiping = false;
       (function tick(now) { performance.mark('tick'); const m = window.PongRender.eraChangeMoment(window.__pong);
         const w = !!(m && m.wiping); if (w && !wiping) performance.mark('ring first frame'); wiping = w;
+        if (w) performance.mark('raw ' + m.raw.toFixed(3));
         window.__ticks.push([now, w, m ? m.raw : null]); if (window.__ticks.length < 400) requestAnimationFrame(tick); })(performance.now());
       return 1; })()`);
     await sleep(400);
@@ -148,7 +161,16 @@ function ringTiming(ticks) {
   const r1 = (v) => +v.toFixed(1);
   return { ringFrames: ring.length, medianFrameMs: r1(median), maxFrameMs: r1(s[s.length - 1] || 0),
     longFrames: ring.filter((f) => f.ms > 3 * median).map((f) => ({ ms: r1(f.ms), raw: f.raw === null ? null : +f.raw.toFixed(3) })),
-    frames: ring.map((f) => r1(f.ms)) };
+    frames: ring.map((f) => r1(f.ms)), beforeRing: beforeRing(ticks) };
+}
+
+/** The six frame intervals up to and including the one into the ring's first frame (item 1218). */
+function beforeRing(ticks) {
+  const k = ticks.findIndex((t) => t[1]);
+  if (k < 1) return [];
+  const out = [];
+  for (let j = Math.max(1, k - 5); j <= k; j++) out.push(+(ticks[j][0] - ticks[j - 1][0]).toFixed(1));
+  return out;
 }
 
 /** Find the longest rAF gap in trace time and sum every thread's work inside it. */
@@ -168,9 +190,18 @@ function analyse(events, n) {
   for (let k = 1; k < ticks.length; k++) gaps.push({ from: ticks[k - 1], to: ticks[k], ms: (ticks[k] - ticks[k - 1]) / 1000 });
   const sorted = gaps.map((g) => g.ms).sort((a, b) => a - b);
   const median = sorted[Math.floor(sorted.length / 2)] || 0;
+  // The raw progress of the frame each gap ends on: the 'raw r' mark made in
+  // the same tick (item 1218); null for a frame outside the ring.
+  const raws = events.filter((e) => /^raw /.test(e.name) && (e.cat || '').includes('blink.user_timing'))
+    .map((e) => ({ ts: e.ts, raw: Number(e.name.slice(4)) })).sort((a, b) => a.ts - b.ts);
+  for (const g of gaps) { const r = raws.find((x) => x.ts >= g.to && x.ts < g.to + 3000); g.raw = r ? r.raw : null; }
   const worst = gaps.reduce((a, g) => (g.ms > (a ? a.ms : -1) ? g : a), null);
   const long = gaps.filter((g) => g.ms > 3 * median);
-  const win = worst && worst.ms > 3 * median ? worst : (ringAt ? { from: ringAt - 16000, to: ringAt, ms: 16 } : worst);
+  let win = worst && worst.ms > 3 * median ? worst : (ringAt ? { from: ringAt - 16000, to: ringAt, ms: 16 } : worst);
+  if (AT_RAW !== null) {
+    const near = long.filter((g) => g.raw !== null).sort((a, b) => Math.abs(a.raw - AT_RAW) - Math.abs(b.raw - AT_RAW))[0];
+    if (near) win = near;
+  }
 
   // Every complete event overlapping the window, per thread: the top-level ones
   // (no parent on the same thread inside the window) add up to the thread's busy time.
@@ -219,8 +250,8 @@ function analyse(events, n) {
   return {
     programBuilds, shaders,
     traceFile: file, eventsTotal: events.length, eventsCut: cut.length,
-    medianFrameMs: +median.toFixed(2), longFrames: long.map((g) => +g.ms.toFixed(1)),
-    window: { ms: +win.ms.toFixed(1), pointAtMs: rel(pointAt), ringFirstFrameAtMs: rel(ringAt), soundsAtMs: sounds.map(rel) },
+    medianFrameMs: +median.toFixed(2), longFrames: long.map((g) => ({ ms: +g.ms.toFixed(1), raw: g.raw })),
+    window: { ms: +win.ms.toFixed(1), raw: win.raw === undefined ? null : win.raw, pointAtMs: rel(pointAt), ringFirstFrameAtMs: rel(ringAt), soundsAtMs: sounds.map(rel) },
     threads, otherEvents: [...other.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40).map(([k, c]) => `${c}x ${k}`)
   };
 }
@@ -231,13 +262,13 @@ for (let r = 0; r < RUNS; r++) {
   results.push(res);
   if (TIMING) {
     console.log(`leg ${res.n}: ring ${res.ringFrames} frames, median ${res.medianFrameMs} ms, max ${res.maxFrameMs} ms, ` +
-      `over 3x median: ${res.longFrames.length ? res.longFrames.map((f) => `${f.ms} ms at raw ${f.raw}`).join(', ') : 'none'}`);
+      `over 3x median: ${res.longFrames.length ? res.longFrames.map((f) => `${f.ms} ms at raw ${f.raw}`).join(', ') : 'none'}; into the ring ${JSON.stringify(res.beforeRing)}`);
     continue;
   }
-  console.log(`leg ${res.n}: long frames ${JSON.stringify(res.longFrames)} (median ${res.medianFrameMs} ms); window ${res.window.ms} ms, ` +
+  console.log(`leg ${res.n}: long frames ${JSON.stringify(res.longFrames)} (median ${res.medianFrameMs} ms); window ${res.window.ms} ms at raw ${res.window.raw}, ` +
     `point at ${res.window.pointAtMs}, ring at ${res.window.ringFirstFrameAtMs}, sounds at ${JSON.stringify(res.window.soundsAtMs)}; page ${JSON.stringify(res.page)}`);
   for (const t of res.threads.slice(0, 8)) console.log(`   ${t.busyMs.toFixed(1).padStart(6)} ms  ${t.thread}  <- ${t.heaviestNames.slice(0, 5).map((x) => `${x.name} ${x.ms}`).join(', ')}`);
 }
-const out = { label: LABEL, noAudio: NO_AUDIO, control: CONTROL, timing: TIMING, fromLoad: FROM_LOAD, root: ROOT, chrome: CHROME, when: new Date().toISOString(), categories: CATEGORIES, results };
+const out = { label: LABEL, noFlourish: NO_FLOURISH, atRaw: AT_RAW, noAudio: NO_AUDIO, control: CONTROL, timing: TIMING, fromLoad: FROM_LOAD, root: ROOT, chrome: CHROME, when: new Date().toISOString(), categories: CATEGORIES, results };
 writeFileSync(path.join(HERE, `${LABEL}.json`), JSON.stringify(out, null, 1) + '\n');
 console.log('wrote', path.join(HERE, `${LABEL}.json`));
