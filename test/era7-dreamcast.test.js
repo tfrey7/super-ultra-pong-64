@@ -9,6 +9,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
 const eralooks = require('../tools/eralooks.js');
+const cameras = require('../tools/table3d-cameras.js');   // the ladder cameras (item 1266)
 
 const { Pong, R } = eralooks.loadRenderer(path.join(__dirname, '..'));
 const PongSound = require('../src/sound.js');
@@ -71,7 +72,7 @@ test('era 7 is the Dreamcast now, on the bible\'s outlined camera and name card'
   assert.strictEqual(look.name, '1999 Sega Dreamcast');
   assert.ok(!look.placeholder);
   assert.notStrictEqual(look.draw, R.eraLook(5).draw);
-  assert.deepStrictEqual(look.camera, { tilt: 22, height: 1500, fov: 23.5, screenY: 314, outline: { width: 3, colour: INK } });
+  assert.deepStrictEqual(look.camera, Object.assign({}, cameras.LADDER[7], { outline: { width: 3, colour: INK } }));
   assert.deepStrictEqual(look.card, { flash: '#ffffff', wipe: ['#ee5a24', '#ffffff', '#111111'], box: '#ffffff',
     border: '#111111', inner: null, year: '#ee5a24', name: '#111111', label: '#1e73d8', dots: null });
   assert.strictEqual(look.paddleInk, R.eraLook(1).paddleInk, 'wears the colours era 1 picked');

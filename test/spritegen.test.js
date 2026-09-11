@@ -65,6 +65,36 @@ test('relations: a shift, a mirror and a patch that keeps what is under "_"', as
   assert.deepStrictEqual(f.idle1.map((r) => r.join('')), ['.a.', '.ak']);
 });
 
+// Era 2 (item 1279): the boy and the rival, drawn as grids in place of the pixellab sheets.
+for (const id of ['era2-boy', 'era2-rival']) {
+  const grid = path.join(ROOT, 'assets', 'spritegen', `${id}.json`);
+  test(`${id}: inside the NES's limits, twelve frames that all differ, and both built sheets are the grid's`, async () => {
+    const S = await load();
+    const P = await snapper();
+    const doc = S.load(grid);
+    const res = S.lint(doc);
+    assert.deepStrictEqual(res.faults, []);
+    assert.strictEqual(res.nums.frames, 12);
+    assert.strictEqual(res.nums.unique, 12, 'every beat frame is its own pose');
+    const img = S.buildSheet(doc);
+    for (const png of [grid.replace(/\.json$/, '.png'), path.join(ROOT, 'assets', 'pixellab', `${id}.png`)]) {
+      const committed = P.decode(fs.readFileSync(png));
+      assert.ok(Buffer.compare(committed.rgba, img.rgba) === 0, `${path.relative(ROOT, png)} is stale: node tools/spritegen.mjs build assets/spritegen/${id}.json (and --out assets/pixellab/${id}.png)`);
+    }
+  });
+}
+
+test('the NES checker counts a stacked tile as another sprite on its lines', async () => {
+  const S = await load();
+  const doc = S.blank({ id: 'n', era: 2, frame: { w: 24, h: 1 }, prompt: '' });
+  doc.palette = { k: '#000000', a: '#fca044', b: '#f83800', c: '#0058f8' };
+  doc.frames.idle0 = ['kabc.kab' + 'kab.....' + 'kab.....'];   // tiles of 4, 3, 3 colours: 2 + 1 + 1 = 4 sprites a line
+  const res = S.lint(doc);
+  assert.ok(res.faults.some((f) => /need 4 sprites a line/.test(f)), res.faults.join('\n'));
+  doc.frames.idle0 = ['kab..kab' + 'kab.....' + 'kab.....'];   // 1 + 1 + 1 = 3: inside the budget
+  assert.ok(!S.lint(doc).faults.some((f) => /sprites a line/.test(f)));
+});
+
 test('the grid file is written one row per line, and reads back the same', async () => {
   const S = await load();
   const doc = S.load(GRID);

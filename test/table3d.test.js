@@ -252,7 +252,7 @@ test('every era\'s draw is handed the table as api.table3d', () => {
 test('era 5 draws the plain table in perspective and reads the state without writing it', () => {
   const look = R.eraLook(5);
   assert.strictEqual(look.era, 5);
-  assert.deepStrictEqual(look.camera, { tilt: 28, height: 1150, fov: 30, screenY: 306 });
+  assert.deepStrictEqual(look.camera, cameras.LADDER[5]);
   assert.strictEqual(look.paddleInk, R.eraLook(1).paddleInk, 'wears the colours era 1 picked');
   const g = rally(5);
   const before = JSON.stringify(g);

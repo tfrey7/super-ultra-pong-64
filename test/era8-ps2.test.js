@@ -12,6 +12,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
 const eralooks = require('../tools/eralooks.js');
+const cameras = require('../tools/table3d-cameras.js');   // the ladder cameras (item 1266)
 
 const ROOT = path.join(__dirname, '..');
 const { Pong, R } = eralooks.loadRenderer(ROOT);
@@ -108,7 +109,7 @@ test('era 8 is the PlayStation 2, built rather than a placeholder, wearing the c
   assert.match(l.name, /PlayStation 2/);
   assert.ok(!l.placeholder, 'no longer a placeholder');
   assert.strictEqual(typeof l.draw, 'function');
-  assert.deepStrictEqual(l.camera, { tilt: 30, height: 1250, fov: 29, screenY: 281 }, 'the bible camera at rest');
+  assert.deepStrictEqual(l.camera, cameras.LADDER[8], 'the ladder camera at rest');
   assert.strictEqual(l.card.dots, null, 'no Super Nintendo buttons on the card');
   assert.notStrictEqual(l.flourish, R.eraLook(1).flourish, 'no borrowed arrival (era 1\'s): its own, item 1154');
   const g = rally();
@@ -146,14 +147,15 @@ test('cinematic letterbox: 52-pixel black bars over everything, the score a subt
 
 test('the camera drifts slowly and never past the measured extremes; the table stays inside the bars', () => {
   const pose = look().drift;
-  assert.deepStrictEqual(pose(0), { tilt: 30, height: 1250, fov: 29, screenY: 281, panX: 0 });
+  const C8 = cameras.LADDER[8];
+  assert.deepStrictEqual(pose(0), Object.assign({}, C8, { panX: 0 }));
   assert.notDeepStrictEqual(pose(3), pose(0), 'it moves');
   for (const k of ['tilt', 'panX', 'height']) assert.ok(fx().DRIFT[k].period >= 12, `${k} slower than 12 s a cycle (R7)`);
   for (let t = 0; t < 700; t += 0.37) {
     const p = pose(t);
-    assert.ok(p.tilt >= 28.5 - 1e-9 && p.tilt <= 31.5 + 1e-9);
+    assert.ok(p.tilt >= C8.tilt - 1.5 - 1e-9 && p.tilt <= C8.tilt + 1.5 + 1e-9);
     assert.ok(p.panX >= -10 - 1e-9 && p.panX <= 10 + 1e-9);
-    assert.ok(p.height >= 1210 - 1e-9 && p.height <= 1290 + 1e-9);
+    assert.ok(p.height >= C8.height - 40 - 1e-9 && p.height <= C8.height + 40 + 1e-9);
     const cam = T.camera(p);
     assert.ok(T.project(cam, 0, 0, 0).y >= 60 && T.project(cam, 800, 0, 0).y >= 60, `far edge below the top bar at t ${t}`);
     assert.ok(T.project(cam, 0, 600, 0).y <= 540, `near edge above the bottom bar at t ${t}`);

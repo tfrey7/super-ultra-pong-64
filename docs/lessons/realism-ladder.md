@@ -48,6 +48,34 @@ every era card reads before it draws.
   figures, because it does not own the rig. The ladder names each snag beside the card that meets
   it (section 9), which costs one sentence now instead of a blocked run later.
 
+## The 3D table and camera, built (item 1266)
+
+The table in the 3D layer is now section 8's: 6-unit edge lines, a 3-unit centre line end to end,
+a see-through net 24 units tall with a solid tape on posts at `y` -20 and 620, and four legs inside
+the footprint down to a floor 110 below, shown as a soft shadow so each era's painted ground stays
+the floor. `PongField3D.tableGeometry()` returns every piece as a field-space box, so the numbers
+are tested without a browser, and the low side view (`docs/shots/item-1266/rally-table-side.png`)
+shows them in the real layer. Each era keeps its own camera, and that per-era `CAMERA` is the
+override the brief asked for. All six were re-solved by `node tools/table3d-cameras.js --players`.
+
+- **Solve the camera, do not tune it by eye.** The rule was a box, not a feeling: two 250-unit
+  players 30 units behind the ends, feet to head inside the picture, and R3 in every pose. Keeping
+  each era's tilt within 4 degrees and its lens within 6, the solver found the nearest camera that
+  held both players, with R3 passing in about a second per era. No era had to shrink its players.
+  The PlayStation 2 needed its drift carried into the search, and the PlayStation needed its arrival
+  lift and wobble together, a pose the old list never had. That is how the first solve failed a
+  test.
+- **A wider view shows the edges of every backdrop.** Three arenas had been built only as wide as
+  the old table, or placed where the old table hid them. The Dreamcast's blimp flew at a fixed
+  screen `y` 9, behind the score. The Xbox hangar wall stopped at the table's ends. The Xbox 360's
+  desert plate stopped 70 pixels short of the left edge. Each fix was one number or one loop. An
+  arena drawn in screen space (the blimp) needs checking against the HUD, and an arena drawn in
+  world space (the wall) needs checking against the widest camera.
+- **Hide the tests' camera numbers behind one table.** Nine tests had copied the old camera
+  numbers. They now read `cameras.LADDER`, so the next camera move changes one file.
+- **Legs you cannot see still count.** From a play camera, the top hides the legs. They are there for
+  the polygon players, whose feet go on that floor, and the side view is how to check them.
+
 ## For a one-era game
 
 A table tennis game on a single machine takes that machine's rung from the table in section 7 and

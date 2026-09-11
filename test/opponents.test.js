@@ -185,20 +185,56 @@ test('the name is drawn in play, and never over the title or the dimmed demo ral
     const ctx = { save() {}, restore() {}, transform() {}, fillRect(x, y, w, h) { calls.push([x, y, w, h]); } };
     return { ctx, calls };
   };
-  for (let era = 0; era <= 4; era++) {
-    const g = playing(era);
-    const r = rec();
-    Opp.drawName(r.ctx, g, R);
-    assert.ok(r.calls.length > 20, `era ${era} letters its name in blocks (${r.calls.length} blocks)`);
-    assert.ok(r.calls.every(([x, y]) => x > g.width / 2 && y < 140), `era ${era}'s name sits by the computer's score`);
-  }
-  const title = Pong.createGame({ era: 2 });
+  const g = playing(0);
+  const r = rec();
+  Opp.drawName(r.ctx, g, R);
+  assert.ok(r.calls.length > 20, `the 1972 machine letters its name in blocks (${r.calls.length} blocks)`);
+  assert.ok(r.calls.every(([x, y]) => x > g.width / 2 && y < 140), 'the 1972 name sits by the computer\'s score');
+  const title = Pong.createGame({ era: 0 });
   const t = rec();
   Opp.drawName(t.ctx, title, R);
   assert.strictEqual(t.calls.length, 0, 'nothing over the title');
   const demo = rec();
-  Opp.drawName(demo.ctx, playing(2), R, { ink: '#3a3a3a' });
+  Opp.drawName(demo.ctx, playing(0), R, { ink: '#3a3a3a' });
   assert.strictEqual(demo.calls.length, 0, 'nothing over the dimmed demo rally');
+});
+
+// Item 1261: every AAA era's score went into a HUD of its own, so the name either
+// sits inside that HUD or is left out where the HUD already names the opponent.
+test('each AAA era letters the name inside its own HUD, or leaves it out where the HUD already names the opponent', () => {
+  const HIDDEN = [1, 2, 3, 4, 5, 7, 8, 9];   // a CPU label, a portrait, a helmet or a gamertag says it already
+  const SHOWN = [0, 6, 10];                  // 1972 as it was; the N64 and the 360 letter it beside/under their scores
+  for (let era = 0; era <= Pong.TOP_ERA; era++) {
+    assert.strictEqual(Opp.nameShown(era), SHOWN.includes(era), `era ${era}: name ${SHOWN.includes(era) ? 'shown' : 'hidden'}`);
+    if (HIDDEN.includes(era)) {
+      assert.ok(typeof Opp.LETTERING[era].hidden === 'string' && Opp.LETTERING[era].hidden.length > 10, `era ${era} says why it is hidden`);
+    }
+  }
+  const rec = () => {
+    const calls = [];
+    const ctx = {
+      save() {}, restore() {}, transform() {},
+      fillRect(x, y, w, h) { calls.push(['rect', x, y]); },
+      fillText(text, x, y) { calls.push(['text', x, y, text]); },
+      measureText(text) { return { width: text.length * 8 }; }
+    };
+    return { ctx, calls };
+  };
+  for (const era of HIDDEN) {
+    const r = rec();
+    Opp.drawName(r.ctx, playing(era), R);
+    assert.strictEqual(r.calls.length, 0, `era ${era} draws no name over its court`);
+  }
+  // The two lettered AAA eras put it in their HUD band, above the court's far edge.
+  const band = { 6: [560, 660, 60], 10: [600, 740, 110] };   // era: [x from, x to, y at most], field units
+  for (const era of [6, 10]) {
+    const r = rec();
+    Opp.drawName(r.ctx, playing(era), R);
+    const texts = r.calls.filter((c) => c[0] === 'text' && c[3] === Opp.profileFor(era).name);
+    assert.ok(texts.length > 0, `era ${era} letters ${Opp.profileFor(era).name}`);
+    const [lo, hi, maxY] = band[era];
+    assert.ok(texts.every(([, x, y]) => x >= lo && x <= hi && y <= maxY), `era ${era}'s name sits in its HUD band`);
+  }
 });
 
 test('a game made with other rules scales the opponent by them, and cpuProfiles false is the old chase', () => {
