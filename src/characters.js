@@ -54,6 +54,13 @@
  *            letterboxed era's picture between its bars, so a figure never
  *            pokes into a bar. null (the default) clips nothing
  *   skin, body   the placeholder's colours; its shirt wears the paddle's ink
+ *   model    3D eras only (item 1248): an assets/models/ name, drawn by
+ *            src/models3d.js as a polygon figure instead of any sheet, the
+ *            paddle drawn as a slab under its hand; `models: { left, right }`
+ *            like `sheets`. Until the file has loaded the sheet path draws.
+ *   shading  the model's look: flat, gouraud, cel, specular, vertex or hd
+ *   modelScale, slabZ, ballInk   the figure's size, the slab's height, and
+ *            the colour the ball is redrawn in where it passes in front
  *
  * A sheet is cut into its frames once, when it has loaded: each frame is a
  * source rectangle, and a figure is ONE drawImage call a frame. The
@@ -90,6 +97,8 @@
     scale: 2.5,
     fps: 6,
     res: 1,             // placeholder sheet pixels per grid cell
+    modelScale: 1.8,    // a model's size on the table: the steep 3D cameras foreshorten
+                        // an upright figure to about half, so 1.8 reads like the sprites did
     round: false,       // placeholder head drawn round (the 3D eras)
     clip: null,         // { y0, y1 }: draw the players only inside this band (field units)
     skin: '#e0b090',
@@ -111,6 +120,9 @@
           },
           frame: { w: 6, h: 28 }, hand: { x: 6, y: 14 }, scale: 5, fps: 7.5 },
     2:  { sheets: { left: 'era2-sheet-left', right: 'era2-sheet-right' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' }, // NES (item 1225: assets/pixellab/era2-players-sheet.mjs)
+    // Eras 5 to 10 (item 1248): each block also names a polygon model from
+    // assets/models/ (tools/blender/player-proof.py) and a shading, drawn by
+    // src/models3d.js in place of the sheets, which draw only until it has loaded.
     // Genesis (item 1226): the barbarian and the knight, pixflux sheets re-cut
     // offline to 20 x 25 frames (assets/pixellab/era3-players-cut.mjs), so the
     // scale is 3.2, not the bible's 2.6 for 12 x 52: 80 units tall, one paddle.
@@ -136,7 +148,8 @@
     5:  { skin: '#c8906a', body: '#1a1a1f', res: 2, round: true,
           sheets: { left: 'era5-left', right: 'era5-right' },
           frame: { w: 20, h: 30 }, hand: { x: 19, y: 18 }, scale: 3.6,
-          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8 },
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
+          model: 'player-proof-lo', shading: 'flat' },       // item 1248: the polygon proof figure
     // Nintendo 64 (item 1230, docs/ART.md Era 6): the penguin holds the player's paddle and the
     // frog the computer's, chunky toy mascots drawn smoothed and fogged at their paddle's depth
     // (capped at 0.35, as the era caps its paddles). Sheets derived by
@@ -146,7 +159,8 @@
     6:  { skin: '#e8b890', body: '#283080', scale: 2.6, res: 3, round: true,
           sheets: { left: 'era6-penguin', right: 'era6-frog' },
           frame: { w: 32, h: 44 }, hand: { x: 29, y: 28 }, anchor: { dx: 0, dy: 0, dz: 24 },
-          fps: 6, smooth: true, fogCap: 0.35 },
+          fps: 6, smooth: true, fogCap: 0.35,
+          model: 'player-proof-lo', shading: 'gouraud' },    // item 1248
     // Dreamcast (item 1231): two Jet Set Radio-manner skaters, cut from pixflux by
     // assets/pixellab/era7-skater-cut.py; each figure about 68 px tall, so 1.3 table
     // units a pixel stands it about 90 tall, the hand on the paddle box's top (dz 24).
@@ -154,7 +168,8 @@
     // this era's polygon-model card (item 1248's renderer) swaps these sheets out.
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 1.3, res: 3, round: true,
           sheets: { left: 'era7-skater-left-sheet', right: 'era7-skater-right-sheet' },
-          frame: { w: 44, h: 84 }, hand: { x: 44, y: 66 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 10 },
+          frame: { w: 44, h: 84 }, hand: { x: 44, y: 66 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 10,
+          model: 'player-proof-mid', shading: 'cel' },       // item 1248
     // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
     // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
     // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
@@ -164,7 +179,8 @@
     8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
           sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
           frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
-          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3, clip: { y0: 52, y1: 548 } },
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3, clip: { y0: 52, y1: 548 },
+          model: 'player-proof-mid', shading: 'specular' },  // item 1248
     // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
     // cyborg, cut from pixellab by assets/pixellab/era9-derive.mjs; the hand on
     // the shield at the paddle box's top (dz 24), 90 table units tall. A
@@ -172,7 +188,8 @@
     // 2026-09-10); the polygon-model card swaps this block's sheets out.
     9:  { skin: '#d6a684', body: '#1c2a1c', scale: 1.667, res: 4, round: true,
           sheets: { left: 'era9-armour-left', right: 'era9-armour-right' },
-          frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6 },
+          frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6,
+          model: 'player-proof-hi', shading: 'vertex' },     // item 1248
     // Xbox 360 (item 1234, docs/ART.md era 10): two heavy soldiers, pixellab
     // sheets reposed, graded, rimmed and grained offline by
     // assets/pixellab/era10-derive.mjs at twice the bible's 32 x 66 (a 96 x 132
@@ -182,10 +199,17 @@
     10: { skin: '#e2b294', body: '#2a2e36', res: 4, round: true,
           sheets: { left: 'era10-soldier-left', right: 'era10-soldier-right' },
           frame: { w: 96, h: 132 }, hand: { x: 84, y: 84 }, scale: 0.68,
-          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8 }
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
+          model: 'player-proof-hi', shading: 'hd' }          // item 1248
   };
 
   var FIRST_3D = 5;
+
+  /** The model name one side of an era block wears: its own of `models`, else `model`. */
+  function modelOf(own, side) {
+    var per = own.models && own.models[side === 'right' ? 'right' : 'left'];
+    return per || own.model || null;
+  }
 
   /** The pixellab name one side of an era block wears: its own of `sheets`, else `sheet`. */
   function sheetOf(own, side) {
@@ -202,8 +226,10 @@
     if (!own) return null;
     var c = Object.assign({}, DEFAULTS, own);
     delete c.sheets;
+    delete c.models;
     c.side = side === 'right' ? 'right' : 'left';
     c.sheet = sheetOf(own, c.side);
+    c.model = modelOf(own, c.side);
     c.frames = Object.assign({}, DEFAULTS.frames, own.frames || {});
     c.anchor = Object.assign({}, DEFAULTS.anchor, own.anchor || {});
     if (!c.sheet) {
@@ -462,6 +488,11 @@
 
   // -------------------------------------------------------------- drawing
   var enabled = !(root.location && /[?&]characters=off\b/.test(String(root.location.search || '')));
+  // ?models=off keeps the 3D eras on their sprites; ?model=<name> puts that one
+  // model file on every 3D era (item 1248: how the frame-time A/B is taken).
+  var search = String((root.location && root.location.search) || '');
+  var modelsOn = !/[?&]models=off\b/.test(search);
+  var forcedModel = (/[?&]model=([a-z0-9][a-z0-9_-]*)/.exec(search) || [])[1] || null;
 
   /**
    * The fog over a 3D figure (item 1230): { colour, amount } -- the era look's
@@ -546,6 +577,61 @@
     ctx.restore();
   }
 
+  // ------------------------------------------------------------- models
+  // One reusable pose and figure a side, so a frame allocates no vertex arrays.
+  var figs = { left: { pose: null }, right: { pose: null } };
+
+  /**
+   * Eras 5 to 10 (item 1248): both players as polygon models, with the
+   * paddles as slabs, sorted and shaded by src/models3d.js. Answers false --
+   * and the sprite path draws -- until both sides' model files have loaded.
+   */
+  function drawModels(ctx, state, sides, mem, R, cam, T, look) {
+    var M = root.PongModels3D;
+    if (!M || !cam || !T || !sides.left.model || !sides.right.model) return false;
+    var ml = M.get(sides.left.model), mr = M.get(sides.right.model);
+    if (!ml || !mr) return false;
+    var list = [];
+    var names = ['left', 'right'];
+    for (var i = 0; i < 2; i++) {
+      var name = names[i], cfg = sides[name], p = state[name];
+      var model = i ? mr : ml;
+      var mirror = name === 'right' ? -1 : 1;
+      var side = mem[name];
+      var t = state.time || 0;
+      var pose = beatOf(side, t, p.vy || 0, cfg);
+      var age = side && side.held ? t - side.since : 0;
+      var kf = M.keyframes(pose.beat, age, p.vy || 0, t);
+      var fig = figs[name];
+      if (fig.model !== model) { figs[name] = fig = { pose: null }; fig.model = model; }
+      fig.pose = M.blend(model, kf.from, kf.to, kf.t, fig.pose);
+      var outerX = mirror > 0 ? p.x : p.x + p.w;
+      fig.scale = cfg.modelScale || 1;
+      // Feet on the floor, the hand on the slab's outer face.
+      fig.anchor = { x: outerX - mirror * 2.5, y: p.y + p.h / 2, z: model.hand[2] * fig.scale };
+      fig.mirror = mirror;
+      fig.ink = R && typeof R.paddleInk === 'function' ? R.paddleInk(state, name) : null;
+      fig.rect = { x: p.x, y: p.y, w: p.w, h: p.h };
+      fig.group = i;
+      list.push(fig);
+    }
+    var ball = null;
+    if (state.ball && !(state.serveDelay > 0)) {
+      var b = state.ball, r = b.size * 0.6;
+      var s = T.project(cam, b.x + b.size / 2, b.y + b.size / 2, r);
+      ball = { x: s.x, y: s.y, r: r * s.scale, depth: s.depth, scale: s.scale, fill: sides.left.ballInk || '#ffffff' };
+    }
+    M.drawScene(ctx, T, cam, list, {
+      mode: sides.left.shading,
+      fog: look && look.fog,
+      outline: cam.outline || sides.left.outline || null,
+      ball: ball,
+      // The slab stands a little above the idle hand that grips it.
+      slabZ: sides.left.slabZ || (ml.hand[2] * (sides.left.modelScale || 1) + 6)
+    });
+    return true;
+  }
+
   /**
    * Both players over a frame already drawn. Reads the state, writes nothing
    * of it. Era 0, dimmed frames and a state with no paddles draw nothing.
@@ -559,15 +645,17 @@
     if (!cfg) return false;
     R = R || root.PongRender;
     var mem = memoryOf(state);
-    var T = null, cam = null;
+    var T = null, cam = null, look = null;
     if (cfg.is3d) {
       T = R && R.table3d;
-      cam = cameraFor(state, R && R.eraLook ? R.eraLook(state.era) : null, T);
+      look = R && R.eraLook ? R.eraLook(state.era) : null;
+      cam = cameraFor(state, look, T);
     }
+    // Each side in its own config: they differ only in the sheet or model it wears.
+    var sides = { left: cfg, right: configFor(era, 'right') };
+    if (cfg.is3d && cfg.model && modelsOn && forcedModel) { sides.left.model = sides.right.model = forcedModel; }
     // The far player (smaller y) first, so the near one overlaps it.
     var order = state.left.y <= state.right.y ? ['left', 'right'] : ['right', 'left'];
-    // Each side in its own config: they differ only in the sheet it wears.
-    var sides = { left: cfg, right: configFor(era, 'right') };
     var band = clipBand(cfg.clip);
     var clipped = band && typeof ctx.clip === 'function' && typeof ctx.rect === 'function' &&
                   typeof ctx.beginPath === 'function';
@@ -578,6 +666,8 @@
       ctx.clip();
     }
     try {
+      // Eras 5 to 10 (item 1248): the polygon models, inside the same clip.
+      if (cfg.is3d && cfg.model && modelsOn && drawModels(ctx, state, sides, mem, R, cam, T, look)) return true;
       for (var i = 0; i < order.length; i++) drawPlayer(ctx, state, order[i], sides[order[i]], mem, R, cam, T);
     } finally {
       if (clipped) ctx.restore();
@@ -624,13 +714,28 @@
     cameraFor: cameraFor,
     drawPose: drawPose,
     drawPlayers: drawPlayers,
+    drawModels: drawModels,
     clipBand: clipBand,
     install: install,
     get enabled() { return enabled; },
     set enabled(v) { enabled = !!v; }
   };
 
+  /** Ask for every era block's model now, so the first 3D frame has it. */
+  function preloadModels() {
+    var M = root.PongModels3D;
+    if (!M) return 0;
+    var n = 0;
+    Object.keys(ERAS).forEach(function (e) {
+      [ERAS[e].model, ERAS[e].models && ERAS[e].models.left, ERAS[e].models && ERAS[e].models.right]
+        .forEach(function (name) { if (name) { M.get(name); n++; } });
+    });
+    return n;
+  }
+  api.preloadModels = preloadModels;
+
   if (root.PongRender) install(root.PongRender);
+  preloadModels();
   root.PongCharacters = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

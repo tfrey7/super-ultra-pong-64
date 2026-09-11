@@ -439,18 +439,6 @@ async function walkLadder(s, baseUrl) {
   const eras = await s.eval('window.Pong.ERAS.map((e) => e.year + " " + e.machine)');
   const points = (g) => g.score.left + g.score.right;
   const track = (g) => g.ball.y + 6;
-  // Stand at the edge away from the ball so it goes past -- but stop choosing
-  // once it is close, or the paddle sweeps across its path at the last moment.
-  let edge = 30;
-  // A ball with spin on it bends (item 1208), so the edge is chosen from where the
-  // rules say it will ARRIVE, not from where it is now.
-  const dodge = (g) => {
-    if (g.ball.x > g.width * 0.35) {
-      const at = g.ball.vx < 0 ? Rally.arrivalY(Pong, g) : null;
-      edge = (at === null ? g.ball.y : at) < g.height / 2 ? g.height - 30 : 30;
-    }
-    return edge;
-  };
 
   await s.key('keyDown', 'Space', ' ', 32);
   await s.key('keyUp', 'Space', ' ', 32);
@@ -490,16 +478,24 @@ async function walkLadder(s, baseUrl) {
     const file = await s.shot('ladder-' + ERA_NAMES[rung], clip);
     frames.push({ rung, era: g.era, file });
     // One point either way moves the machine, and the ring starts where the ball
-    // went out. Even changes are a real miss past the player (the ring starts on
-    // the left); odd ones are the player's own point, the way a human climbs, so
+    // went out. Even changes are the computer's point, past the player (the ring
+    // starts on the left); odd ones are the player's own point, the way a human climbs, so
     // the ring starts on the right. Beating the computer in a rally is a coin
     // flip, so the ball is put just past the computer's paddle, heading out --
-    // outside the paddle, so it cannot be bounced back.
+    // outside the paddle, so it cannot be bounced back. The computer's point is
+    // made just as certain, the mirror of it: the ball just behind the player's
+    // paddle, heading out left (item 1252). Dodging a live rally instead lost
+    // that point to the player on 2 of 6 climbs on the Nintendo 64, whose 32 ms
+    // frames in the playtest's GPU-less Chrome gave the hand's round trips time
+    // to sweep the paddle back into the ball's path.
     const outRight = rung % 2 === 1;
     const before = points(g);
-    if (outRight) await s.eval(`(() => { const g = window.__pong, r = g.right;
-      g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0; })()`);
-    const after = await playUntil(s, geo, 15000, outRight ? track : dodge, (x) => points(x) > before);
+    await s.eval(outRight
+      ? `(() => { const g = window.__pong, r = g.right, b = g.ball;
+          b.x = r.x + r.w + 2; b.y = g.height * 0.3; b.vx = 600; b.vy = 0; })()`
+      : `(() => { const g = window.__pong, l = g.left, b = g.ball;
+          b.x = l.x - b.size - 2; b.y = g.height * 0.3; b.vx = -600; b.vy = 0; b.spin = 0; })()`);
+    const after = await playUntil(s, geo, 15000, track, (x) => points(x) > before);
     moves.push({ from: g.era, to: after.era, scored: points(after) > before,
       score: `${after.score.left}-${after.score.right}` });
     // The eleventh point ends the match (item 1211): film its finale straight
