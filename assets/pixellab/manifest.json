@@ -1023,6 +1023,236 @@
         "direction": "east",
         "no_background": true
       }
+    },
+    {
+      "name": "era3-arena-wall",
+      "file": "era3-arena-wall.png",
+      "prompt": "16-bit Sega Genesis background tile strip, a castle arena wall of big grey stone blocks at night, dark mortar lines, moss in the cracks, lit warm orange from below by torchlight, side view, seamless horizontal, Golden Axe style, saturated colours",
+      "size": {
+        "width": 320,
+        "height": 48
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side"
+      },
+      "seed": 1226003,
+      "date": "2026-09-11T03:37:12.650Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 14.8,
+      "pixels": {
+        "width": 320,
+        "height": 48
+      },
+      "bytes": 5637,
+      "sha256": "03e89750e37f4e8591ea868863a9b33f9cf09b58495cd99e80f20221e822bb24",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis background tile strip, a castle arena wall of big grey stone blocks at night, dark mortar lines, moss in the cracks, lit warm orange from below by torchlight, side view, seamless horizontal, Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 320,
+          "height": 48
+        },
+        "seed": 1226003,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "5ad72dd69b3a3ac5c355147c3500038ea9fb8557100a62a265cfd1f04f253f12"
+      }
+    },
+    {
+      "name": "era3-torch",
+      "file": "era3-torch.png",
+      "prompt": "16-bit Sega Genesis sprite strip, 3 frames side by side of the same wall torch, iron bracket, burning flame in orange yellow and red, each frame the flame a different shape, Golden Axe style",
+      "size": {
+        "width": 48,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "no_background": true
+      },
+      "seed": 1226004,
+      "date": "2026-09-11T03:38:05.302Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 51.9,
+      "pixels": {
+        "width": 48,
+        "height": 32
+      },
+      "bytes": 615,
+      "sha256": "abe24e0021ae3a2cca73fac313e5bec7e40e0949245377e9d465a657035a76dd",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite strip, 3 frames side by side of the same wall torch, iron bracket, burning flame in orange yellow and red, each frame the flame a different shape, Golden Axe style",
+        "image_size": {
+          "width": 48,
+          "height": 32
+        },
+        "seed": 1226004,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "no_background": true
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "cf732f7ace6f400dd62495fd444facd27a15ab4df266e2d43de2afc61ae7e958"
+      }
+    },
+    {
+      "name": "era3-portraits",
+      "file": "era3-portraits.png",
+      "prompt": "16-bit Sega Genesis status bar portraits, two face portraits side by side: left a barbarian warrior with a horned helmet and a beard, right an armoured knight in a steel helm with a red crest, front view, Golden Axe style, saturated colours",
+      "size": {
+        "width": 64,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "seed": 1226005,
+      "date": "2026-09-11T03:38:17.939Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 12,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 1111,
+      "sha256": "48caee2dfa3055c73a366d3e028cb493299a2ab44df12c918654ded8460b3446",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis status bar portraits, two face portraits side by side: left a barbarian warrior with a horned helmet and a beard, right an armoured knight in a steel helm with a red crest, front view, Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 64,
+          "height": 32
+        },
+        "seed": 1226005,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "a240a73792990527c34a387ea0c0df7c8ade53c0aae569c4b6ae56a93ec00f54"
+      }
+    },
+    {
+      "name": "era3-panel",
+      "file": "era3-panel.png",
+      "prompt": "16-bit Sega Genesis game status panel, a long carved grey stone slab frame with bevelled edges and rivets, dark recessed middle, Golden Axe interface style",
+      "size": {
+        "width": 320,
+        "height": 32
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "seed": 1226006,
+      "date": "2026-09-11T03:38:37.450Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 18.7,
+      "pixels": {
+        "width": 320,
+        "height": 32
+      },
+      "bytes": 1598,
+      "sha256": "6ae4c698861972bcb7393561009a1329014261b712d47a8b1b8e997363081291",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis game status panel, a long carved grey stone slab frame with bevelled edges and rivets, dark recessed middle, Golden Axe interface style",
+        "image_size": {
+          "width": 320,
+          "height": 32
+        },
+        "seed": 1226006,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "729a429c0755526c823712d8775e62b2217cb892086791fcf52e61c50732f2b6"
+      }
     }
   ]
 }
