@@ -170,3 +170,16 @@ frame, and they cost nothing measurable. The tenth hit is `docs/shots/item-1226/
   the bar keeps its full length.
 - The net replaced the dashed centre line it grew from. It is an 8-unit grey band with a 6-unit
   drop shadow on the blue and a 10-unit post on each side edge, drawn before the ball (R1, R2).
+
+## LESSONS: the sprite generator (item 1272)
+
+- **The pixellab players break the machine's own rule.** Put through `tools/spritegen.mjs lint`,
+  `era3-p1.png` has 46 colours, and one Genesis sprite palette held 15. It also changes costume,
+  helmet and shield from frame to frame (11 different figures across 12 frames).
+- **A barbarian drawn as a text grid** (`assets/spritegen/era3-barbarian.json`): 12 frames of
+  20 x 25, 14 colours on the 3-bit grid, one character throughout. It took 3 min 44 s to draw
+  and 17 ms to build. It is not wired into the game yet;
+  [contact.png](../shots/item-1272/contact.png) puts it beside today's sheet. The whole pipeline
+  is in [sprites.md](sprites.md).
+- **Genesis colours are `levels(3)`**: 0, 36, 73, 109, 146, 182, 219 and 255 per channel. Write
+  the palette in those values, and the checker refuses anything else, naming the nearest.

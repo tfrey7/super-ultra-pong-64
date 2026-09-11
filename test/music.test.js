@@ -85,7 +85,9 @@ function melodyNotes(arr) {
     const p = arr.parts[e.part];
     if (p.play === 'melody' && p.rule === 'full') e.midis.forEach((m) => out.push(s + ':' + (m - 12 * (p.octave || 0))));
   }));
-  return out.sort();
+  // A tune doubled by a second part (the Genesis's square an octave up, the
+  // Super Nintendo's horns an octave under, item 1242) is still the one tune.
+  return [...new Set(out)].sort();
 }
 
 // ------------------------------------------------------------- the table
@@ -181,7 +183,9 @@ test('the arcade only taps the melody\'s bones: two short beeps a bar, each the 
   const arr = M.ARRANGEMENTS[0];
   const score = M.arrange(arr);
   const taps = [];
-  score.forEach((list, s) => list.forEach((e) => taps.push({ s, m: e.midis[0], len: e.len })));
+  // The melody's taps only: the board's blips that join as the game tightens
+  // (item 1242) are drum hits on the steps between them.
+  score.forEach((list, s) => list.forEach((e) => { if (arr.parts[e.part].play === 'melody') taps.push({ s, m: e.midis[0], len: e.len }); }));
   assert.strictEqual(taps.length, T.bars * 2);
   const melody = T.melody.map(M.parseBar);
   taps.forEach((t) => {
@@ -234,14 +238,16 @@ test('the NES: its pulse duty changes between sections, chords are fast arpeggio
   }));
 });
 
-test('the Genesis: FM bass in sixteenths, an FM lead, a square on top, and grit', () => {
+test('the Genesis: FM bass in sixteenths, an FM lead, an FM piano, a square on top, and grit', () => {
   const arr = M.ARRANGEMENTS[3];
   const score = M.arrange(arr);
   const bi = arr.parts.findIndex((p) => p.play === 'bass');
   const perBar = score.slice(0, 16).reduce((n, l) => n + l.filter((e) => e.part === bi).length, 0);
   assert.strictEqual(perBar, 16);
   assert.ok(arr.parts[bi].voice.fm && arr.parts.find((p) => p.play === 'melody').voice.fm);
-  assert.strictEqual(arr.parts.find((p) => p.play === 'chords').voice.wave, 'square');
+  // Since item 1242 the PSG square rides the tune an octave up, and the chords are an FM piano.
+  assert.ok(arr.parts.some((p) => p.play === 'melody' && p.octave === 1 && p.voice.wave === 'square'));
+  assert.ok(arr.parts.find((p) => p.play === 'chords').voice.fm);
   assert.ok(arr.effects.grit > 0);
 });
 
