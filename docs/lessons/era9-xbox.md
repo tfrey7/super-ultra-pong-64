@@ -98,10 +98,9 @@ happens to be Pong, to its page in [docs/ART.md](../ART.md).*
 
 **What sold the flagship look here**
 
-- **People with weight standing at the table.** An armoured space marine on the left and a steel
-  cyborg on the right, each 90 table units tall at the paddle's outer edge, holding the paddle as
-  an energy shield. Each is a pixellab sheet drawn by the shared player rig (`src/characters.js`,
-  era 9's block), scaled by the table's depth. The marine's glowing-shield frames are the swing.
+- **People standing at the table** (the idea sold; the sprite form did not, see below). An
+  armoured space marine on the left and a steel cyborg on the right, each 90 table units tall at
+  the paddle's outer edge, holding the paddle as an energy shield.
 - **The light touches the players too.** Each player casts a hard shadow 40 units long from its
   feet, directly away from the ball's moving light, at 0.30, lighter than the paddles' 0.45 (R5).
   When the ball comes within 160 units the player's frame is drawn a second time in `'lighter'`,
@@ -118,6 +117,15 @@ happens to be Pong, to its page in [docs/ART.md](../ART.md).*
 
 **What did not work**
 
+- **Flat sprites read as sprites on a 3D table, and were ruled out.** Tim, seeing the 3D eras'
+  players: *"if you are trying to do sprites in the 3d eras uh...that is not gonna look AAA here
+  dude"*. A 2001 flagship's people are polygon models lit by the scene; a pixel billboard standing
+  on a perspective table reads as a cut-out, whatever its shading. The marine and the cyborg here
+  are a **stand-in** only, wired through era 9's block in `src/characters.js`. The real players are
+  Blender-built models drawn by the game's own 3D, on a card that follows this one and keeps these
+  two characters' concept. The shadow, glint and miss-flash code in the era file is written against
+  the rig's anchor, so it carries over to a model standing in the same spot. The pixellab lessons
+  below still hold for any 2D era.
 - **pixflux does not draw a sprite sheet on a grid.** Asked for 3 x 6 frames of 24 x 54, it drew
   the marine as 13 figures in 7 rows of two, and the cyborg as four figures of two different
   sizes. The fix costs no generations: `assets/pixellab/era9-derive.mjs` keys out the ground (the
@@ -149,8 +157,10 @@ playtest's 18.5 ms line, in software-drawn Chrome. With other runs loading the m
 
 **What a one-era game would copy**
 
-1. The rig plus two sheets: `src/characters.js` with only the era 9 block, the two sheets, and
-   `era9-derive.mjs` as the recipe for turning whatever pixflux draws into a grid.
+1. Players as polygon models, not sprites (see above). Keep the two characters' concept: a
+   gunmetal space marine with green trim and a pale-green mirrored visor, and a tall polished-steel
+   cyborg with one red eye slit, each holding the paddle as an energy shield. For a 2D era, the rig
+   plus `era9-derive.mjs` is still the recipe for turning whatever pixflux draws into a grid.
 2. The four light rules, together: the ball is the light, every shadow falls away from it, every
    extra shadow is lighter than the contact shadow, and anything metal within reach glints.
 3. One set, three moving things: a dimmed backdrop picture behind the far rail, two beacons and a
