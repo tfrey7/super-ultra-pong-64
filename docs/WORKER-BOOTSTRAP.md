@@ -97,7 +97,7 @@ era-0 machine, one point let through per rung, a check that each point moved it 
 a screenshot of each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to
 `ladder-era4-snes.png`, cropped to the field) and one more point to prove it stops on era 4.
 `--ladder` runs only that walk (about half a minute); `--scoring` runs only the rally and the
-scoring check (about ten seconds); `--reference` also copies its five frames into
+scoring check (about fifteen seconds a run); `--reference` also copies its five frames into
 the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
 `index.html?era=N` (N is 0 to 4) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
@@ -176,7 +176,7 @@ his emulator — never touch either.**
   cannot return the shot, and keeps shooting for up to 45 seconds (it stops at the point, usually
   inside fifteen). A FAIL on that line now means scoring is really
   broken, or the computer has been made unbeatable -- both regressions. `node tools/playtest.mjs
-  --scoring` runs just that check in about ten seconds. `node tools/beatability-sample.mjs` still
+  --scoring` runs just that check, about fifteen seconds a run. `node tools/beatability-sample.mjs` still
   measures how beatable the game itself is: its `track` and `corner` rows are the design, its
   `scripted` row is the check's hand.
 - **Eras 0 and 1 are pinned to the pixel.** `tools/eralooks-today.json` holds every draw call
