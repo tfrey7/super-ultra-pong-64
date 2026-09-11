@@ -64,6 +64,27 @@
     ballSpeedStep: 22,      // added on every paddle hit
     ballMaxSpeed: 720,
     maxBounceAngle: Math.PI / 3,  // 60 degrees off the horizontal
+    // The 1972 machine cut its paddle face into eight segments, each with its
+    // own return angle: flat off the middle two, steeper segment by segment out
+    // to the tips. Fractions of maxBounceAngle, top of the paddle first.
+    paddleSegments: [-1, -2 / 3, -1 / 3, 0, 0, 1 / 3, 2 / 3, 1],
+    // Spin. A paddle moving at the moment of contact bends the ball's flight
+    // the way the paddle was going: this many radians a second of turn per
+    // field unit a second of paddle speed, capped, fading as it flies.
+    spinFromPaddle: 0.0042,
+    maxSpin: 1.7,           // radians a second of bend, at the most
+    spinDecay: 0.35,        // the bend fades by e every 1/spinDecay seconds
+    maxFlightAngle: 1.2,    // a bend never turns the ball steeper than ~69 degrees
+    // The smash: a hit while the paddle moves at least this fast (units a
+    // second; the keyboard's full speed counts) leaves with a burst of speed
+    // on top of the rally speed, gone again at the next hit.
+    smashPaddleSpeed: 460,
+    smashBoost: 0.38,       // fraction of the rally speed added
+    smashMaxSpeed: 940,
+    hitStop: 0.03,          // seconds of hit-stop a plain hit suggests to a feel layer
+    smashHitStop: 0.11,     // ...and a smash
+    cpuSpinRead: 0.55,      // how much of the coming bend the computer allows for
+                            // (0 ignores spin, 1 reads it perfectly); see spinBend
     serveDelay: 0.9,        // seconds the ball waits at the centre
     eraChangePause: 1.8,    // ...stretched to this after a point that moved the
                             // machine up an era, so the era change (a 1.5 s
@@ -91,6 +112,7 @@
       y: (height - rules.paddleHeight) / 2,
       w: rules.paddleWidth,
       h: rules.paddleHeight,
+      vy: 0,                // how fast it moved over the last step, units a second
       aimError: 0
     };
   }
@@ -166,8 +188,11 @@
       // side, era, time } -- era is the rung it happened on, and for a point
       // it is the rung that point moved the machine up TO.
       events: [],
+      // spin: radians a second the flight bends, + downward on screen whichever
+      // way the ball is going. burst: the smash's extra speed, taken off again
+      // at the next hit so a rally's speed is its own.
       ball: {
-        x: 0, y: 0, vx: 0, vy: 0,
+        x: 0, y: 0, vx: 0, vy: 0, spin: 0, burst: 0,
         size: rules.ballSize
       },
       left: makePaddle(rules.paddleInset, rules, height),
@@ -193,6 +218,8 @@
     var angle = (state.rng() * 2 - 1) * (r.maxBounceAngle * 0.4);
     b.vx = Math.cos(angle) * r.ballStartSpeed * direction;
     b.vy = Math.sin(angle) * r.ballStartSpeed;
+    b.spin = 0;
+    b.burst = 0;
     state.rally = 0;
     state.serveDelay = r.serveDelay;
     state.lastEvent = 'serve';
@@ -260,9 +287,11 @@
   }
 
   /** Note something that happened this step on state.events (see createGame). */
-  function emit(state, type, side) {
+  function emit(state, type, side, extra) {
     if (!state.events) state.events = [];
-    state.events.push({ type: type, side: side || null, era: state.era || 0, time: state.time });
+    var ev = { type: type, side: side || null, era: state.era || 0, time: state.time };
+    if (extra) for (var k in extra) ev[k] = extra[k];
+    state.events.push(ev);
   }
 
   function rerollCpuAim(state) {
@@ -303,7 +332,7 @@
     // Chasing the ball only once it is on its way over, aiming slightly off,
     // and moving slower than a steep shot travels, is what makes it beatable.
     var target = incoming
-      ? b.y + b.size / 2 + p.aimError
+      ? b.y + b.size / 2 + p.aimError + (r.cpuSpinRead || 0) * spinBend(state, p.x)
       : state.height / 2;
     var speed = incoming ? r.cpuSpeed : r.cpuSpeed * r.cpuHomeSpeed;
     var centre = p.y + p.h / 2;
@@ -330,18 +359,82 @@
     var r = state.rules;
     var hit = (b.y + b.size / 2) - (paddle.y + paddle.h / 2);
     var rel = clamp(hit / (paddle.h / 2), -1, 1);
-    var angle = rel * r.maxBounceAngle;
-    var speed = Math.min(ballSpeed(state) + r.ballSpeedStep, r.ballMaxSpeed);
+    var angle = segmentOf(r, rel).angle;
+    // The rally's own speed climbs a step a hit; a smash's burst rides on top
+    // for one flight and is taken off again here.
+    var base = Math.min(ballSpeed(state) - (b.burst || 0) + r.ballSpeedStep, r.ballMaxSpeed);
+    var pv = paddle.vy || 0;
+    var smash = Math.abs(pv) >= r.smashPaddleSpeed;
+    var burst = smash ? Math.max(0, Math.min(base * r.smashBoost, r.smashMaxSpeed - base)) : 0;
+    var speed = base + burst;
 
     b.vx = Math.cos(angle) * speed * dirX;
     b.vy = Math.sin(angle) * speed;
+    b.spin = clamp(pv * r.spinFromPaddle, -r.maxSpin, r.maxSpin);
+    b.burst = burst;
     // Nudge clear of the paddle so the next frame cannot re-collide.
     b.x = dirX > 0 ? paddle.x + paddle.w : paddle.x - b.size;
 
     state.rally += 1;
     state.lastEvent = 'paddle';
-    emit(state, 'paddle', dirX > 0 ? 'left' : 'right');
+    // A feel layer may read hitStop; the voice reads smash for its heavier hit.
+    emit(state, 'paddle', dirX > 0 ? 'left' : 'right', {
+      smash: smash, spin: b.spin, speed: speed,
+      hitStop: smash ? r.smashHitStop : r.hitStop
+    });
     rerollCpuAim(state);
+  }
+
+  /**
+   * Which of the paddle's eight segments a hit at `rel` (-1 the top tip, +1 the
+   * bottom tip, 0 dead centre) lands on, and the return angle it gives.
+   */
+  function segmentOf(rules, rel) {
+    var table = rules.paddleSegments || RULES.paddleSegments;
+    var n = table.length;
+    var i = Math.min(n - 1, Math.max(0, Math.floor((clamp(rel, -1, 1) + 1) / 2 * n)));
+    return { index: i, angle: table[i] * rules.maxBounceAngle };
+  }
+
+  /**
+   * Spin at work over dt seconds on a moving { vx, vy, spin }: the flight turns
+   * by spin * dt (downward for +spin, whichever way it travels), never past
+   * maxFlightAngle, at the same speed, and the spin fades.
+   */
+  function bend(m, dt, r) {
+    if (!m.spin) return;
+    var speed = Math.sqrt(m.vx * m.vx + m.vy * m.vy);
+    if (speed > 0) {
+      var dir = m.vx < 0 ? -1 : 1;
+      var a = clamp(Math.atan2(m.vy, Math.abs(m.vx)) + m.spin * dt, -r.maxFlightAngle, r.maxFlightAngle);
+      m.vx = Math.cos(a) * speed * dir;
+      m.vy = Math.sin(a) * speed;
+    }
+    m.spin *= Math.exp(-r.spinDecay * dt);
+    if (Math.abs(m.spin) < 0.01) m.spin = 0;
+  }
+
+  /**
+   * The spin hook for whoever moves the computer's paddle: how far, in field
+   * units (+ down), the ball's spin will carry it off its straight line by the
+   * time it reaches column x. Walls are ignored -- it is a read, not a replay.
+   * 0 for a ball with no spin or one heading away from x.
+   */
+  function spinBend(state, x) {
+    var b = state.ball;
+    var r = state.rules;
+    if (!b.spin || !b.vx) return 0;
+    var cx = b.x + b.size / 2;
+    if ((x - cx) * b.vx <= 0) return 0;
+    var m = { vx: b.vx, vy: b.vy, spin: b.spin };
+    var y = 0, straight = 0, dt = 1 / 30;
+    for (var t = 0; t < 4 && (x - cx) * b.vx > 0; t += dt) {
+      straight += b.vy * dt;
+      bend(m, dt, r);
+      cx += m.vx * dt;
+      y += m.vy * dt;
+    }
+    return y - straight;
   }
 
   function bounceOffWalls(state) {
@@ -349,11 +442,13 @@
     if (b.y < 0) {
       b.y = -b.y;
       b.vy = Math.abs(b.vy);
+      b.spin = -(b.spin || 0);   // the mirror image: a bend into the wall bends away
       state.lastEvent = 'wall';
       emit(state, 'wall', 'top');
     } else if (b.y + b.size > state.height) {
       b.y = 2 * (state.height - b.size) - b.y;
       b.vy = -Math.abs(b.vy);
+      b.spin = -(b.spin || 0);
       state.lastEvent = 'wall';
       emit(state, 'wall', 'bottom');
     }
@@ -362,6 +457,7 @@
   /** One small slice of ball movement. Returns true if a point was scored. */
   function moveBall(state, dt) {
     var b = state.ball;
+    if (b.spin) bend(b, dt, state.rules);
     b.x += b.vx * dt;
     b.y += b.vy * dt;
 
@@ -415,8 +511,12 @@
     // happens at all until startGame() is called.
     if (state.phase === 'title') return state;
 
+    var leftWas = state.left.y, rightWas = state.right.y;
     stepPlayer(state, dt, intent);
     stepCpu(state, dt);
+    // How fast each paddle is moving, for spin and the smash.
+    state.left.vy = (state.left.y - leftWas) / dt;
+    state.right.vy = (state.right.y - rightWas) / dt;
 
     if (state.serveDelay > 0) {
       state.serveDelay -= dt;
@@ -446,6 +546,8 @@
     step: step,
     serve: serve,
     ballSpeed: ballSpeed,
+    segmentOf: segmentOf,
+    spinBend: spinBend,
     clamp: clamp
   };
 });
