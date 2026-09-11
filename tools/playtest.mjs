@@ -71,6 +71,10 @@ const REFERENCE = process.argv.includes('--reference');
 // --curve runs only the curved-shot check (item 1208), a few seconds; with
 // --reference it also writes its film strip to the tracked docs/shots/paddle-physics/.
 const CURVE_ONLY = process.argv.includes('--curve');
+// --whole runs only the whole match (section 11, item 1212): attract screen to the
+// thanks screen, everything on, and a contact sheet of its film; about two minutes.
+// With --reference its frames and sheet are copied to the tracked docs/shots/whole-match/.
+const WHOLE_ONLY = process.argv.includes('--whole');
 const ERA_SHOTS = path.join(ROOT, 'docs', 'shots', 'eras');
 // One name per rung, the same as that era's file in src/eras/.
 const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes',
@@ -344,7 +348,8 @@ async function curveShot(s) {
       taken.push(f);
       return f;
     })();
-    if (REFERENCE) {
+    // The whole match swings too; its --reference keeps to its own folder.
+    if (REFERENCE && !WHOLE_ONLY) {
       const dir = path.join(ROOT, 'docs', 'shots', 'paddle-physics');
       mkdirSync(dir, { recursive: true });
       copyFileSync(file, path.join(dir, 'curve-strip.png'));
@@ -719,10 +724,243 @@ async function feelRallies(s, baseUrl) {
   return shots;
 }
 
+/**
+ * 11. One whole match, the way a player meets it, with everything on (item 1212):
+ * the attract screen, a coin, then a climb from the 1972 arcade to the 2005 Xbox
+ * 360 -- a point per rung, as the ladder walk plays it -- with a curved smash off
+ * the player's paddle on the Atari, a real rally on the Genesis, the Nintendo 64
+ * and the 360 (a frame of each mid-rally), match point on the 360 filmed while it
+ * is in slow motion, then the eleventh point's finale: the rewind down to the
+ * arcade, the thanks screen, and the machine back on attract. A recorder in the
+ * page watches every frame -- paddle hits (a smash, a spin), the feel layer's
+ * counter and slow motion, which era's music is playing, the finale's stages and
+ * each era's ordinary frame times -- and the checks read it at the end. Nothing
+ * is taken out: the computer's aim is steadied only for the three rallies, so a
+ * rally long enough to film happens at all. The film is stitched into one
+ * contact sheet, whole-contact-sheet.png.
+ */
+const WHOLE_RALLY_ERAS = [3, 6, 10];
+const WHOLE_SHOTS = path.join(ROOT, 'docs', 'shots', 'whole-match');
+async function wholeMatch(s, baseUrl) {
+  await s.send('Page.navigate', { url: baseUrl });
+  await sleep(900);
+  for (let i = 0; i < 100; i++) {
+    if (await s.eval('!!(window.__pong && document.getElementById("field"))').catch(() => false)) break;
+    await sleep(100);
+  }
+  const geo = await geometry(s);
+  const clip = { x: geo.left, y: geo.top, width: geo.width, height: geo.height };
+  const midX = geo.left + geo.width / 2;
+  const film = [];
+  const eras = await s.eval('window.Pong.ERAS.map((e) => e.year + " " + e.machine)');
+
+  // The attract screen, past the tube's warm-up and with INSERT COIN lit.
+  for (let i = 0; i < 80; i++) {
+    if (await s.eval('!window.__pongCabinet || window.__pongCabinet.stage(window.__pong) === "attract"')) break;
+    await sleep(60);
+  }
+  for (let i = 0; i < 40; i++) {
+    if (await s.eval('window.PongRender.promptLit(window.__pong)')) break;
+    await sleep(60);
+  }
+  const t = await s.eval(`(() => { const g = window.__pong, c = window.__pongCabinet;
+    return { phase: g.phase, stage: c ? c.stage(g) : null, music: window.__pongMusic ? window.__pongMusic.era : 'none' }; })()`);
+  film.push({ label: 'attract: INSERT COIN', file: await s.shot('whole-title', clip) });
+  check('whole match: the machine opens on its attract screen', t.phase === 'title' && t.stage === 'attract',
+    `phase ${t.phase}, cabinet ${t.stage}, music ${t.music}`);
+
+  // The recorder: one rAF callback after the game's own, every frame to the end.
+  await s.eval(`(() => {
+    const R = window.__whole = { hits: 0, smash: 0, curve: 0, maxSpin: 0, music: {}, counter: {}, slow: null,
+      stages: [], rewind: [], frames: {}, titleAgain: false, over: null };
+    let last = null, lastTime = -1;
+    function tick(now) {
+      const g = window.__pong, M = window.__pongMusic, F = window.PongFeel, MA = window.PongMatch;
+      const m = F ? F.moment(g) : null;
+      const inPlay = g.phase === 'playing' || g.phase === 'over';
+      if (inPlay && g.time !== lastTime) {
+        lastTime = g.time;
+        for (const e of g.events || []) if (e.type === 'paddle') {
+          R.hits++; if (e.smash) R.smash++;
+          const sp = Math.abs(e.spin || 0); if (sp > 0.5) R.curve++; R.maxSpin = Math.max(R.maxSpin, sp);
+        }
+      }
+      if (inPlay && M && M.era !== null && M.scheduled > 0) R.music[M.era] = (R.music[M.era] || 0) + 1;
+      if (m && m.counter) R.counter[g.era] = Math.max(R.counter[g.era] || 0, m.counter);
+      if (m && m.slow && !R.slow) R.slow = { era: g.era, score: g.score.left + '-' + g.score.right };
+      if (g.phase === 'over' && !R.over) R.over = { era: g.era, winner: g.winner, score: g.score.left + '-' + g.score.right };
+      const f = MA && MA.finale(g);
+      if (f) {
+        if (R.stages[R.stages.length - 1] !== f.stage) R.stages.push(f.stage);
+        if (f.stage === 'rewind' && R.rewind[R.rewind.length - 1] !== g.era) R.rewind.push(g.era);
+      }
+      if (g.phase === 'title' && R.stages.length) R.titleAgain = true;
+      const ring = window.PongRender.eraChangeMoment(g);
+      const ordinary = !window.__wholeBusy && g.phase === 'playing' && g.serveDelay <= 0 && !(ring && ring.wiping) &&
+        !(m && (m.slow || m.hitStop > 0));
+      if (ordinary && last !== null) (R.frames[g.era] = R.frames[g.era] || []).push(now - last);
+      last = ordinary ? now : null;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    return true; })()`);
+
+  // A coin: a click on the field, the way a player starts it.
+  await s.click(midX, geo.top + geo.height / 2);
+  await sleep(150);
+  const c0 = await state(s);
+  check('whole match: a coin (a click) starts play on the arcade machine',
+    c0.phase === 'playing' && c0.era === 0, `phase ${c0.phase}, era ${c0.era}`);
+
+  const points = (g) => g.score.left + g.score.right;
+  const track = (g) => g.ball.y + 6;
+  let edge = 30;
+  const dodge = (g) => {
+    if (g.ball.x > g.width * 0.35) {
+      const at = g.ball.vx < 0 ? Rally.arrivalY(Pong, g) : null;
+      edge = (at === null ? g.ball.y : at) < g.height / 2 ? g.height - 30 : 30;
+    }
+    return edge;
+  };
+  const toClientY = (y) => geo.top + (y / 600) * geo.height;
+  const rallies = [];
+  let slowShot = null;
+  for (let rung = 0; rung < eras.length; rung++) {
+    let g = await playUntil(s, geo, 9000, track, (x) => x.serveDelay <= 0 || x.phase !== 'playing');
+    if (g.phase !== 'playing') break;
+    const startPts = points(g);
+    if ((rung === 0 || rung === 2) && !(await s.eval('window.__whole.smash'))) {
+      // A smash with spin off the player's own swing (curveShot, section 7), on
+      // the arcade machine and once more on the NES if the first swing's smoothed
+      // paddle speed fell short of a smash. The frames it spends drawing its film
+      // strip in the page are the harness's, so the recorder leaves them out.
+      await s.eval('window.__wholeBusy = true');
+      await curveShot(s);
+      await s.eval('window.__wholeBusy = false');
+      g = await playUntil(s, geo, 1500, track);
+    }
+    if (WHOLE_RALLY_ERAS.includes(rung) && points(g) === startPts) {
+      // The computer's aim steadied, so the rally runs long enough to film.
+      const keep = await s.eval(`(() => { const g = window.__pong; const k = g.rules.cpuMaxAimError;
+        g.rules.cpuMaxAimError = 0; g.right.aimError = 0; return k; })()`);
+      let file = null;
+      const until = Date.now() + 30000;
+      // Filmed from the fifth hit (the counter is up by then on the later machines),
+      // so a rally the computer ends early on a busy machine is still on film.
+      while (Date.now() < until && points(g) === startPts && g.rally < 11) {
+        await s.mouseTo(midX, toClientY(track(g)));
+        if (!file && g.rally >= 5 && g.serveDelay <= 0) {
+          await s.eval('window.__wholeBusy = true');   // a capture stalls the frame it lands in
+          file = await s.shot(`whole-rally-${ERA_NAMES[rung]}`, clip);
+          await s.eval('window.__wholeBusy = false');
+        }
+        await sleep(25);
+        g = await state(s);
+      }
+      await s.eval(`(() => { window.__pong.rules.cpuMaxAimError = ${keep}; return true; })()`);
+      rallies.push({ rung, era: g.era, rally: g.rally, file });
+      if (file) film.push({ label: `mid-rally: ${eras[rung]}`, file });
+    }
+    // This rung's point: a miss past the player on even rungs, the player's own
+    // point on odd ones (the ladder walk's rule), unless one already went in.
+    // A second of ordinary play first, so every era's frame time has a reading.
+    if (points(g) === startPts) g = await playUntil(s, geo, 1000, track, (x) => points(x) !== startPts);
+    if (points(g) === startPts) {
+      const outRight = rung % 2 === 1;
+      if (outRight) await s.eval(`(() => { const g = window.__pong, r = g.right;
+        g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0; })()`);
+      const until = Date.now() + 15000;
+      while (Date.now() < until && points(g) === startPts) {
+        await s.mouseTo(midX, toClientY(outRight ? track(g) : dodge(g)));
+        // Match point on the 360: film the slow motion the moment it holds.
+        if (!slowShot && rung === eras.length - 1 &&
+            await s.eval('!!(window.PongFeel && window.PongFeel.moment(window.__pong).slow)')) {
+          slowShot = await s.shot('whole-matchpoint-slowmo', clip);
+          film.push({ label: 'match point, in slow motion', file: slowShot });
+        }
+        await sleep(20);
+        g = await state(s);
+      }
+    }
+    if (g.phase === 'over') break;
+  }
+
+  const finale = await filmFinale(s, clip, 'whole');
+  const names = ['the result on the 360', 'the rewind, midway', 'thank you for playing'];
+  finale.forEach((file, i) => film.push({ label: names[i] || path.basename(file), file }));
+  const R = await s.eval('window.__whole');
+
+  check('whole match: the player\'s swing hit a smash with spin on it, and the flight curved',
+    R.smash > 0 && R.curve > 0,
+    `${R.hits} paddle hits in the match, ${R.smash} smashes, ${R.curve} with spin over 0.5 rad/s (most ${R.maxSpin.toFixed(2)})`);
+  for (const r of rallies) {
+    check(`whole match: a real rally on the ${eras[r.rung]}, filmed mid-rally`, !!r.file && r.era === r.rung,
+      `${r.rally} hits on era ${r.era}` + (r.file ? '' : '; no frame (the rally ended before hit 5)'));
+  }
+  const counted = Object.keys(R.counter).map(Number);
+  check('whole match: the rally counter came up on the later machines', counted.some((e) => e >= 6),
+    counted.length ? counted.map((e) => `era ${e}: up to ${R.counter[e]}`).join('; ') : 'never shown');
+  const heard = eras.map((_, e) => e).filter((e) => R.music[e]);
+  check('whole match: every era\'s arrangement of the theme started',
+    heard.length === eras.length, `music playing on ${heard.length} of ${eras.length} eras: ${heard.join(', ')}`);
+  check('whole match: eleven points were scored, and the match has a winner',
+    !!R.over && R.over.score.split('-').reduce((a, b) => a + Number(b), 0) === 11 && !!R.over.winner,
+    R.over ? `final score ${R.over.score}, ${R.over.winner} won, on era ${R.over.era}` : 'the match never ended');
+  check('whole match: match point went into slow motion, and was filmed', !!R.slow && !!slowShot,
+    R.slow ? `slow motion at ${R.slow.score} on era ${R.slow.era}` : 'never slowed');
+  check('whole match: the finale rewound to the arcade, thanked the player and went back to attract',
+    R.rewind[R.rewind.length - 1] === 0 && R.stages.includes('thanks') && R.titleAgain,
+    `stages ${R.stages.join(' > ')}; rewind through eras ${R.rewind.join(', ')}; attract again ${R.titleAgain}`);
+  // Ordinary play's frame time on each era, over the whole match. The 2D eras
+  // are held to a 60 Hz frame; the 3D eras' software-drawn cost in this Chrome
+  // is card 1216's (bootstrap, section 8), so they are printed, not judged.
+  const speed = eras.map((_, e) => ({ e, ...intervalStats(R.frames[e] || []) }));
+  const flat = speed.filter((x) => x.e <= 4);
+  check('whole match: ordinary play on the 2D machines holds a 16.7 ms frame',
+    flat.every((x) => x.frames >= 30 && x.mean <= FULL_RATE_MS),
+    flat.map((x) => `era ${x.e}: ${x.frames} frames, mean ${fmtMs(x.mean)}, p95 ${fmtMs(x.p95)}`).join('; ') +
+    ` (line: mean ${FULL_RATE_MS} ms)`);
+  console.log('      the 3D eras, for the record (card 1216): ' + speed.filter((x) => x.e > 4)
+    .map((x) => `era ${x.e}: mean ${fmtMs(x.mean)} over ${x.frames} frames`).join('; '));
+
+  const sheet = await contactSheet(s, film);
+  const all = [...film.map((f) => f.file), sheet];
+  if (REFERENCE) {
+    mkdirSync(WHOLE_SHOTS, { recursive: true });
+    for (const f of all) copyFileSync(f, path.join(WHOLE_SHOTS, path.basename(f)));
+  }
+  return all;
+}
+
+/** The film, four across, each frame labelled, stitched in the page's own canvas. */
+async function contactSheet(s, film) {
+  const { readFileSync } = await import('node:fs');
+  const frames = film.map((f) => ({ label: f.label, src: 'data:image/png;base64,' + readFileSync(f.file).toString('base64') }));
+  const png = await s.eval(`(async () => {
+    const frames = ${JSON.stringify(frames)};
+    const W = 400, H = 300, L = 26, cols = 4, rows = Math.ceil(frames.length / cols);
+    const c = document.createElement('canvas'); c.width = W * cols; c.height = (H + L) * rows;
+    const x = c.getContext('2d'); x.fillStyle = '#111'; x.fillRect(0, 0, c.width, c.height);
+    for (let i = 0; i < frames.length; i++) {
+      const img = new Image(); img.src = frames[i].src; await img.decode();
+      const ox = (i % cols) * W, oy = Math.floor(i / cols) * (H + L);
+      x.drawImage(img, ox + 2, oy + 2, W - 4, H - 4);
+      x.fillStyle = '#eee'; x.font = 'bold 15px monospace'; x.textBaseline = 'middle';
+      x.fillText((i + 1) + '. ' + frames[i].label, ox + 8, oy + H + L / 2);
+    }
+    return c.toDataURL('image/png'); })()`);
+  mkdirSync(SHOTS, { recursive: true });
+  const file = path.join(SHOTS, 'whole-contact-sheet.png');
+  writeFileSync(file, Buffer.from(png.split(',')[1], 'base64'));
+  taken.push(file);
+  return file;
+}
+
 function summarise(shots) {
   console.log('\nscreenshots:');
   for (const f of shots) console.log('  ' + f);
   if (REFERENCE && CURVE_ONLY) console.log('the film strip was also copied to docs/shots/paddle-physics/curve-strip.png (tracked)');
+  else if (REFERENCE && WHOLE_ONLY) console.log(`the whole match's film and contact sheet were also copied to ${WHOLE_SHOTS} (tracked)`);
   else if (REFERENCE) console.log(`the era frames and the mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
@@ -786,6 +1024,7 @@ async function main() {
     if (LADDER_ONLY) return summarise(await walkLadder(s, url.split('?')[0]));
     if (FEEL_ONLY) return summarise(await feelRallies(s, url.split('?')[0]));
     if (MATCH_ONLY) return summarise(await matchEnd(s, url.split('?')[0]));
+    if (WHOLE_ONLY) return summarise(await wholeMatch(s, url.split('?')[0]));
 
     const geo = await geometry(s);
     const g0 = await state(s);
@@ -1030,8 +1269,11 @@ async function main() {
     const ladderShots = await walkLadder(s, url.split('?')[0]);
     // 9. Game feel: a twelve-hit rally on three eras (feelRallies, above).
     const feelShots = await feelRallies(s, url.split('?')[0]);
+    // 11. One whole match, attract screen to thanks screen (wholeMatch, above).
+    const wholeShots = await wholeMatch(s, url.split('?')[0]);
     summarise([titleShot, firstFrameShot,
-      ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots, ...feelShots]);
+      ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots, ...feelShots,
+      ...wholeShots]);
   } catch (e) {
     if (e instanceof ForeignPage) {
       // Not a failed check: no check ran. One line, and a non-zero exit.
