@@ -56,6 +56,8 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 // --scoring runs only the rally and the scoring check (section 6), about ten
 // seconds -- the quick way to ask "can the player still score?" many times.
 const SCORING_ONLY = process.argv.includes('--scoring');
+// --feel runs only the game-feel rallies (section 9), about a minute.
+const FEEL_ONLY = process.argv.includes('--feel');
 // --reference also copies the eleven era frames the walk takes (era0-arcade.png to
 // era10-xbox360.png), and the ten frames it catches mid-change (change-era0-to-era1.png
 // to change-era9-to-era10.png),
@@ -361,6 +363,68 @@ async function walkLadder(s, baseUrl) {
   return [...frames.map((f) => f.file), ...changes.filter((c) => c.file).map((c) => c.file)];
 }
 
+/**
+ * 9. Game feel (src/feel.js, item 1205). A real rally of twelve paddle hits on
+ * each of three eras -- the Genesis (shake and squash, no counter yet), the
+ * Nintendo 64 (the counter arrives) and the Xbox 360 (everything) -- played by
+ * the rules themselves: the computer's aim error is pinned to nothing so it
+ * returns every ball, and the hand follows the ball. A frame is taken on the
+ * tenth hit (its callout, the counter, the trail and the squash all showing),
+ * the counter is read on the twelfth, and the page's own rAF clock is timed
+ * over the rally, hit-stops and all, against the 16.7 ms of a 60 Hz frame.
+ */
+const FEEL_ERAS = [3, 6, 10];
+async function feelRallies(s, baseUrl) {
+  const shots = [];
+  for (const era of FEEL_ERAS) {
+    await s.send('Page.navigate', { url: baseUrl + '?era=' + era });
+    await sleep(900);
+    const geo = await geometry(s);
+    const clip = { x: geo.left, y: geo.top, width: geo.width, height: geo.height };
+    const midX = geo.left + geo.width / 2;
+    const toClientY = (y) => geo.top + (y / 600) * geo.height;
+    await s.key('keyDown', 'Space', ' ', 32);
+    await s.key('keyUp', 'Space', ' ', 32);
+    await sleep(150);
+    await s.eval('(() => { const g = window.__pong; g.rules.cpuMaxAimError = 0; g.right.aimError = 0; return true; })()');
+    const timing = s.eval(`new Promise((done) => {
+      const stamps = []; const t0 = performance.now();
+      function tick(now) {
+        stamps.push(now);
+        const g = window.__pong;
+        if (g.rally < 12 && now - t0 < 40000) requestAnimationFrame(tick); else done(stamps);
+      }
+      requestAnimationFrame(tick);
+    })`);
+    let g = await state(s);
+    let file = null;
+    const deadline = Date.now() + 40000;
+    while (Date.now() < deadline && g.rally < 12 && g.score.left + g.score.right === 0) {
+      await s.mouseTo(midX, toClientY(g.ball.y + 6));
+      if (!file && g.rally >= 10) file = await s.shot(`feel-era${era}-${ERA_NAMES[era].split('-')[1]}`, clip);
+      await sleep(25);
+      g = await state(s);
+    }
+    const m = await s.eval('window.PongFeel.moment(window.__pong)');
+    const stamps = await timing;
+    const d = [];
+    for (let i = 1; i < stamps.length; i++) d.push(stamps[i] - stamps[i - 1]);
+    d.sort((a, b) => a - b);
+    const mean = d.reduce((a, b) => a + b, 0) / Math.max(1, d.length);
+    const p95 = d[Math.floor(d.length * 0.95)] || 0;
+    const counts = m.effects.counter;
+    check(`a twelve-hit rally on the ${ERA_NAMES[era]} ${counts ? 'shows the rally counter' : 'shows no counter yet'}`,
+      g.rally >= 12 && (counts ? m.counter === g.rally : m.counter === 0),
+      `${g.rally} hits, score ${g.score.left}-${g.score.right}, intensity ${m.intensity}, counter reads ` +
+      `${m.counter || 'nothing'}, effects on: ${Object.keys(m.effects).filter((k) => m.effects[k] === true).join(', ') || 'none'}`);
+    check(`and the ${ERA_NAMES[era]} rally plays at 60 frames a second, hit-stops and all`,
+      d.length >= 60 && mean <= 18.5,
+      `${d.length} frames, mean ${mean.toFixed(1)} ms, p95 ${p95.toFixed(1)} ms`);
+    if (file) shots.push(file);
+  }
+  return shots;
+}
+
 function summarise(shots) {
   console.log('\nscreenshots:');
   for (const f of shots) console.log('  ' + f);
@@ -415,6 +479,7 @@ async function main() {
     }
     await sleep(400);
     if (LADDER_ONLY) return summarise(await walkLadder(s, url.split('?')[0]));
+    if (FEEL_ONLY) return summarise(await feelRallies(s, url.split('?')[0]));
 
     const geo = await geometry(s);
     const g0 = await state(s);
@@ -624,8 +689,10 @@ async function main() {
 
     // 8. One whole match up the ladder, era by era.
     const ladderShots = await walkLadder(s, url.split('?')[0]);
+    // 9. Game feel: a twelve-hit rally on three eras (feelRallies, above).
+    const feelShots = await feelRallies(s, url.split('?')[0]);
     summarise([titleShot, firstFrameShot,
-      ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots]);
+      ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots, ...feelShots]);
   } catch (e) {
     // A run that stops part way is a FAIL with its summary, never a quiet exit:
     // Chrome's connection dropping (tools/cdp.mjs) is the case this was built for
