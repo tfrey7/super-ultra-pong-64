@@ -22,6 +22,7 @@ const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > 0
 const ROOT = path.resolve(arg('--root', '.'));
 const OUT = path.resolve(arg('--out', 'frame.png'));
 const PORT = Number(arg('--port', 9471));
+const BALL_Y = Number(arg('--ball-y', 40));   // 40: up in the stand's lines; 330: open court
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') + '?era=1&title=off';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -55,7 +56,7 @@ try {
     g.score.left = 3; g.score.right = 2;
     g.time = 30.1; g.eraChangedAt = 0.001; g.serveDelay = 0;
     g.rally = 0; g.events = [];
-    g.ball.x = 412; g.ball.y = 40; g.ball.vx = 300; g.ball.vy = -120;
+    g.ball.x = 412; g.ball.y = ${BALL_Y}; g.ball.vx = 300; g.ball.vy = -120;
     g.left.y = 220; g.right.y = 300; g.left.vy = 0; g.right.vy = 0;
     return { era: g.era, inks: [window.PongRender.paddleInk(g, 'left'), window.PongRender.paddleInk(g, 'right')] };
   })()` });
