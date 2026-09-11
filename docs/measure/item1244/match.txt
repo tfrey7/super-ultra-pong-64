@@ -1,0 +1,73 @@
+match: 83.2 s rendered in 4.8 s wall; 3242 notes booked, 6189 sources started, 20 cross-fades, 21 arrangements let go of, errors 0
+song position: 577 steps booked, 150 skipped, 4 repeated
+era 0 early (rally 3-6)                 -39.7 dBFS RMS  peak out 0.026 in 0.017  samples >= ceiling 0, past the knee 0
+era 0 late (rally 10-12)                -39.7 dBFS RMS  peak out 0.031 in 0.021  samples >= ceiling 0, past the knee 0
+era 1 early (rally 3-6)                 -33.2 dBFS RMS  peak out 0.112 in 0.076  samples >= ceiling 0, past the knee 0
+era 1 late (rally 10-12)                -33.2 dBFS RMS  peak out 0.101 in 0.068  samples >= ceiling 0, past the knee 0
+era 2 early (rally 3-6)                   -35 dBFS RMS  peak out 0.064 in 0.043  samples >= ceiling 0, past the knee 0
+era 2 late (rally 10-12)                -34.4 dBFS RMS  peak out 0.108 in 0.073  samples >= ceiling 0, past the knee 0
+era 3 early (rally 3-6)                 -20.4 dBFS RMS  peak out 0.221 in 0.149  samples >= ceiling 0, past the knee 0
+era 3 late (rally 10-12)                -20.2 dBFS RMS  peak out 0.223 in 0.15   samples >= ceiling 0, past the knee 0
+era 4 early (rally 3-6)                 -34.8 dBFS RMS  peak out 0.081 in 0.055  samples >= ceiling 0, past the knee 0
+era 4 late (rally 10-12)                -32.1 dBFS RMS  peak out 0.131 in 0.089  samples >= ceiling 0, past the knee 0
+era 5 early (rally 3-6)                 -35.2 dBFS RMS  peak out 0.098 in 0.066  samples >= ceiling 0, past the knee 0
+era 5 late (rally 10-12)                  -33 dBFS RMS  peak out 0.15  in 0.101  samples >= ceiling 0, past the knee 0
+era 6 early (rally 3-6)                 -38.1 dBFS RMS  peak out 0.062 in 0.042  samples >= ceiling 0, past the knee 0
+era 6 late (rally 10-12)                -35.4 dBFS RMS  peak out 0.081 in 0.055  samples >= ceiling 0, past the knee 0
+era 7 early (rally 3-6)                 -34.3 dBFS RMS  peak out 0.142 in 0.096  samples >= ceiling 0, past the knee 0
+era 7 late (rally 10-12)                -33.5 dBFS RMS  peak out 0.168 in 0.113  samples >= ceiling 0, past the knee 0
+era 8 early (rally 3-6)                 -28.9 dBFS RMS  peak out 0.184 in 0.13   samples >= ceiling 0, past the knee 0
+era 8 late (rally 10-12)                -23.8 dBFS RMS  peak out 0.19  in 0.128  samples >= ceiling 0, past the knee 0
+era 9 early (rally 3-6)                 -25.5 dBFS RMS  peak out 0.172 in 0.116  samples >= ceiling 0, past the knee 0
+era 9 late (rally 10-12)                -23.4 dBFS RMS  peak out 0.186 in 0.126  samples >= ceiling 0, past the knee 0
+era 10 early (rally 3-6)                -24.5 dBFS RMS  peak out 0.335 in 0.226  samples >= ceiling 0, past the knee 0
+era 10 late (rally 10-12)               -24.3 dBFS RMS  peak out 0.306 in 0.207  samples >= ceiling 0, past the knee 0
+announce (360, intensity 1)             -24.2 dBFS RMS  peak out 0.356 in 0.24   samples >= ceiling 0, past the knee 0
+rewind rung 10 to 9                     -23.6 dBFS RMS  peak out 0.31  in 0.209  samples >= ceiling 0, past the knee 0
+rewind rung 9 to 8                      -27.3 dBFS RMS  peak out 0.176 in 0.119  samples >= ceiling 0, past the knee 0
+rewind rung 8 to 7                      -31.6 dBFS RMS  peak out 0.129 in 0.087  samples >= ceiling 0, past the knee 0
+rewind rung 7 to 6                      -34.8 dBFS RMS  peak out 0.111 in 0.075  samples >= ceiling 0, past the knee 0
+rewind rung 6 to 5                      -40.5 dBFS RMS  peak out 0.039 in 0.026  samples >= ceiling 0, past the knee 0
+rewind rung 5 to 4                        -38 dBFS RMS  peak out 0.082 in 0.055  samples >= ceiling 0, past the knee 0
+rewind rung 4 to 3                      -34.7 dBFS RMS  peak out 0.111 in 0.075  samples >= ceiling 0, past the knee 0
+rewind rung 3 to 2                      -30.5 dBFS RMS  peak out 0.08  in 0.054  samples >= ceiling 0, past the knee 0
+rewind rung 2 to 1                      -33.5 dBFS RMS  peak out 0.078 in 0.053  samples >= ceiling 0, past the knee 0
+rewind rung 1 to 0                      -38.6 dBFS RMS  peak out 0.049 in 0.033  samples >= ceiling 0, past the knee 0
+thanks (era 0, intensity 1)             -39.7 dBFS RMS  peak out 0.032 in 0.022  samples >= ceiling 0, past the knee 0
+title tail (after the fade is let go)    -200 dBFS RMS  peak out 0     in 0      samples >= ceiling 0, past the knee 0
+whole match                             -27.9 dBFS RMS  peak out 0.356 in 0.24   samples >= ceiling 0, past the knee 0
+switch null -> 0  at 0.05 s (playing), bar 0 step 0, 4 drones started
+switch    0 -> 1  at 6.00 s (playing), bar 3 step 10, 2 drones started; fade starts 46 ms from a beat (phase 0.89), ends 130 ms from a beat (phase 0.29); step grid jump 450.4 ms
+switch    1 -> 2  at 12.05 s (playing), bar 7 step 3, 0 drones started; fade starts 75 ms from a beat (phase 0.18), ends 177 ms from a beat (phase 0.6); step grid jump 28.6 ms
+switch    2 -> 3  at 18.00 s (playing), bar 2 step 11, 1 drones started; fade starts 101 ms from a beat (phase 0.25), ends 156 ms from a beat (phase 0.65); step grid jump 197 ms
+switch    3 -> 4  at 24.05 s (playing), bar 6 step 4, 0 drones started; fade starts 182 ms from a beat (phase 0.54), ends 30 ms from a beat (phase 0.93); step grid jump 23.8 ms
+switch    4 -> 5  at 30.00 s (playing), bar 1 step 12, 2 drones started; fade starts 0 ms from a beat (phase 0), ends 13 ms from a beat (phase 0.97); step grid jump 191.3 ms
+switch    5 -> 6  at 36.00 s (playing), bar 5 step 5, 0 drones started; fade starts 100 ms from a beat (phase 0.75), ends 64 ms from a beat (phase 0.15); step grid jump 27.6 ms
+switch    6 -> 7  at 42.05 s (playing), bar 0 step 14, 1 drones started; fade starts 15 ms from a beat (phase 0.04), ends 191 ms from a beat (phase 0.43); step grid jump 212.3 ms
+switch    7 -> 8  at 48.00 s (playing), bar 4 step 6, 5 drones started; fade starts 35 ms from a beat (phase 0.08), ends 209 ms from a beat (phase 0.47); step grid jump 192.4 ms
+switch    8 -> 9  at 54.05 s (playing), bar 7 step 15, 2 drones started; fade starts 146 ms from a beat (phase 0.36), ends 109 ms from a beat (phase 0.75); step grid jump 166.1 ms
+switch    9 -> 10 at 60.00 s (playing), bar 3 step 8, 0 drones started; fade starts 161 ms from a beat (phase 0.41), ends 83 ms from a beat (phase 0.81); step grid jump 0 ms
+switch   10 -> 9  at 69.25 s (over), bar 1 step 1, 2 drones started; fade starts 97 ms from a beat (phase 0.75), ends 187 ms from a beat (phase 0.53); step grid jump 196.7 ms
+switch    9 -> 8  at 69.75 s (over), bar 1 step 6, 5 drones started; fade starts 10 ms from a beat (phase 0.03), ends 79 ms from a beat (phase 0.8); step grid jump 188.3 ms
+switch    8 -> 7  at 70.25 s (over), bar 1 step 11, 1 drones started; fade starts 112 ms from a beat (phase 0.28), ends 23 ms from a beat (phase 0.06); step grid jump 185.8 ms
+switch    7 -> 6  at 70.75 s (over), bar 2 step 0, 0 drones started; fade starts 183 ms from a beat (phase 0.54), ends 125 ms from a beat (phase 0.31); step grid jump 0 ms
+switch    6 -> 5  at 71.25 s (over), bar 2 step 5, 2 drones started; fade starts 81 ms from a beat (phase 0.8), ends 171 ms from a beat (phase 0.57); step grid jump 180.6 ms
+switch    5 -> 4  at 71.75 s (over), bar 2 step 10, 0 drones started; fade starts 21 ms from a beat (phase 0.05), ends 69 ms from a beat (phase 0.83); step grid jump 0 ms
+switch    4 -> 3  at 72.25 s (over), bar 2 step 15, 1 drones started; fade starts 122 ms from a beat (phase 0.31), ends 33 ms from a beat (phase 0.08); step grid jump 175.5 ms
+switch    3 -> 2  at 72.75 s (over), bar 3 step 4, 0 drones started; fade starts 173 ms from a beat (phase 0.56), ends 135 ms from a beat (phase 0.34); step grid jump 0 ms
+switch    2 -> 1  at 73.25 s (over), bar 3 step 9, 2 drones started; fade starts 71 ms from a beat (phase 0.82), ends 160 ms from a beat (phase 0.6); step grid jump 170.4 ms
+switch    1 -> 0  at 73.75 s (over), bar 3 step 14, 4 drones started; fade starts 37 ms from a beat (phase 0.09), ends 53 ms from a beat (phase 0.87); step grid jump 162 ms
+switch    0 -> null at 80.20 s (title), bar 3 step 14, 0 drones started; fade starts 70 ms from a beat (phase 0.65), ends ? ms from a beat (phase ?); step grid jump undefined ms
+check at 1.75 s (era 0): 4 sources with no stop yet, 0 let go of / 0 cross-fades
+check at 7.75 s (era 1): 2 sources with no stop yet, 1 let go of / 1 cross-fades
+check at 13.75 s (era 2): 0 sources with no stop yet, 2 let go of / 2 cross-fades
+check at 19.75 s (era 3): 1 sources with no stop yet, 3 let go of / 3 cross-fades
+check at 25.75 s (era 4): 0 sources with no stop yet, 4 let go of / 4 cross-fades
+check at 31.75 s (era 5): 2 sources with no stop yet, 5 let go of / 5 cross-fades
+check at 37.75 s (era 6): 0 sources with no stop yet, 6 let go of / 6 cross-fades
+check at 43.75 s (era 7): 1 sources with no stop yet, 7 let go of / 7 cross-fades
+check at 49.75 s (era 8): 5 sources with no stop yet, 8 let go of / 8 cross-fades
+check at 55.75 s (era 9): 2 sources with no stop yet, 9 let go of / 9 cross-fades
+check at 61.75 s (era 10): 0 sources with no stop yet, 10 let go of / 10 cross-fades
+check at 83.20 s (era title): 0 sources with no stop yet, 21 let go of / 20 cross-fades
+open sources at the end of the thanks screen: 4
