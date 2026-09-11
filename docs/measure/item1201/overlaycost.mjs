@@ -27,7 +27,7 @@
 import { writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import { CdpConnection } from '../../../tools/cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -63,7 +63,7 @@ async function measure(setup, gpu, overlay) {
     '--window-size=1000,760', '--remote-debugging-port=' + PORT, '--no-first-run',
     '--no-default-browser-check', 'about:blank'];
   if (!gpu) flags.unshift('--disable-gpu');
-  const chrome = launchChrome(CHROME, flags, { name: 'overlaycost' });
+  const chrome = await launchChrome(CHROME, flags, { name: 'overlaycost' }).catch(refusePortTaken);
   const rows = [];
   let ws;
   try {
