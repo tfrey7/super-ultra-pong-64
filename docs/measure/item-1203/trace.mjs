@@ -16,11 +16,12 @@
  *        [--control]    same schedule, no point forced
  *
  * Writes, beside this file: <label>.json (every leg's breakdown), and
- * <label>-leg<N>.trace.json -- the trace cut to 400 ms either side of the long
+ * <label>-leg<N>.trace.json.gz -- the trace cut to 150 ms either side of the long
  * frame (or of the ring's first frame when there is none), which opens as-is in
  * DevTools' Performance panel (Load profile).
  */
 import { writeFileSync, existsSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import { launchChrome } from '../../../tools/chrome.mjs';
@@ -172,10 +173,10 @@ function analyse(events, n) {
   }
 
   // The trace, cut to 400 ms either side of the window, for DevTools.
-  const lo = win.from - 400000, hi = win.to + 400000;
+  const lo = win.from - 150000, hi = win.to + 150000;
   const cut = events.filter((e) => e.ph === 'M' || (e.ts >= lo && e.ts <= hi) || (e.ph === 'X' && e.ts < hi && e.ts + (e.dur || 0) > lo));
-  const file = `${LABEL}-leg${n}.trace.json`;
-  writeFileSync(path.join(HERE, file), JSON.stringify({ traceEvents: cut }));
+  const file = `${LABEL}-leg${n}.trace.json.gz`;
+  writeFileSync(path.join(HERE, file), gzipSync(JSON.stringify({ traceEvents: cut })));
 
   const rel = (ts) => (ts === null || ts === undefined ? null : +((ts - win.from) / 1000).toFixed(1));
   return {
