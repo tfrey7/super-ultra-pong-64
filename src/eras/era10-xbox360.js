@@ -47,7 +47,7 @@
   // END pixellab embeds
 
   // The bible's measured camera (section 12): a long lens, nothing moves.
-  var CAMERA = { tilt: 32, height: 1600, fov: 20.5, screenY: 312 };
+  var CAMERA = { tilt: 36, height: 1925, fov: 19.5, screenY: 399 };   // the ladder camera (item 1266)
 
   var C = {
     umber: '#3b342b', mud: '#5a5145', concrete: '#7d776c', ash: '#a8a296',

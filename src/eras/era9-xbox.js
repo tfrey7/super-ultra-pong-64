@@ -29,7 +29,7 @@
   var R = root.PongRender;
 
   // The bible's measured camera (section 12): nothing moves it.
-  var CAMERA = { tilt: 27, height: 1000, fov: 35, screenY: 303 };
+  var CAMERA = { tilt: 29, height: 1300, fov: 32, screenY: 387 };   // the ladder camera (item 1266)
 
   var C = {
     black: '#050605', gunmetal: '#2a2f2b', steel: '#5b635d', steelLight: '#aeb8b0',

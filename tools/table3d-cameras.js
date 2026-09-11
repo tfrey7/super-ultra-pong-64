@@ -164,10 +164,12 @@ function solvePlayers(e) {
   return best && { tilt: best.tilt, height: best.height, fov: best.fov, screenY: best.screenY };
 }
 
-// The six eras' cameras exactly as docs/ERAS.md gives them. `motion` lists the
-// extremes of anything that moves the camera during play or the arrival
-// flourish; every one of them must pass R3 too.
-const ERAS = [
+// The six eras' cameras before the realism ladder (docs/ERAS.md section 12 as
+// items 1146 to 1157 measured them). Kept as data: `--players` solves the
+// ladder cameras from these, and reports each arena's share before and after.
+// `motion` lists the extremes of anything that moves the camera during play or
+// the arrival flourish; every one of them must pass R3 too.
+const BEFORE = [
   { era: 5, name: 'Sony PlayStation', tilt: 28, height: 1150, fov: 30, screenY: 306,
     motion: [{ height: 1156, panX: 1.5 }, { height: 1144, panX: -1.5 }, { height: 1190 }] },
   { era: 6, name: 'Nintendo 64', tilt: 26, height: 900, fov: 39.5, screenY: 301,
@@ -180,6 +182,21 @@ const ERAS = [
   { era: 9, name: 'Xbox', tilt: 27, height: 1000, fov: 35, screenY: 303, motion: [] },
   { era: 10, name: 'Xbox 360', tilt: 32, height: 1600, fov: 20.5, screenY: 312, motion: [] }
 ];
+
+// The cameras the eras draw with since item 1266: the realism ladder's camera
+// (docs/ART.md section 8), each solved from its era's camera above by
+// solvePlayers() -- the same tilt and lens as near as they go, pulled back until
+// two 250-unit players stand whole behind the table ends, R3 still passing in
+// every pose. Each era file's CAMERA is its row here; a test holds them equal.
+const LADDER = {
+  5: { tilt: 30, height: 1550, fov: 26.5, screenY: 388 },
+  6: { tilt: 24, height: 1250, fov: 35, screenY: 382 },
+  7: { tilt: 26, height: 2000, fov: 21, screenY: 383 },
+  8: { tilt: 26, height: 1900, fov: 23.5, screenY: 333 },
+  9: { tilt: 29, height: 1300, fov: 32, screenY: 387 },
+  10: { tilt: 36, height: 1925, fov: 19.5, screenY: 399 }
+};
+const ERAS = BEFORE.map((e) => rebase(e, LADDER[e.era]));
 
 /** Every pose an era's camera takes: at rest, then each motion extreme. */
 function poses(e) {
@@ -219,12 +236,13 @@ if (require.main === module) {
     process.exit(0);
   }
   if (process.argv.includes('--players')) {
-    for (const e of ERAS) {
+    console.log('era | solved from the old camera | arena share before -> after | players whole before -> after');
+    for (const e of BEFORE) {
       const s = solvePlayers(e);
-      const before = { p: players(e), a: arenaShare(e) };
-      const after = s && rebase(e, s);
-      console.log(`${e.era} ${e.name}: ${JSON.stringify(s)}\n   before ${JSON.stringify(before)}` +
-        (after ? `\n   after  ${JSON.stringify({ p: players(after), a: arenaShare(after), m: measure(after) })}` : ''));
+      const after = ERAS.find((x) => x.era === e.era);
+      console.log(`${String(e.era).padStart(2)} ${e.name.padEnd(17)} solved ${JSON.stringify(s)} (in use ${JSON.stringify(LADDER[e.era])}) | ` +
+        `arena ${arenaShare(e).share} -> ${arenaShare(after).share} (rows above the far edge ${arenaShare(e).rowsAboveFarEdge} -> ${arenaShare(after).rowsAboveFarEdge}) | ` +
+        `players ${players(e).whole} -> ${players(after).whole} ${JSON.stringify(players(after))} | ${JSON.stringify(measure(after))}`);
     }
     process.exit(0);
   }
@@ -254,5 +272,5 @@ if (require.main === module) {
   }
 }
 
-module.exports = { camera, project, measure, readable, poses, fit, ERAS, W, H,
+module.exports = { camera, project, measure, readable, poses, fit, ERAS, BEFORE, LADDER, W, H,
   PLAYER, playerBox, players, arenaShare, solvePlayers, rebase };

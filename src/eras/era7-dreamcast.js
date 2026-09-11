@@ -30,7 +30,7 @@
   var RAD = Math.PI / 180;
 
   // The bible's camera: the flattest, longest lens of the six, outlined in ink.
-  var CAMERA = { tilt: 22, height: 1500, fov: 23.5, screenY: 314, outline: { width: 3, colour: '#111111' } };
+  var CAMERA = { tilt: 26, height: 2000, fov: 21, screenY: 383, outline: { width: 3, colour: '#111111' } };
 
   var PALETTE = {
     ink: '#111111', paper: '#ffffff', orange: '#ee5a24', blue: '#1e73d8',
