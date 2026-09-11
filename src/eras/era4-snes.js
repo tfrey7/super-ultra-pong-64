@@ -352,6 +352,12 @@
   var HELD_CARD = { box: INVISIBLE, border: null, inner: null, year: INVISIBLE,
                     name: INVISIBLE, label: INVISIBLE, dots: null };
 
+  // The look the engine actually reads -- this file's entry merged over era
+  // 1's (`like: 1`) and cached by the renderer -- so a held-back card is held
+  // where the card style is looked up. A rebuilt cache starts from the
+  // registered look, which never holds a card, so the card can only reappear.
+  function liveLook() { return R.eraLook(4); }
+
   function smooth(a, b, x) {
     if (x <= a) return 0;
     if (x >= b) return 1;
@@ -500,10 +506,10 @@
     fx.setTransform(1, 0, 0, 1, 0, 0);
     fx.clearRect(0, 0, W, H);
     // The same moment just after the ring: the plain frame with the engine's card on it.
-    var held = LOOK.card;
-    LOOK.card = null;
+    var held = liveLook().card;
+    liveLook().card = null;
     R.drawEraFrame(fx, Object.assign({}, state, { time: (state.eraChangedAt || 0) + duration + 0.001 }), {});
-    LOOK.card = held;
+    liveLook().card = held;
     var cx = cardImg.getContext('2d');
     cx.setTransform(1, 0, 0, 1, 0, 0);
     cx.clearRect(0, 0, cardImg.width, cardImg.height);
@@ -551,10 +557,10 @@
 
     if (info.dim) return;          // the rally behind the title has no card
     var cp = cardPose(u, spin);
-    LOOK.card = cp.landed ? null : HELD_CARD;
+    liveLook().card = cp.landed ? null : HELD_CARD;
     if (!cp.shown) return;
     var img = croppedCard(state, W, H, toEra, info.duration);
-    if (!img) { LOOK.card = null; return; }
+    if (!img) { liveLook().card = null; return; }
     ctx.save();
     ctx.globalAlpha = cp.alpha;
     ctx.translate(W / 2, H / 2);
@@ -567,8 +573,8 @@
   function draw(ctx, state, opts, api) {
     var P = api || R;
     // Past the ring (or a frame that skipped over its end), the engine's card is never held back.
-    if (LOOK.card === HELD_CARD && !(state.time - (state.eraChangedAt || 0) < ((R.ERA_CHANGE && R.ERA_CHANGE.wipe) || 1.5))) {
-      LOOK.card = null;
+    if (liveLook().card === HELD_CARD && !(state.time - (state.eraChangedAt || 0) < ((R.ERA_CHANGE && R.ERA_CHANGE.wipe) || 1.5))) {
+      liveLook().card = null;
     }
     if (opts && opts.ink) return P.drawBase(ctx, state, opts);
 

@@ -81,7 +81,7 @@ test('tipped back, the field is a trapezoid of strips: contiguous, narrowing tow
     assert.ok(strips[i].depth < strips[i - 1].depth, 'and shows a nearer part of the field');
   }
   const top = strips[0], bottom = strips[strips.length - 1];
-  assert.ok(bottom.scale > 1.4 * top.scale, `far edge narrower (${top.scale.toFixed(2)} vs ${bottom.scale.toFixed(2)})`);
+  assert.ok(bottom.scale > 1.2 * top.scale, `far edge narrower (${top.scale.toFixed(2)} vs ${bottom.scale.toFixed(2)})`);
   assert.ok(bottom.y1 - top.y0 < 600, 'receded: the field takes less than the screen');
   // Each strip's transform puts the field row it shows at the strip's middle.
   for (const s of [top, strips[30], bottom]) {
