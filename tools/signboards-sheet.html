@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Era signboards: the contact sheet</title>
 <!--
-  The five signboards side by side (item 1183), each drawn by the real
+  The signboards side by side (items 1183, 1184), each drawn by the real
   src/signboards.js over its own era's field, as the ring leaves them:
   on the left at the page's full 800 x 600, on the right the same card
   squeezed down to the machine's own screen and blown back up block for
@@ -13,6 +13,8 @@
     py -3.10 "G:/Claude Stuff/fleet-console/scripts/shot.py"
        "file:///<repo>/tools/signboards-sheet.html" docs/shots/signboards/contact-sheet.png
   ?t=0.6 draws them at another moment (the blinking words go off).
+  ?from=5&to=10 draws the six 3D machines' instead of the first five:
+       "file:///<repo>/tools/signboards-sheet.html?from=5&to=10" docs/shots/signboards/contact-sheet-3d.png
 -->
 <style>
   body { margin: 0; padding: 16px; background: #15151c; color: #d8d8e0;
@@ -24,7 +26,7 @@
 </style>
 </head>
 <body>
-  <h1>Era signboards, 1972 to 1991: at full size, and at the machine's own resolution</h1>
+  <h1 id="title">Era signboards, 1972 to 1991: at full size, and at the machine's own resolution</h1>
   <div id="sheet"></div>
   <script src="../src/game.js"></script>
   <script src="../src/sprites.js"></script>
@@ -35,6 +37,12 @@
   <script src="../src/eras/era2-nes.js"></script>
   <script src="../src/eras/era3-genesis.js"></script>
   <script src="../src/eras/era4-snes.js"></script>
+  <script src="../src/eras/era5-playstation.js"></script>
+  <script src="../src/eras/era6-n64.js"></script>
+  <script src="../src/eras/era7-dreamcast.js"></script>
+  <script src="../src/eras/era8-ps2.js"></script>
+  <script src="../src/eras/era9-xbox.js"></script>
+  <script src="../src/eras/era10-xbox360.js"></script>
   <script src="../src/signboards.js"></script>
   <script src="../src/erachange.js"></script>
   <script>
@@ -43,7 +51,13 @@
       var q = /[?&]t=([0-9.]+)/.exec(location.search);
       var t = q ? Number(q[1]) : 0.1;
       var sheet = document.getElementById('sheet');
-      for (var era = 0; era <= 4; era++) {
+      // ?from=5&to=10 draws the 3D machines' six (item 1184).
+      var qf = /[?&]from=([0-9]+)/.exec(location.search), qt = /[?&]to=([0-9]+)/.exec(location.search);
+      var from = qf ? Number(qf[1]) : 0, to = qt ? Number(qt[1]) : 4;
+      var years = { 0: 1972, 4: 1991, 5: 1994, 10: 2005 };
+      if (from !== 0 || to !== 4) document.getElementById('title').textContent =
+        'Era signboards, ' + (years[from] || 'era ' + from) + ' to ' + (years[to] || 'era ' + to) + ': at full size, and at the machine\'s own resolution';
+      for (var era = from; era <= to; era++) {
         var g = Pong.createGame({ rng: function () { return 0.3; }, phase: 'playing', era: era });
         var full = document.createElement('canvas');
         full.width = g.width; full.height = g.height;

@@ -467,14 +467,14 @@
     nameLine(ctx, k, k.nameTop, k.ink('year'), k.ink('name'));
 
     var four = (s.wipe && s.wipe.length >= 4) ? s.wipe : PS_FOUR;
-    var sw = Math.min(k.textW, 360), seg = sw / 4, sy = r.y + r.h - 44;
+    var sw = Math.min(k.textW, 360), seg = sw / 4, sy = r.y + 108;
     for (var i = 0; i < 4; i++) {
       ctx.fillStyle = four[i];
       ctx.fillRect(k.mid - sw / 2 + i * seg, sy, seg - 4, 6);
     }
     if (blinkOn(k.t, 1)) {
       ctx.fillStyle = k.ink('label');
-      centred(ctx, k, 'PRESS START', sy + 14, { h: 3 });
+      centred(ctx, k, 'PRESS START', sy + 18);
     }
   }
 
@@ -665,15 +665,16 @@
     ctx.fillStyle = 'rgba(124,211,32,0.07)';
     for (var y = r.y + f + 2; y < r.y + r.h - f; y += 4) ctx.fillRect(r.x + f, y, r.w - 2 * f, 1);
 
-    var tw = 12, th = 64, ty = r.y + r.h / 2 - th / 2;                 // the gel tabs
-    ctx.fillStyle = green;
-    rounded(ctx, r.x + f + 10, ty, tw, th, tw / 2);
-    ctx.fill();
-    rounded(ctx, r.x + r.w - f - 10 - tw, ty, tw, th, tw / 2);
-    ctx.fill();
-
     ctx.fillStyle = k.ink('label');
-    centred(ctx, k, 'ERA ' + k.era, r.y + 24);
+    var label = 'ERA ' + k.era;
+    var left = centred(ctx, k, label, r.y + 24);
+    var right = left + textWidth(label, CARD.labelCell, CARD.labelGap);
+    var tw = 44, th = 10, ty = r.y + 29;                               // gel pills either side of it
+    ctx.fillStyle = green;
+    rounded(ctx, left - 16 - tw, ty, tw, th, th / 2);
+    ctx.fill();
+    rounded(ctx, right + 16, ty, tw, th, th / 2);
+    ctx.fill();
 
     k.nameTop = r.y + 62;
     glow(ctx, 'rgba(124,211,32,0.9)', 12);
@@ -681,7 +682,10 @@
     ctx.restore();
 
     ctx.fillStyle = green;                                             // a status bar under the name
-    ctx.fillRect(k.mid - 80, r.y + r.h - 36, 160 * Math.min(1, (k.t || 1) / 0.8), 4);
+    ctx.fillStyle = 'rgba(124,211,32,0.25)';
+    ctx.fillRect(k.mid - 80, r.y + r.h - 36, 160, 4);
+    ctx.fillStyle = green;
+    ctx.fillRect(k.mid - 80, r.y + r.h - 36, 160 * Math.min(1, 0.3 + (k.t || 1) / 0.8), 4);
     ctx.restore();
   }
 
