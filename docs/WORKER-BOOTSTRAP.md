@@ -114,7 +114,9 @@ frames and ten change frames into the tracked `docs/shots/eras/`. To look at one
 `index.html?era=N` (N is 0 to 10) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
 plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
-it cannot find a browser, and `--port <n>` if 9333 is busy; every launch gets a fresh Chrome profile
+it cannot find a browser, and `--port <n>` if 9333 is busy -- the playtest refuses a port that is
+already listening, in one line with exit code 2, and never drives a page it did not open (item 1215);
+every launch gets a fresh Chrome profile
 that is deleted when Chrome exits, so two playtests on two ports can run at once. Use it for any change to
 `src/render.js`, `src/input.js`, `src/main.js` or `index.html`; `node --test` alone is enough for a
 change confined to the rules.
@@ -248,6 +250,14 @@ his emulator — never touch either.**
   in a `finally`. The playtest and every capture script under `docs/` already do. What it cannot
   cover is the script itself being killed outright (Task Manager, `taskkill /F`): nothing runs
   then, and that one folder stays.
+- **Two playtests on one `--port` used to drive each other's game** (item 1215). A Chrome that
+  cannot bind its debugging port starts anyway, with none, and the harness then attached to the
+  Chrome that held the number: on 2026-09-10 item 1181's run on 9341 spent a minute clicking item
+  1205's page and reported 16/21 checks that measured the wrong game. Since item 1215 the playtest
+  checks the port before it launches anything -- `playtest: port N is already in use ... pick another
+  with --port <n>`, exit 2 -- and after launch attaches only to its own checkout's `index.html`. On
+  that line, pick another port and run again; it is not a failed check. A capture script of your own
+  should do the same: `portTakenWhy(port)` and `pickOwnPage(targets, url)` in `tools/chrome.mjs`.
 - **Proof paths in a report must survive the landing.** The integrator deletes your worktree, so
   a picture cited at `G:/Claude Stuff/super-ultra-pong-64-<name>/...` is a dead link the moment the
   branch lands (item 1138). Cite the path the file will have in the main checkout.

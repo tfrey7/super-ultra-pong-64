@@ -21,7 +21,7 @@ import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { launchChrome } from './chrome.mjs';
+import { launchChrome, portTakenWhy, portTakenLine, pickOwnPage } from './chrome.mjs';
 import { CdpConnection, DroppedConnection } from './cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -115,13 +115,24 @@ class Session extends CdpConnection {
   }
 }
 
-async function targetUrl() {
+/** The port's endpoint is not our Chrome's: stop before touching anything on it (item 1215). */
+class ForeignPage extends Error {}
+
+// Attach only to the page this checkout asked for. The port was free a moment ago
+// (main() checks), but another worker's Chrome can still take it in between, and
+// then our Chrome runs with no port at all while the endpoint answers with theirs.
+async function targetUrl(asked) {
   for (let i = 0; i < 60; i++) {
+    let list = null;
     try {
-      const list = await fetch(`http://127.0.0.1:${PORT}/json/list`).then((r) => r.json());
-      const page = list.find((t) => t.type === 'page' && t.webSocketDebuggerUrl);
-      if (page) return page.webSocketDebuggerUrl;
+      list = await fetch(`http://127.0.0.1:${PORT}/json/list`).then((r) => r.json());
     } catch { /* chrome is still coming up */ }
+    const { own, foreign } = pickOwnPage(list, asked);
+    if (own) return own.webSocketDebuggerUrl;
+    if (foreign) {
+      throw new ForeignPage(`playtest: port ${PORT} is serving a page that is not this checkout's ` +
+        `(${foreign.url}), so another Chrome holds it; pick another with --port <n> -- nothing on it was touched`);
+    }
     await sleep(250);
   }
   throw new Error('Chrome never opened a debuggable page');
@@ -382,6 +393,15 @@ function summarise(shots) {
 }
 
 async function main() {
+  // Refuse a port that is already listening, before Chrome is even started: a
+  // Chrome that cannot bind it runs on without one, and the endpoint on that
+  // number belongs to whoever holds it (item 1215).
+  const taken = await portTakenWhy(PORT);
+  if (taken) {
+    console.error(portTakenLine(PORT, taken));
+    process.exitCode = 2;
+    return;
+  }
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
   const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') +
     // ?era=N alone opens straight into play (item 1207); title=on keeps the
@@ -408,7 +428,7 @@ async function main() {
 
   let ws;
   try {
-    ws = new WebSocket(await targetUrl());
+    ws = new WebSocket(await targetUrl(url));
     await new Promise((res, rej) => {
       ws.addEventListener('open', res);
       ws.addEventListener('error', rej);
@@ -666,6 +686,12 @@ async function main() {
     summarise([titleShot, firstFrameShot,
       ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots]);
   } catch (e) {
+    if (e instanceof ForeignPage) {
+      // Not a failed check: no check ran. One line, and a non-zero exit.
+      console.error(e.message);
+      process.exitCode = 2;
+      return;
+    }
     // A run that stops part way is a FAIL with its summary, never a quiet exit:
     // Chrome's connection dropping (tools/cdp.mjs) is the case this was built for
     // (item 1182). The finally below still closes Chrome and deletes its profile.
