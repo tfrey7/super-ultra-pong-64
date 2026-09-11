@@ -140,8 +140,10 @@ you ever add one of those things, this is the file that has to say so.
 - **Playtest screenshots.** The harness rewrites `docs/shots/playtest/` on every run, so that
   directory is gitignored and a playtest leaves `git status --short` empty — there is nothing to
   check afterwards and nothing to restore. The screenshots that *are* tracked are the reference
-  frames a reader opens: `docs/shots/eras/era0-arcade.png` to `era4-snes.png`, one per rung, and
-  the older `docs/shots/bootstrap/era-zero.png`. If you deliberately change how an era looks,
+  frames a reader opens: `docs/shots/eras/era0-arcade.png` to `era4-snes.png`, one per rung,
+  `change-era0-to-era1.png` to `change-era3-to-era4.png` beside them, one per era change caught
+  mid-ring, and the older `docs/shots/bootstrap/era-zero.png`. If you deliberately change how an
+  era looks or how it arrives,
   re-take them with `node tools/playtest.mjs --ladder --reference` and commit them on purpose, in
   their own commit. Only `--reference` writes there; a plain playtest never touches them.
 - Chrome's throwaway profile directories and any temp files from a playtest run — keep them on
