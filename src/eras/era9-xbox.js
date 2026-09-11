@@ -29,7 +29,7 @@
   var R = root.PongRender;
 
   // The bible's measured camera (section 12): nothing moves it.
-  var CAMERA = { tilt: 27, height: 1000, fov: 35, screenY: 303 };
+  var CAMERA = { tilt: 29, height: 1300, fov: 32, screenY: 387 };   // the ladder camera (item 1266)
 
   var C = {
     black: '#050605', gunmetal: '#2a2f2b', steel: '#5b635d', steelLight: '#aeb8b0',
@@ -449,15 +449,22 @@
     if (!(w > 0 && h > 0)) return;
     var img = picture('era9-hangar');
     ctx.save();
-    if (img) {
-      var smooth = ctx.imageSmoothingEnabled;
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(img, x, y, w, h);
-      ctx.imageSmoothingEnabled = smooth;
-    } else {
-      ctx.fillStyle = C.gunmetal;
-      ctx.fillRect(x, y, w, h);
+    // The ladder camera (item 1266) sees past both ends of the wall, so the plate
+    // repeats once each side, deep in the dark, and the hangar runs off the picture.
+    for (var t = -1; t <= 1; t++) {
+      if (img) {
+        var smooth = ctx.imageSmoothingEnabled;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, x + t * w, y, w, h);
+        ctx.imageSmoothingEnabled = smooth;
+      } else {
+        ctx.fillStyle = C.gunmetal;
+        ctx.fillRect(x + t * w, y, w, h);
+      }
     }
+    ctx.fillStyle = T.rgba(C.black, 0.72);
+    ctx.fillRect(x - w, y, w, h);
+    ctx.fillRect(x + w, y, w, h);
     // The wall sits in the dark: black over it, lifted where the light is.
     var lx = T.project(cam, L.x, HANGAR.y, 0).x;
     var g = ctx.createLinearGradient(x, 0, x + w, 0);

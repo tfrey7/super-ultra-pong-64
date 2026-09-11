@@ -1,5 +1,10 @@
 /*
- * Era 1's two players, drawn in code (item 1224) -- 0 pixellab generations.
+ * Era 1's two players (item 1224; redrawn as text grids by item 1278) -- 0 pixellab generations.
+ *
+ * Since item 1278 every pose comes from assets/spritegen/era1-left.json and
+ * era1-right.json, drawn row by row and checked by tools/spritegen.mjs against
+ * the 2600's limits; this file lays each grid out once per paddle ink. The
+ * notes below are item 1224's history.
  *
  *   node assets/pixellab/era1-sheets.mjs
  *
@@ -33,6 +38,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { encodePng } from './era2-nes-quantize.mjs';
+import * as SG from '../../tools/spritegen.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const ERA_FILE = path.join(HERE, '..', '..', 'src', 'eras', 'era1-atari2600.js');
@@ -52,65 +58,21 @@ export function paddleInks(src = fs.readFileSync(ERA_FILE, 'utf8')) {
 
 /**
  * One pose as a 6 x 28 grid of 0/1, facing right. side 'left' or 'right',
- * beat one of BEATS, i the frame within it.
+ * beat one of BEATS, i the frame within it. Since item 1278 the poses are not
+ * painted here: they are read from the text grids tools/spritegen.mjs checks,
+ * assets/spritegen/era1-left.json and era1-right.json, drawn row by row the
+ * EarthBound way. This file only lays each grid out once per paddle ink.
  */
+const GRIDS = {};
+function grid(side) {
+  const s = side === 'right' ? 'right' : 'left';
+  if (!GRIDS[s]) GRIDS[s] = SG.resolve(SG.load(path.join(HERE, '..', 'spritegen', 'era1-' + s + '.json')));
+  return GRIDS[s];
+}
 export function pose(side, beat, i) {
-  const g = Array.from({ length: FRAME.h }, () => new Array(FRAME.w).fill(0));
-  const rect = (x, y, w, h) => {
-    for (let r = y; r < y + h; r++) for (let c = x; c < x + w; c++) {
-      if (r >= 0 && r < FRAME.h && c >= 0 && c < FRAME.w) g[r][c] = 1;
-    }
-  };
-  const low = side === 'right' ? 1 : 0;     // the right player's head, one row lower
-  let lift = 0;                             // the whole upper body, rows up (+) or down (-)
-  let legs = [[0, 2], [3, 2]];              // [x, w] pairs: together, one row of daylight
-  let legTop = 17;
-  let arm = 13;                             // the arm's top row: 13-14 holds the hand
-  let armKind = 'hold';
-  let headDrop = 0;
-  let torsoTop = 8;
-
-  if (beat === 'idle') {
-    lift = i % 2 ? -1 : 0;                  // the one-row bob
-  } else if (beat === 'up' || beat === 'down') {
-    legs = i % 2 ? [[1, 2], [3, 2]] : [[0, 2], [4, 2]];   // legs apart on alternate frames
-    lift = beat === 'up' ? 1 : -1;          // stretching up, crouching down
-  } else if (beat === 'swing') {
-    arm = [11, 9, 13][i] ?? 13;             // the arm row jumps up, up, then back
-    armKind = 'swing';
-    legs = [[0, 2], [4, 2]];
-  } else if (beat === 'miss') {
-    headDrop = 3;                           // the head drops into the torso
-    torsoTop = 10;                          // the torso two rows shorter
-    armKind = 'hang';
-  } else if (beat === 'win') {
-    armKind = 'raised';                     // the hop is in the legs: feet off the ground
-    legs = [[1, 2], [3, 2]];
-  }
-
-  // Legs, rooted to the ground unless hopping.
-  const hop = beat === 'win' && i % 2 === 0 ? 2 : 0;   // the 2-pixel hop, feet tucked up
-  for (const [x, w] of legs) rect(x, legTop, w, FRAME.h - legTop - hop);
-  // Torso.
-  const tTop = torsoTop - lift;
-  rect(0, tTop, 4, legTop - tTop);
-  // Head and neck.
-  const headY = 2 + low + headDrop - lift;
-  rect(1, headY, 4, 5);
-  if (!low && !headDrop) rect(2, headY + 5, 1, Math.max(0, tTop - headY - 5));
-  // Arms.
-  if (armKind === 'hold') {
-    rect(3, arm, 3, 2);
-  } else if (armKind === 'swing') {
-    rect(3, arm, 3, 2);
-    if (i === 1) rect(5, arm, 1, 6);        // the bat's sweep, a column down to the hand
-  } else if (armKind === 'hang') {
-    rect(4, tTop + 2, 1, 7);
-  } else if (armKind === 'raised') {
-    rect(0, 0, 1, headY + 2);               // both arms straight up past the head: \\o/
-    rect(5, 0, 1, headY + 2);
-  }
-  return g;
+  const g = grid(side)[beat + i];
+  if (!g) throw new Error('era1 ' + side + ' has no frame ' + beat + i);
+  return g.map((row) => row.map((c) => (c === '.' ? 0 : 1)));
 }
 
 /** A whole sheet in one ink, as RGBA bytes: { width, height, rgba }. */
@@ -160,17 +122,17 @@ export function main(log = console.log) {
       const name = sheetName(side, idx);
       const buf = encodePng(s.width, s.height, s.rgba);
       fs.writeFileSync(path.join(HERE, name + '.png'), buf);
-      const prompt = 'painted in code, no generation: era 1\'s ' + (side === 'right' ? 'computer' : 'player') +
+      const prompt = 'drawn as a text grid, no generation: era 1\'s ' + (side === 'right' ? 'computer' : 'player') +
         ', a one-colour 2600 sprite in ' + ink + ', 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)';
       const entry = {
         name, file: name + '.png', prompt,
         size: { width: s.width, height: s.height },
-        style: { painted: 'pixel by pixel from docs/ART.md, Era 1, PLAYERS' },
+        style: { drawn: 'text grids checked by tools/spritegen.mjs (assets/spritegen/era1-' + side + '.json), from docs/ART.md, Era 1, PLAYERS' },
         seed: 0, date,
         cost: { type: 'derived', generations: 0 },
         derivedBy: 'node assets/pixellab/era1-sheets.mjs',
-        how: 'the bible\'s silhouette rows painted into a grid, one ink index ' + idx + ' of era 1\'s palette',
-        card: 'item 1224',
+        how: 'the text grid assets/spritegen/era1-' + side + '.json laid out in ink index ' + idx + ' of era 1\'s palette',
+        card: 'item 1278 (item 1224 before it)',
         verdict: 'drawn by src/characters.js for era 1, the pair named by era 1\'s look (playerSheets)',
         pixels: { width: s.width, height: s.height },
         bytes: buf.length,

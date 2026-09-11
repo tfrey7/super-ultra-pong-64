@@ -170,3 +170,5 @@ Super Mario World's sprites) that happens to be Pong. Picture:
   them to the waist up.
 - The bats are rung 3's (earned-ink rubber, wood line, black rubber, handle), drawn as filled quads
   through the tilt. The dyed capsule sprite (`tintedPaddle`) is no longer drawn in play.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the racer's helmet already sits beside the right score box, and the caption left over the track was three unreadable glyphs.

@@ -107,7 +107,10 @@
 
   // One block per rung. Era 0 has none: the 1972 machine stays bars and a dot.
   var ERAS = {
-    // Atari 2600 (item 1224): two one-colour 6 x 28 sprites painted in code by
+    // Atari 2600 (item 1224; redrawn by item 1278): two one-colour 6 x 28
+    // sprites drawn as text grids (assets/spritegen/era1-left.json, the player
+    // with a ponytail, and era1-right.json, the computer in a billed cap),
+    // checked by tools/spritegen.mjs against the 2600's limits and laid out by
     // assets/pixellab/era1-sheets.mjs, one sheet per paddle ink and side; era
     // 1's look names the pair this frame wears (playerSheets), so each figure
     // is always in its own paddle's colour, as a 2600 player and its missile
@@ -119,7 +122,12 @@
             return L && typeof L.playerSheets === 'function' ? L.playerSheets() : null;
           },
           frame: { w: 6, h: 28 }, hand: { x: 6, y: 14 }, scale: 5, fps: 7.5 },
-    2:  { sheets: { left: 'era2-sheet-left', right: 'era2-sheet-right' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' }, // NES (item 1225: assets/pixellab/era2-players-sheet.mjs)
+    // NES (item 1279): the boy and the rival drawn as text grids with
+    // tools/spritegen.mjs, not pixellab -- assets/spritegen/era2-boy.json and
+    // era2-rival.json from assets/spritegen/era2-players-compose.mjs, built into
+    // assets/pixellab/ where the loader looks. Same frame, hand and scale as
+    // item 1225's sheets, so the figure holds the paddle where it did.
+    2:  { sheets: { left: 'era2-boy', right: 'era2-rival' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' },
     // Eras 5 to 10 (item 1248): each block also names a polygon model from
     // assets/models/ (tools/blender/player-proof.py) and a shading, drawn by
     // src/models3d.js in place of the sheets, which draw only until it has loaded.

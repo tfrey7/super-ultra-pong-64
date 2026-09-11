@@ -168,3 +168,5 @@ playtest's 18.5 ms line, in software-drawn Chrome. With other runs loading the m
    vent. That is enough for a place, and each costs one or two draws a frame.
 4. The moments on the set rather than on the HUD: red beacons and a red outline say "point" in a
    2001 game's own language.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the gamertag over the computer's paddle already carries its name (and its taunts), so CPU 2001 under the digit said it twice.

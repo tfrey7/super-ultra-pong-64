@@ -158,3 +158,5 @@ era 5): *Tekken* and *Toshinden* on a *Ridge Racer* night. Frames of the result,
   goes into the low-resolution buffer, never over it.
 - Real polygon fighters, not sprites. Keep the two concepts: the left player in a red gi with a
   black belt, the right in a blue sleeveless top and grey trousers.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the top bar already says CPU over the right score, so the caption under it said the same thing twice.
