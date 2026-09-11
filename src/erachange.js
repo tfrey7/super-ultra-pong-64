@@ -1,63 +1,117 @@
 /*
  * Super Ultra Pong 64: Remastered -- the era change, as a moment.
  *
- * When a point moves the machine up a rung, the player should SEE it happen:
- * a flash over the field, a wipe of the new machine's colours across it, and
- * a name card ("1985 · NES") in the new machine's own style.
+ * When a point moves the machine up a rung, the new machine SPREADS across the
+ * field from the spot where the ball went out: a ring grows from that point,
+ * and inside it the field is drawn by the new era's renderer while outside it
+ * the old era's renderer keeps drawing. Both draw the same live state every
+ * frame, so nothing disappears and the paddles stay in the player's hands the
+ * whole way. Once the ring has passed the centre of the field the new era's
+ * name card ("1985 · NES") comes up in that era's own style, and it stays until
+ * the ball launches.
  *
- * Drawing only. It reads two things the rules already leave in the state --
- * state.era and state.eraChangedAt -- and adds no rule of its own. The whole
- * moment lives INSIDE the serve pause the game already has (rules.serveDelay):
- * a point starts that pause, the card is up for its length, and it is gone the
- * frame the ball launches. So the serve is never delayed by so much as a frame.
+ * Timing. The rules stretch the serve pause after an era-change point to
+ * rules.eraChangePause (1.8 s, src/game.js); the ring takes WIPE_S (1.5 s) of
+ * it, eased, and reaches past the far corner, so the whole field is the new
+ * era with a beat to spare. Nothing here ever holds the ball: the moment is
+ * gone the frame the serve launches.
+ *
+ * Technique. Two offscreen canvases, one per era, each draw the full frame;
+ * the old one is copied on, the new one is copied on through a circular clip,
+ * then the ring's edge and the flourish are drawn over it. Clip paths,
+ * gradients and transforms only -- no per-pixel work. Under node --test there
+ * is no document, so the same composite goes straight onto the given context.
+ *
+ * THE FLOURISH HOOK -- how an era gives its arrival its own look.
+ * An era file may put a `flourish` function on the look it registers:
+ *
+ *   R.registerEra({ era: 2, ..., flourish: function (ctx, p, origin, fromEra, toEra, info) {} })
+ *
+ * It is the ARRIVING era's hook that plays (entering era 2 plays era 2's). It
+ * is called once per frame while the ring is growing, after the ring's plain
+ * edge has been drawn, inside ctx.save()/restore() so it cannot leak state:
+ *   ctx      the page's canvas context, in field units (800 x 600)
+ *   p        eased progress, 0 at the point to 1 when the ring covers the field
+ *   origin   { x, y } where the ball left the field (state.missAt)
+ *   fromEra  the rung being left      toEra  the rung arriving
+ *   info     { radius, t, duration, width, height, state, dim } -- radius is the
+ *            ring's edge in field units; state is READ-ONLY; dim is the ink when
+ *            this is the attract rally behind the title (null in a real game)
+ * With no hook the plain ring plays. A hook draws, and nothing else.
  *
  * The year and the machine's name come from the ladder (Pong.ERAS in
  * src/game.js). Each rung's card style is in STYLES below; an era file may
- * carry its own `card` object on its look (same fields) and that wins, so an
- * era card can restyle its name card without editing this file.
+ * carry its own `card` object on its look (same fields) and that wins.
  *
- * Loaded by index.html after the era files, before the loop. The loop calls
- * PongRender.drawEraChange(ctx, state) after drawing the frame.
+ * Loaded by index.html after the era files, before the loop. The loop draws
+ * every frame through PongRender.drawEraFrame(ctx, state, opts).
  */
 (function (root) {
   'use strict';
   var R = root.PongRender;
 
-  var FLASH_S = 0.12;     // the white-out at the instant of the point
-  var WIPE_S = 0.32;      // the band of new colours crossing the field
-  var CARD_FROM_S = 0.08; // the card comes up as the flash fades
-  var BAND_W = 120;       // how wide the wipe band is, in field units
+  var WIPE_S = 1.5;       // how long the ring takes to cover the field
+  var EDGE_PAD = 40;      // the ring's reach past the far corner, so its edge leaves the screen
+  var GLOW_W = 26;        // the soft band just inside the ring's edge
 
-  // How each rung's name card looks. Plain colours, filled rectangles and the
-  // score's own block font -- the only things the renderer ever draws with.
-  //   flash   the colour the field whites out to
-  //   wipe    the stripes of the band that crosses the field
+  // ------------------------------------------------- the pure part: timing
+  /** Raw progress of the wipe, 0..1, at t seconds after the point. */
+  function wipeProgress(t, duration) {
+    var d = duration === undefined ? WIPE_S : duration;
+    if (!(d > 0)) return 1;
+    if (!(t > 0)) return 0;
+    return t >= d ? 1 : t / d;
+  }
+
+  /** Ease in and out (cubic): slow off the mark, fast across, settling at the far corner. */
+  function easeWipe(p) {
+    if (!(p > 0)) return 0;
+    if (p >= 1) return 1;
+    return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+  }
+
+  /** How far the ring must reach from origin to cover a width x height field. */
+  function ringReach(origin, width, height) {
+    var dx = Math.max(origin.x, width - origin.x);
+    var dy = Math.max(origin.y, height - origin.y);
+    return Math.sqrt(dx * dx + dy * dy) + EDGE_PAD;
+  }
+
+  /** The ring's radius for an eased progress: 0 at the point, past the far corner at 1. */
+  function ringRadius(eased, origin, width, height) {
+    var e = eased > 0 ? (eased < 1 ? eased : 1) : 0;
+    return e * ringReach(origin, width, height);
+  }
+
+  /** Where the change spreads from: where the ball went out, or the centre. */
+  function wipeOrigin(state) {
+    var m = state.missAt;
+    if (m && typeof m.x === 'number' && typeof m.y === 'number') return { x: m.x, y: m.y };
+    return { x: state.width / 2, y: state.height / 2 };
+  }
+
+  // How each rung's name card looks, and the colour of its ring's edge.
+  //   edge    the ring's bright leading line
   //   box     the card's fill        border  its frame (null: no frame)
   //   inner   a second, inner frame line (the NES dialog box), or null
   //   year    ink for the year       name    ink for the machine
   //   label   ink for the small ERA n line above
   //   dots    optional little squares under the name (the SNES buttons)
   var STYLES = {
-    0: { flash: '#ffffff', wipe: ['#ffffff'], box: '#000000', border: '#ffffff',
+    0: { edge: '#ffffff', box: '#000000', border: '#ffffff',
          inner: null, year: '#ffffff', name: '#ffffff', label: '#ffffff' },
-    // 1977 Atari 2600: black, with the woodgrain-era rainbow stripes, and the
-    // year and name in the two paddles' own colours.
-    1: { flash: '#ffffff', wipe: ['#c85c14', '#d8a038', '#c8cc30'], box: '#000000',
-         border: '#d8a038', inner: null, year: 'paddle-left', name: 'paddle-right',
-         label: '#d88860' },
+    // 1977 Atari 2600: black, gold frame, the year and name in the paddles' colours.
+    1: { edge: '#d8a038', box: '#000000', border: '#d8a038', inner: null,
+         year: 'paddle-left', name: 'paddle-right', label: '#d88860' },
     // 1985 NES: the black dialog box with the double white frame.
-    2: { flash: '#fcfcfc', wipe: ['#e40058', '#fcfcfc', '#7c7c7c'], box: '#000000',
-         border: '#fcfcfc', inner: '#fcfcfc', year: '#fcfcfc', name: '#fcfcfc',
-         label: '#e40058' },
+    2: { edge: '#e40058', box: '#000000', border: '#fcfcfc', inner: '#fcfcfc',
+         year: '#fcfcfc', name: '#fcfcfc', label: '#e40058' },
     // 1989 Sega Genesis: a deep blue window, white frame, yellow year.
-    3: { flash: '#ffffff', wipe: ['#1e3cb4', '#3c78ff', '#ffffff'], box: '#1e3cb4',
-         border: '#ffffff', inner: null, year: '#f8d800', name: '#ffffff',
-         label: '#8cb4ff' },
-    // 1991 Super Nintendo: a purple window, lavender frame, and the four
-    // coloured buttons under the name.
-    4: { flash: '#e8e0ff', wipe: ['#d82800', '#f8c000', '#00a844', '#2058d8'],
-         box: '#403070', border: '#b4a0dc', inner: null, year: '#ffffff',
-         name: '#ffffff', label: '#b4a0dc',
+    3: { edge: '#3c78ff', box: '#1e3cb4', border: '#ffffff', inner: null,
+         year: '#f8d800', name: '#ffffff', label: '#8cb4ff' },
+    // 1991 Super Nintendo: a purple window, lavender frame, the four buttons.
+    4: { edge: '#f8c000', box: '#403070', border: '#b4a0dc', inner: null,
+         year: '#ffffff', name: '#ffffff', label: '#b4a0dc',
          dots: ['#d82800', '#f8c000', '#00a844', '#2058d8'] }
   };
 
@@ -127,20 +181,31 @@
   }
 
   /**
-   * Is an era change on screen this instant, and how far through is it?
-   * Null when nothing is showing. It shows only when a POINT moved the machine
-   * (the era is above the one the session started at), only in play, and only
-   * while the serve pause that point started is still running -- so the card
-   * can never outlast the pause or hold the ball back.
+   * Is an era change on screen this instant, and where has it got to? Null
+   * when nothing is showing. It shows only when a POINT moved the machine (the
+   * era is above the one the session started at), only in play, and only while
+   * the serve pause that point started is still running -- so it can never
+   * outlast the pause or hold the ball back.
    */
   function eraChangeMoment(state) {
     if (!state || state.phase !== 'playing') return null;
     if (!(state.era > (state.startEra || 0))) return null;
     if (!(state.serveDelay > 0)) return null;
-    var length = (state.rules && state.rules.serveDelay) || 0;
+    var rules = state.rules || {};
+    var length = Math.max(rules.serveDelay || 0, rules.eraChangePause || 0);
     var t = state.time - (state.eraChangedAt || 0);
     if (!(t >= 0) || t >= length) return null;
-    return { era: state.era, t: t, length: length, text: cardText(state.era) };
+    var origin = wipeOrigin(state);
+    var raw = wipeProgress(t, WIPE_S);
+    var p = easeWipe(raw);
+    var radius = ringRadius(p, origin, state.width, state.height);
+    var cx = state.width / 2 - origin.x;
+    var cy = state.height / 2 - origin.y;
+    return {
+      era: state.era, from: state.era - 1, t: t, length: length, duration: WIPE_S,
+      text: cardText(state.era), origin: origin, raw: raw, p: p, radius: radius,
+      wiping: raw < 1, cardUp: radius >= Math.sqrt(cx * cx + cy * cy)
+    };
   }
 
   function ink(style, key, state) {
@@ -150,26 +215,9 @@
     return v;
   }
 
-  function drawFlash(ctx, state, m, style) {
-    if (m.t >= FLASH_S) return;
-    ctx.fillStyle = rgba(style.flash, 0.85 * (1 - m.t / FLASH_S));
-    ctx.fillRect(0, 0, state.width, state.height);
-  }
-
-  function drawWipe(ctx, state, m, style) {
-    if (m.t >= WIPE_S) return;
-    var x = (m.t / WIPE_S) * (state.width + BAND_W) - BAND_W;
-    var stripe = BAND_W / style.wipe.length;
-    for (var i = 0; i < style.wipe.length; i++) {
-      ctx.fillStyle = style.wipe[i];
-      ctx.fillRect(x + i * stripe, 0, stripe, state.height);
-    }
-  }
-
   var CARD = { height: 170, pad: 36, cell: 7, gap: 5, labelCell: 4, labelGap: 3, frame: 6 };
 
   function drawCard(ctx, state, m, style) {
-    if (m.t < CARD_FROM_S) return;
     var mid = state.width / 2;
     var textW = textWidth(m.text, CARD.cell, CARD.gap);
     var w = Math.min(state.width - 40, textW + CARD.pad * 2);
@@ -221,23 +269,124 @@
     }
   }
 
+  // ------------------------------------------------- the two layers
+  var layers = [];
+
+  /** An offscreen canvas the size of the field, made once and reused; null off-page. */
+  function layer(i, w, h) {
+    if (typeof document === 'undefined' || !document.createElement) return null;
+    var c = layers[i];
+    if (!c) {
+      c = layers[i] = document.createElement('canvas');
+      c.getContext('2d');
+    }
+    if (c.width !== w) c.width = w;
+    if (c.height !== h) c.height = h;
+    var x = c.getContext('2d');
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.clearRect(0, 0, w, h);
+    return x;
+  }
+
+  /** One era's full frame of the live state, on ctx, with nothing leaking out. */
+  function drawEra(ctx, state, era, opts) {
+    var s = era === state.era ? state : Object.assign({}, state, { era: era });
+    ctx.save();
+    R.draw(ctx, s, opts);
+    ctx.restore();
+  }
+
+  function clipRing(ctx, m) {
+    ctx.beginPath();
+    ctx.arc(m.origin.x, m.origin.y, Math.max(0, m.radius), 0, Math.PI * 2);
+    ctx.clip();
+  }
+
+  /** The plain ring: a soft glow inside the edge and a bright line on it. */
+  function drawEdge(ctx, m, colour) {
+    var r = m.radius;
+    if (!(r > 1)) return;
+    var o = m.origin;
+    var inner = Math.max(0, r - GLOW_W);
+    ctx.save();
+    var glow = ctx.createRadialGradient(o.x, o.y, inner, o.x, o.y, r);
+    glow.addColorStop(0, rgba(colour, 0));
+    glow.addColorStop(1, rgba(colour, 0.45));
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(o.x, o.y, r, 0, Math.PI * 2);
+    ctx.arc(o.x, o.y, inner, 0, Math.PI * 2, true);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(o.x, o.y, r, 0, Math.PI * 2);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = colour;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawRing(ctx, state, opts, m, style) {
+    var w = state.width;
+    var h = state.height;
+    var a = layer(0, w, h);
+    var b = a && layer(1, w, h);
+    if (a && b) {
+      drawEra(a, state, m.from, opts);
+      drawEra(b, state, m.era, opts);
+      ctx.drawImage(a.canvas, 0, 0);
+      ctx.save();
+      clipRing(ctx, m);
+      ctx.drawImage(b.canvas, 0, 0);
+      ctx.restore();
+    } else {
+      // No document (node --test): the same composite, straight onto ctx.
+      drawEra(ctx, state, m.from, opts);
+      ctx.save();
+      clipRing(ctx, m);
+      drawEra(ctx, state, m.era, opts);
+      ctx.restore();
+    }
+    var dim = (opts && opts.ink) || null;
+    drawEdge(ctx, m, dim || style.edge || '#ffffff');
+
+    var look = R.eraLook(m.era);
+    if (look && typeof look.flourish === 'function') {
+      ctx.save();
+      look.flourish(ctx, m.p, { x: m.origin.x, y: m.origin.y }, m.from, m.era, {
+        radius: m.radius, t: m.t, duration: m.duration,
+        width: w, height: h, state: state, dim: dim
+      });
+      ctx.restore();
+    }
+  }
+
   /**
-   * Draw the era change over a frame that is already on the canvas. Does
-   * nothing at all (not one draw call) when no change is showing.
+   * Draw one whole frame of a playing state: the plain frame, or -- while an
+   * era change is on -- the ring between the two eras, then the name card.
+   * opts are the renderer's (opts.ink dims the attract rally); opts.card
+   * false leaves the card off, which is how the rally behind the title plays
+   * its ring without a card under the title. Returns whether a change showed.
    */
-  function drawEraChange(ctx, state) {
+  function drawEraFrame(ctx, state, opts) {
     var m = eraChangeMoment(state);
-    if (!m) return false;
+    if (!m) {
+      R.draw(ctx, state, opts);
+      return false;
+    }
     var style = cardStyle(m.era);
-    drawWipe(ctx, state, m, style);
-    drawCard(ctx, state, m, style);
-    drawFlash(ctx, state, m, style);
+    if (m.wiping) drawRing(ctx, state, opts, m, style);
+    else R.draw(ctx, state, opts);
+    if (m.cardUp && !(opts && opts.card === false)) drawCard(ctx, state, m, style);
     return true;
   }
 
   R.eraChangeMoment = eraChangeMoment;
-  R.drawEraChange = drawEraChange;
+  R.drawEraFrame = drawEraFrame;
   R.eraCardText = cardText;
   R.eraCardStyle = cardStyle;
-  R.ERA_CHANGE = { flash: FLASH_S, wipe: WIPE_S, cardFrom: CARD_FROM_S, styles: STYLES };
+  R.ERA_CHANGE = {
+    wipe: WIPE_S, edgePad: EDGE_PAD, styles: STYLES,
+    wipeProgress: wipeProgress, easeWipe: easeWipe,
+    ringReach: ringReach, ringRadius: ringRadius, wipeOrigin: wipeOrigin
+  };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
