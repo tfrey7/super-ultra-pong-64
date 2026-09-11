@@ -264,14 +264,29 @@
   function composite(ctx, state, opts, m, style) {
     var w = state.width;
     var h = state.height;
-    var a = layer(0, w, h);
-    var b = a && layer(1, w, h);
+    // The layers match the canvas they land on, pixel for pixel, and draw in
+    // its scale -- the page's own 800 x 600, or the display's native frame
+    // (src/display.js) at whatever resolution the era on screen has.
+    var into = ctx.canvas && ctx.canvas.width > 0 && typeof ctx.getTransform === 'function' ? ctx.canvas : null;
+    var lw = into ? into.width : w;
+    var lh = into ? into.height : h;
+    var a = layer(0, lw, lh);
+    var b = a && layer(1, lw, lh);
     if (a && b) {
+      if (into) {
+        var t = ctx.getTransform();
+        a.setTransform(t); b.setTransform(t);
+        a.imageSmoothingEnabled = b.imageSmoothingEnabled = ctx.imageSmoothingEnabled;
+      }
       drawEra(a, state, m.from, opts);
       drawEra(b, state, m.era, opts);
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.drawImage(a.canvas, 0, 0);
+      ctx.restore();
       ctx.save();
       clipRing(ctx, m);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.drawImage(b.canvas, 0, 0);
       ctx.restore();
     } else {

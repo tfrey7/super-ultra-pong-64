@@ -297,9 +297,22 @@
     ctx.restore();
   }
 
+  // The pixellab tiles (item 1187), laid over the era's own fills through the
+  // shared table at the HD generation's texel density: a fine, full-resolution
+  // tread under the grating, filtered smooth, with the bloom, the depth of
+  // field and the grain all drawn over it afterwards as before.
+  var TEXTURE = {
+    court: { name: 'court-metal', alpha: 0.45, blend: 'overlay', period: 44, strip: 1, fade: 0.2, smooth: true },
+    trim: { name: 'trim', alpha: 0.45, blend: 'overlay', period: 22, smooth: true },
+    paddle: { name: 'paddle', alpha: 0.35, blend: 'overlay', period: 14, smooth: true },
+    ball: { name: 'ball', alpha: 0.35, blend: 'soft-light', period: 10, smooth: true }
+  };
+
   /** 2: the slab, its grating, its bevels and light strips. */
   function tableStyle(T) {
     return Object.assign({}, TABLE_COLOURS, {
+      texture: TEXTURE.court,
+      trim: TEXTURE.trim,
       surface: function (c, cam, pts) {
         trace(c, pts);
         var g = c.createLinearGradient(0, pts[0].y, 0, pts[2].y);
@@ -376,7 +389,7 @@
     var out = [];
     for (var i = 0; i < sides.length; i++) {
       var ink = P.paddleInk(state, sides[i]);
-      var faces = T.box(ctx, cam, state[sides[i]], 0, PADDLE.z, { ink: ink, shade: 'gradient', light: PADDLE.light });
+      var faces = T.box(ctx, cam, state[sides[i]], 0, PADDLE.z, { ink: ink, shade: 'gradient', light: PADDLE.light, texture: TEXTURE.paddle });
       out.push({ ink: ink, faces: faces });
       if (bloom) {
         bloom.ctx.strokeStyle = C.glow;
@@ -671,7 +684,7 @@
     gradePass(ctx);
     grainPass(ctx, T, state);
     restoreInks(ctx, drawn);
-    if (ball) T.ball(ctx, cam, state.ball, { fill: ballFill(ctx) });   // 7
+    if (ball) T.ball(ctx, cam, state.ball, { fill: ballFill(ctx), texture: TEXTURE.ball });   // 7
     hud(ctx, state, P, farY - 6);                              // 8
     if (toast) drawToast(ctx, P, toast);
     ctx.restore();
