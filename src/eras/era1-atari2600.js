@@ -5,10 +5,11 @@
  * frame stay the 1972 machine's; each paddle, and its score, wears the colour
  * the rules picked for it (state.paddleColour holds a palette INDEX).
  *
- * A dozen colours picked by eye to sit in the range a 2600 could show -- warm
- * and slightly muddy, no pure #ff channels anywhere. This is NOT the real
- * 128-entry NTSC palette and does not pretend to be; when an era genuinely
- * needs that, that era can go and look it up.
+ * A dozen colours, each a real entry of the 2600's 128-colour NTSC palette
+ * (item 1287; named by hue and luminance where they are listed). A scanline
+ * carries the TIA's four colour registers' worth and no more: COLUBK the black
+ * field, COLUPF the wall, the stand, the net and the ball, COLUP0 and COLUP1
+ * the two players' inks, which the score also wears (score mode).
  *
  * Every entry is deliberately bright, because the field is black and a paddle
  * that vanishes into it is a broken game. PongRender.isLegible() is the check
@@ -45,19 +46,25 @@
   'use strict';
   var R = root.PongRender;
 
+  // Item 1287, to Combat: every ink is a real entry of the TIA's 128-colour
+  // NTSC palette, 16 hues x 8 luminances, the colour byte the cartridge writes
+  // being hue << 4 | luminance << 1. The RGB is Stella's standard NTSC table
+  // (src/common/PaletteHandler.cxx, ourNTSCPalette, in the stella-emu/stella
+  // repository); each was the legible entry nearest the ink it replaced.
+  // test/era1-atari2600.test.js holds the same table and fails on any ink off it.
   var PADDLE_INKS = [
-    '#c85c14',   // burnt orange
-    '#d8a038',   // gold
-    '#c8cc30',   // olive yellow
-    '#68bc40',   // grass
-    '#40b898',   // teal
-    '#4890d8',   // sky blue
-    '#7068d4',   // indigo
-    '#a858c8',   // violet
-    '#d0589c',   // magenta
-    '#cc4444',   // red
-    '#d88860',   // salmon
-    '#8cc8e8'    // pale blue
+    '#b55328',   // burnt orange  hue 3, luminance 2 ($34)
+    '#d2a44a',   // gold          hue 2, luminance 5 ($2A)
+    '#d2d240',   // olive yellow  hue 1, luminance 5 ($1A)
+    '#5cba5c',   // grass         hue 12, luminance 4 ($C8)
+    '#54b899',   // teal          hue 11, luminance 4 ($B8)
+    '#548ad2',   // sky blue      hue 9, luminance 4 ($98)
+    '#7f5cd5',   // indigo        hue 7, luminance 4 ($78)
+    '#a459d0',   // violet        hue 6, luminance 4 ($68)
+    '#c659b3',   // magenta       hue 5, luminance 4 ($58)
+    '#c84848',   // red           hue 4, luminance 3 ($46)
+    '#e39759',   // salmon        hue 3, luminance 5 ($3A)
+    '#84c8fc'    // pale blue     hue 9, luminance 7 ($9E)
   ];
 
   var PALETTE = PADDLE_INKS.filter(R.isLegible);
@@ -71,7 +78,8 @@
   var FRINGE = 8;          // widest the colour fields drift apart, field units
   var BAR = 34;            // half the height of the frame bar at the roll's seam
   var FLASH_S = 0.28;      // how long the power-on line lasts
-  var BLEED_INKS = ['#d8a038', '#d0589c', '#4890d8', '#68bc40', '#c85c14', '#a858c8'];
+  // The paddles' own inks, smeared round the ring (gold, magenta, sky, grass, orange, violet).
+  var BLEED_INKS = [1, 8, 5, 3, 0, 7].map(function (i) { return PADDLE_INKS[i]; });
 
   function phosphor(a) {
     return 'rgba(' + PHOSPHOR.join(',') + ',' + Math.max(0, Math.min(1, a)).toFixed(3) + ')';
@@ -265,8 +273,15 @@
   // units, and the display samples it down to exactly that.
   var PX = 5;              // one native pixel across, in field units
   var LINE = 3.125;        // one scanline, in field units
-  var PLAYFIELD = '#2c3a7a';   // wall and stand (relative luminance under 0.05)
-  var BALL_INK = '#f0fff6';    // the phosphor white; the only object that never changes colour
+  // Four colour registers a line (item 1287). COLUPF is one colour for the whole
+  // frame -- the wall, the stand, the net and the ball, because the TIA draws
+  // its ball in the playfield's colour. The ball reaches every line from the top
+  // wall to the bottom one, so the stand cannot sit on lines it never visits:
+  // the stand SHARES the playfield colour, and a line where the ball crosses the
+  // stand is still four colours. It is grey, hue 0 luminance 3 ($06), so the
+  // ball stays a neutral like every other era's and matches no paddle ink.
+  var PLAYFIELD = '#8e8e8e';   // COLUPF: hue 0, luminance 3 ($06), Stella's NTSC table
+  var BALL_INK = PLAYFIELD;    // the TIA's ball object is drawn in COLUPF
   var WALL_LINES = 4;
   var STAND = { rows: 3, lines: 6, block: 4, swapS: 16 / 60, fastS: 4 / 60, fastFor: 1 };
   var SCORE = { top: 40, offset: 110, blockW: 4 * PX, blockH: 4 * LINE, gap: 2 * PX };
