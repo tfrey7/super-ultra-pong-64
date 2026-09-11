@@ -50,7 +50,9 @@
   // NTSC palette, 16 hues x 8 luminances, the colour byte the cartridge writes
   // being hue << 4 | luminance << 1. The RGB is Stella's standard NTSC table
   // (src/common/PaletteHandler.cxx, ourNTSCPalette, in the stella-emu/stella
-  // repository); each was the legible entry nearest the ink it replaced.
+  // repository); each was the legible entry nearest the ink it replaced, but
+  // salmon: its nearest ($3A) sat 51 degrees of hue from its NES cousin in era
+  // 2 (test/era2-nes.test.js allows 45), so it is the light red $4A, 24 off.
   // test/era1-atari2600.test.js holds the same table and fails on any ink off it.
   var PADDLE_INKS = [
     '#b55328',   // burnt orange  hue 3, luminance 2 ($34)
@@ -63,7 +65,7 @@
     '#a459d0',   // violet        hue 6, luminance 4 ($68)
     '#c659b3',   // magenta       hue 5, luminance 4 ($58)
     '#c84848',   // red           hue 4, luminance 3 ($46)
-    '#e39759',   // salmon        hue 3, luminance 5 ($3A)
+    '#e46f6f',   // salmon        hue 4, luminance 5 ($4A)
     '#84c8fc'    // pale blue     hue 9, luminance 7 ($9E)
   ];
 

@@ -59,7 +59,7 @@ const INKS = [
   { name: 'violet', hue: 6, lum: 4, rgb: '#a459d0' },
   { name: 'magenta', hue: 5, lum: 4, rgb: '#c659b3' },
   { name: 'red', hue: 4, lum: 3, rgb: '#c84848' },
-  { name: 'salmon', hue: 3, lum: 5, rgb: '#e39759' },
+  { name: 'salmon', hue: 4, lum: 5, rgb: '#e46f6f' },
   { name: 'pale blue', hue: 9, lum: 7, rgb: '#84c8fc' }
 ];
 
