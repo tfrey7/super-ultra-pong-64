@@ -24,7 +24,7 @@
 import { writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { launchChrome, portTakenWhy } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import { CdpConnection } from '../../../tools/cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -232,14 +232,13 @@ async function climb(s) {
   return rows;
 }
 
-const taken = await portTakenWhy(PORT);
-if (taken) { console.log(`port ${PORT} is taken (${taken}); pick another with --port`); process.exit(2); }
 const flags = ['--headless=new', '--hide-scrollbars', '--mute-audio', '--allow-file-access-from-files',
   '--autoplay-policy=no-user-gesture-required',
   '--window-size=1000,760', '--remote-debugging-port=' + PORT, '--no-first-run',
   '--no-default-browser-check', 'about:blank'];
 if (!GPU) flags.unshift('--disable-gpu');
-const chrome = launchChrome(CHROME, flags, { name: 'climb1238' });
+// launchChrome refuses a debugging port somebody else holds (item 1215), in one line with exit 2.
+const chrome = await launchChrome(CHROME, flags, { name: 'climb1238' }).catch(refusePortTaken);
 let ws;
 const out = { taken: new Date().toISOString(), label: LABEL, gpu: GPU, fresh: [], climb: [] };
 try {
