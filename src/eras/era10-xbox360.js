@@ -101,9 +101,9 @@
 
   /** 16 x 16: 1-pixel rows of concrete and mud, and a mud seam down one side. */
   function gratingTile(T, ctx) {
-    if (tiles.grating !== undefined) return tiles.grating;
+    if (tiles.grating) return tiles.grating;
     var buf = T.offscreen('x360-grating', 16, 16);
-    if (!buf || typeof ctx.createPattern !== 'function') return (tiles.grating = null);
+    if (!buf || !('createPattern' in ctx)) return null;
     var g = buf.ctx;
     for (var y = 0; y < 16; y++) {
       g.fillStyle = y % 2 ? C.mud : C.concrete;
@@ -117,12 +117,14 @@
 
   /** Three 128 x 128 noise tiles: 1400 black and white specks each on grain mid. */
   function grainTiles(T, ctx) {
-    if (tiles.grain !== undefined) return tiles.grain;
-    if (typeof ctx.createPattern !== 'function') return (tiles.grain = null);
+    if (tiles.grain) return tiles.grain;
+    // Ask for a buffer before touching the context: with no document there is
+    // no grain, and a test's strict recording canvas is never asked for more.
+    if (!T.offscreen('x360-grain0', GRAIN.size, GRAIN.size) || !('createPattern' in ctx)) return null;
     var list = [];
     for (var i = 0; i < GRAIN.tiles; i++) {
       var buf = T.offscreen('x360-grain' + i, GRAIN.size, GRAIN.size);
-      if (!buf) return (tiles.grain = null);
+      if (!buf) return null;
       var g = buf.ctx;
       var rnd = lcg(0x360 + i * 7919);
       g.fillStyle = C.grainMid;
@@ -190,8 +192,8 @@
   function hdText(ctx, P, text, x, y, px, align, colour) {
     ctx.fillStyle = colour;
     ctx.font = '600 ' + px + 'px ' + FONT_FAMILY;
-    var m = typeof ctx.measureText === 'function' ? ctx.measureText(text) : null;
-    if (m && m.width > 0 && typeof ctx.fillText === 'function') {
+    var m = 'measureText' in ctx ? ctx.measureText(text) : null;
+    if (m && m.width > 0 && 'fillText' in ctx) {
       ctx.textAlign = align;
       ctx.textBaseline = 'alphabetic';
       ctx.fillText(text, x, y);
@@ -316,9 +318,8 @@
 
   /** 3: depth of field -- the far strip again, from a half-scale copy of the frame so far. */
   function farStripSoft(ctx, T, cam) {
-    if (!ctx.canvas || typeof ctx.drawImage !== 'function') return false;
     var half = T.offscreen('dof-half', 400, 300);
-    if (!half) return false;
+    if (!half || !('canvas' in ctx) || !ctx.canvas) return false;
     var h = half.ctx;
     h.setTransform(1, 0, 0, 1, 0, 0);
     h.clearRect(0, 0, 400, 300);
@@ -521,7 +522,8 @@
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
     // The hairline under the whole band.
-    line(ctx, { x: 0, y: bandBottom }, { x: 800, y: bandBottom }, 1, C.greenDark, true);
+    // One row up from the band's bottom so the half-pixel rounding stays inside it (R8).
+    line(ctx, { x: 0, y: bandBottom - 1 }, { x: 800, y: bandBottom - 1 }, 1, C.greenDark, true);
     blades(ctx, state, P, false);
     // A gamerscore that climbs with the match: 50G for arriving, 10G a point.
     var total = state.score.left + state.score.right;
