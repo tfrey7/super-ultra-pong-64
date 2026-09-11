@@ -19,8 +19,67 @@
  */
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, existsSync } from 'node:fs';
+import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
+
+/*
+ * A debugging port somebody else holds (item 1215). Chrome that cannot bind its
+ * --remote-debugging-port starts anyway, with no port, and the DevTools endpoint
+ * on that number is still the OTHER Chrome's -- so a harness that connects to it
+ * drives another worker's page. On 2026-09-10 item 1181's playtest spent a
+ * minute clicking item 1205's game on port 9341 and reported 16/21 from it.
+ *
+ * portTaken(port) answers before launch: taken if we cannot listen on it at
+ * 127.0.0.1 (where Chrome binds it), or if something answers a connect there
+ * (a listener on 0.0.0.0 does not always stop a 127.0.0.1 bind on Windows).
+ */
+export function portTaken(port, { host = '127.0.0.1', connectMs = 400 } = {}) {
+  const listens = () => new Promise((resolve) => {
+    const server = net.createServer();
+    server.once('error', () => resolve(false));
+    server.listen(port, host, () => server.close(() => resolve(true)));
+  });
+  const answers = () => new Promise((resolve) => {
+    const sock = net.connect({ port, host });
+    const done = (yes) => { clearTimeout(timer); sock.destroy(); resolve(yes); };
+    const timer = setTimeout(() => done(false), connectMs);
+    sock.once('connect', () => done(true));
+    sock.once('error', () => done(false));
+  });
+  return listens().then(async (free) => !free || await answers());
+}
+
+/** The one line a harness prints when its port is taken; it names the port and the way out. */
+export function portTakenLine(port) {
+  return `playtest: port ${port} is already in use by another program (probably another worker's Chrome); ` +
+    `pick another with --port <n> -- nothing was launched`;
+}
+
+/** A URL compared as a file: no query, no hash, percent-decoded, and case-blind on Windows. */
+function samePage(u) {
+  let s = String(u || '');
+  s = s.split('#')[0].split('?')[0];
+  try { s = decodeURI(s); } catch { /* leave it as it is */ }
+  s = s.replace(/\\/g, '/');
+  return process.platform === 'win32' ? s.toLowerCase() : s;
+}
+
+/**
+ * Which DevTools target is OUR page. `targets` is Chrome's /json/list, `asked` the file URL the
+ * harness launched Chrome on. Answers { own } with the target whose URL is that page, or
+ * { foreign } with a page that is plainly somebody else's (a real URL that is not ours -- our
+ * Chrome was started on our page, so it cannot be showing another checkout's), or {} while
+ * Chrome is still coming up (no page yet, or only about:blank).
+ */
+export function pickOwnPage(targets, asked) {
+  const want = samePage(asked);
+  const pages = (targets || []).filter((t) => t && t.type === 'page' && t.webSocketDebuggerUrl);
+  const own = pages.find((t) => samePage(t.url) === want);
+  if (own) return { own };
+  const foreign = pages.find((t) => t.url && !/^(about:|chrome:|chrome-error:|devtools:)/.test(t.url));
+  return foreign ? { foreign } : {};
+}
 
 /** Every Chrome started here and not yet cleaned up, for the exit and signal hooks. */
 const live = new Set();
