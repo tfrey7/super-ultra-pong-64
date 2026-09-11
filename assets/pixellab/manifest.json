@@ -1199,6 +1199,2483 @@
         "detail": "highly detailed"
       },
       "note": "entry rebuilt by item 1232: three generations ran in parallel and the tool's manifest writes raced, keeping only the last; prompt, seed, request and bill are as sent and billed"
+    },
+    {
+      "name": "era2-players-left",
+      "file": "era2-players-left.png",
+      "prompt": "NES 8-bit sprite sheet of a tennis player boy, side view facing right, red headband, white shirt and white shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "seed": 12251,
+      "date": "2026-09-11T03:22:11.121Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 19.8,
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 343,
+      "sha256": "c2416c48a6b372eadce1c2cb67ed67de6a08135bd99e03c3fd54acade667ea8b",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite sheet of a tennis player boy, side view facing right, red headband, white shirt and white shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+        "image_size": {
+          "width": 30,
+          "height": 264
+        },
+        "seed": 12251,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "verdict": "rejected: the 30 x 264 sprite sheet came back almost empty (a dozen stray pixels down a clear strip); pixflux does not draw a 3 x 6 sheet from a row-by-row prompt",
+      "card": "item 1225"
+    },
+    {
+      "name": "era2-players-right",
+      "file": "era2-players-right.png",
+      "prompt": "NES 8-bit sprite sheet of a rival tennis player, side view facing right, blue cap, green shirt, dark shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "seed": 12252,
+      "date": "2026-09-11T03:22:26.218Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 14.5,
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 499,
+      "sha256": "6ba2c57d9adecce1687056102a705ae66cfef6aef7cf9072b3d0801324767344",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite sheet of a rival tennis player, side view facing right, blue cap, green shirt, dark shorts, holding an upright bat with both fists in front of him. 3 columns by 6 rows of animation frames on a grid, each frame 10 pixels wide and 44 tall: row 1 idle knee bend, row 2 shuffling moving up, row 3 shuffling moving down, row 4 swing turning side-on with fists raised, row 5 miss head turned away shoulders slumped, row 6 win fist in the air hopping",
+        "image_size": {
+          "width": 30,
+          "height": 264
+        },
+        "seed": 12252,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "no_background": true
+      },
+      "verdict": "rejected: the same as era2-players-left -- a near-empty strip",
+      "card": "item 1225"
+    },
+    {
+      "name": "era2-sheet-left",
+      "file": "era2-sheet-left.png",
+      "prompt": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12253,
+      "date": "2026-09-11T03:23:42.867Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "era2-player-left-pose.png",
+      "derivedBy": "node assets/pixellab/era2-players-sheet.mjs",
+      "how": "drawn pixel by pixel in the script from the art bible's era 2 silhouette (head 8 x 9, torso 8 x 14, legs 3 x 16, back-edge outline, hand at 10,22) in NES inks, the pose image as the reference for who the character is; six rows (idle, up, down, swing, miss, win) of 3 frames of 10 x 44",
+      "card": "item 1225",
+      "verdict": "worn by the player on era 2 (src/characters.js, the NES block's sheets.left)",
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 870,
+      "sha256": "4ffc5907cf8d40030280e5364f9026e68b123f2aa09e75c2d53f4e62ee159038",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12253,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era2-sheet-right",
+      "file": "era2-sheet-right.png",
+      "prompt": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12254,
+      "date": "2026-09-11T03:24:06.548Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "era2-player-right-pose.png",
+      "derivedBy": "node assets/pixellab/era2-players-sheet.mjs",
+      "how": "drawn pixel by pixel in the script from the art bible's era 2 silhouette (head 8 x 9, torso 8 x 14, legs 3 x 16, back-edge outline, hand at 10,22) in NES inks, the pose image as the reference for who the character is; six rows (idle, up, down, swing, miss, win) of 3 frames of 10 x 44",
+      "card": "item 1225",
+      "verdict": "worn by the computer on era 2 (src/characters.js, the NES block's sheets.right)",
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 879,
+      "sha256": "74a3985417508b362bc756f1f0da991488eb376c5d540adc873e848f48cc81a2",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12254,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era2-player-left-pose",
+      "file": "era2-player-left-pose.png",
+      "prompt": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12253,
+      "date": "2026-09-11T03:23:42.867Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 27.7,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 2250,
+      "sha256": "c03b53887e6321903b3b0fc920fa790cfbb1c365792fff9663068d7a924d528d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12253,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "verdict": "reference only: a good 32 x 64 standing pose, but 28 pixels wide with the fists out and the room behind a paddle is 10; its headband, colours and big head are what era2-sheet-left.png is drawn to",
+      "card": "item 1225"
+    },
+    {
+      "name": "era2-player-right-pose",
+      "file": "era2-player-right-pose.png",
+      "prompt": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12254,
+      "date": "2026-09-11T03:24:06.548Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 21.5,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 2414,
+      "sha256": "bb9643dd7f9636e6cb9955e85c5908ce6a59cdbc0117454313e979a5f4d3d1a5",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12254,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "verdict": "reference only: as era2-player-left-pose, for the rival in the blue cap; era2-sheet-right.png is drawn to it",
+      "card": "item 1225"
+    },
+    {
+      "name": "era3-players-left",
+      "file": "era3-players-left.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226001,
+      "date": "2026-09-11T03:23:35.447Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 6,
+      "seconds": 74.8,
+      "pixels": {
+        "width": 36,
+        "height": 312
+      },
+      "bytes": 7083,
+      "sha256": "f3017e0247d16fc92f43fd6eae655bbf77bf9c09777137269a8288c22214b4c3",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226001,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era3-players-right",
+      "file": "era3-players-right.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226002,
+      "date": "2026-09-11T03:23:56.033Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 17.6,
+      "pixels": {
+        "width": 36,
+        "height": 312
+      },
+      "bytes": 5593,
+      "sha256": "b695bee5b8e73eb3324ce069afe7765fe689b6527c2a3d2ff0a83dc9fc900749",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226002,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era3-arena-wall",
+      "file": "era3-arena-wall.png",
+      "prompt": "16-bit Sega Genesis background tile strip, a castle arena wall of big grey stone blocks at night, dark mortar lines, moss in the cracks, lit warm orange from below by torchlight, side view, seamless horizontal, Golden Axe style, saturated colours",
+      "size": {
+        "width": 320,
+        "height": 48
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side"
+      },
+      "seed": 1226003,
+      "date": "2026-09-11T03:37:12.650Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 14.8,
+      "pixels": {
+        "width": 320,
+        "height": 48
+      },
+      "bytes": 5637,
+      "sha256": "03e89750e37f4e8591ea868863a9b33f9cf09b58495cd99e80f20221e822bb24",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis background tile strip, a castle arena wall of big grey stone blocks at night, dark mortar lines, moss in the cracks, lit warm orange from below by torchlight, side view, seamless horizontal, Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 320,
+          "height": 48
+        },
+        "seed": 1226003,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "5ad72dd69b3a3ac5c355147c3500038ea9fb8557100a62a265cfd1f04f253f12"
+      }
+    },
+    {
+      "name": "era3-torch",
+      "file": "era3-torch.png",
+      "prompt": "16-bit Sega Genesis sprite strip, 3 frames side by side of the same wall torch, iron bracket, burning flame in orange yellow and red, each frame the flame a different shape, Golden Axe style",
+      "size": {
+        "width": 48,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "no_background": true
+      },
+      "seed": 1226004,
+      "date": "2026-09-11T03:38:05.302Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 51.9,
+      "pixels": {
+        "width": 48,
+        "height": 32
+      },
+      "bytes": 615,
+      "sha256": "abe24e0021ae3a2cca73fac313e5bec7e40e0949245377e9d465a657035a76dd",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite strip, 3 frames side by side of the same wall torch, iron bracket, burning flame in orange yellow and red, each frame the flame a different shape, Golden Axe style",
+        "image_size": {
+          "width": 48,
+          "height": 32
+        },
+        "seed": 1226004,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "no_background": true
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "cf732f7ace6f400dd62495fd444facd27a15ab4df266e2d43de2afc61ae7e958"
+      }
+    },
+    {
+      "name": "era3-portraits",
+      "file": "era3-portraits.png",
+      "prompt": "16-bit Sega Genesis status bar portraits, two face portraits side by side: left a barbarian warrior with a horned helmet and a beard, right an armoured knight in a steel helm with a red crest, front view, Golden Axe style, saturated colours",
+      "size": {
+        "width": 64,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "seed": 1226005,
+      "date": "2026-09-11T03:38:17.939Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 12,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 1111,
+      "sha256": "48caee2dfa3055c73a366d3e028cb493299a2ab44df12c918654ded8460b3446",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis status bar portraits, two face portraits side by side: left a barbarian warrior with a horned helmet and a beard, right an armoured knight in a steel helm with a red crest, front view, Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 64,
+          "height": 32
+        },
+        "seed": 1226005,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "a240a73792990527c34a387ea0c0df7c8ade53c0aae569c4b6ae56a93ec00f54"
+      }
+    },
+    {
+      "name": "era3-panel",
+      "file": "era3-panel.png",
+      "prompt": "16-bit Sega Genesis game status panel, a long carved grey stone slab frame with bevelled edges and rivets, dark recessed middle, Golden Axe interface style",
+      "size": {
+        "width": 320,
+        "height": 32
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "seed": 1226006,
+      "date": "2026-09-11T03:38:37.450Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 18.7,
+      "pixels": {
+        "width": 320,
+        "height": 32
+      },
+      "bytes": 1598,
+      "sha256": "6ae4c698861972bcb7393561009a1329014261b712d47a8b1b8e997363081291",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis game status panel, a long carved grey stone slab frame with bevelled edges and rivets, dark recessed middle, Golden Axe interface style",
+        "image_size": {
+          "width": 320,
+          "height": 32
+        },
+        "seed": 1226006,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "medium detail"
+      },
+      "palette": {
+        "tool": "tools/palette-snap.mjs",
+        "bits": 3,
+        "levels": [
+          0,
+          36,
+          73,
+          109,
+          146,
+          182,
+          219,
+          255
+        ],
+        "alphaCut": 128,
+        "sourceSha256": "729a429c0755526c823712d8775e62b2217cb892086791fcf52e61c50732f2b6"
+      }
+    },
+    {
+      "name": "era3-p1",
+      "file": "era3-p1.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226001,
+      "date": "2026-09-11T03:23:35.447Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 6,
+      "seconds": 74.8,
+      "pixels": {
+        "width": 60,
+        "height": 150
+      },
+      "bytes": 2335,
+      "sha256": "d199947e6104b5ff430c7e201d3373a2993f012d0b7ece5abe8aa5e8ce130928",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226001,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era3-players-left.png",
+      "derivedBy": "node assets/pixellab/era3-players-cut.mjs",
+      "how": "the 11 figures pixflux stacked in one column, packed in order into a 3 x 6 sheet of 20 x 25 frames (idle 2, up 2, down 2, swing 3 with the first repeated, miss 1, win 2), feet down and shield edge right, snapped to 3 bits a channel",
+      "card": "item 1226",
+      "verdict": "worn by era 3's players (src/characters.js)"
+    },
+    {
+      "name": "era3-p2",
+      "file": "era3-p2.png",
+      "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+      "size": {
+        "width": 36,
+        "height": 312
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1226002,
+      "date": "2026-09-11T03:23:56.033Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 2,
+      "seconds": 17.6,
+      "pixels": {
+        "width": 60,
+        "height": 150
+      },
+      "bytes": 1727,
+      "sha256": "1d250569365096d4fba4af3209d04ee38bdfaeb0de7589981d94f6e6f22cb5e8",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same armoured knight in a crested helm, side view facing right, steel plate armour, red crest, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising a sword overhead. Golden Axe style, saturated colours",
+        "image_size": {
+          "width": 36,
+          "height": 312
+        },
+        "seed": 1226002,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era3-players-right.png",
+      "derivedBy": "node assets/pixellab/era3-players-cut.mjs",
+      "how": "the 11 figures pixflux stacked in one column, packed in order into a 3 x 6 sheet of 20 x 25 frames (idle 2, up 2, down 2, swing 3 with the first repeated, miss 1, win 2), feet down and shield edge right, snapped to 3 bits a channel",
+      "card": "item 1226",
+      "verdict": "worn by era 3's players (src/characters.js)"
+    },
+    {
+      "name": "era4-players-left-sheet",
+      "file": "era4-players-left-sheet.png",
+      "prompt": "16-bit Super Nintendo sprite sheet, 3 columns by 6 rows of the same small hover-racing pilot facing right, side view: red and white racing suit, round red helmet with dark visor band, standing on a small grey hover pad with a blue jet flame under it. row 1 idle, row 2 leaning up, row 3 leaning down, row 4 spinning, row 5 slumped, row 6 both arms raised in victory",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "seed": 4101,
+      "date": "2026-09-11T03:22:24.000Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 17.8,
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 2747,
+      "sha256": "11a177fa2e5e2e5b62fd059bda8e50deae747b1bdd90eee1f465b66aa68a9b7c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite sheet, 3 columns by 6 rows of the same small hover-racing pilot facing right, side view: red and white racing suit, round red helmet with dark visor band, standing on a small grey hover pad with a blue jet flame under it. row 1 idle, row 2 leaning up, row 3 leaning down, row 4 spinning, row 5 slumped, row 6 both arms raised in victory",
+        "image_size": {
+          "width": 30,
+          "height": 264
+        },
+        "seed": 4101,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-left",
+      "file": "era4-pilot-left.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4102,
+      "date": "2026-09-11T03:22:43.007Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 18.4,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 3368,
+      "sha256": "b540f00eb7cd8f9abd2ada1318f982156b973f440a9215ed5b50065d461e4d2d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4102,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-right",
+      "file": "era4-pilot-right.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4103,
+      "date": "2026-09-11T03:23:02.185Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 18.5,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 2428,
+      "sha256": "76629ee98a492715a310632ea1e277f1176d4b2433bba5d85b5d216a0fc248e6",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4103,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-balloon",
+      "file": "era4-balloon.png",
+      "prompt": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "seed": 4104,
+      "date": "2026-09-11T03:23:43.204Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 27.7,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 879,
+      "sha256": "e03bd501ee9d5e36537acb2883c2f54565d4115eab2e74bcc85f4b491fd770ec",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4104,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pylon",
+      "file": "era4-pylon.png",
+      "prompt": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 4105,
+      "date": "2026-09-11T03:23:59.604Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 15.1,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 330,
+      "sha256": "cd0834af21a86f6707e68ec4bc316f2e1d2201217b57add600a72028a87de47e",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4105,
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-left-win",
+      "file": "era4-pilot-left-win.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: red and white racing suit, round red helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4106,
+      "date": "2026-09-11T03:37:50.097Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 16.5,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 1129,
+      "sha256": "d6885607f33de30237b31793b16d4cf3c4d5600db23786562de6f5701c353ad0",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: red and white racing suit, round red helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4106,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-pilot-right-win",
+      "file": "era4-pilot-right-win.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4107,
+      "date": "2026-09-11T03:38:19.463Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 24.8,
+      "pixels": {
+        "width": 32,
+        "height": 128
+      },
+      "bytes": 1035,
+      "sha256": "246b8cbd1d85587efbf51000d48ca4e4d4ba383511b2dfb7c6f3c25801c91c17",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot facing right, side view, full body, victory pose with both arms raised high above the head, jumping: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4107,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era4-players-left",
+      "file": "era4-players-left.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4102,
+      "date": "2026-09-11T03:22:43.007Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 96,
+        "height": 606
+      },
+      "bytes": 13669,
+      "sha256": "b634003b385ff5e610fdab67f4c1259de8b802b1e623ce0f4854099bcf24bb3a",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4102,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era4-pilot-left.png",
+      "derivedBy": "node assets/pixellab/era4-players-build.mjs",
+      "how": "the one pose cut into the rig's six beats (idle, up, down, swing, miss, win; 2/2/2/3/2/2 frames), jet flame and raised arms drawn in code, 15-bit SNES colour, capped at #f8f8d0; frame 32x101, hand (32, 41)",
+      "card": "item 1227",
+      "verdict": "worn by era 4's players (src/characters.js, ERAS[4].sheets)"
+    },
+    {
+      "name": "era4-players-right",
+      "file": "era4-players-right.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4103,
+      "date": "2026-09-11T03:23:02.185Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 96,
+        "height": 606
+      },
+      "bytes": 9292,
+      "sha256": "0cc9924325b70aacce2e229b8d5b8d99e5de6c2c10a5794be2cab53e9fb4e1ca",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4103,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era4-pilot-right.png",
+      "derivedBy": "node assets/pixellab/era4-players-build.mjs",
+      "how": "the one pose cut into the rig's six beats (idle, up, down, swing, miss, win; 2/2/2/3/2/2 frames), jet flame and raised arms drawn in code, 15-bit SNES colour, capped at #f8f8d0; frame 32x101, hand (32, 41)",
+      "card": "item 1227",
+      "verdict": "worn by era 4's players (src/characters.js, ERAS[4].sheets)"
+    },
+    {
+      "name": "era4-balloon-snes",
+      "file": "era4-balloon-snes.png",
+      "prompt": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "seed": 4104,
+      "date": "2026-09-11T03:23:43.204Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 18,
+        "height": 26
+      },
+      "bytes": 458,
+      "sha256": "8b46c34ac11e95d047ce09a79da6873e684c08208bf2249904f733e8eae237b1",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one small hot-air balloon, round striped envelope in warm orange and cream, small wicker basket hanging below, Pilotwings style, soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4104,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "no_background": true
+      },
+      "derivedFrom": "era4-balloon.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not, cropped to the pixels it draws; 32 colours",
+      "card": "item 1227",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
+      "name": "era4-pylon-snes",
+      "file": "era4-pylon-snes.png",
+      "prompt": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 4105,
+      "date": "2026-09-11T03:23:59.604Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 8,
+        "height": 28
+      },
+      "bytes": 195,
+      "sha256": "fe51a7287c8f977df309c6d9edf873bebf15b8f6fc72aee420d849aac9bee1f5",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of one tall thin race-track marker pylon, dark grey post with a bright amber light at the top, F-Zero style, front view",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 4105,
+        "outline": "single color outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "derivedFrom": "era4-pylon.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not, cropped to the pixels it draws; 12 colours",
+      "card": "item 1227",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
+      "name": "era9-armour-left",
+      "file": "era9-armour-left.png",
+      "prompt": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90101,
+      "date": "2026-09-11T03:34:40.245Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 84,
+        "height": 324
+      },
+      "bytes": 11414,
+      "sha256": "3d05574f72959dc7f6af2397387a8ab5d8e7c9599e073b9834ab69caf0109fbc",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 90101,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "derivedFrom": "era9-armour-left-raw.png",
+      "derivedBy": "assets/pixellab/era9-derive.mjs",
+      "how": "pixflux drew 13 figures in 7 rows of two instead of a 3 x 6 grid; each beat's frame cut from its cell, the ground keyed out, pasted onto 28 x 54 frames, feet down, front to the right",
+      "card": "1233",
+      "verdict": "used: all six beats; swing is the shield-forward pair with the glowing-shield figure mirrored as the contact frame"
+    },
+    {
+      "name": "era9-armour-left-raw",
+      "file": "era9-armour-left-raw.png",
+      "prompt": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90101,
+      "date": "2026-09-11T03:34:40.245Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 13.3,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 24206,
+      "sha256": "0a43bff00e2f8d378bd525b50c389b12383739a090cd19ed0583d3ea2c3f491a",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one armoured sci-fi space marine seen from the side facing right, gunmetal grey power armour with green trim, broad shoulder pads, big helmet with a mirrored pale green visor, embossed diamond plate texture on the armour, holding a glowing energy shield in the right hand. row 1 idle weapon-ready stance two frames; row 2 strafing step legs apart leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, the middle frame arm fully extended widest pose; row 5 hit recoil torso rocked back one frame; row 6 fist pump victory arm raised high two frames. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 90101,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      }
+    },
+    {
+      "name": "era9-armour-right-raw",
+      "file": "era9-armour-right-raw.png",
+      "prompt": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one tall steel cyborg robot seen from the side facing right, polished steel armour plates, a single glowing red eye slit in the head, embossed metal panels, holding a glowing energy shield in the right hand. row 1 idle stance two frames; row 2 strafing step leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, middle frame widest; row 5 hit recoil rocked back one frame; row 6 fist raised in victory two frames. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90102,
+      "date": "2026-09-11T03:34:58.212Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 17.2,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 20502,
+      "sha256": "fca712ffd816924ffbdedf18f6160bde38d43642c3cb157ac6b2f1c40141f289",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet, 3 columns by 6 rows of animation frames, each frame 24x54 pixels, one tall steel cyborg robot seen from the side facing right, polished steel armour plates, a single glowing red eye slit in the head, embossed metal panels, holding a glowing energy shield in the right hand. row 1 idle stance two frames; row 2 strafing step leaning up two frames; row 3 strafing step leaning down two frames; row 4 melee shield bash three frames, middle frame widest; row 5 hit recoil rocked back one frame; row 6 fist raised in victory two frames. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 90102,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "verdict": "not used: four figures of two sizes, no grid -- replaced from the re-roll reserve by era9-armour-right-row"
+    },
+    {
+      "name": "era9-hangar",
+      "file": "tex3d-era9-hangar.png",
+      "prompt": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+      "size": {
+        "width": 400,
+        "height": 80
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90103,
+      "date": "2026-09-11T03:35:13.605Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 400,
+        "height": 80
+      },
+      "bytes": 40185,
+      "sha256": "875de8cc475ef3dae1d4b7a8b514c311a2c39a0281353cd9e2c05dbf9f90052c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+        "image_size": {
+          "width": 400,
+          "height": 80
+        },
+        "seed": 90103,
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "derivedFrom": "era9-hangar.png",
+      "derivedBy": "assets/pixellab/era9-derive.mjs",
+      "how": "copied as it came, then embedded in src/textures3d.js",
+      "card": "1233",
+      "verdict": "used as it came"
+    },
+    {
+      "name": "era9-hangar",
+      "file": "era9-hangar.png",
+      "prompt": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+      "size": {
+        "width": 400,
+        "height": 80
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90103,
+      "date": "2026-09-11T03:35:13.605Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 5,
+      "seconds": 14.7,
+      "pixels": {
+        "width": 400,
+        "height": 80
+      },
+      "bytes": 40185,
+      "sha256": "875de8cc475ef3dae1d4b7a8b514c311a2c39a0281353cd9e2c05dbf9f90052c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "seamless pixel art texture of a sci-fi starship hangar wall, dark gunmetal steel panels, bolted plates, small green indicator lights, pipes and vents, hard lighting, 2001 xbox game style, flat front view",
+        "image_size": {
+          "width": 400,
+          "height": 80
+        },
+        "seed": 90103,
+        "outline": "lineless",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "era9-beacon",
+      "file": "tex3d-era9-beacon.png",
+      "prompt": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90104,
+      "date": "2026-09-11T03:35:29.965Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 1013,
+      "sha256": "15c5b8c13174158458876a4e95e186ffb5115b463e0c581c1c99d7544ebeae9d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 90104,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "derivedFrom": "era9-beacon.png",
+      "derivedBy": "assets/pixellab/era9-derive.mjs",
+      "how": "ground keyed out, then embedded in src/textures3d.js",
+      "card": "1233",
+      "verdict": "used as it came"
+    },
+    {
+      "name": "era9-beacon",
+      "file": "era9-beacon.png",
+      "prompt": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+      "size": {
+        "width": 32,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 90104,
+      "date": "2026-09-11T03:35:29.965Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 15.7,
+      "pixels": {
+        "width": 32,
+        "height": 64
+      },
+      "bytes": 1626,
+      "sha256": "d9dbd34ac01c9bc6d99ea849173768ea0e01c0841eb34f10fd201b5c9ba5b040",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sci-fi warning beacon post, front view, steel pillar with a green glowing lamp housing on top, hazard stripes at its foot, bolted metal, black background, 2001 xbox game style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 90104,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "era9-armour-right",
+      "file": "era9-armour-right.png",
+      "prompt": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 54
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90105,
+      "date": "2026-09-11T03:37:06.596Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 84,
+        "height": 324
+      },
+      "bytes": 3812,
+      "sha256": "c7a49c1908af41ad28529bb9054c430b416de0a84187ae10fe5f21e730dbaa79",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 54
+        },
+        "seed": 90105,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "derivedFrom": "era9-armour-right-row.png",
+      "derivedBy": "assets/pixellab/era9-derive.mjs",
+      "how": "the re-roll: one row of three 24 x 54 stances; cut on the rig's grid, the swing and recoil made by sliding a stance 1-3 pixels toward or away from the ball",
+      "card": "1233",
+      "verdict": "used, weakly: the three stances barely differ, so the cyborg's beats read mostly through position and the code-drawn miss flash"
+    },
+    {
+      "name": "era9-armour-right-row",
+      "file": "era9-armour-right-row.png",
+      "prompt": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+      "size": {
+        "width": 72,
+        "height": 54
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      },
+      "seed": 90105,
+      "date": "2026-09-11T03:37:06.596Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 12,
+      "pixels": {
+        "width": 72,
+        "height": 54
+      },
+      "bytes": 2947,
+      "sha256": "59e6756b9f4726c4974ba8c5c6ead8b44b81ffa6238d3700a34f8403a710f98c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art, three animation frames side by side in one row, each frame 24x54 pixels, the same tall polished steel cyborg robot seen from the side facing right, single glowing red eye slit, full body head to feet: frame 1 standing ready, frame 2 punching forward with the right arm fully extended, frame 3 right fist raised high in victory. black background, 2001 xbox game style, hard lighting",
+        "image_size": {
+          "width": 72,
+          "height": 54
+        },
+        "seed": 90105,
+        "outline": "single color black outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east"
+      }
+    },
+    {
+      "name": "era10-banner",
+      "file": "era10-banner.png",
+      "prompt": "torn hanging cloth banner, ragged bottom edge, faded original military emblem of a stylised cog and wings, no text, dusty mud brown and faded green, gritty 2005 shooter style",
+      "size": {
+        "width": 64,
+        "height": 96
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 679215469,
+      "date": "2026-09-11T03:35:15.939Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 6,
+      "seconds": 31,
+      "pixels": {
+        "width": 64,
+        "height": 96
+      },
+      "bytes": 4636,
+      "sha256": "3c53cae800ced46309100d9244b640cf930276ae5da8e55f94a963698639dc6e",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "torn hanging cloth banner, ragged bottom edge, faded original military emblem of a stylised cog and wings, no text, dusty mud brown and faded green, gritty 2005 shooter style",
+        "image_size": {
+          "width": 64,
+          "height": 96
+        },
+        "seed": 679215469,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-armour-left",
+      "file": "era10-armour-left.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 1326562740,
+      "date": "2026-09-11T03:36:49.365Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 44.1,
+      "pixels": {
+        "width": 96,
+        "height": 396
+      },
+      "bytes": 36295,
+      "sha256": "e4805d4f4c9cb4e1ba20f50b9f7558ceb8ee67acfda50d006fd521bbbf6e78eb",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 1326562740,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-armour-right",
+      "file": "era10-armour-right.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 2017111403,
+      "date": "2026-09-11T03:37:38.972Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 31.1,
+      "pixels": {
+        "width": 96,
+        "height": 396
+      },
+      "bytes": 34786,
+      "sha256": "0a6780b85026229a406a07d532cfd2d9492a715bb27c992e1640b023cedc5f5b",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 2017111403,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-soldier-left",
+      "file": "era10-soldier-left.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 1326562740,
+      "date": "2026-09-11T03:36:49.365Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 1,
+      "seconds": 44.1,
+      "pixels": {
+        "width": 288,
+        "height": 792
+      },
+      "bytes": 248552,
+      "sha256": "0c738a2d5f0f8e4d3521cd8c436a096042f8afd072e95d2c751bbbbd4e20d62c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 1326562740,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "derivedFrom": "era10-armour-left.png",
+      "derivedBy": "node assets/pixellab/era10-derive.mjs",
+      "how": "11 figures found in the generated sheet, reposed per beat (POSES), graded toward #c9b89a, a 1-pixel HDR-sun rim and its glow, seeded grain at 0.12, at twice the size with bilinear filtering",
+      "card": "item 1234",
+      "verdict": "drawn by the character rig (src/characters.js, era 10 block) behind its paddle"
+    },
+    {
+      "name": "era10-soldier-right",
+      "file": "era10-soldier-right.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 2017111403,
+      "date": "2026-09-11T03:37:38.972Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 1,
+      "seconds": 31.1,
+      "pixels": {
+        "width": 288,
+        "height": 792
+      },
+      "bytes": 159207,
+      "sha256": "8671ea55dd96239c40a8893da6cc5382b3bc5ffb7260ea739cc6b89f543f325c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 2017111403,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "derivedFrom": "era10-armour-right.png",
+      "derivedBy": "node assets/pixellab/era10-derive.mjs",
+      "how": "8 figures found in the generated sheet, reposed per beat (POSES), graded toward #c9b89a, a 1-pixel HDR-sun rim and its glow, seeded grain at 0.12, at twice the size with bilinear filtering",
+      "card": "item 1234",
+      "verdict": "drawn by the character rig (src/characters.js, era 10 block) behind its paddle"
+    },
+    {
+      "name": "era10-ruin",
+      "file": "era10-ruin.png",
+      "prompt": "ruined city plaza at sunset, six broken concrete columns with jagged tops, bombed-out stone, umber and mud brown, dusty haze, gritty 2005 shooter backdrop, side view, desaturated",
+      "size": {
+        "width": 400,
+        "height": 120
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 7870210,
+      "date": "2026-09-11T03:49:39.203Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 17.9,
+      "pixels": {
+        "width": 400,
+        "height": 120
+      },
+      "bytes": 32643,
+      "sha256": "3f3321b3166494309ecc81669d4bf4c008b270e62e34c5186aebb075ec5d69d8",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "ruined city plaza at sunset, six broken concrete columns with jagged tops, bombed-out stone, umber and mud brown, dusty haze, gritty 2005 shooter backdrop, side view, desaturated",
+        "image_size": {
+          "width": 400,
+          "height": 120
+        },
+        "seed": 7870210,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-gamerpics",
+      "file": "era10-gamerpics.png",
+      "prompt": "two square avatar icons side by side, left a bulky original soldier helmet with a narrow slit visor in dark green armour, right the same kind of helmet in ash grey, dark background, 2005 console profile picture style, original design",
+      "size": {
+        "width": 64,
+        "height": 32
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "negative_description": "gold visor, orange visor, halo, master chief"
+      },
+      "seed": 1267114965,
+      "date": "2026-09-11T03:50:48.716Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 12.6,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 2166,
+      "sha256": "e357477a122c1865dccaadf5222921554581dedc19c9c3272efd39211be14702",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "two square avatar icons side by side, left a bulky original soldier helmet with a narrow slit visor in dark green armour, right the same kind of helmet in ash grey, dark background, 2005 console profile picture style, original design",
+        "image_size": {
+          "width": 64,
+          "height": 32
+        },
+        "seed": 1267114965,
+        "negative_description": "gold visor, orange visor, halo, master chief",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "era10-gamerpics-heads",
+      "file": "era10-gamerpics-heads.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 1326562740,
+      "date": "2026-09-11T03:36:49.365Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 1,
+      "seconds": 44.1,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 4747,
+      "sha256": "b4430c44ac03f129dbd870fd504b26b86507aa88b823e66f61d20e937b2136f7",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 1326562740,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "derivedFrom": "era10-armour-left.png",
+      "derivedBy": "node assets/pixellab/era10-derive.mjs",
+      "how": "the left and right sheets' first idle figures, each head cropped square and scaled to 32 x 32 on #1b1b1b (era10-gamerpics.png, two rolls, read as a famous franchise helmet and is not drawn)",
+      "card": "item 1234",
+      "verdict": "drawn by the character rig (src/characters.js, era 10 block) behind its paddle"
+    },
+    {
+      "name": "era7-skater-right",
+      "file": "era7-skater-right.png",
+      "prompt": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1960749465,
+      "date": "2026-09-11T03:34:25.613Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 20.4,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 17458,
+      "sha256": "1ab8b9a7070d92c13a945dd73154b2b51d2246d784d62d76972d786777f25afe",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 1960749465,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "card": "item 1231",
+      "verdict": "raw: cut into era7-skater-right-sheet.png by assets/pixellab/era7-skater-cut.py"
+    },
+    {
+      "name": "era7-skater-left-action",
+      "file": "era7-skater-left-action.png",
+      "prompt": "three frames in one row of the same character side view facing right, a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates: frame 1 spinning swing with one arm flung out to the right, frame 2 stumbling with torso bent forward, frame 3 trick jump mid-air with both arms raised in celebration. cel-shaded Jet Set Radio style",
+      "size": {
+        "width": 108,
+        "height": 80
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 462531854,
+      "date": "2026-09-11T03:35:47.938Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 29.7,
+      "pixels": {
+        "width": 108,
+        "height": 80
+      },
+      "bytes": 4663,
+      "sha256": "c2637b48a75a9209cc7ecca58679ac1c7fbdae512fe136c053bd6d87e2368692",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "three frames in one row of the same character side view facing right, a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates: frame 1 spinning swing with one arm flung out to the right, frame 2 stumbling with torso bent forward, frame 3 trick jump mid-air with both arms raised in celebration. cel-shaded Jet Set Radio style",
+        "image_size": {
+          "width": 108,
+          "height": 80
+        },
+        "seed": 462531854,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "card": "item 1231",
+      "verdict": "raw: cut into era7-skater-left-sheet.png by assets/pixellab/era7-skater-cut.py"
+    },
+    {
+      "name": "era7-skater-left",
+      "file": "era7-skater-left.png",
+      "prompt": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1636193142,
+      "date": "2026-09-11T03:34:25.613Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 13.7,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 15348,
+      "sha256": "bec99701b5baeeac9d01e7c54a537d17a4fe3f6b7627f62979c331a51cea7e9d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 1636193142,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "rebuilt": "item 1231: this entry was lost when two generations ran at once and each rewrote the manifest; rebuilt from the tool's own printed seed and the prompt it was sent, the date taken from its twin generated alongside it",
+      "card": "item 1231",
+      "verdict": "raw: cut into era7-skater-left-sheet.png by assets/pixellab/era7-skater-cut.py"
+    },
+    {
+      "name": "era7-skater-right-action",
+      "file": "era7-skater-right-action.png",
+      "prompt": "three frames in one row of the same character side view facing right, a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates: frame 1 spinning swing with one arm flung out to the right, frame 2 stumbling with torso bent forward, frame 3 trick jump mid-air with both arms raised in celebration. cel-shaded Jet Set Radio style",
+      "size": {
+        "width": 108,
+        "height": 80
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1938212233,
+      "date": "2026-09-11T03:35:47.938Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 25.9,
+      "pixels": {
+        "width": 108,
+        "height": 80
+      },
+      "bytes": 4680,
+      "sha256": "8b9091553d748d0f55b93896d60cc68877da96baccb4a72c81d9397cb1cc095d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "three frames in one row of the same character side view facing right, a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates: frame 1 spinning swing with one arm flung out to the right, frame 2 stumbling with torso bent forward, frame 3 trick jump mid-air with both arms raised in celebration. cel-shaded Jet Set Radio style",
+        "image_size": {
+          "width": 108,
+          "height": 80
+        },
+        "seed": 1938212233,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "rebuilt": "item 1231: this entry was lost when two generations ran at once and each rewrote the manifest; rebuilt from the tool's own printed seed and the prompt it was sent, the date taken from its twin generated alongside it",
+      "card": "item 1231",
+      "verdict": "raw: cut into era7-skater-right-sheet.png by assets/pixellab/era7-skater-cut.py"
+    },
+    {
+      "name": "era7-skater-left-sheet",
+      "file": "era7-skater-left-sheet.png",
+      "prompt": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1636193142,
+      "date": "2026-09-11T03:34:25.613Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 132,
+        "height": 504
+      },
+      "bytes": 23797,
+      "sha256": "623ed92c4e2997046a5211857f6a34e016120102a26079f089eb8fad3de43df4",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 1636193142,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "rebuilt": "item 1231: this entry was lost when two generations ran at once and each rewrote the manifest; rebuilt from the tool's own printed seed and the prompt it was sent, the date taken from its twin generated alongside it",
+      "card": "item 1231",
+      "verdict": "worn by era 7's left player (src/characters.js ERAS[7].sheets.left)",
+      "derivedFrom": [
+        "era7-skater-left.png",
+        "era7-skater-left-action.png"
+      ],
+      "derivedBy": "py -3.10 assets/pixellab/era7-skater-cut.py",
+      "how": "pixflux drew a 2 x 4 grid of 36 x 81 figures, not the 3 x 6 sheet asked for; each figure found as a cluster of pixels, the action row scaled to the standing height (nearest), paper white pulled to 224, laid out as the rig's six rows (idle 2, up 2, down 2, swing 3, miss 1, win 2) of 44 x 84 frames, feet on the bottom row"
+    },
+    {
+      "name": "era7-skater-right-sheet",
+      "file": "era7-skater-right-sheet.png",
+      "prompt": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1960749465,
+      "date": "2026-09-11T03:34:25.613Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 132,
+        "height": 504
+      },
+      "bytes": 22304,
+      "sha256": "0694229bddd4feaf4d39893843c562bd35184ffae902c932c085529ebf61be4f",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 1960749465,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "card": "item 1231",
+      "verdict": "worn by era 7's right player (src/characters.js ERAS[7].sheets.right)",
+      "derivedFrom": [
+        "era7-skater-right.png",
+        "era7-skater-right-action.png"
+      ],
+      "derivedBy": "py -3.10 assets/pixellab/era7-skater-cut.py",
+      "how": "pixflux drew a 2 x 4 grid of 36 x 81 figures, not the 3 x 6 sheet asked for; each figure found as a cluster of pixels, the action row scaled to the standing height (nearest), paper white pulled to 224, laid out as the rig's six rows (idle 2, up 2, down 2, swing 3, miss 1, win 2) of 44 x 84 frames, feet on the bottom row"
+    },
+    {
+      "name": "tex3d-era6-penguin",
+      "file": "tex3d-era6-penguin.png",
+      "prompt": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-penguin-raw2 (the stand) and era6-penguin-win-raw (the jump for joy); their prompts and seeds are their own entries",
+      "derivedFrom": [
+        "era6-penguin-raw2",
+        "era6-penguin-win-raw"
+      ],
+      "seed": 1793498882,
+      "size": {
+        "width": 96,
+        "height": 264
+      },
+      "pixels": {
+        "width": 96,
+        "height": 264
+      },
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "bytes": 26913,
+      "sha256": "7223536321110e6472eeed9f9ffe23fba184c27fd7fba149f1d26fe89ff752d5",
+      "date": "2026-09-11T03:38:38.534Z",
+      "note": "item 1230: 3 x 6 frames of 32 x 44, idle up down swing miss win; dated as its newest source and listed before the generations, so the tool reads the cost of one image off a real bill",
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "request": {
+        "description": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-penguin-raw2 (the stand) and era6-penguin-win-raw (the jump for joy); their prompts and seeds are their own entries",
+        "seed": 1793498882,
+        "derived": "py -3.10 assets/pixellab/era6-n64-sheets.py -- no request is sent; the sources are the entries named in derivedFrom"
+      }
+    },
+    {
+      "name": "tex3d-era6-frog",
+      "file": "tex3d-era6-frog.png",
+      "prompt": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-frog-sheet-raw (the stand) and era6-frog-win-raw (the jump for joy); their prompts and seeds are their own entries",
+      "derivedFrom": [
+        "era6-frog-sheet-raw",
+        "era6-frog-win-raw"
+      ],
+      "seed": 1594989580,
+      "size": {
+        "width": 96,
+        "height": 264
+      },
+      "pixels": {
+        "width": 96,
+        "height": 264
+      },
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "bytes": 30052,
+      "sha256": "0f1b240973bce354842c34cacea104b064815c3d26ef72b8ba079570fb4c6b8d",
+      "date": "2026-09-11T03:38:59.548Z",
+      "note": "item 1230: 3 x 6 frames of 32 x 44, idle up down swing miss win; dated as its newest source and listed before the generations, so the tool reads the cost of one image off a real bill",
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "request": {
+        "description": "DERIVED, not generated: assets/pixellab/era6-n64-sheets.py builds the six-row sheet from era6-frog-sheet-raw (the stand) and era6-frog-win-raw (the jump for joy); their prompts and seeds are their own entries",
+        "seed": 1594989580,
+        "derived": "py -3.10 assets/pixellab/era6-n64-sheets.py -- no request is sent; the sources are the entries named in derivedFrom"
+      }
+    },
+    {
+      "name": "era6-penguin-sheet-raw",
+      "file": "era6-penguin-sheet-raw.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, the same cute chunky round penguin mascot in every cell, dark blue body, cream white belly, red scarf, big round head, stubby flippers, smooth rounded 1996 3D toy game character, facing right, hugging a board to its chest. Row 1 idle waddle bob. Row 2 hop step leaning forward. Row 3 hop step leaning back. Row 4 belly bump lunge forward. Row 5 dizzy spin with three yellow stars round its head. Row 6 victory jump with both flippers raised. Full body in each cell, evenly spaced",
+      "size": {
+        "width": 60,
+        "height": 270
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 796592394,
+      "date": "2026-09-11T03:36:54.343Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 18,
+      "pixels": {
+        "width": 60,
+        "height": 270
+      },
+      "bytes": 4004,
+      "sha256": "6e5e4aa17e6822bc35832e34c52a7a0c5b45e1cab8411804f728e99fa5550661",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, the same cute chunky round penguin mascot in every cell, dark blue body, cream white belly, red scarf, big round head, stubby flippers, smooth rounded 1996 3D toy game character, facing right, hugging a board to its chest. Row 1 idle waddle bob. Row 2 hop step leaning forward. Row 3 hop step leaning back. Row 4 belly bump lunge forward. Row 5 dizzy spin with three yellow stars round its head. Row 6 victory jump with both flippers raised. Full body in each cell, evenly spaced",
+        "image_size": {
+          "width": 60,
+          "height": 270
+        },
+        "seed": 796592394,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "note": "restored by hand on item 1230: this run and the frog run wrote the manifest at the same time and this entry was lost; prompt and seed are from the run output, bytes 4004, 18 s"
+    },
+    {
+      "name": "era6-frog-sheet-raw",
+      "file": "era6-frog-sheet-raw.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, the same cute chunky round green frog mascot in every cell, bright green body, pale mint belly, yellow baseball cap, big round head, stubby arms, smooth rounded 1996 3D toy game character, facing right, hugging a board to its chest. Row 1 idle bob. Row 2 hop step leaning forward. Row 3 hop step leaning back. Row 4 belly bump lunge forward. Row 5 dizzy spin with three yellow stars round its head. Row 6 victory jump with both arms raised. Full body in each cell, evenly spaced",
+      "size": {
+        "width": 60,
+        "height": 270
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 1594989580,
+      "date": "2026-09-11T03:36:54.343Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 29.6,
+      "pixels": {
+        "width": 60,
+        "height": 270
+      },
+      "bytes": 6730,
+      "sha256": "80bd7b1d959b83d470dc743f0bc1cf1459f9d8d22aa1d75d3af932565d2cb240",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, the same cute chunky round green frog mascot in every cell, bright green body, pale mint belly, yellow baseball cap, big round head, stubby arms, smooth rounded 1996 3D toy game character, facing right, hugging a board to its chest. Row 1 idle bob. Row 2 hop step leaning forward. Row 3 hop step leaning back. Row 4 belly bump lunge forward. Row 5 dizzy spin with three yellow stars round its head. Row 6 victory jump with both arms raised. Full body in each cell, evenly spaced",
+        "image_size": {
+          "width": 60,
+          "height": 270
+        },
+        "seed": 1594989580,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "note": "renamed from tex3d-era6-frog on item 1230: pixflux drew one pose seven times, so the sheet the game uses is derived (era6-n64-sheets.py)"
+    },
+    {
+      "name": "era6-penguin-raw2",
+      "file": "era6-penguin-raw2.png",
+      "prompt": "one cute chunky round penguin mascot, full body, dark blue body, cream white belly, red scarf, big round head, stubby flippers, orange feet, smooth rounded 1996 3D toy game character, three quarter view facing right, hugging a small board to its chest",
+      "size": {
+        "width": 32,
+        "height": 40
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 1793498882,
+      "date": "2026-09-11T03:38:22.927Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 14.1,
+      "pixels": {
+        "width": 32,
+        "height": 40
+      },
+      "bytes": 1499,
+      "sha256": "9967c4596825e0f09b727db435c23cbdb5bfe3dd1973923a053177cf0085c637",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "one cute chunky round penguin mascot, full body, dark blue body, cream white belly, red scarf, big round head, stubby flippers, orange feet, smooth rounded 1996 3D toy game character, three quarter view facing right, hugging a small board to its chest",
+        "image_size": {
+          "width": 32,
+          "height": 40
+        },
+        "seed": 1793498882,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era6-penguin-win-raw",
+      "file": "era6-penguin-win-raw.png",
+      "prompt": "one cute chunky round penguin mascot, full body, dark blue body, cream white belly, red scarf, big round head, orange feet, smooth rounded 1996 3D toy game character, three quarter view facing right, jumping for joy with both flippers raised high above its head",
+      "size": {
+        "width": 32,
+        "height": 40
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 150740665,
+      "date": "2026-09-11T03:38:38.534Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 14.9,
+      "pixels": {
+        "width": 32,
+        "height": 40
+      },
+      "bytes": 1136,
+      "sha256": "1a9b32cf9b042e55ce027eb6f36116df62fa84b8b543cff1c83e37612a96c6ff",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "one cute chunky round penguin mascot, full body, dark blue body, cream white belly, red scarf, big round head, orange feet, smooth rounded 1996 3D toy game character, three quarter view facing right, jumping for joy with both flippers raised high above its head",
+        "image_size": {
+          "width": 32,
+          "height": 40
+        },
+        "seed": 150740665,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era6-frog-win-raw",
+      "file": "era6-frog-win-raw.png",
+      "prompt": "one cute chunky round green frog mascot, full body, bright green body, pale mint belly, yellow baseball cap, big round head, smooth rounded 1996 3D toy game character, three quarter view facing right, jumping for joy with both arms raised high above its head",
+      "size": {
+        "width": 32,
+        "height": 40
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      },
+      "seed": 1680196899,
+      "date": "2026-09-11T03:38:59.548Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 20.1,
+      "pixels": {
+        "width": 32,
+        "height": 40
+      },
+      "bytes": 1587,
+      "sha256": "596f85642cc0ca8bfe589af81aacbf0ef57f73fb8cbd4b34b5be9a594fb34605",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "one cute chunky round green frog mascot, full body, bright green body, pale mint belly, yellow baseball cap, big round head, smooth rounded 1996 3D toy game character, three quarter view facing right, jumping for joy with both arms raised high above its head",
+        "image_size": {
+          "width": 32,
+          "height": 40
+        },
+        "seed": 1680196899,
+        "outline": "selective outline",
+        "shading": "medium shading",
+        "no_background": true
+      }
     }
   ]
 }

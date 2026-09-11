@@ -124,8 +124,11 @@ test('the ball is the brightest and last thing on the table: white, a shade band
   const white = fills.map((o) => o.style).lastIndexOf('#ffffff');
   assert.ok(white > 0, 'the ball is drawn');
   assert.strictEqual(fills[white + 1].style, look.PALETTE.ballShade, 'its shade band straight after');
+  // The HUD: the graffiti's magenta and yellow, and since item 1231 the cyan
+  // spray tags and the spray cans (ink caps, magenta or empty-purple bodies).
+  const hud = [look.PALETTE.magenta, look.PALETTE.yellow, look.PALETTE.cyan, INK, look.HUD.can.empty];
   for (const o of fills.slice(white + 2)) {
-    assert.ok([look.PALETTE.magenta, look.PALETTE.yellow].includes(o.style), `only the HUD after the ball (${o.style})`);
+    assert.ok(hud.includes(o.style), `only the HUD after the ball (${o.style})`);
   }
   assert.strictEqual(fills.filter((o) => o.style === '#ffffff').length, 1, 'nothing else on screen is pure white (R1)');
   assert.strictEqual(fills[white - 1].style, 'rgba(17,17,17,0.350)', 'a flat ink contact shadow at 0.35');

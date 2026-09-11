@@ -89,3 +89,71 @@ Look file: [src/eras/era6-n64.js](../../src/eras/era6-n64.js). Chapter 7 of [doc
 4. Delete the other era files, `src/display-crt.js`, `src/erachange.js`, `src/signboards.js`,
    `src/match.js`, and `advanceEra`'s call.
 5. Judge the fog at a glance: can you see the far rail? If yes, it is too gentle.
+
+## LESSONS
+
+*Item 1230 made this era 1996's flagship game that happens to be Pong (docs/ART.md, Era 6): two
+toy mascots hold the paddles, the table sits in a toy park, and the score wears a round
+power meter. Pictures: [the rally at the first look](../shots/item1230/rally-era6-first-look.png)
+and [after the fixes it called for](../shots/item1230/era6-after-fixes.png).*
+
+### What sold 1996's flagship look here
+
+- **The characters, as concepts**: a round penguin in a red scarf for the player and a round
+  frog in a yellow cap for the computer, chunky *Super Mario 64*-era toys. The concept holds; the
+  flat sprite that draws them now is a stand-in (see *What did not work*). Smoothing the sheet and
+  laying the era's fog over the figure at its paddle's depth, capped at 0.35 like the paddles
+  (`src/characters.js`, block fields `smooth` and `fogCap`), did help it sit in the soft world.
+- **Set dressing that moves on its own**: pennants waving on toy-yellow poles past the table's
+  ends, butterflies over the horizon. Drawn into the half-resolution world, so the blur takes them
+  too and they never compete with the crisp ball.
+- **A round, toy HUD**: the outlined toy score plus an eight-slice pie power meter that fills with
+  the rally, and five toy-yellow stars popping from the scorer's paddle on a point.
+
+### What did not work
+
+- **Flat sprites read as sprites on a 3D table, and were ruled out.** Tim, seeing the 3D eras'
+  sprite players: *"if you are trying to do sprites in the 3d eras uh...that is not gonna look AAA
+  here dude"*. However soft and fogged, a pixel-art billboard on a polygon table says 2D. The 1996
+  answer is a low-poly model drawn by the game's own 3D; the penguin and the frog are to be built
+  in Blender on a card of their own, and the sprites stay only as a stand-in until then.
+- **pixflux does not draw sprite sheets.** Asked for "3 columns and 6 rows" at 60 x 270, it drew
+  the frog as one pose repeated seven times down a single column, and the penguin as fourteen
+  10-pixel figures in two columns. Two generations for nothing usable as a sheet
+  (`assets/pixellab/era6-frog-sheet-raw.png`, `era6-penguin-sheet-raw.png`). **What worked: one
+  figure per generation** (32 x 40, "full body, three quarter view facing right"), and the six rows
+  built offline from it by transforms ([era6-n64-sheets.py](../../assets/pixellab/era6-n64-sheets.py)):
+  bob, squash, a 12-degree lean, a lunge, an edge-on spin-out with stars, a jump. A pose a
+  transform cannot make (arms up for the win) needs its own generation. Five generations in all,
+  of the twelve allowed.
+- **Two pixellab runs at once lose a manifest entry.** Each reads the manifest, generates, and
+  writes it back, so the slower run overwrote the faster one's entry. Run generations one after
+  another.
+- **Fogged "at their depth like the rails", the poles vanished.** At y 150 the fog is 0.9, and the
+  first browser look showed two faint lines and no cloth. Capped at 0.45, like the paddles' cap,
+  they read. The butterflies had the same fate under the pale wall; they fly over it now.
+- **The bible's meter "under each score" crosses R8 on this camera**: the far edge is at y 102 and
+  the score ends at 80, so a radius-14 meter under it breaks the line at 96. It sits beside the
+  score, on the inner side, because the computer's name is written on the outer side of the
+  right-hand score.
+- **What it costs a frame** ([eraspeed.json](../measure/item1230/eraspeed.json) against master's
+  [eraspeed-master.json](../measure/item1230/eraspeed-master.json), taken back to back by
+  `docs/measure/item1230/eraspeed.mjs`): with the GPU, era 6 went from 4.37 to 6.07 ms a frame
+  (p95 4.3 to 8.6), well inside 16.7. In the playtest's GPU-less Chrome it reads 35.1 against
+  master's 37.7, which is noise on a loaded machine; both are over that harness's 18.5 ms line, as
+  every 3D era is there (card 1216). The figures' fog pass (three draws each) and the pennants'
+  curves are the new work, if a later card needs the 1.7 ms back.
+- **The rig could not smooth or fog a figure**, and it threw under `node --test` once an era named
+  a sheet (no `Image` in Node). Both are fixed in the rig for every 3D era, not just this one.
+
+### What a one-era game would copy
+
+1. **Players as low-poly models, not sprites.** Keep the penguin and the frog as the concept (the
+   silhouette, the colours, the scarf and the cap) and build them in 3D. The sprite recipe here (one
+   pixflux figure per pose, the rows built offline by `era6-n64-sheets.py`) is for a 2D era.
+2. **The draw order that keeps play readable**: the blurred world, then the crisp paddles and ball,
+   then the players fogged at their depth, then the stars, and the HUD last, not shaking.
+3. **Cap every fog you put on something the player should see** (paddles, figures, dressing); let
+   only the world itself go fully into the wall.
+4. **The toy park and the round HUD**: poles, pennants and butterflies drawn in code into the
+   half-resolution world; an eight-slice pie meter filling with the rally; stars on a point.

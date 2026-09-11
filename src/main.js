@@ -86,6 +86,7 @@
     }
 
     var titleCanvas = null;
+    var overlaysWarmed = false;
 
     function drawFrame() {
       if (display) {
@@ -95,6 +96,9 @@
         var native = display.begin(era, game.width, game.height);
         if (game.phase === 'title') drawField(native, attract, { ink: ATTRACT_INK, card: false });
         else drawGame(native, game);
+        // Every screen overlay drawn once before the first frame is shown, so
+        // none is first drawn mid-ring (item 1239, src/display.js).
+        if (!overlaysWarmed) { overlaysWarmed = true; if (display.warmOverlays) display.warmOverlays(ctx); }
         display.present(ctx, era, game.time);
         // MATCH POINT, the announcement, the rewind and the thanks, kept sharp.
         if (root.PongMatch) root.PongMatch.drawOver(ctx, game, canvas.width / game.width);

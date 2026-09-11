@@ -45,7 +45,11 @@ export const PIECES = [
   // The paddle is cropped to the pixels it draws (10x58 of its 16x64), so it
   // fills the whole rectangle the rules collide with rather than two thirds of it.
   { key: 'paddle', from: 'snes-paddle.png', to: 'era4-paddle.png', crop: true },
-  { key: 'ball', from: 'snes-ball.png', to: 'era4-ball.png' }
+  { key: 'ball', from: 'snes-ball.png', to: 'era4-ball.png' },
+  // Item 1227's set dressing: the hot-air balloon and the marker pylon, each
+  // cropped to the pixels it draws.
+  { key: 'balloon', from: 'era4-balloon.png', to: 'era4-balloon-snes.png', crop: true, card: 'item 1227' },
+  { key: 'pylon', from: 'era4-pylon.png', to: 'era4-pylon-snes.png', crop: true, card: 'item 1227' }
 ];
 const BEGIN = '// BEGIN pixellab embeds';
 const END = '// END pixellab embeds';
@@ -115,7 +119,7 @@ export function withEntries(manifest, made) {
       derivedFrom: m.from,
       derivedBy: 'node assets/pixellab/era4-snes-embed.mjs',
       how: `every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not${m.crop ? ', cropped to the pixels it draws' : ''}; ${m.colours} colours`,
-      card: 'item 1180',
+      card: m.card || 'item 1180',
       verdict: 'drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)',
       pixels: { width: m.width, height: m.height },
       bytes: m.bytes,
@@ -139,7 +143,7 @@ export function main(log = console.log) {
     fs.writeFileSync(path.join(HERE, p.to), art[p.key]);
     const colours = new Set();
     for (let i = 0; i < img.rgba.length; i += 4) if (img.rgba[i + 3]) colours.add(img.rgba.readUInt32BE(i));
-    made.push({ from: p.from, to: p.to, crop: !!p.crop, width: img.width, height: img.height, colours: colours.size,
+    made.push({ from: p.from, to: p.to, crop: !!p.crop, card: p.card, width: img.width, height: img.height, colours: colours.size,
       bytes: art[p.key].length, sha256: crypto.createHash('sha256').update(art[p.key]).digest('hex') });
     log(`${p.to} ${img.width}x${img.height}, ${art[p.key].length} bytes, ${colours.size} SNES colours`);
   }
@@ -147,7 +151,7 @@ export function main(log = console.log) {
   const mpath = path.join(HERE, 'manifest.json');
   const raw = fs.readFileSync(mpath, 'utf8');
   fs.writeFileSync(mpath, JSON.stringify(withEntries(JSON.parse(raw), made), null, 2) + (raw.endsWith('\n') ? '\n' : ''));
-  log(`embedded all three in ${path.relative(process.cwd(), ERA_FILE)}; manifest entries written`);
+  log(`embedded all ${PIECES.length} in ${path.relative(process.cwd(), ERA_FILE)}; manifest entries written`);
   return 0;
 }
 
