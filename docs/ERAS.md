@@ -575,17 +575,21 @@ the strongest perspective. The flourish overshoot reaches tilt 28, a measured po
    `imageSmoothingEnabled = true`. It is copied up with smoothing **on**: a soft, smeared table.
    Paddles and ball are drawn on the main canvas afterwards, crisp (R4). *Null offscreen:* flat
    quads in table grass.
-2. **Heavy distance fog.** `fog = { start: 0.25, end: 1.15, power: 1.2, max: 0.92, colour: '#b9d4ec' }`.
+2. **Heavy distance fog.** `fog = { start: 0.25, end: 0.85, power: 1.4, max: 0.97, colour: '#b9d4ec' }`:
+   full fog from `d = 0.85`, **before** the far rail, so the rail and the last stretch of court are
+   all but gone, while mid-court (`d = 0.5`, fog 0.28) is only hazed (card 1197 pulled it in from
+   `start 0.25, end 1.15, power 1.2, max 0.92`, which left the whole court visible under a haze).
    `T.fogBand(ctx, cam, fog)` goes over the table at step 3. The rails and hills take
    `T.fogColour` at their depth, and scenery behind the far wall is drawn **fully fogged** from
-   `d = 1.15`, so the world simply ends in a pale wall. Paddles take fog too, **capped at 0.35**, so
+   `d = 0.85`, so the world simply ends in a pale wall. Paddles take fog too, **capped at 0.35**, so
    the far paddle is paler but always legible.
 3. **Smooth, rounded low-poly.** Paddles are boxes 24 tall with `shade: 'gradient'`, plus rounded
    ends: a projected half-ellipse cap on the top face at each end, in `T.shade(ink, 0.35)`. The
    rails are half-cylinders: a box whose near face takes a 3-stop vertical gradient, rail red dark
    to rail red to rail red dark. **The ball is a smooth sphere**: a radial gradient from a hot spot
-   at the upper-left third, `#ffffff` to `#ffe9a8` to `#f0b020` at the rim. That is the opposite of
-   the PlayStation's gem.
+   at the upper-left third, `#ffffff` to `#ffe9a8` to `#f0b020` at the rim, and **big**: radius
+   `0.9 x ball.size`, half as wide again as the PlayStation's stock 0.6 (card 1197). That is the
+   opposite of the PlayStation's gem.
 4. **Saturated cartoon world.** Behind the far wall: a sky gradient (sky top to sky horizon), 3
    rolling hill arcs (big ellipses, far hills first, fogged), and 2 clouds, each 3 overlapping white
    circles drifting at 4 units a second. Every material comes from the palette; no greys except the
