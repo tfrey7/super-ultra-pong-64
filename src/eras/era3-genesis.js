@@ -369,8 +369,8 @@
     if (img) {
       var smooth = ctx.imageSmoothingEnabled;
       ctx.imageSmoothingEnabled = false;
-      // Only the top 36 rows: pixflux lettered nonsense into the bottom rows,
-      // and 36 rows into the 96-unit band is one row a native line.
+      // Only the top 36 rows, one a native line of the 96-unit band; the rows
+      // under them are a bright floor edge that would compete with the ball.
       ctx.drawImage(img, 0, 0, 320, 36, Math.floor(-off), top, w, h);
       ctx.drawImage(img, 0, 0, 320, 36, Math.floor(w - off), top, w, h);
       ctx.imageSmoothingEnabled = smooth;
