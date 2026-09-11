@@ -93,6 +93,8 @@
     scale: 2.5,
     fps: 6,
     res: 1,             // placeholder sheet pixels per grid cell
+    modelScale: 1.8,    // a model's size on the table: the steep 3D cameras foreshorten
+                        // an upright figure to about half, so 1.8 reads like the sprites did
     round: false,       // placeholder head drawn round (the 3D eras)
     skin: '#e0b090',
     body: '#303040'
@@ -474,9 +476,10 @@
       if (fig.model !== model) { figs[name] = fig = { pose: null }; fig.model = model; }
       fig.pose = M.blend(model, kf.from, kf.to, kf.t, fig.pose);
       var outerX = mirror > 0 ? p.x : p.x + p.w;
-      fig.anchor = { x: outerX - mirror * 2.5, y: p.y + p.h / 2, z: model.hand[2] };
-      fig.mirror = mirror;
       fig.scale = cfg.modelScale || 1;
+      // Feet on the floor, the hand on the slab's outer face.
+      fig.anchor = { x: outerX - mirror * 2.5, y: p.y + p.h / 2, z: model.hand[2] * fig.scale };
+      fig.mirror = mirror;
       fig.ink = R && typeof R.paddleInk === 'function' ? R.paddleInk(state, name) : null;
       fig.rect = { x: p.x, y: p.y, w: p.w, h: p.h };
       fig.group = i;
@@ -493,7 +496,8 @@
       fog: look && look.fog,
       outline: cam.outline || sides.left.outline || null,
       ball: ball,
-      slabZ: sides.left.slabZ
+      // The slab stands a little above the idle hand that grips it.
+      slabZ: sides.left.slabZ || (ml.hand[2] * (sides.left.modelScale || 1) + 6)
     });
     return true;
   }
