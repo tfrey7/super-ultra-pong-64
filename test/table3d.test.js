@@ -277,12 +277,13 @@ test('behind the title era 5 keeps the stock dimmed frame', () => {
   assert.deepStrictEqual(got.calls, want.calls);
 });
 
-test('eras 6 to 10 are placeholders drawing era 5\'s table under their own name cards', () => {
+test('eras 6 to 10 are placeholders drawing era 5\'s table under their own name cards, until their own cards land', () => {
   const cards = new Set();
   for (let era = 6; era <= 10; era++) {
     const look = R.eraLook(era);
     assert.strictEqual(look.era, era);
-    assert.strictEqual(look.placeholder, true);
+    cards.add(JSON.stringify(look.card));
+    if (!look.placeholder) continue;   // its era card has landed its own look
     assert.strictEqual(look.draw, R.eraLook(5).draw);
     cards.add(JSON.stringify(look.card));
   }
