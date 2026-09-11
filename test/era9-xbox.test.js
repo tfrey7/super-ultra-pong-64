@@ -61,17 +61,50 @@ test('it reads the state without writing it, and the white ball is the last fill
   assert.strictEqual(fills[fills.length - 1].style, '#ffffff');
 });
 
-test('the light orbits the table every 9 seconds, 160 units up (low, so the shadows read)', () => {
-  const at = (t) => X.lightAt(t);
-  assert.deepStrictEqual(at(0), { x: 700, y: 300, z: 160 });
-  const q = at(2.25);
-  assert.ok(Math.abs(q.x - 400) < 1e-9 && Math.abs(q.y - 480) < 1e-9);
-  const lap = at(9);
-  assert.ok(Math.abs(lap.x - 700) < 1e-9 && Math.abs(lap.y - 300) < 1e-9);
+test('the light is the ball: 160 units up over its centre, a little ahead of it, whatever the clock says', () => {
+  const ball = (x, y, vx, vy) => ({ x, y, vx, vy, size: 12 });
+  // Heading right and up: the light sits 0.1 s of travel ahead of the centre.
+  const L = X.lightFor(ball(530, 140, 380, -120));
+  assert.strictEqual(L.z, 160);
+  assert.ok(Math.abs(L.x - (536 + 38)) < 1e-9 && Math.abs(L.y - (146 - 12)) < 1e-9);
+  // A fast ball is led no more than 44 units.
+  const fast = X.lightFor(ball(100, 300, -900, 0));
+  assert.ok(Math.abs(fast.x - (106 - 44)) < 1e-9 && fast.y === 306);
+  // Drawn frames: the light is over the ball on the left and on the right, and
+  // the same ball at two different times gets the same light (no orbit).
+  const left = rally(500), right = rally(510), later = rally(520);
+  left.ball.x = 90; left.ball.y = 420; left.ball.vx = -380; left.ball.vy = 120;
+  right.ball.x = 700; right.ball.y = 120;
+  later.ball.x = 700; later.ball.y = 120;
+  const Ll = X.lightOf(left), Lr = X.lightOf(right), Lt = X.lightOf(later);
+  assert.ok(Math.abs(Ll.x - 96) <= 44 && Math.abs(Ll.y - 426) <= 44 && Ll.x < 96, 'on the left, ahead of the ball');
+  assert.ok(Math.abs(Lr.x - 706) <= 44 && Math.abs(Lr.y - 126) <= 44 && Lr.x > 706, 'on the right, ahead of the ball');
+  assert.deepStrictEqual(Lt, Lr, 'the clock does not move it');
+});
+
+test('when the ball turns the lead swings round over a few frames rather than jumping', () => {
+  const g = rally(600);
+  const first = X.lightOf(g);                     // heading right: the light leads to the right
+  g.ball.vx = -380; g.time += 1 / 60;             // struck back
+  const next = X.lightOf(g);
+  assert.ok(next.x < first.x && next.x > g.ball.x + 6, 'one frame on it has started back but is still ahead of the old way');
+  for (let i = 0; i < 30; i++) { g.time += 1 / 60; X.lightOf(g); }
+  const settled = X.lightOf(g);
+  assert.ok(Math.abs(settled.x - X.lightFor(g.ball).x) < 0.5, 'half a second on it leads the new way');
+});
+
+test('the shadows fall away from the ball: across the table they swing with it', () => {
+  const rect = { x: 250, y: 250, w: 12, h: 84 };
+  const onRight = X.paddleShadow(X.lightFor({ x: 600, y: 280, vx: 0, vy: 0, size: 12 }), rect);
+  const onLeft = X.paddleShadow(X.lightFor({ x: 30, y: 280, vx: 0, vy: 0, size: 12 }), rect);
+  assert.ok(Math.min(...onRight.map((p) => p[0])) < rect.x - 5, 'ball to the right: the shadow falls left');
+  assert.ok(Math.max(...onLeft.map((p) => p[0])) > rect.x + rect.w + 5, 'ball to the left: the shadow falls right');
+  assert.ok(X.BALL_SHADOW >= 1.5, 'the ball\'s own shadow is drawn big enough to show round it');
 });
 
 test('a paddle\'s hard shadow covers its true footprint and falls away from the light, and moves with it', () => {
-  const rect = { x: 250, y: 250, w: 12, h: 84 };   // between the light's two extremes, x 100 and 700
+  const rect = { x: 250, y: 250, w: 12, h: 84 };
+  const lightAt = (x) => ({ x, y: 300, z: 160 });
   const inside = (poly, x, y) => {
     let c = false;
     for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
@@ -80,12 +113,12 @@ test('a paddle\'s hard shadow covers its true footprint and falls away from the 
     }
     return c;
   };
-  const L = X.lightAt(0);                         // the light is to the right: the shadow falls left
+  const L = lightAt(700);                         // the light is to the right: the shadow falls left
   const shadow = X.paddleShadow(L, rect);
   const xs = shadow.map((p) => p[0]);
   assert.ok(Math.min(...xs) < rect.x - 5, 'the shadow reaches out past the paddle, away from the light');
   assert.ok(inside(shadow, rect.x + 6, rect.y + 42), 'the footprint is under its own shadow');
-  const later = X.paddleShadow(X.lightAt(4.5), rect);   // the light has gone round to the left
+  const later = X.paddleShadow(lightAt(100), rect);     // the light has gone over to the left
   assert.ok(Math.max(...later.map((p) => p[0])) > rect.x + rect.w + 1, 'half a lap later it falls the other way');
   // The ball's centre at z = r is cast along the same line.
   const cast = X.castPoint({ x: 400, y: 300, z: 520 }, 500, 300, 260);

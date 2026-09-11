@@ -107,8 +107,8 @@ and four change frames into the tracked `docs/shots/eras/`. To look at one era w
 `index.html?era=N` (N is 0 to 4) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
 plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
-it cannot find a browser, and `--port <n>` if 9333 is busy; each port gets its own Chrome profile,
-so two playtests on two ports can run at once. Use it for any change to
+it cannot find a browser, and `--port <n>` if 9333 is busy; every launch gets a fresh Chrome profile
+that is deleted when Chrome exits, so two playtests on two ports can run at once. Use it for any change to
 `src/render.js`, `src/input.js`, `src/main.js` or `index.html`; `node --test` alone is enough for a
 change confined to the rules.
 
@@ -149,7 +149,8 @@ you ever add one of those things, this is the file that has to say so.
   re-take them with `node tools/playtest.mjs --ladder --reference` and commit them on purpose, in
   their own commit. Only `--reference` writes there; a plain playtest never touches them.
 - Chrome's throwaway profile directories and any temp files from a playtest run — keep them on
-  `G:/claude-tmp`, outside the worktree.
+  `G:/claude-tmp`, outside the worktree. `tools/chrome.mjs` puts each profile under the temp
+  directory and deletes it itself, so set `TEMP`/`TMP` to `G:/claude-tmp` and there is nothing to tidy.
 
 ## 7. Ports this repo owns
 
@@ -222,6 +223,15 @@ his emulator — never touch either.**
 - **The first ring on a cold page has one long frame** (about 110-120 ms at raw progress 0.006).
   It is the ring engine's (item 1164), not your flourish's: item 1140 proved it by A/B with its
   flourish removed. Do not chase it in an era file.
+- **Start Chrome only through `tools/chrome.mjs`, never with a hand-built `--user-data-dir`.** A
+  capture script that spawns Chrome itself leaves its profile behind -- about 18 MB a run, and on
+  2026-09-10 the flourish cards' scripts left more than forty such folders in `G:/claude-tmp` (item
+  1169). `launchChrome(chromePath, flags, { name })` makes a fresh folder per launch and deletes it
+  when Chrome exits: when the script ends, on an uncaught error, on `process.exit` and on Ctrl+C.
+  Pass your flags as before, minus the profile (it refuses one), and end with `await chrome.close()`
+  in a `finally`. The playtest and every capture script under `docs/` already do. What it cannot
+  cover is the script itself being killed outright (Task Manager, `taskkill /F`): nothing runs
+  then, and that one folder stays.
 - **Proof paths in a report must survive the landing.** The integrator deletes your worktree, so
   a picture cited at `G:/Claude Stuff/super-ultra-pong-64-<name>/...` is a dead link the moment the
   branch lands (item 1138). Cite the path the file will have in the main checkout.

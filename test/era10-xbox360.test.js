@@ -256,10 +256,12 @@ test('Achievement Unlocked: WELCOME TO HD on arriving, 10G on every point, slidi
   t = toast(Object.assign(g, { time: 103.8 }));
   assert.strictEqual(t.t, 0, 'a new point replaces the toast showing');
 
-  // Arriving through an era change is timed from the change.
+  // Climbing here by a point is the top of the ladder (item 1156), timed from
+  // the change: nothing until beat 3, 0.95 s in, then the toast pops.
   const arrived = rally({ time: 200.4, eraChangedAt: 200 });
-  t = toast(arrived);
-  assert.strictEqual(t.text, '50G - WELCOME TO HD');
+  assert.strictEqual(toast(arrived), null, 'not before the ring has passed the centre');
+  t = toast(Object.assign(arrived, { time: 201.35 }));
+  assert.strictEqual(t.text, '100G · Top of the Ladder');
   assert.ok(Math.abs(t.t - 0.4) < 1e-9);
 
   // Even when era 10 was on screen a moment before: the playtest's forced
@@ -268,9 +270,10 @@ test('Achievement Unlocked: WELCOME TO HD on arriving, 10G on every point, slidi
   toast(again);
   toast(Object.assign(again, { time: 250.1 }));
   again.score.left += 1;
-  t = toast(Object.assign(again, { time: 250.2, eraChangedAt: 250.2 }));
-  assert.strictEqual(t.text, '50G - WELCOME TO HD', 'a change stamped by the rules is an arrival, not a point');
-  assert.strictEqual(t.t, 0);
+  assert.strictEqual(toast(Object.assign(again, { time: 250.2, eraChangedAt: 250.2 })), null);
+  t = toast(Object.assign(again, { time: 251.2 }));
+  assert.strictEqual(t.text, '100G · Top of the Ladder', 'a change stamped by the rules is an arrival, not a point');
+  assert.ok(Math.abs(t.t - 0.05) < 1e-9);
 
   // Drawn: a dark rounded card at 0.92 in the top centre, with both lines.
   const ops = frame(rally({ time: 300.5 }));

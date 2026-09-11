@@ -792,6 +792,11 @@ letterbox (section 12).
    a flare-blue radial gradient of radius 90 at 0.35, plus 5 ghosts on the line from the source
    through the screen centre, at `t` of 0.3, 0.55, 0.8, 1.2 and 1.5, with radii 18, 10, 26, 8 and
    40. The ghosts are hexagons, alternating flare blue and amber, at opacity 0.08 to 0.14 (R1).
+   **As built (card 1148), the light is `(120, -40, 60)`.** `(120, -400, 600)` projects 490 to 600
+   pixels above the canvas in every drift pose (this camera looks 60 degrees below the horizon), so
+   its source never showed and only two ghosts reached the frame. The built point sits just behind
+   the far rail and lands at screen `y` 25 to 54, under the top bar's edge, so the glow spills from
+   behind the letterbox and never sits over the table in any pose.
 6. **Dust motes and a glossy slab.** 40 motes in screen space (seeded positions) drift at
    `(+6, 3 * sin(t + i))` pixels a second, wrapping at the edges, sized 1 to 2.5 pixels, dust
    colour at an opacity flickering from 0.15 to 0.4. The table is a dark glossy slab with a sheen
@@ -875,11 +880,13 @@ them off with bump maps, specular highlights and real-time shadows. Card 1149.
    lights up where the light is and goes dull where it is not: that is the bump map. Paddles are
    `shade: 'gradient'` steel with a 2-pixel specular stripe on the top face whose position along
    the paddle follows the light's `y`. *Null tile:* flat gunmetal quads and the pool alone.
-2. **Hard dynamic shadows from a moving light.** The light orbits:
-   `L = (400 + 300 * cos(2 * Math.PI * t / 9), 300 + 180 * sin(2 * Math.PI * t / 9), 520)`. The
+2. **Hard dynamic shadows from a moving light.** The light is the ball: it follows the ball at
+   height 160, over its centre and led a little ahead along its travel (0.1 s of its velocity, at
+   most 44 units, the lead easing round when the ball turns), so the pool and every shadow cross the
+   table with it (card 1194; the orbit at 520 before it hid the shadows and wandered off the ball). The
    shadow of a point `P` falls on the table at `L + (P - L) * (L.z / (L.z - P.z))`. For each paddle,
    fill the hull of its footprint and its four projected top corners in `#000000` at **0.45**; the
-   ball's shadow is its centre at `z = r` cast the same way, as an ellipse. The shadows are
+   ball's shadow is its centre at `z = r` cast the same way, as an ellipse 1.9 times the ball's radius so it shows round the ball. The shadows are
    hard-edged, with no gradient. The contact shadow still sits under the ball at its true footprint
    (R5).
 3. **Green on black, glowing.** Everything is black or steel except the green: the rails' top faces
@@ -1035,8 +1042,8 @@ voice: {
             { wave: 'sine', freq: 55, at: 1.15, dur: 0.8, gain: 0.35 },
             { wave: 'sine', freq: 1760, at: 1.2, dur: 0.9, gain: 0.10 },
             { wave: 'sine', freq: 2637, at: 1.25, dur: 0.7, gain: 0.05 },
-            { wave: 'sine', freq: 1175, at: 2.0, attack: 0.003, dur: 0.07, gain: 0.18 },
-            { wave: 'sine', freq: 1568, at: 2.07, dur: 0.18, gain: 0.16 } ],
+            { wave: 'sine', freq: 1175, at: 0.95, attack: 0.003, dur: 0.07, gain: 0.18 },
+            { wave: 'sine', freq: 1568, at: 1.02, dur: 0.18, gain: 0.16 } ],
   effects: { reverb: { seconds: 2.5, decay: 2.5, mix: 0.4 } }
 }
 ```
@@ -1057,6 +1064,16 @@ chime), from memory. They are not transcriptions.
 3. *Arrival (p 0.8 to 1).* **The blades slide in and the toast pops.** The 4 blade tabs sweep in
    from `x` 800 to their places, 0.06 of `p` apart, and the `50G - WELCOME TO HD` toast drops in.
    The boot sting's blip lands with it.
+
+*As built (item 1156), the finale of the ladder:* beat 1 is the white-out above. Beat 2 carries
+the Blades dashboard instead of the ribbons: five tall slanted panels (blade green, silver, blade
+green dark, green, silver, at 0.55 fading back) ride just inside the ring's edge across the field,
+each with a silver hairline on its leading edge, and behind them bloom pours in (a `'lighter'`
+annulus 200 units deep) with the grain at 0.3 over the look's own grade. Beat 3 fades the panels,
+slides the HUD blades home, and pops the toast at 0.95 s after the point, reading
+`100G · Top of the Ladder` (a page opened at era 10 still says `50G - WELCOME TO HD`). The ring has
+passed the centre by 0.74 s from any origin, so the toast always follows the name card. The boot
+list's closing blip moved from 2.0 s to 0.95 s so it sounds with the pop, inside the serve pause.
 
 ---
 

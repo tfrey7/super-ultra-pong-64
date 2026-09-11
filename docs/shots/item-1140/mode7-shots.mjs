@@ -8,8 +8,8 @@
  *
  *   node docs/shots/item-1140/mode7-shots.mjs [--port 9341]
  */
-import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { launchChrome } from '../../../tools/chrome.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -21,11 +21,12 @@ const PORT = i > 0 ? Number(process.argv[i + 1]) : 9341;
 const PLAIN = process.argv.includes('--no-flourish');
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
-const PROFILE = path.join(process.env.TEMP || 'G:/claude-tmp', `item-1140-chrome-${PORT}`);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
-  '--mute-audio', '--no-first-run', '--window-size=1000,760', 'about:blank'], { stdio: 'ignore' });
+// A fresh profile folder, deleted when Chrome exits -- even through the
+// --no-flourish leg's process.exit below (tools/chrome.mjs, item 1169).
+const chrome = launchChrome(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`,
+  '--mute-audio', '--no-first-run', '--window-size=1000,760', 'about:blank'], { name: 'mode7' });
 
 let ws;
 try {
@@ -135,5 +136,5 @@ try {
   console.log(JSON.stringify(out, null, 1));
 } finally {
   try { ws && ws.close(); } catch { /* gone */ }
-  chrome.kill();
+  await chrome.close();
 }
