@@ -845,9 +845,11 @@ async function wholeMatch(s, baseUrl) {
         g.rules.cpuMaxAimError = 0; g.right.aimError = 0; return k; })()`);
       let file = null;
       const until = Date.now() + 30000;
+      // Filmed from the fifth hit (the counter is up by then on the later machines),
+      // so a rally the computer ends early on a busy machine is still on film.
       while (Date.now() < until && points(g) === startPts && g.rally < 11) {
         await s.mouseTo(midX, toClientY(track(g)));
-        if (!file && g.rally >= 7 && g.serveDelay <= 0) {
+        if (!file && g.rally >= 5 && g.serveDelay <= 0) {
           await s.eval('window.__wholeBusy = true');   // a capture stalls the frame it lands in
           file = await s.shot(`whole-rally-${ERA_NAMES[rung]}`, clip);
           await s.eval('window.__wholeBusy = false');
@@ -893,7 +895,7 @@ async function wholeMatch(s, baseUrl) {
     `${R.hits} paddle hits in the match, ${R.smash} smashes, ${R.curve} with spin over 0.5 rad/s (most ${R.maxSpin.toFixed(2)})`);
   for (const r of rallies) {
     check(`whole match: a real rally on the ${eras[r.rung]}, filmed mid-rally`, !!r.file && r.era === r.rung,
-      `${r.rally} hits on era ${r.era}` + (r.file ? '' : '; no frame (the rally ended before hit 7)'));
+      `${r.rally} hits on era ${r.era}` + (r.file ? '' : '; no frame (the rally ended before hit 5)'));
   }
   const counted = Object.keys(R.counter).map(Number);
   check('whole match: the rally counter came up on the later machines', counted.some((e) => e >= 6),
