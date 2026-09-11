@@ -90,15 +90,15 @@
 
   /**
    * The scanline strip: ONE pixel wide, len rows per native line, drawn once
-   * per (lines, shape, darkness) and stretched over the whole picture with
+   * for each (lines, shape, darkness) and kept and stretched over the whole picture with
    * smoothing on, which is what turns its few rows into a soft line profile.
    */
   function scanStrip(lines, shape, dark) {
     var len = shape.length;
     var key = lines + ':' + shape.join(',') + ':' + dark.toFixed(3);
-    var s = canvasOf('scan', 1, lines * len);
-    if (s.c.key === key) return s.c;
-    s.c.key = key; s.c.made++;
+    var s = canvasOf('scan:' + key, 1, lines * len);
+    if (s.c.made) return s.c;
+    s.c.made++;
     var x = s.x;
     x.setTransform(1, 0, 0, 1, 0, 0);
     x.clearRect(0, 0, 1, lines * len);

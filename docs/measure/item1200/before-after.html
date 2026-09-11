@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Item 1200: eras 5-10 before and after the TV overlays</title>
+<style>
+  body { margin: 0; padding: 16px; background: #111; color: #ddd; font: 13px/1.3 system-ui, sans-serif; }
+  h1 { font-size: 16px; margin: 0 0 12px; }
+  .row { display: grid; grid-template-columns: repeat(2, 480px); gap: 12px; margin-bottom: 14px; }
+  figure { margin: 0; }
+  canvas { display: block; width: 480px; height: 360px; background: #000; }
+  figcaption { margin-top: 4px; }
+  b { color: #fff; }
+</style>
+</head>
+<body>
+<h1>Eras 5 to 10 through the page's own display pipeline: left, the picture with no screen over it; right, the same frame on the screen of its day</h1>
+<div id="grid"></div>
+<script src="../../../src/game.js"></script>
+<script src="../../../src/sprites.js"></script>
+<script src="../../../src/render.js"></script>
+<script src="../../../src/display.js"></script>
+<script src="../../../src/display-crt.js"></script>
+<script src="../../../src/display-tv.js"></script>
+<script src="../../../src/table3d.js"></script>
+<script src="../../../src/eras/era0-arcade.js"></script>
+<script src="../../../src/eras/era1-atari2600.js"></script>
+<script src="../../../src/eras/era2-nes.js"></script>
+<script src="../../../src/eras/era3-genesis.js"></script>
+<script src="../../../src/eras/era4-snes.js"></script>
+<script src="../../../src/eras/era5-playstation.js"></script>
+<script src="../../../src/eras/era6-n64.js"></script>
+<script src="../../../src/eras/era7-dreamcast.js"></script>
+<script src="../../../src/eras/era8-ps2.js"></script>
+<script src="../../../src/eras/era9-xbox.js"></script>
+<script src="../../../src/eras/era10-xbox360.js"></script>
+<script src="../../../src/signboards.js"></script>
+<script src="../../../src/erachange.js"></script>
+<script>
+(function () {
+  // ?eras=5,6 picks the rows; ?zoom=1 draws a 2x crop of the ball's corner.
+  var D = window.PongDisplay, R = window.PongRender, grid = document.getElementById('grid');
+  var q = location.search;
+  var pick = /eras=([\d,]+)/.exec(q);
+  var eras = pick ? pick[1].split(',').map(Number) : [5, 6, 7, 8, 9, 10];
+  var zoom = /zoom=1/.test(q);
+  var scale = window.devicePixelRatio || 1;
+  eras.forEach(function (e) {
+    var entry = Pong.ERAS[e];
+    var div = document.createElement('div'); div.className = 'row';
+    [false, true].forEach(function (on) {
+      // Two frames, one sixtieth apart, the ball moving fast, so the smear has
+      // something to show on the Xbox 360.
+      var row = D.row(e), keep = row.overlay;
+      if (!on) row.overlay = 'none';
+      var c = document.createElement('canvas');
+      c.width = 480 * scale * (zoom ? 2 : 1); c.height = 360 * scale * (zoom ? 2 : 1);
+      var x = c.getContext('2d');
+      [0, 1].forEach(function (f) {
+        var g = Pong.createGame({ era: e, phase: 'playing' });
+        g.score.left = 3; g.score.right = 5; g.serveDelay = 0; g.time = 12 + f / 60;
+        g.ball.x = 520 + f * 14; g.ball.y = 230 - f * 6; g.ball.vx = 840; g.ball.vy = -360;
+        g.left.y = 250; g.right.y = 180;
+        var nat = D.begin(e, g.width, g.height);
+        R.draw(nat, g);
+        x.save();
+        if (zoom) x.translate(-c.width * 0.5, -c.height * 0.2);
+        D.present(x, e, g.time);
+        x.restore();
+      });
+      row.overlay = keep;
+      var fig = document.createElement('figure');
+      var cap = document.createElement('figcaption');
+      cap.innerHTML = '<b>' + e + ' ' + entry.year + ' ' + entry.machine + '</b> &middot; ' +
+        (on ? row.overlay + ' at ' + row.strength : 'no screen') + (zoom ? ' &middot; 2x crop' : '');
+      fig.appendChild(c); fig.appendChild(cap); div.appendChild(fig);
+    });
+    grid.appendChild(div);
+  });
+})();
+</script>
+</body>
+</html>
