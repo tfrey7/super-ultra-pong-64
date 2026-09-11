@@ -59,6 +59,9 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 const SCORING_ONLY = process.argv.includes('--scoring');
 // --feel runs only the game-feel rallies (section 9), about a minute.
 const FEEL_ONLY = process.argv.includes('--feel');
+// --match runs only the match's end (section 10, item 1211): ten points in on the
+// Xbox 360, the eleventh, then the finale filmed through to the attract screen.
+const MATCH_ONLY = process.argv.includes('--match');
 // --reference also copies the eleven era frames the walk takes (era0-arcade.png to
 // era10-xbox360.png), and the ten frames it catches mid-change (change-era0-to-era1.png
 // to change-era9-to-era10.png),
@@ -441,12 +444,83 @@ async function walkLadder(s, baseUrl) {
       (d.same ? ' (the two rungs draw the same frame, so only an exact match with the new era is asked)' : ''));
   }
 
+  // That last point was the eleventh: the match is over, and its finale plays.
+  const finale = await filmFinale(s, clip, 'ladder');
+
   if (REFERENCE) {
     mkdirSync(ERA_SHOTS, { recursive: true });
     for (const f of frames) copyFileSync(f.file, path.join(ERA_SHOTS, ERA_NAMES[f.rung] + '.png'));
     for (const c of changes) if (c.file) copyFileSync(c.file, path.join(ERA_SHOTS, path.basename(c.file)));
   }
-  return [...frames.map((f) => f.file), ...changes.filter((c) => c.file).map((c) => c.file)];
+  return [...frames.map((f) => f.file), ...changes.filter((c) => c.file).map((c) => c.file), ...finale];
+}
+
+/**
+ * 10. The match's end (src/match.js, item 1211). Called the moment the eleventh
+ * point has gone in: the game is 'over' with a winner, the announcement holds
+ * the 360, the rewind walks the era down one rung a half second -- a frame is
+ * taken with the ring shrinking midway down -- then the 1972 thanks screen is
+ * filmed, and the machine goes back to the attract screen on its own.
+ */
+async function filmFinale(s, clip, tag) {
+  const shots = [];
+  const over = await s.eval(`(() => { const g = window.__pong, M = window.PongMatch;
+    const f = M && M.finale(g); return { phase: g.phase, winner: g.winner, era: g.era,
+      score: g.score.left + '-' + g.score.right, stage: f && f.stage, total: g.rules.matchPoints }; })()`);
+  check(`the eleventh point ends the match on the Xbox 360 (${tag})`,
+    over.phase === 'over' && over.era === 10 && (over.winner === 'left' || over.winner === 'right') && over.stage === 'announce',
+    `phase ${over.phase}, era ${over.era}, score ${over.score}, winner ${over.winner}, finale ${over.stage}`);
+  if (over.phase !== 'over') return shots;
+  await sleep(1400);
+  shots.push(await s.shot(`finale-announce-${tag}`, clip));
+  // Midway down the ladder, with the ring part-way closed.
+  const seen = [];
+  let mid = null;
+  const until = Date.now() + 12000;
+  while (Date.now() < until) {
+    const f = await s.eval(`(() => { const g = window.__pong, f = window.PongMatch.finale(g);
+      return f ? { stage: f.stage, era: g.era, from: f.from, raw: f.raw } : { stage: g.phase }; })()`);
+    if (f.stage === 'rewind' && seen[seen.length - 1] !== f.era) seen.push(f.era);
+    if (!mid && f.stage === 'rewind' && f.from <= 6 && f.raw > 0.3 && f.raw < 0.7) {
+      mid = f;
+      shots.push(await s.shot(`finale-rewind-${tag}`, clip));
+    }
+    if (f.stage === 'thanks') break;
+    await sleep(40);
+  }
+  check(`the rewind walks the eras back down to the arcade (${tag})`,
+    seen.length >= 6 && seen[seen.length - 1] === 0 && seen.every((e, i) => i === 0 || e < seen[i - 1]),
+    `eras seen on the way down: ${seen.join(', ')}`);
+  check(`a frame of the rewind is caught mid-ring (${tag})`, !!mid,
+    mid ? `the ${mid.from} shrinking to ${mid.from - 1} at ${(mid.raw * 100).toFixed(0)}%` : 'never caught');
+  await sleep(1500);
+  const th = await s.eval(`(() => { const g = window.__pong, f = window.PongMatch.finale(g);
+    return { stage: f && f.stage, era: g.era }; })()`);
+  shots.push(await s.shot(`finale-thanks-${tag}`, clip));
+  check(`the 1972 screen thanks the player (${tag})`, th.stage === 'thanks' && th.era === 0,
+    `finale ${th.stage}, era ${th.era}`);
+  let phase = null;
+  for (let i = 0; i < 100 && phase !== 'title'; i++) { await sleep(100); phase = (await state(s)).phase; }
+  check(`and then the machine is back on the attract screen (${tag})`, phase === 'title', `phase ${phase}`);
+  return shots;
+}
+
+/** --match: open on the 360 ten points in, let the eleventh through, film the finale. */
+async function matchEnd(s, baseUrl) {
+  await s.send('Page.navigate', { url: baseUrl + '?era=10' });
+  await sleep(1200);
+  const geo = await geometry(s);
+  const clip = { x: geo.left, y: geo.top, width: geo.width, height: geo.height };
+  await s.eval(`(() => { const g = window.__pong; g.score.left = 6; g.score.right = 4; g.serveDelay = 1.2; })()`);
+  await sleep(300);
+  const mp = await s.eval('window.Pong.isMatchPoint(window.__pong) && window.PongMatch.overlays(window.__pong)');
+  const plate = await s.shot('finale-matchpoint', clip);
+  check('ten points in, the next point is match point and MATCH POINT is up', mp === true, `isMatchPoint and the plate: ${mp}`);
+  // The player's point: the ball just past the computer's paddle, heading out.
+  await s.eval(`(() => { const g = window.__pong, r = g.right; g.serveDelay = 0;
+    g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0; })()`);
+  for (let i = 0; i < 60 && (await state(s)).phase === 'playing'; i++) await sleep(50);
+  return [plate, ...await filmFinale(s, clip, 'match')];
 }
 
 /**
@@ -606,6 +680,7 @@ async function main() {
     await sleep(400);
     if (LADDER_ONLY) return summarise(await walkLadder(s, url.split('?')[0]));
     if (FEEL_ONLY) return summarise(await feelRallies(s, url.split('?')[0]));
+    if (MATCH_ONLY) return summarise(await matchEnd(s, url.split('?')[0]));
 
     const geo = await geometry(s);
     const g0 = await state(s);

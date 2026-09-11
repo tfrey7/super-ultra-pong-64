@@ -68,7 +68,8 @@
     var drawField = PongRender.drawEraFrame || PongRender.draw;
     // The real game's frame goes through game feel (src/feel.js): shake, squash,
     // trail, flash and the rally counter, drawn into the machine's own picture.
-    function drawGame(c, g) { if (root.PongFeel) root.PongFeel.draw(c, g, drawField); else drawField(c, g); }
+    // A finished match draws its finale instead (src/match.js): the rewind's ring.
+    function drawGame(c, g) { if (root.PongMatch && root.PongMatch.drawField(c, g, drawField)) return; if (root.PongFeel) root.PongFeel.draw(c, g, drawField); else drawField(c, g); }
 
     // The display (src/display.js): each era drawn at its own machine's
     // resolution, then scaled up onto this canvas. ?display=off skips it and
@@ -95,6 +96,8 @@
         if (game.phase === 'title') drawField(native, attract, { ink: ATTRACT_INK, card: false });
         else drawGame(native, game);
         display.present(ctx, era, game.time);
+        // MATCH POINT, the announcement, the rewind and the thanks, kept sharp.
+        if (root.PongMatch) root.PongMatch.drawOver(ctx, game, canvas.width / game.width);
         if (game.phase === 'title' || (cabinet && cabinet.stage(game) !== 'play')) {
           // The title is the cabinet's own lettering, kept sharp over the
           // machine's picture rather than squeezed into its pixels: drawn at
@@ -128,6 +131,7 @@
       } else {
         drawGame(ctx, game);
         if (cabinet) cabinet.drawOver(ctx, game);   // CREDIT 1, PLAYER 1 READY
+        if (root.PongMatch) root.PongMatch.drawOver(ctx, game);
       }
     }
 
@@ -138,6 +142,7 @@
       // In the title phase this only advances the clock the blink reads.
       // Through the feel layer, which owns hit-stop and match-point slow motion.
       (root.PongFeel ? root.PongFeel.step : Pong.step)(game, dt, input.read());
+      if (root.PongMatch) root.PongMatch.step(game);   // the finale walks the eras down
       if (sound) sound.handle(game);
       if (game.phase === 'title') Pong.step(attract, dt, attractIntent(dt));
 
