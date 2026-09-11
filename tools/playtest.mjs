@@ -318,6 +318,14 @@ async function main() {
       });
       await s.reload();
     }
+    // Wait for the page to actually be there -- the game and its field -- rather
+    // than a fixed beat: on a busy machine 400 ms was sometimes not enough, and
+    // the first read threw "Uncaught" before any check ran (item 1160).
+    for (let i = 0; i < 100; i++) {
+      const ready = await s.eval('!!(window.__pong && document.getElementById("field"))').catch(() => false);
+      if (ready) break;
+      await sleep(100);
+    }
     await sleep(400);
     if (LADDER_ONLY) return summarise(await walkLadder(s, url.split('?')[0]));
 
