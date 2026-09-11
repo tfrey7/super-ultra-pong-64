@@ -22,6 +22,7 @@ import path from 'node:path';
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const Rally = require('./scoring-rally.js');
 
 function arg(name, fallback) {
   const i = process.argv.indexOf('--' + name);
@@ -52,6 +53,7 @@ function trial(Pong, seed, aimStyle) {
   const g = Pong.createGame({ rng, phase: 'playing' });
   if (g.phase === 'title' && Pong.startGame) Pong.startGame(g);
   g.aimStyle = aimStyle;   // read by aim(); the rules themselves ignore it
+  if (aimStyle === 'scripted') g.scorer = Rally.createScorer(Pong);
 
   let hand = g.height / 2;
   let sincePoll = 0;
@@ -71,8 +73,12 @@ function trial(Pong, seed, aimStyle) {
  * done. 'corner' still intercepts, but off centre, so the ball leaves at a
  * steep angle AWAY from where the computer is standing -- the play the
  * bootstrap doc says scores roughly every 20 seconds instead of every 32.
+ * 'scripted' is the playtest's own hand (tools/scoring-rally.js): it plans
+ * each shot against the rules so the computer cannot return it. The two rows
+ * above measure how beatable the game is; this one measures the check.
  */
 function aim(g) {
+  if (g.aimStyle === 'scripted') return g.scorer(Rally.snapshotOf(g));
   const centre = g.ball.y + g.ball.size / 2;
   if (g.aimStyle !== 'corner') return centre;
   const away = (g.right.y + g.right.h / 2) < g.height / 2 ? 1 : -1;  // +1 = downwards
@@ -105,7 +111,8 @@ const against = arg('against', null);
 if (against) modules.push([path.resolve(against), 'comparison']);
 
 const runs = [];
-for (const style of ['track', 'corner']) {
+const STYLES = (arg('styles', 'track,corner,scripted')).split(',');
+for (const style of STYLES) {
   for (const [mod, label] of modules) runs.push(sample(mod, label, style));
 }
 
