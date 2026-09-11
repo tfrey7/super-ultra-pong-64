@@ -1,0 +1,46 @@
+{
+ "taken": "2026-09-11T04:11:11.010Z",
+ "url": "file:///G:/Claude Stuff/super-ultra-pong-64-item-1241/index.html?era=10",
+ "calm": {
+  "era": 10,
+  "intensity": 0,
+  "scheduled": 55,
+  "errors": 0,
+  "audio": "running",
+  "score": "0-0",
+  "rally": 0,
+  "compressor": "DynamicsCompressorNode",
+  "ceiling": "WaveShaperNode",
+  "booked3s": 49
+ },
+ "peak": {
+  "era": 10,
+  "intensity": 1,
+  "scheduled": 131,
+  "errors": 0,
+  "audio": "running",
+  "score": "5-5",
+  "rally": 12,
+  "compressor": "DynamicsCompressorNode",
+  "ceiling": "WaveShaperNode",
+  "booked3s": 69
+ },
+ "hot": {
+  "era": 10,
+  "intensity": 1,
+  "scheduled": 237,
+  "errors": 0,
+  "audio": "running",
+  "score": "5-5",
+  "rally": 12,
+  "compressor": "DynamicsCompressorNode",
+  "ceiling": "WaveShaperNode",
+  "boostDb": 18,
+  "pre": 1.0475282669067383,
+  "post": 0.8026132583618164,
+  "over": 0,
+  "reads": 53,
+  "reduction": -5.398449420928955,
+  "ceilingLevel": 0.89
+ }
+}
