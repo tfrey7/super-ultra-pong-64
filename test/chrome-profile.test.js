@@ -15,8 +15,8 @@ const fakeChrome = (code) => ['-e', code, '--'];
 
 test('the profile is a fresh folder, and goes when the browser ends on its own', async () => {
   const { launchChrome } = await load();
-  const a = launchChrome(process.execPath, fakeChrome('setTimeout(() => {}, 50)'), { name: 'test' });
-  const b = launchChrome(process.execPath, fakeChrome('setTimeout(() => {}, 50)'), { name: 'test' });
+  const a = await launchChrome(process.execPath, fakeChrome('setTimeout(() => {}, 50)'), { name: 'test' });
+  const b = await launchChrome(process.execPath, fakeChrome('setTimeout(() => {}, 50)'), { name: 'test' });
   assert.notStrictEqual(a.profile, b.profile, 'two launches share a profile');
   assert.ok(fs.existsSync(a.profile), 'the profile folder was not made');
   assert.match(path.basename(a.profile), /^pong-chrome-test-/);
@@ -27,7 +27,7 @@ test('the profile is a fresh folder, and goes when the browser ends on its own',
 
 test('close() stops a browser that would run on, and deletes its folder', async () => {
   const { launchChrome } = await load();
-  const c = launchChrome(process.execPath, fakeChrome('setInterval(() => {}, 1000)'), { name: 'test' });
+  const c = await launchChrome(process.execPath, fakeChrome('setInterval(() => {}, 1000)'), { name: 'test' });
   fs.writeFileSync(path.join(c.profile, 'Local State'), 'held'); // something inside, as Chrome leaves
   assert.strictEqual(await c.close(), true);
   assert.ok(!fs.existsSync(c.profile));
@@ -35,13 +35,13 @@ test('close() stops a browser that would run on, and deletes its folder', async 
 
 test('a flag that brings its own --user-data-dir is refused', async () => {
   const { launchChrome } = await load();
-  assert.throws(() => launchChrome(process.execPath, ['--user-data-dir=G:/claude-tmp/x']), /user-data-dir/);
+  await assert.rejects(launchChrome(process.execPath, ['--user-data-dir=G:/claude-tmp/x']), /user-data-dir/);
 });
 
 // A script that starts a browser that would run for a minute, prints its folder, then ends as `how` says.
 function runScript(how) {
   const code = `import { launchChrome } from ${JSON.stringify(HELPER)};
-    const c = launchChrome(process.execPath, ['-e', 'setInterval(() => {}, 1000)', '--'], { name: 'test' });
+    const c = await launchChrome(process.execPath, ['-e', 'setInterval(() => {}, 1000)', '--'], { name: 'test' });
     console.log(c.profile);
     setTimeout(() => { ${how} }, 200);`;
   const r = spawnSync(process.execPath, ['--input-type=module', '-e', code], { encoding: 'utf8', timeout: 20000 });

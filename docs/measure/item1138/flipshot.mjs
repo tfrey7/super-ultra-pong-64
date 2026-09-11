@@ -12,7 +12,7 @@
  * beside flipshot.json. Nothing in src/ knows this exists.
  */
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -75,9 +75,9 @@ const stats = (stamps) => {
 async function main() {
   const url = pathToFileURL(path.join(ROOT, 'index.html')).href + '?era=1';
   // A fresh profile folder, deleted when Chrome exits (tools/chrome.mjs, item 1169).
-  const chrome = launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
+  const chrome = await launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
-    '--no-first-run', '--no-default-browser-check', url], { name: 'flipshot' });
+    '--no-first-run', '--no-default-browser-check', url], { name: 'flipshot' }).catch(refusePortTaken);
   let s;
   try {
     s = await connect();

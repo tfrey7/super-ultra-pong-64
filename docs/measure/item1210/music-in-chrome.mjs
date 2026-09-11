@@ -21,7 +21,7 @@
 import { writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import { CdpConnection } from '../../../tools/cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -66,9 +66,9 @@ function check(name, ok, detail) {
 }
 
 async function main() {
-  const chrome = launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
+  const chrome = await launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT, '--no-first-run',
-    '--no-default-browser-check', 'about:blank'], { name: 'item1210' });
+    '--no-default-browser-check', 'about:blank'], { name: 'item1210' }).catch(refusePortTaken);
   const errors = [];
   const rendered = [];
   try {

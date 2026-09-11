@@ -11,7 +11,7 @@
 //      after the ring has covered the field (card up, no shards left).
 // Writes the PNGs and shatter-capture.json beside this file.
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -25,10 +25,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const url = pathToFileURL(path.join(ROOT, 'index.html')).href + '?era=2';
 
 // A fresh profile folder, deleted when Chrome exits (tools/chrome.mjs, item 1169).
-const chrome = launchChrome(CHROME, [
+const chrome = await launchChrome(CHROME, [
   '--headless=new', `--remote-debugging-port=${PORT}`,
   '--mute-audio', '--no-first-run', '--no-default-browser-check', '--window-size=1000,760', url
-], { name: 'shatter' });
+], { name: 'shatter' }).catch(refusePortTaken);
 console.log(`chrome pid ${chrome.pid}`);
 
 let ws;
