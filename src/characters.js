@@ -102,7 +102,16 @@
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
     8:  { skin: '#dcae8c', body: '#20242c', scale: 3.2, res: 4, round: true }, // PlayStation 2
     9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
-    10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
+    // Xbox 360 (item 1234, docs/ART.md era 10): two heavy soldiers, pixellab
+    // sheets reposed, graded, rimmed and grained offline by
+    // assets/pixellab/era10-derive.mjs at twice the bible's 32 x 66 (a 96 x 132
+    // frame holding a 48 x 66 figure cell), so the rig's unsmoothed draw of a
+    // pre-smoothed sheet reads HD. 0.68 table units a sheet pixel is the
+    // bible's 1.36 at that doubling: about 90 units tall on the table.
+    10: { skin: '#e2b294', body: '#2a2e36', res: 4, round: true,
+          sheets: { left: 'era10-soldier-left', right: 'era10-soldier-right' },
+          frame: { w: 96, h: 132 }, hand: { x: 84, y: 84 }, scale: 0.68,
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8 }
   };
 
   var FIRST_3D = 5;

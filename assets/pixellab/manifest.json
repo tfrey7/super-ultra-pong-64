@@ -931,6 +931,126 @@
         "shading": "medium shading",
         "detail": "low detail"
       }
+    },
+    {
+      "name": "era10-banner",
+      "file": "era10-banner.png",
+      "prompt": "torn hanging cloth banner, ragged bottom edge, faded original military emblem of a stylised cog and wings, no text, dusty mud brown and faded green, gritty 2005 shooter style",
+      "size": {
+        "width": 64,
+        "height": 96
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 679215469,
+      "date": "2026-09-11T03:35:15.939Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 6,
+      "seconds": 31,
+      "pixels": {
+        "width": 64,
+        "height": 96
+      },
+      "bytes": 4636,
+      "sha256": "3c53cae800ced46309100d9244b640cf930276ae5da8e55f94a963698639dc6e",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "torn hanging cloth banner, ragged bottom edge, faded original military emblem of a stylised cog and wings, no text, dusty mud brown and faded green, gritty 2005 shooter style",
+        "image_size": {
+          "width": 64,
+          "height": 96
+        },
+        "seed": 679215469,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-armour-left",
+      "file": "era10-armour-left.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 1326562740,
+      "date": "2026-09-11T03:36:49.365Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 44.1,
+      "pixels": {
+        "width": 96,
+        "height": 396
+      },
+      "bytes": 36295,
+      "sha256": "e4805d4f4c9cb4e1ba20f50b9f7558ceb8ee67acfda50d006fd521bbbf6e78eb",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 1326562740,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-armour-right",
+      "file": "era10-armour-right.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 2017111403,
+      "date": "2026-09-11T03:37:38.972Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 31.1,
+      "pixels": {
+        "width": 96,
+        "height": 396
+      },
+      "bytes": 34786,
+      "sha256": "0a6780b85026229a406a07d532cfd2d9492a715bb27c992e1640b023cedc5f5b",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 2017111403,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
     }
   ]
 }
