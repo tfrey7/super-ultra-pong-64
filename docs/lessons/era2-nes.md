@@ -46,7 +46,16 @@ Look file: [src/eras/era2-nes.js](../../src/eras/era2-nes.js).
 - **The generated court had two grey boxes that read as a "3"**, one in each goal mouth beside
   the paddles, and its own halfway line sat left of the game's centre line (item 1178, fixed by
   1191). They are painted out offline in the quantizer (`PAINT_OUT`), with no generations spent,
-  and a test pins it. Some ragged grey dashes remain and read as texture.
+  and a test pins it. Some ragged grey dashes remained and read as texture, until item 1259
+  took them out with the rest of the pitch (next line).
+- **The generated court was the wrong sport** (item 1178, found by 1225's rally shot, fixed by
+  1259). The prompt asked for a court, and pixflux drew a football pitch (centre circle, penalty
+  boxes, arcs, goal boxes) over a tiled floor. Item 1191 painted out only the marks that read as a
+  number, and the pitch then sat under a tennis match for two cards. **Look at a generated
+  backdrop for what it depicts, not only for stray marks.** The fix spent no generations: the
+  quantizer now keeps only the floor ink and the tile grid (read off the margins the pitch never
+  covered and drawn whole), and the tennis lines are about a dozen `fillRect`s in the era file.
+  Frame time did not move (16.7 ms), and a test pins that no ink off the grid is left.
 - **The power-on chime was played from the flourish, and the voice table was patched at run
   time** (item 1138). Both broke the rule that a flourish only draws. Item 1162 moved the chime
   onto the voice's `boot` list.

@@ -153,15 +153,15 @@
       },
       "derivedFrom": "era2-court-raw.png",
       "derivedBy": "node assets/pixellab/era2-nes-quantize.mjs",
-      "how": "quantized pixel by pixel to the nearest NES colour, every entry as bright as the ball held back (luma under 0.8); then the two light-grey boxes that read as a 3 beside each paddle and the pitch's own halfway line painted back to the floor colour (PAINT_OUT, item 1191)",
-      "card": "item 1178, item 1191",
+      "how": "quantized pixel by pixel to the nearest NES colour, every entry as bright as the ball held back (luma under 0.8); then every football-pitch marking the generation drew (outer border, penalty boxes, arcs, goal boxes, centre circle, grey dashes) painted back to the floor colour, keeping only the floor and its tile grid, read off the margins the pitch never covered and drawn whole, less the grid column under the net (paintOut, item 1259; until then item 1191 painted out only the two boxes that read as a 3 and the halfway line)",
+      "card": "item 1178, item 1191, item 1259",
       "verdict": "drawn by era 2 (src/eras/era2-nes.js, embedded there as a data: URI)",
       "pixels": {
         "width": 200,
         "height": 148
       },
-      "bytes": 1233,
-      "sha256": "27a0b2a9108c79a60187f1c61992bea6f2177b63daae914b5c3d09d9a3e0a211",
+      "bytes": 718,
+      "sha256": "5fee08858473b397e9e189a68d3e3e865d0f45243aae39b630a63ccf60d44421",
       "endpoint": "POST /v1/generate-image-pixflux",
       "request": {
         "description": "top-down view of a retro 8-bit NES sports arena floor, dark teal square floor tiles with thin black grout lines, flat and simple, empty, no players, no text",
