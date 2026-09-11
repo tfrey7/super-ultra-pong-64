@@ -92,6 +92,28 @@ test('era 0 stays 1972 Pong, bars and a dot, and has no page of headings to buil
   assert.deepStrictEqual(Object.keys(sections(body)), [], 'era 0 has no build headings');
 });
 
+test('a 56-unit player on the end strip never leans over its paddle, in any 3D camera pose', () => {
+  // The claim in the art bible's "Where a player stands": feet at x 4 to 30
+  // (left) and 770 to 796 (right), head at z 56, measured in every pose the
+  // era bible measures, every 50 units along the table.
+  const cameras = require('../tools/table3d-cameras.js');
+  assert.deepStrictEqual(cameras.ERAS.map((e) => e.era), [5, 6, 7, 8, 9, 10]);
+  for (const e of cameras.ERAS) {
+    for (const pose of cameras.poses(e)) {
+      const c = cameras.camera(pose);
+      for (let y = 0; y <= 600; y += 50) {
+        const p = (x, z) => cameras.project(c, x, y, z).x;
+        const left = p(46, 0) - Math.max(p(30, 56), p(30, 0));
+        const right = Math.min(p(770, 56), p(770, 0)) - p(754, 0);
+        assert.ok(left >= 11, `era ${e.era} at y ${y}: the left player is ${left.toFixed(1)} px clear of its paddle`);
+        assert.ok(right >= 11, `era ${e.era} at y ${y}: the right player is ${right.toFixed(1)} px clear of its paddle`);
+        const h = cameras.project(c, 17, y, 0).y - cameras.project(c, 17, y, 56).y;
+        assert.ok(h >= 9 && h <= 30, `era ${e.era} at y ${y}: the player is ${h.toFixed(1)} px tall, outside the bible's 9 to 30`);
+      }
+    }
+  }
+});
+
 for (let era = 1; era <= 10; era++) {
   test(`era ${era} has every fixed heading, in order, each with something under it`, () => {
     const s = sections(pages()[era].body);
@@ -108,7 +130,7 @@ for (let era = 1; era <= 10; era++) {
     const games = s['FLAGSHIP LOOK'].match(/\*[^*\n]+\* \((?:19|20)\d\d/g) || [];
     assert.ok(games.length >= 2, `era ${era} names ${games.length} flagship games`);
     for (const b of BEATS) {
-      assert.match(s.PLAYERS, new RegExp(`\\*\\*${b}\\*\\*`, 'i'), `era ${era}'s players have a ${b} beat`);
+      assert.match(s.PLAYERS, new RegExp(`\\*\\*${b}:?\\*\\*`, 'i'), `era ${era}'s players have a ${b} beat`);
     }
   });
 

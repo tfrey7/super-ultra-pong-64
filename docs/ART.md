@@ -79,9 +79,25 @@ paddle's outer face: feet at x 4 to 30 (left; 770 to 796 on the right), centred 
 era 9, item 4) floats just over its head. It is drawn in painter's step 4 immediately **before**
 its paddle box, and its contact shadow is an ellipse 30 x 20 units at 0.30 opacity, lighter than
 the ball's (R5). A downward-tilted camera makes vertical edges lean outward as they rise, so a
-figure on the end strip leans away from the table, never over it; each era card checks that with
-`T.project` at the figure's top corners in all of its camera's measured poses (section 12 of
-ERAS.md) and reports the numbers. The figures take the era's fog, grade and bloom like any
+figure on the end strip leans away from the table, never over it. `test/art-bible.test.js`
+measures it with `tools/table3d-cameras.js` in every camera pose ERAS.md measures (its section
+12), at every 50 units along the table: the figure's inner top corner stays at least 11 page
+pixels outside its paddle's inner face. The same measurement gives each era's figure size -- the
+cameras look steeply down, so a standing figure is short on screen, and **taller at the far end
+than the near one**:
+
+| Era | Figure height, near end to far end | In that machine's pixels | Clearance from the paddle's face |
+| --- | --- | --- | --- |
+| 5 PlayStation (320 wide) | 15 to 29 page px | 6 to 11 | 12 px |
+| 6 Nintendo 64 (320) | 9 to 28 | 4 to 11 | 11.5 |
+| 7 Dreamcast (640) | 11 to 25 | 9 to 20 | 13 |
+| 8 PlayStation 2 (512) | 15 to 28 | 10 to 18 | 11 |
+| 9 Xbox (640) | 12 to 28 | 10 to 23 | 12 |
+| 10 Xbox 360 (960) | 22 to 30 | 27 to 36 | 13 |
+
+At the table's near end the head of a figure on the Nintendo 64 and the Xbox cameras projects just
+past the canvas's side edge (4 and 2 page pixels past it) and is clipped there; that is allowed, and no
+figure is ever moved to avoid it. The figures take the era's fog, grade and bloom like any
 scenery; the paddles alone are exempt (R4).
 
 **The 3D rig.** Every 3D figure is the same rig of 10 boxes, drawn in code; an era changes its
@@ -546,3 +562,539 @@ balloons are drawn into the composite the flourish tilts, so they spin with it.
 
 Drawn in code instead: the halo, the panels and power bars, the streamers, every blink, the derived
 frames, and the flame's stretch. The sky, the Mode 7 floor, the paddle and the ball on master stay.
+
+---
+
+## Era 5: 1994 Sony PlayStation
+
+### FLAGSHIP LOOK
+
+Style targets: *Ridge Racer* (1994, the Japanese launch), *Tekken* (1995 on the PlayStation, a
+year past the rung; the arcade game is 1994) and *Battle Arena Toshinden* (1995 in Japan). What
+the era borrows:
+
+- **How much is on screen:** one lit 3D arena, two polygon fighters, a few hundred flat-shaded
+  triangles in all.
+- **Palette:** 15-bit colour through ERAS.md's era 5 palette; each fighter adds 3 colours
+  *(new)* of its own.
+- **Model size:** the fighters are the shared rig, **10 boxes, 30 visible faces**, 6 to 11
+  PlayStation pixels tall (the table above), every vertex snapped to the 2.5-pixel chunk grid.
+- **Animation:** the rig's poses stepped at **15 poses a second** -- the angles hold for 4 frames
+  and jump, the choppy keyframing of early 3D fighters.
+- **Interface:** *Tekken*'s long health bars at the top, and the round text in big chunky
+  letters.
+
+### SCENE
+
+- **Where:** a harbour rooftop at night, a *Toshinden* arena with a *Ridge Racer* city behind it.
+- **What fills the frame:** ERAS.md's backdrop (the 6-band dithered ramp and the pool of light)
+  and table, plus a **skyline** behind the far wall: 10 flat-shaded boxes, 40 to 90 units wide
+  and 60 to 200 tall, at world `y` -60 to -120, faces in table texture dark and light, 24 window
+  quads in accent yellow at 0.5 opacity.
+- **Backdrop layers:** 3 -- the dithered ramp, the skyline, the table with its pool of light.
+- **What moves on its own:** **2 searchlight beams** behind the skyline, each a triangle from a
+  point on the skyline's roofline, 40 units wide at the top, sweeping plus and minus 25 degrees
+  once every 5 s, accent blue at 0.18 opacity; the windows switch, one at a time, every 0.7 s.
+
+### PLAYERS
+
+- **Who:** two martial artists: left in a red gi with a black belt (accent red, `#1a1a1f`, skin
+  `#c8906a` *(new)*), right in a blue sleeveless top and grey trousers (accent blue, rail colour,
+  skin `#a8704a` *(new)*). Brightest figure colour: the gi's lit face, accent red lit by 0.3,
+  never white.
+- **Silhouette:** the shared rig with the torso widened to 12 units at the shoulders, flat-shaded
+  (`shade: 'flat'`, the paddles' `light`), each face one colour, the head a plain box with the
+  face texture affine-mapped onto its front (so it swims with the table).
+- **How it holds the paddle:** in a fighting stance, the lead forearm along the paddle's outer
+  face at its middle, the rear fist on its top edge.
+- **idle:** the stance bob (shared 3D table), stepped at 15 a second. **move:** the side-step,
+  legs split. **swing:** a palm strike -- the lead arm to 80 at contact. **miss:** the stagger,
+  torso back 15. **win:** a *Tekken*-style victory: one fist up to 160, the other on the hip.
+
+### BALL
+
+ERAS.md's era 5 ball, the **low-poly gem** -- an octagon in 8 facets, `#ffffff`, `#dcdcdc` and
+`#b4b4b4`, full resolution, drawn last -- as a fighting-game **power gem**. This page adds nothing
+to its drawing.
+
+### SCOREBOARD
+
+ERAS.md's score in the block font at cell 6, into the 320 x 240 buffer, kept. Added, inside the
+HUD band (R8; each card checks the band's bottom is above the far edge's `y` minus 6 with
+`T.project`): two **health bars**, 110 buffer pixels by 4, from the score outward, accent yellow
+on `#4a4e59`, that drain one tenth for each point the other side has taken, and `P1` and `CPU`
+under them in the block font at cell 2.
+
+### MOMENTS
+
+- **A point scored:** the conceding bar drains with a red chunk that shrinks over 0.4 s
+  (*Tekken*'s white-then-red damage) in accent red; the word `POINT` in the block font at cell 8,
+  accent yellow with a 1-buffer-pixel red shadow, in the HUD band for 0.8 s; the players play win
+  and miss.
+- **Match point:** `FINAL ROUND` in the same style, held while `isMatchPoint` holds, and both
+  searchlights swing onto the table's centre line and stop.
+
+### TREATMENT
+
+ERAS.md's **wobbly polygons**, all six of them: the 320 x 240 chunk buffer, the affine texture
+swim, vertex snapping with the camera wobble, flat and Gouraud shading, dithered gradients and
+seam sparkle. The fighters are drawn into the chunk buffer in step 4, snapped like everything
+else, so they jitter; that is the era, and R4 protects only the paddles.
+
+### ASSETS
+
+**Budget:** 6 of 12 generations.
+
+| Gens | Name | pixflux size | In game at | What it is |
+| --- | --- | --- | --- | --- |
+| 1 | `era5-fighter-left` | 64 x 64, 4 cells of 32 x 32 | 32 x 32 textures | the red fighter's face, gi front, gi back, belt |
+| 1 | `era5-fighter-right` | 64 x 64 | 32 x 32 textures | the blue fighter's four |
+| 1 | `era5-windows` | 64 x 64 | a 64 x 64 tile | the skyline's window texture, affine-mapped |
+| 1 | `era5-hud-text` | 128 x 32 | 128 x 32 | `POINT` and `FINAL ROUND` lettering, snapped to the chunk grid |
+| 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
+
+Embedded as data: URIs through `src/textures3d.js`. Drawn in code instead: the rig and every
+pose, the skyline boxes, the searchlights, the health bars and the damage chunk.
+
+---
+
+## Era 6: 1996 Nintendo 64
+
+### FLAGSHIP LOOK
+
+Style targets: *Super Mario 64* (1996), *Wave Race 64* (1996) and *Pilotwings 64* (1996). What
+the era borrows:
+
+- **How much is on screen:** a whole toybox world to the horizon, cut off by fog; round, smooth
+  low-poly characters.
+- **Palette:** ERAS.md's era 6 toy colours; each character 3 colours *(new)* plus the palette.
+- **Model size:** the shared rig **re-proportioned to a chunky mascot**: legs 14, pelvis 6, torso
+  18 (14 wide), head 16 (1.6 times), a 2-unit hat, still 56 in all; 4 to 11 Nintendo 64 pixels
+  tall. Every box gets the paddles' rounded half-ellipse caps, Gouraud-shaded (`shade:
+  'gradient'`).
+- **Animation:** smooth -- the rig's angles eased every frame, never stepped, with a 10% overshoot
+  on each beat's arrival (*Super Mario 64*'s squash).
+- **Interface:** big outlined numbers and a round pie-slice power meter.
+
+### SCENE
+
+- **Where:** a grassy toy park on a sunny afternoon.
+- **What fills the frame:** ERAS.md's sky, 3 fogged hills and 2 drifting clouds, plus **2
+  flagpoles just beyond the end rails**, at world `(-40, 150)` and `(840, 150)`, 90 units tall,
+  toy yellow poles with a triangular pennant 30 x 20 in toy blue (left) and toy green (right),
+  fogged at their depth like the rails.
+- **Backdrop layers:** 3 -- sky, hills, the table with its poles.
+- **What moves on its own:** the clouds at 4 units a second (ERAS.md); the pennants wave, their
+  tip swinging plus and minus 6 units at 1.5 times a second; **3 butterflies** in toy yellow, 4
+  units wide, circling above the far hills on a 60-unit loop every 8 s, fogged.
+
+### PLAYERS
+
+- **Who:** left, a round **penguin** in a red scarf (body `#1f3fbf` HUD outline blue, belly
+  cloud-soft `#f4f0e0` *(new)*, scarf rail red); right, a round **frog** in a yellow cap (toy
+  green, toy yellow, `#9ee6a0` *(new)* belly). Brightest figure colour: the penguin's belly,
+  `#f4f0e0`, below the ball's white.
+- **Silhouette:** the mascot rig above: a big round head on a pear-shaped body, stubby arms.
+- **How it holds the paddle:** hugged to the chest, both flippers or hands wrapped round its outer
+  face at the middle, the way a toy holds a board.
+- **idle:** a waddle-bob, squashing 5% at the bottom of each bob. **move:** a hop-step, the body
+  tilting 12 into the travel. **swing:** a belly bump -- the body lunges 6 units toward the paddle
+  at contact. **miss:** a spin-out, the whole rig turning 360 about its feet over 0.6 s.
+  **win:** a *Super Mario 64* jump -- up to `z` 12, arms up, with a 3-frame squash on landing.
+
+### BALL
+
+ERAS.md's era 6 ball, the **smooth sphere**: a radial gradient from the hot spot, `#ffffff` to
+`#ffe9a8` to `#f0b020`, radius 0.9 times the ball's size -- a toy rubber ball. Nothing added to
+its drawing.
+
+### SCOREBOARD
+
+ERAS.md's toy-outlined score at cell 12, kept. Added in the HUD band: under each score a **power
+meter**, a circle of radius 14 page pixels in 8 pie slices, one lit per rally hit (toy yellow on
+toy blue at 0.6), resetting at the serve, outlined 2 pixels in HUD outline.
+
+### MOMENTS
+
+- **A point scored:** ERAS.md's rumble shake (amplitude 6, 0.25 s); **5 toy-yellow stars**, 8
+  page pixels wide, pop from the scorer's paddle and arc up and out over 0.6 s; the players play
+  win and miss.
+- **Match point:** the power meters spin once a second, and the sky's horizon colour pulses
+  toward toy yellow at 0.15 opacity, once a second.
+
+### TREATMENT
+
+ERAS.md's **fog** (full from `d` 0.85, the scenery beyond fully fogged) and **bilinear smear**,
+and the rumble. The players take fog like the paddles, **capped at 0.35**, so the far player is
+paler but always readable; their 16 x 16 textures are drawn with smoothing on, smeared like the
+table's.
+
+### ASSETS
+
+**Budget:** 6 of 12 generations.
+
+| Gens | Name | pixflux size | In game at | What it is |
+| --- | --- | --- | --- | --- |
+| 1 | `era6-penguin` | 64 x 32, 2 cells of 32 x 32 | 16 x 16 textures, smoothed | the penguin's face and belly |
+| 1 | `era6-frog` | 64 x 32 | 16 x 16 textures | the frog's face and belly |
+| 1 | `era6-pennants` | 64 x 32, 2 cells | 32 x 32 | the two pennant faces |
+| 1 | `era6-star` | 32 x 32 | 8 page px | the pop star, drawn smoothed |
+| 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
+
+Drawn in code instead: the rig, its caps and every pose, the poles, the butterflies, the power
+meters and the shake.
+
+---
+
+## Era 7: 1999 Sega Dreamcast
+
+### FLAGSHIP LOOK
+
+Style targets: *Soulcalibur* (1999), *Sonic Adventure* (1999 in North America) and *Jet Set
+Radio* (2000, a year past the rung: the cel-shaded, graffiti look ERAS.md already gives the era).
+What the era borrows:
+
+- **How much is on screen:** a crisp 640 x 480 city, bold flat colour, ink outlines, big type.
+- **Palette:** ERAS.md's poster colours, **no gradients anywhere** -- flat fills and 2-band cel
+  shading only.
+- **Model size:** the shared rig with **long legs** (legs 24, pelvis 6, torso 16, head 10) and a
+  skate box 10 x 4 x 3 under each foot; 9 to 20 Dreamcast pixels tall, ink-outlined 3 pixels.
+- **Animation:** snappy -- each beat's key angle reached in 2 frames, held, then released;
+  *Soulcalibur*'s sharp poses rather than tweening.
+- **Interface:** graffiti numbers and tags.
+
+### SCENE
+
+- **Where:** a rooftop skate spot above a city at sunset.
+- **What fills the frame:** ERAS.md's 3 flat sky bands and its skyline of 9 seeded purple
+  rectangles, plus **3 poster billboards** on the skyline, each 60 x 30 units, flat poster
+  colours, ink-outlined, and a **water tower** (a box 40 x 40 x 70 on 4 legs) at world `(700,
+  -80)`.
+- **Backdrop layers:** 3 -- sky bands, skyline with billboards, the table's 3 depth bands.
+- **What moves on its own:** **12 window lights** on the skyline in poster yellow, each toggling
+  every 0.5 to 2 s (seeded); a **blimp** 80 x 24 units in poster blue crossing the sky band at 12
+  units a second, wrapping every 70 s.
+
+### PLAYERS
+
+- **Who:** two **inline skaters** in the *Jet Set Radio* manner: left in a swirl-orange jacket
+  and big headphones, right in a poster-blue hoodie and a beanie, both in poster-yellow skates.
+  Brightest figure colour: poster yellow; **no paper white on a figure** (R1: paper white is the
+  ball's luminance).
+- **Silhouette:** tall and lean with big feet: the long-leg rig, the headphones two 4 x 4 x 4
+  boxes on the head, the hood a 12 x 12 x 6 box behind it.
+- **How it holds the paddle:** one-handed, at arm's length, like a skater holding a board out
+  sideways; the free arm out for balance at 60.
+- **idle:** rolling on the spot, the skates sliding 2 units back and forth. **move:** a skating
+  stride, legs split plus and minus 25. **swing:** a spin -- the rig turns 180 and back over the
+  0.18 s, the paddle hand leading. **miss:** a stumble, torso forward 20 then back. **win:** a
+  trick jump to `z` 10 with a 360 turn and a pose held for 0.3 s.
+
+### BALL
+
+ERAS.md's era 7 ball: **two cel bands** (a white circle, the ball shade band offset inside it,
+the ink outline at width 2), its hard contact shadow, the comic **speed lines** behind it and the
+**impact starburst** on a hit. Nothing added to its drawing.
+
+### SCOREBOARD
+
+ERAS.md's graffiti score (cell 13, skewed, extruded in magenta, ink outline, drips), kept. Added
+under each number: a **tag** -- `P1` and `CPU` in the block font at cell 4, same skew, poster
+cyan fill, ink outline -- and a row of **3 spray-can icons** 10 x 18 page pixels, one filled per 3
+rally hits.
+
+### MOMENTS
+
+- **A point scored:** a **paint splat** in poster magenta, 90 x 60 page pixels, stamped behind the
+  scorer's number in the HUD band and fading over 1.2 s; the blimp's side flashes the new score
+  for 1 s; the players play win and miss.
+- **Match point:** the sky bands swap order (magenta top, yellow bottom) and both tags blink 4
+  times a second.
+
+### TREATMENT
+
+ERAS.md's **cel shading with thick ink outlines**: outline mode on for every shape (the players
+too, `cam.outline` width 3), banded shading with the hard edge 40% down each face, flat poster
+fills and the speed lines -- all at 640 x 480 with no smoothing.
+
+### ASSETS
+
+**Budget:** 5 of 12 generations. Cel shading is code; pixellab gives only flat decals.
+
+| Gens | Name | pixflux size | In game at | What it is |
+| --- | --- | --- | --- | --- |
+| 1 | `era7-decals` | 64 x 32, 2 cells of 32 x 32 | 32 x 32, flat | the two jackets' back decals: original graffiti marks, no real logo |
+| 1 | `era7-posters` | 192 x 32, 3 cells of 64 x 32 | 60 x 30 units each | the three billboards, `lineless`, `flat shading` |
+| 1 | `era7-spraycan` | 32 x 32 | 10 x 18 page px | the scoreboard icon |
+| 2 | re-roll reserve | -- | -- | for a decal that comes back wrong |
+
+Drawn in code instead: both skaters and every pose, the water tower, the blimp, the windows, the
+tags and the splat.
+
+---
+
+## Era 8: 2000 PlayStation 2
+
+### FLAGSHIP LOOK
+
+Style targets: *SSX* (2000), *Tekken Tag Tournament* (2000 on the PlayStation 2) and *Metal Gear
+Solid 2* (2001, a year past the rung: the film look ERAS.md gives the era). What the era borrows:
+
+- **How much is on screen:** a moody night set, particles everywhere, a letterboxed frame.
+- **Palette:** ERAS.md's era 8 navy, slate and amber; the players add 2 colours *(new)*.
+- **Model size:** the shared rig at standard proportions with **soft edges**: every box drawn
+  with a 1-unit bevel face (the slab's sheen colour); 10 to 18 PlayStation 2 pixels tall.
+- **Animation:** motion-captured smoothness -- angles eased every frame with a 0.1 s lag on the
+  head and arms behind the torso.
+- **Interface:** film subtitles and codec-style name plates in the letterbox bars.
+
+### SCENE
+
+- **Where:** a helipad on a skyscraper roof at night, in the rain.
+- **What fills the frame:** ERAS.md's letterbox, glossy slab, dust motes, lens flare and
+  reflections, plus a **skyline** of 8 slate towers, 120 to 300 units tall, at world `y` -100
+  to -200, with **30 amber window lights** at 0.5 opacity; and **rain**.
+- **Backdrop layers:** 3 -- the deep-navy sky, the towers, the slab.
+- **What moves on its own:** **rain**, 50 streaks, each a 1-pixel line 12 page pixels long,
+  slate at 0.25 opacity, falling at 900 page pixels a second with a 10-degree slant, seeded and
+  wrapping, drawn at step 6 before the letterbox; the dust motes and the camera drift
+  (ERAS.md); a **searchlight** from behind the towers, a triangle in flare blue at 0.08 sweeping
+  once every 9 s.
+
+### PLAYERS
+
+- **Who:** two **operatives** in sneaking suits: left in midnight with an amber visor (amber
+  light at 0.8), right in slate with a flare-blue visor. Brightest figure colour: the visor,
+  amber light or flare blue at 0.8 -- never white.
+- **Silhouette:** lean and tall, a tactical belt (a box 10 x 16 x 3 at the waist), the visor a
+  box 2 units deep across the head's front.
+- **How it holds the paddle:** low and ready, both hands on its outer face near the bottom, like a
+  riot shield carried at hip height.
+- **idle:** a slow breath, 1.5-unit bob every 2 s (half the shared rate). **move:** a crouched
+  run, legs split plus and minus 20, torso forward 15. **swing:** a shoulder charge into the
+  paddle. **miss:** the head turns to follow the ball out, 0.6 s. **win:** a two-finger salute,
+  one arm to 120, held 0.8 s.
+- **Reflections:** each player drawn a second time with `z` negated at 0.18 opacity, before the
+  real one, the same as the paddles (ERAS.md).
+
+### BALL
+
+ERAS.md's era 8 ball: the white core with its **alpha-glow trail** of 10 points and its amber
+halo -- an **amber tracer** crossing the dark. Nothing added to its drawing.
+
+### SCOREBOARD
+
+ERAS.md's subtitle score in the top bar (cell 5, HUD ink at 0.85), kept. Added in the **bottom
+bar**: two codec **name plates**, each 140 x 28 page pixels, `#0b1020` with a 1-pixel slate edge,
+at x 40 and 620, `P1` and `CPU` in the block font at cell 3 in HUD ink with a 20 x 20 visor icon
+beside it in that player's visor colour.
+
+### MOMENTS
+
+- **A point scored:** the top bar's subtitle types `POINT - P1` or `POINT - CPU` one letter every
+  0.03 s, holding 1 s; the sparks burst a second time at the point's exit, 24 more; the players
+  play win and miss.
+- **Match point:** the subtitle reads `MATCH POINT` in amber light, and the rain doubles to 100
+  streaks.
+
+### TREATMENT
+
+ERAS.md's **cinematic letterbox** (52 pixels top and bottom), the spark particles, the glow trail,
+the slow drift, the lens flare, the dust and the glossy reflections. The players stand inside all
+of it; the rain and the flare pass over them, never over the ball (the ball is drawn after).
+
+### ASSETS
+
+**Budget:** 6 of 12 generations.
+
+| Gens | Name | pixflux size | In game at | What it is |
+| --- | --- | --- | --- | --- |
+| 1 | `era8-suit-left` | 64 x 64, 4 cells of 32 x 32 | 32 x 32 textures | the midnight suit's front, back, belt and visor |
+| 1 | `era8-suit-right` | 64 x 64 | 32 x 32 textures | the slate suit's four |
+| 1 | `era8-skyline` | 400 x 100 | a 400 x 100 plate, smoothed | the towers and their windows at night |
+| 1 | `era8-visor-icons` | 64 x 32, 2 cells | 20 x 20 page px | the name plates' icons |
+| 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
+
+Drawn in code instead: the rig, bevels and poses, the reflections, the rain, the searchlight, the
+name plates and the typed subtitle.
+
+---
+
+## Era 9: 2001 Xbox
+
+### FLAGSHIP LOOK
+
+Style targets: *Halo: Combat Evolved* (2001), *Dead or Alive 3* (2001) and *Project Gotham
+Racing* (2001). What the era borrows:
+
+- **How much is on screen:** hard metal surfaces, a light that moves, every surface lit
+  per pixel.
+- **Palette:** ERAS.md's era 9 black, steel and green; the players take it whole, one colour
+  *(new)*.
+- **Model size:** the shared rig **armoured**: the torso 12 wide with 2 shoulder pads (boxes 6 x 8
+  x 4 on its top corners, not joints); 10 to 23 Xbox pixels tall.
+- **Animation:** heavy and weighted: every beat's angles eased with ease-out over its length, the
+  swing's contact held 2 frames longer.
+- **Interface:** *Halo*'s segmented shield bar and name tags over the players.
+
+### SCENE
+
+- **Where:** a starship hangar deck.
+- **What fills the frame:** ERAS.md's black backdrop and faint green horizon line, plus a **hangar
+  wall** behind the far rail: 6 steel ribs, boxes 12 x 12 x 160 units at world `y` -60, `x` 50 to
+  750 evenly, in steel with the plate tile; **2 beacon posts** just beyond the end rails at world
+  `(-30, 60)` and `(830, 60)`, 60 units tall.
+- **Backdrop layers:** 3 -- the black and its horizon line, the ribbed wall, the diamond-plate
+  table.
+- **What moves on its own:** the **beacons** rotate, a green-glow wedge sweeping once every 2 s;
+  **steam vents** at the foot of ribs 2 and 5 puff every 3 s, 5 steel-light circles rising 40 units
+  and fading over 1 s at 0.3.
+
+### PLAYERS
+
+- **Who:** left, a **space marine** in gunmetal armour with green trims and a mirrored visor in
+  specular colour at 0.7; right, a tall **steel cyborg** with a single shield-alarm-red eye slit.
+  Brightest figure colour: the visor's specular, `#e8ffe0` at 0.7, never the ball's white at full.
+- **Silhouette:** broad and top-heavy: the shoulder pads, a helmet box 11 x 11 x 11, the visor a
+  box 2 deep across its front.
+- **How it holds the paddle:** as a deployable **energy shield**, the lead arm through it at the
+  middle, the other hand on its top edge.
+- **idle:** a weapon-ready bob, 1 unit. **move:** a strafing step, legs split plus and minus 18,
+  torso level. **swing:** a melee bash, the shield arm to 80 with the contact held 0.03 s longer.
+  **miss:** the armour flashes shield alarm red on its outline for 0.3 s and the torso rocks back.
+  **win:** a single fist pump to 160, held 0.5 s.
+- **Shadows and light:** the players cast hard shadows from the ball's moving light, as the
+  paddles do (0.45, hull of footprint and top corners), and the armour carries the plate tile with
+  the specular pool, so their emboss lights up as the ball passes (ERAS.md's bump map).
+
+### BALL
+
+ERAS.md's era 9 ball: the white core that **is the light** -- the pool, the specular stripe on
+the paddles and every hard shadow follow it. Nothing added to its drawing.
+
+### SCOREBOARD
+
+ERAS.md's shield bars (10 skewed segments each, the total beside them), kept, and its gamertags at
+`z` 60 over each paddle -- which float just over the 56-unit players' heads, as the tags of
+*Halo*'s multiplayer did. Added: a **motion-tracker dot** 12 page pixels across in the HUD band's
+centre, a green ring with a green-glow dot at the ball's `x` along its width.
+
+### MOMENTS
+
+- **A point scored:** ERAS.md's shield-alarm flash and recharge on the conceding bar; the beacons
+  turn shield-alarm red for 1 s; the players play win and miss.
+- **Match point:** this is the era where match point first happens (the point that reaches era
+  10). The beacons stay red, the gamertags' borders pulse green glow once a second, and the steam
+  vents blow continuously.
+
+### TREATMENT
+
+ERAS.md's **bump-mapped metal** with the moving specular pool, the **hard dynamic shadows** and
+the **green glow** -- the players' armour takes the same plate tile and pool, and their outlines
+are not stroked with `shadowBlur` (the era's two blurs stay the paddles').
+
+### ASSETS
+
+**Budget:** 6 of 12 generations.
+
+| Gens | Name | pixflux size | In game at | What it is |
+| --- | --- | --- | --- | --- |
+| 1 | `era9-armour-left` | 64 x 64, 4 cells of 32 x 32 | 32 x 32 textures | the marine's chest, back, helmet and pads |
+| 1 | `era9-armour-right` | 64 x 64 | 32 x 32 textures | the cyborg's four |
+| 1 | `era9-hangar` | 400 x 80 | a 400 x 80 plate | the hangar wall between the ribs |
+| 1 | `era9-beacon` | 32 x 64 | 32 x 64 | the beacon post's face |
+| 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
+
+The landed `tex3d-court-metal` stays the table's. Drawn in code instead: the rig and its pads,
+the ribs, the rotating wedge, the steam, the tracker and every flash.
+
+---
+
+## Era 10: 2005 Xbox 360
+
+### FLAGSHIP LOOK
+
+Style targets: *Project Gotham Racing 3* (2005), *Perfect Dark Zero* (2005) and *Gears of War*
+(2006, a year past the rung: the brown-and-grey grade ERAS.md gives the era). What the era
+borrows:
+
+- **How much is on screen:** HD detail everywhere, every post-process effect at once, a ruined
+  world behind the action.
+- **Palette:** ERAS.md's era 10 umber, mud, concrete, ash and blade green, through the grade.
+- **Model size:** the shared rig **bulked**: torso 14 wide, shoulder pads 8 x 10 x 5, the head
+  9 (small on the big body), 27 to 36 Xbox 360 pixels tall -- the first era with room for detail.
+- **Animation:** eased with follow-through: the arms lag the torso 0.08 s and settle with one
+  overshoot; the move beat carries a 1-unit side sway.
+- **Interface:** the Blades, gamerpics and the achievement toast.
+
+### SCENE
+
+- **Where:** a bombed-out city plaza at sunset.
+- **What fills the frame:** ERAS.md's HDR sun behind the far wall and the concrete slab, plus a
+  **ruin**: 6 broken columns (boxes 20 x 20 x 80 to 160 units, tops cut at seeded angles) at
+  world `y` -60 to -140 in umber and mud, and a **torn banner** 60 x 90 units on the second
+  column, drawn into the depth-of-field buffer so it is soft.
+- **Backdrop layers:** 3 -- the sun and sky, the ruin (soft, in the DOF buffer), the slab.
+- **What moves on its own:** **40 ash flakes** drifting down at 8 to 20 page pixels a second,
+  1 to 2 pixels, ash at 0.3 opacity, seeded and wrapping; the banner's lower edge ripples plus and
+  minus 4 units at 0.8 times a second; the sun's bloom breathes plus and minus 5% every 6 s.
+
+### PLAYERS
+
+- **Who:** two **heavy soldiers** in battered armour: left with blade-green trims, right with
+  ash-grey trims and a mud-brown cloth hood. Brightest figure colour: the rim light, HDR sun at
+  0.6 -- never bloom white.
+- **Silhouette:** a wide wedge -- the huge pads, a chest plate box 16 x 16 x 4 over the torso, thick
+  forearms (5 x 5 x 11).
+- **How it holds the paddle:** braced behind it as **cover**, one shoulder against its outer face,
+  both hands on its top edge -- the cover system the era is remembered for.
+- **idle:** a heavy breath, the pads rising 1 unit every 2 s. **move:** a roadie run, torso forward
+  25, legs plus and minus 20. **swing:** a mantle-and-shove, the torso up over the paddle's top
+  edge to 80 and back. **miss:** a flinch, the head down 30 and the arms up to shield it.
+  **win:** a slow fist to the chest, then up to 160, held 0.8 s.
+- **Rim lights:** each player's outline gets a 1.5-pixel HDR-sun rim at 0.6, restored after the
+  grade the way the paddles' inks are, and the rim is drawn into the bloom buffer too, so it glows.
+
+### BALL
+
+ERAS.md's era 10 ball: the white core with its **motion-blur capsule**, 3 ghost discs and its
+blooming halo -- a **tracer round** through the haze. Nothing added to its drawing.
+
+### SCOREBOARD
+
+ERAS.md's Blades (four tabs, the scores in the HD font) and the achievement toast, kept. Added: a
+**gamerpic** 24 x 24 page pixels at the top of each of the first two blades -- the left player's
+helmet in blade green, the right's in ash -- with a 1-pixel blade-silver frame.
+
+### MOMENTS
+
+- **A point scored:** ERAS.md's toast, `10G - POINT SCORED`; the ash flakes gust sideways at 60
+  pixels a second for 0.5 s; the players play win and miss. This is the one era where a point
+  does not change the machine.
+- **Match point:** the toast reads `MATCH POINT` over `100G - FINISH IT` *(new text; the block
+  font fallback must draw each letter)*, the vignette's clear radius tightens from 250 to 220, and
+  the feel layer's slow motion plays.
+
+### TREATMENT
+
+ERAS.md's **bloom and grain** and all the rest: HD crispness, multi-scale bloom, the
+brown-and-grey grade, the vignette, film grain, motion blur on the ball and depth of field on the
+far end. The players are graded and grained like the slab; only their rim lights, like the
+paddles' inks, are restored after the grade.
+
+### ASSETS
+
+**Budget:** 7 of 12 generations. Pixel art at this resolution is the wrong look, so every image
+is a texture drawn with smoothing, never a sprite shown at its own size.
+
+| Gens | Name | pixflux size | In game at | What it is |
+| --- | --- | --- | --- | --- |
+| 1 | `era10-armour-left` | 64 x 64, 4 cells of 32 x 32 | 32 x 32 textures, smoothed | the green-trim soldier's chest, pads, back and helmet |
+| 1 | `era10-armour-right` | 64 x 64 | 32 x 32 textures | the grey-trim soldier's four |
+| 1 | `era10-ruin` | 400 x 120 | a 400 x 120 plate in the DOF buffer | the broken columns' faces |
+| 1 | `era10-banner` | 64 x 96 | 60 x 90 units | the torn banner, an original emblem, no real logo |
+| 1 | `era10-gamerpics` | 64 x 32, 2 cells of 32 x 32 | 24 x 24 page px | the two gamerpics |
+| 2 | re-roll reserve | -- | -- | for a texture that comes back wrong |
+
+Drawn in code instead: the rig, pads and every pose, the rim lights, the ash, the banner's ripple,
+the gamerpic frames and the toast's new text.
