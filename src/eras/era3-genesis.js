@@ -254,6 +254,7 @@
     minWedges: 5,
     maxWedges: 36,
     maxFlight: 300,     // ring radius a loose shard takes to fly off, at most
+    minFlight: 80,      // ...and at least, however near the far corner it breaks
     throwDist: 640,     // how far a shard has been thrown when its flight ends
     edgeInk: '#b6dbff', // the lit edge of the glass (on the palette)
     shadow: 'rgba(0,0,36,0.55)'
@@ -388,13 +389,17 @@
    */
   function shardPose(s, radius, reach) {
     if (!(radius > s.near) || !(radius < reach)) return null;
-    if (radius < s.mid) {
+    // A shard breaks loose at its middle, but never later than minFlight
+    // before the end, so one out by the far corner still flies rather than
+    // sitting cracked until the last frame and blinking out.
+    var loose = Math.min(s.mid, reach - SHATTER.minFlight);
+    if (radius < loose) {
       return { phase: 'crack', q: 0, x: 0, y: 0, angle: 0, scale: 1, alpha: 1,
-               glint: (radius - s.near) / Math.max(1, s.mid - s.near) };
+               glint: (radius - s.near) / Math.max(1, loose - s.near) };
     }
-    var span = Math.min(SHATTER.maxFlight, reach - s.mid);
+    var span = Math.min(SHATTER.maxFlight, reach - loose);
     if (!(span > 0)) return null;
-    var q = (radius - s.mid) / span;
+    var q = (radius - loose) / span;
     if (q >= 1) return null;
     var travel = SHATTER.throwDist * s.throwK * (0.3 * q + 0.7 * q * q);
     return {
