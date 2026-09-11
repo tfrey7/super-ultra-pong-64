@@ -16,10 +16,11 @@
  *   hdtv-720p      a 720p flat panel -- the Xbox 360 (10): no scanlines, a hint of
  *                  LCD softness and a slight smear on fast movement.
  *
- * How it stays cheap: every effect is a pre-drawn canvas made once (and again
- * only when the page's size changes) stamped with one drawImage, or the native
- * frame drawn again -- offset, shrunk, or the previous frame's copy -- at low
- * alpha. No pixel is ever read or written one at a time.
+ * How it stays cheap: every blend is done on a copy of the NATIVE picture --
+ * the frame drawn again offset, shrunk, or last frame's copy, at low alpha, and
+ * pre-drawn canvases (made once) -- and the page gets only two draws a frame:
+ * the finished copy and the scanline strip. No pixel is ever read or written
+ * one at a time.
  *
  * How it keeps the ball the brightest, sharpest thing on screen (ERAS.md R1,
  * R2): every redraw of the frame uses a mode that can only brighten
@@ -136,12 +137,18 @@
   }
 
   // ------------------------------------------------------------------ drawing
-  function stamp(ctx, src, rect, mode, alpha, dx, dy) {
+  // Every blend happens on a copy of the NATIVE picture (320 x 240 for the
+  // PlayStation), never on the page: blending the page's million-odd pixels
+  // seven times a frame held the 3D eras to 10-20 frames a second in the
+  // playtest's Chrome. The finished copy is then put on the page with one
+  // drawImage over the plain picture, and the scanlines with one more.
+
+  /** Draw src over the whole of a w x h canvas, in a mode, at an alpha, offset dx. */
+  function blend(x, src, w, h, mode, alpha, dx) {
     if (!(alpha > 0) || !src) return;
-    ctx.globalCompositeOperation = mode;
-    ctx.globalAlpha = Math.min(1, alpha);
-    ctx.drawImage(src, 0, 0, src.width, src.height,
-      rect.x + (dx || 0), rect.y + (dy || 0), rect.w, rect.h);
+    x.globalCompositeOperation = mode;
+    x.globalAlpha = Math.min(1, alpha);
+    x.drawImage(src, 0, 0, src.width, src.height, dx || 0, 0, w, h);
   }
 
   /** A shrunken copy of the native frame, for glow and softness. */
@@ -151,6 +158,7 @@
     var s = canvasOf(name, w, h);
     s.x.setTransform(1, 0, 0, 1, 0, 0);
     s.x.globalCompositeOperation = 'copy';
+    s.x.globalAlpha = 1;
     s.x.imageSmoothingEnabled = true;
     s.x.drawImage(native, 0, 0, native.width, native.height, 0, 0, w, h);
     s.x.globalCompositeOperation = 'source-over';
@@ -164,21 +172,27 @@
     var native = info && info.native;
     var s = row.strength == null ? 1 : row.strength;
     if (!native || !(s > 0) || !hasDocument()) return;
-    var px = rect.w / native.width;             // one native pixel, in page pixels
-    ctx.imageSmoothingEnabled = true;
+    var W = native.width, H = native.height;
+
+    // The copy the blends land on -- the playtest reads the native picture
+    // itself, which stays exactly as the era drew it.
+    var post = canvasOf('post', W, H), x = post.x;
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.imageSmoothingEnabled = true;
+    blend(x, native, W, H, 'copy', 1, 0);
 
     // Colour bleed and a touch of blur: the frame one native pixel to either
     // side, only ever brightening, so bright edges spread and nothing dims.
     if (k.bleed) {
-      stamp(ctx, native, rect, 'lighten', k.bleed * s * 0.5, -px, 0);
-      stamp(ctx, native, rect, 'lighten', k.bleed * s * 0.5, px, 0);
+      blend(x, native, W, H, 'lighten', k.bleed * s * 0.5, -1);
+      blend(x, native, W, H, 'lighten', k.bleed * s * 0.5, 1);
     }
     // Composite's chroma rides a narrower band than its brightness: the hue
     // lags two native pixels, the brightness stays where it was.
-    if (k.chroma) stamp(ctx, native, rect, 'color', k.chroma * s, 2 * px, 0);
+    if (k.chroma) blend(x, native, W, H, 'color', k.chroma * s, 2);
 
     // LCD softness: a half-size copy, brightening only.
-    if (k.soft) stamp(ctx, shrunk('soft', native, 0.5), rect, 'lighten', k.soft * s);
+    if (k.soft) blend(x, shrunk('soft', native, 0.5), W, H, 'lighten', k.soft * s, 0);
 
     // Motion smear: last frame's picture, brightening only, so the ball leaves
     // a faint trail on fast movement and a still picture looks unchanged.
@@ -186,36 +200,39 @@
       var prev = cache.prev;
       if (smearState.have && smearState.era === info.era && info.time >= smearState.time &&
           info.time - smearState.time < 0.1 && prev) {
-        stamp(ctx, prev, rect, 'lighten', k.smear * s);
+        blend(x, prev, W, H, 'lighten', k.smear * s, 0);
       }
-      var p = canvasOf('prev', Math.round(native.width / 2), Math.round(native.height / 2));
+      var p = canvasOf('prev', Math.round(W / 2), Math.round(H / 2));
       p.x.setTransform(1, 0, 0, 1, 0, 0);
       p.x.globalCompositeOperation = 'copy';
+      p.x.globalAlpha = 1;
       p.x.imageSmoothingEnabled = true;
-      p.x.drawImage(native, 0, 0, native.width, native.height, 0, 0, p.c.width, p.c.height);
+      p.x.drawImage(native, 0, 0, W, H, 0, 0, p.c.width, p.c.height);
       p.x.globalCompositeOperation = 'source-over';
       smearState.era = info.era; smearState.time = info.time; smearState.have = true;
     }
 
     // Bloom / edge glow: a small copy scaled back up is a wide soft blur;
     // 'screen' only adds light, and never past white.
-    if (k.glow) stamp(ctx, shrunk('glow', native, k.glowScale), rect, 'screen', k.glow * s);
+    if (k.glow) blend(x, shrunk('glow', native, k.glowScale), W, H, 'screen', k.glow * s, 0);
 
-    // The PlayStation's ordered dither, one native pixel per cell, hard-edged.
-    if (k.dither && row.dither) {
-      ctx.imageSmoothingEnabled = false;
-      stamp(ctx, ditherScreen(native.width, native.height), rect, 'soft-light', k.dither * s);
-      ctx.imageSmoothingEnabled = true;
-    }
+    // The PlayStation's ordered dither, one native pixel per cell.
+    if (k.dither && row.dither) blend(x, ditherScreen(W, H), W, H, 'soft-light', k.dither * s, 0);
 
-    // Scanlines last: one strip per native line, stretched over the picture.
-    if (k.scan) {
-      var strip = scanStrip(native.height, k.scanShape, Math.min(1, k.scan * s));
-      stamp(ctx, strip, rect, 'source-over', 1);
-    }
+    x.globalAlpha = 1;
+    x.globalCompositeOperation = 'source-over';
 
-    ctx.globalAlpha = 1;
+    // Onto the page: the finished copy over the plain picture, scaled the way
+    // the row scales, then the scanlines, one strip per native line.
     ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.imageSmoothingEnabled = !!row.smooth;
+    ctx.drawImage(post.c, 0, 0, W, H, rect.x, rect.y, rect.w, rect.h);
+    if (k.scan) {
+      ctx.imageSmoothingEnabled = true;
+      var strip = scanStrip(H, k.scanShape, Math.min(1, k.scan * s));
+      ctx.drawImage(strip, 0, 0, strip.width, strip.height, rect.x, rect.y, rect.w, rect.h);
+    }
   }
 
   Object.keys(KINDS).forEach(function (name) {

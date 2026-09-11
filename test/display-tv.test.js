@@ -18,7 +18,8 @@ function fakeDocument(made) {
   return { createElement: () => {
     const c = { width: 0, height: 0, draws: [] };
     const x = { canvas: c, setTransform() {}, clearRect() {}, fillRect() { c.draws.push('fillRect'); },
-      createPattern: () => ({}), drawImage() { c.draws.push('drawImage'); } };
+      createPattern: () => ({}),
+      drawImage(src) { c.draws.push({ mode: this.globalCompositeOperation || 'source-over', w: src.width }); } };
     c.getContext = () => x;
     made.push(c); return c; } };
 }
@@ -55,7 +56,7 @@ test('the kinds have the parts the brief names, and the Xbox 360 has no scanline
   assert.deepStrictEqual([...TV.BAYER4].sort((a, b) => a - b), [...Array(16).keys()], 'a real 4 x 4 Bayer matrix');
 });
 
-test('every redraw of the frame only brightens or keeps brightness, so the ball stays the brightest thing', () => {
+test('every blend only brightens or keeps brightness, on the native picture, and the page gets two draws', () => {
   const made = [];
   globalThis.document = fakeDocument(made);
   try {
@@ -66,23 +67,28 @@ test('every redraw of the frame only brightens or keeps brightness, so the ball 
       D.present(page, era, 1 + era);
       D.begin(era, 800, 600);
       D.present(page, era, 1.016 + era);   // a second frame, so the smear has a previous one
-      const over = calls.filter((c) => c.mode !== 'source-over' || c.alpha < 1 || c.h > c.w);
-      assert.ok(over.length > 0, `era ${era} draws an overlay`);
-      for (const c of over) {
-        assert.ok(['lighten', 'screen', 'color', 'soft-light', 'source-over'].includes(c.mode), `era ${era} mode ${c.mode}`);
-        if (c.mode === 'source-over') assert.strictEqual(c.w, 1, `era ${era}: the only plain draw is the scanline strip`);
+      const post = TV.cache.post;
+      assert.ok(post, `era ${era} blends on its own copy`);
+      assert.deepStrictEqual([post.width, post.height], [D.row(era).w, D.row(era).h], `era ${era}: at the native size`);
+      const blends = post.draws.filter((d) => d.mode !== 'copy');
+      assert.ok(blends.length > 0, `era ${era} draws a screen`);
+      for (const d of blends) {
+        assert.ok(['lighten', 'screen', 'color', 'soft-light'].includes(d.mode), `era ${era} mode ${d.mode}`);
       }
-      assert.strictEqual(calls.filter((c) => c.mode === 'source-over' && c.alpha === 1 && c.w > 1).length, 2,
-        `era ${era}: the picture itself is the one plain drawImage per frame`);
+      // Per frame on the page: the picture, the finished copy over it, and the
+      // scanline strip -- all plain draws, nothing blended at page size.
+      for (const c of calls) assert.strictEqual(c.mode, 'source-over', `era ${era}: no blend at page size`);
       const strips = calls.filter((c) => c.w === 1);
       if (era === 10) assert.strictEqual(strips.length, 0, 'no scanlines on the flat panel');
       else assert.strictEqual(strips.length, 2, `era ${era}: one scanline strip per frame`);
+      assert.strictEqual(calls.length, era === 10 ? 4 : 6, `era ${era}: ${era === 10 ? 2 : 3} page draws a frame`);
       if (era === 10) {
         // Two frames of LCD softness (a half-size copy each), plus ONE smear:
         // the first frame had no previous frame to smear.
-        const halves = calls.filter((c) => c.mode === 'lighten' && c.w === 480);
+        const halves = post.draws.filter((d) => d.mode === 'lighten' && d.w === 480);
         assert.strictEqual(halves.length, 3, 'the second frame smears the first one over it');
       }
+      post.draws.length = 0;
     }
   } finally {
     delete globalThis.document;
