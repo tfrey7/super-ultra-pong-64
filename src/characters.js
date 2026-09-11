@@ -49,6 +49,10 @@
  *   scale    field units per sheet pixel -- on the 3D eras, table units, so
  *            the figure then shrinks and grows with the table's depth
  *   fps      how fast idle/up/down/win cycle their frames
+ *   clip     { y0, y1 } (item 1249): both players are drawn only between these
+ *            two heights, in field units, across the whole width -- a
+ *            letterboxed era's picture between its bars, so a figure never
+ *            pokes into a bar. null (the default) clips nothing
  *   skin, body   the placeholder's colours; its shirt wears the paddle's ink
  *
  * A sheet is cut into its frames once, when it has loaded: each frame is a
@@ -87,6 +91,7 @@
     fps: 6,
     res: 1,             // placeholder sheet pixels per grid cell
     round: false,       // placeholder head drawn round (the 3D eras)
+    clip: null,         // { y0, y1 }: draw the players only inside this band (field units)
     skin: '#e0b090',
     body: '#303040'
   };
@@ -117,11 +122,12 @@
     // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
     // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
     // fps 3, not the bible's 8: the rig has one rate for idle, move and win,
-    // and at 8 a two-frame breath reads as a flicker.
+    // and at 8 a two-frame breath reads as a flicker. The players are clipped
+    // to the picture between the era's 52-pixel letterbox bars (item 1249).
     8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
           sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
           frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
-          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3 },
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3, clip: { y0: 52, y1: 548 } },
     // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
     // cyborg, cut from pixellab by assets/pixellab/era9-derive.mjs; the hand on
     // the shield at the paddle box's top (dz 24), 90 table units tall. A
@@ -391,17 +397,21 @@
    * A loaded pixellab sheet, cut into its frames: { image, rects } where
    * rects[beat][i] is that frame's source rectangle. Null until it has loaded
    * (the placeholder draws meanwhile), and null for good if it failed.
+   *
+   * Null too when the loader cannot make an image at all -- under node --test
+   * there is no Image, and the default loader's `new Image()` throws: that is
+   * "not loaded", and the placeholder draws (items 1225 and 1249 each found
+   * it, from eras 2 and 8). Nothing is remembered about that, so a loader installed later (a
+   * test's stand-in) is asked afresh on the next frame.
    */
   var cut = {};
   function sheetFrames(cfg, sprites) {
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
-    // Headless there is no Image to load into, and the loader throws: that is
-    // "not loaded", and the placeholder draws (item 1225, the first real sheet).
     var image;
     try { image = S.load(cfg.sheet); } catch (e) { return null; }
-    if (!S.ready(cfg.sheet)) return null;
+    if (!image || !S.ready(cfg.sheet)) return null;
     var rects = {};
     for (var row = 0; row < BEATS.length; row++) {
       var list = rects[BEATS[row]] = [];
@@ -472,8 +482,29 @@
     var order = state.left.y <= state.right.y ? ['left', 'right'] : ['right', 'left'];
     // Each side in its own config: they differ only in the sheet it wears.
     var sides = { left: cfg, right: configFor(era, 'right') };
-    for (var i = 0; i < order.length; i++) drawPlayer(ctx, state, order[i], sides[order[i]], mem, R, cam, T);
+    var band = clipBand(cfg.clip);
+    var clipped = band && typeof ctx.clip === 'function' && typeof ctx.rect === 'function' &&
+                  typeof ctx.beginPath === 'function';
+    if (clipped) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, band.y0, state.width || 800, band.y1 - band.y0);
+      ctx.clip();
+    }
+    try {
+      for (var i = 0; i < order.length; i++) drawPlayer(ctx, state, order[i], sides[order[i]], mem, R, cam, T);
+    } finally {
+      if (clipped) ctx.restore();
+    }
     return true;
+  }
+
+  /** An era's clip as { y0, y1 } with y0 above y1, or null for none (or one that makes no sense). */
+  function clipBand(clip) {
+    if (!clip) return null;
+    var y0 = Number(clip.y0), y1 = Number(clip.y1);
+    if (!isFinite(y0) || !isFinite(y1) || y1 <= y0) return null;
+    return { y0: y0, y1: y1 };
   }
 
   // Wrap the renderer's draw once, so every frame anything draws has the players.
@@ -507,6 +538,7 @@
     cameraFor: cameraFor,
     drawPose: drawPose,
     drawPlayers: drawPlayers,
+    clipBand: clipBand,
     install: install,
     get enabled() { return enabled; },
     set enabled(v) { enabled = !!v; }
