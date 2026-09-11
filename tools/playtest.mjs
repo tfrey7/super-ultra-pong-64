@@ -861,6 +861,8 @@ async function wholeMatch(s, baseUrl) {
     }
     // This rung's point: a miss past the player on even rungs, the player's own
     // point on odd ones (the ladder walk's rule), unless one already went in.
+    // A second of ordinary play first, so every era's frame time has a reading.
+    if (points(g) === startPts) g = await playUntil(s, geo, 1000, track, (x) => points(x) !== startPts);
     if (points(g) === startPts) {
       const outRight = rung % 2 === 1;
       if (outRight) await s.eval(`(() => { const g = window.__pong, r = g.right;
