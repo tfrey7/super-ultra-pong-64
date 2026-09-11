@@ -55,7 +55,9 @@
   var BALL_SHADOW = 1.9;
   var POOL = { radius: 160, alpha: 0.35, tileAlpha: 0.6 };
   var TAGS = { left: 'PONG SLAYER', right: 'CPU 2001' };
-  var TAG = { w: 104, h: 22, z: 60, cell: 2, gap: 2, alpha: 0.85 };
+  // z 60 was head height before the players (item 1233): a 90-unit player's
+  // head is at about 100, so the tag floats at 118, over it, as Halo's did.
+  var TAG = { w: 104, h: 22, z: 118, cell: 2, gap: 2, alpha: 0.85 };
   var SHIELD = { segments: 10, w: 16, h: 12, gap: 3, skew: -0.3, top: 30, margin: 44,
                  cell: 5, digitGap: 4, alarm: 0.3, recharge: 0.5 };
 
