@@ -272,7 +272,8 @@ So the six era cards never touch the same line:
   the hard-coded 4. As built, a rung above the `VOICES` rows whose look has no `voice` yet plays the
   Super Nintendo's row and echo, so the placeholders are never silent. Of the section 3 additions,
   1144 builds only the hook: `wave: 'noise'` notes are skipped rather than played, and `attack`,
-  `filter`, `unison`, `lfo`, `shape`, `reverb`, `bus` and the boot sting are still to build.
+  `filter`, `unison`, `lfo`, `shape`, `reverb` and `bus` are still to build. The boot sting is
+  built (item 1162, section 3), and eras 1 and 2 already use it.
 - **Name cards** carry `dots: null`, so no rung above 4 inherits the Super Nintendo's four
   buttons from `STYLES[4]` in `src/erachange.js`.
 
@@ -324,6 +325,14 @@ filter every note of the era passes through.
 it sounded, and that era's voice has a `boot` list, it plays `boot` instead of `score`. The sting
 lands with the ring wipe's first frame. A sting may ring past the serve; it changes nothing in
 play.
+
+As built (item 1162): `handle(state)` asks the rules instead of that wording, because a new match
+starts back at era 0 after the player last sounded a higher one. A point moved the machine up when
+`state.eraChangedAt` equals the event's own `time`. A bare `play(ev)`, with no game to ask, keeps
+the wording above. The player counts stings in `boots`, and `last.type` reads `'boot'`. Because
+`boot` replaces `score`, a sting that should still be heard over the point starts with the point's
+notes: eras 1 and 2 do (`ATARI_POINT` and `NES_POINT` in `src/sound.js`). A flourish never plays a
+note.
 
 ---
 

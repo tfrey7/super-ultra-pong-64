@@ -103,7 +103,7 @@ async function main() {
     const ringStamps = run.stamps.filter((_, i) => run.ring[i]);
     const toEra = await s.evaluate('window.__pong.era');
     const sound = await s.evaluate(`(() => { const p = window.__pongSound; return p ? {
-      audio: p.audioState(), played: p.played, errors: p.errors, last: p.last } : null; })()`);
+      audio: p.audioState(), played: p.played, errors: p.errors, last: p.last, boots: p.boots } : null; })()`);
 
     // Pass 2: a frame held mid-flip.
     await s.send('Page.reload', { ignoreCache: true });

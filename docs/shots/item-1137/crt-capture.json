@@ -1,70 +1,72 @@
 {
- "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1137",
- "url": "file:///G:/Claude%20Stuff/super-ultra-pong-64-item-1137/index.html",
- "chromePid": 40768,
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1162",
+ "url": "file:///G:/Claude%20Stuff/super-ultra-pong-64-item-1162/index.html",
+ "chromePid": 38896,
  "ordinaryPlay": {
   "frames": 240,
   "meanMs": 4.2,
   "p95Ms": 4.3,
-  "maxMs": 4.3,
-  "worstFrameIndex": 2,
+  "maxMs": 4.4,
+  "worstFrameIndex": 110,
   "firstDeltasMs": [
    4.2,
    4.1,
-   4.3,
-   4.1,
-   4.2
-  ]
- },
- "firstRing": {
-  "frames": 360,
-  "meanMs": 4.2,
-  "p95Ms": 4.3,
-  "maxMs": 4.3,
-  "worstFrameIndex": 5,
-  "firstDeltasMs": [
-   4.1,
    4.2,
    4.2,
-   4.1,
    4.1
   ]
  },
- "secondRing": {
-  "frames": 361,
-  "meanMs": 4.2,
-  "p95Ms": 4.3,
-  "maxMs": 4.3,
-  "worstFrameIndex": 3,
+ "firstRing": {
+  "frames": 284,
+  "meanMs": 5.6,
+  "p95Ms": 4.4,
+  "maxMs": 129.2,
+  "worstFrameIndex": 14,
   "firstDeltasMs": [
    4.2,
    4.1,
+   4.2,
+   41.7,
+   4.2
+  ]
+ },
+ "secondRing": {
+  "frames": 359,
+  "meanMs": 4.2,
+  "p95Ms": 4.3,
+  "maxMs": 8.3,
+  "worstFrameIndex": 158,
+  "firstDeltasMs": [
    4.1,
    4.3,
+   4.1,
+   4.2,
    4.2
   ]
  },
  "after": {
   "era": 1,
-  "played": 5,
+  "played": 3,
   "errors": 0,
   "last": {
    "era": 1,
-   "type": "sting",
+   "type": "boot",
    "waves": [
+    "square",
     "fm",
     "square",
     "fm"
    ],
    "echo": false
   },
+  "boots": 2,
   "audio": "running",
-  "stingVoices": 3
+  "bootVoices": 4
  },
  "frozenChange": {
   "era": 1,
-  "at": 1.1876333333333342,
-  "time": 1.1876333333333342
+  "at": 1.1874333333333342,
+  "time": 1.1874333333333342
  },
  "frames": [
   {
