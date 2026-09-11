@@ -36,11 +36,19 @@
   chain: { tone: 9500 },
 
   // 6 -- 1996 Nintendo 64: samples squeezed onto a cartridge, played by the
-  // RSP, so everything sounds muffled and bathed in reverb.
+  // RSP, so everything sounds muffled and bathed in reverb. Item 1243: Star
+  // Fox 64's military brass, GoldenEye's spy guitar and big-beat drums.
+  //   intro  (0)    the string pad, the flute (A) and the horn (B) on the
+  //                 tune, bowed basses, a slow kick and a crash at each section
+  //   build  (0.3)  a marching snare ostinato rolling into each section, the
+  //                 GoldenEye spy line climbing the chords on a surf guitar
+  //   climax (0.7)  the brass fanfare stabs, timpani on the downbeats and a
+  //                 roll into each section, big-beat drums, a loose hat
   name: 'Nintendo 64',
-  about: 'Synth-orchestral: a fat, slowly vibrating string pad, brassy stabs punching the chords, the melody on a breathy flute in the A section and a proud horn in the B, bowed basses, timpani and a crash at each section, all a little muffled and swimming in a big hall reverb.',
-  trait: 'Cartridge-squeezed samples: the whole mix rolled off above about 9 kHz, orchestral pads and brass, and a big reverb over everything.',
+  about: 'Military synth-orchestra, Star Fox 64 and GoldenEye: a fat, slowly vibrating string pad, the melody on a breathy flute in the A section and a proud horn in the B over bowed basses; as the rally builds a marching snare starts its ostinato and a spy-film surf guitar climbs the chords; at the top the brass fanfare punches every chord, timpani pound the downbeats and roll into each section and a big-beat breakbeat drives it, all a little muffled and swimming in a big hall reverb.',
+  trait: 'Cartridge-squeezed samples: the whole mix rolled off above about 9 kHz, orchestral pads and brass, marching snare and timpani, and a big reverb over everything.',
   parts: [
+    // ---------------------------------------------------------- the intro
     { play: 'melody', rule: 'full', sections: ['A'],
       voice: { wave: 'triangle', gain: 0.085, env: { a: 0.04, d: 0.25, s: 0.75, r: 0.2 }, legato: 0.92,
                filter: { type: 'lowpass', freq: 2600, q: 0.7 },
@@ -54,7 +62,9 @@
                env: { a: 0.45, d: 0.4, s: 0.85, r: 0.7 }, legato: 0.98,
                filter: { type: 'lowpass', freq: 2100, q: 0.7 },
                vibrato: { rate: 4.4, cents: 8, delay: 0.3 } } },
-    { play: 'chords', rule: 'rhythm', pattern: 'X . . x . . x . . . . . x . . .', fill: 'X . . x . . x . . . x . X . X .',
+    // The brass fanfare: joins at the climax (Star Fox 64's horns).
+    { play: 'chords', rule: 'rhythm', from: 0.7,
+      pattern: 'X . . x X . . . X . x x X . . .', fill: 'X . . x X . . x X . x x X - X -',
       voice: { wave: 'sawtooth', gain: 0.04, unison: [8],
                env: { a: 0.015, d: 0.16, s: 0.45, r: 0.1 }, legato: 0.8,
                filter: { type: 'lowpass', freq: 850, q: 1.5, sweep: { to: 2700, time: 0.07 } } } },
@@ -65,7 +75,25 @@
       voice: { wave: 'kick', freq: 95, gain: 0.26, env: { a: 0.002, d: 0.4, s: 0, r: 0.05 } } },
     { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
       voice: { wave: 'noise', gain: 0.06, env: { a: 0.002, d: 1.2, s: 0, r: 0.1 },
-               filter: { type: 'highpass', freq: 4500, q: 0.6 } } }
+               filter: { type: 'highpass', freq: 4500, q: 0.6 } } },
+    // ---------------------------------------------------------- the build
+    // The marching snare: a drum-corps ostinato, rolling into each section.
+    { play: 'drum', hit: 'snare', from: 0.3,
+      pattern: 'X . x x X . x . X . x x X x x x', fill: 'x x x x x x x x X x x x X X X X' },
+    // The GoldenEye spy line: a surf guitar (a saw through a light drive and
+    // a spring-reverb echo) climbing root, fifth and octave in eighths.
+    { play: 'chords', rule: 'broken', voicing: 'power', from: 0.3,
+      voice: { wave: 'sawtooth', gain: 0.045, drive: 0.35, pan: 0.35,
+               env: { a: 0.003, d: 0.2, s: 0.4, r: 0.08 }, legato: 0.75,
+               filter: { type: 'lowpass', freq: 2400, q: 1.1 },
+               vibrato: { rate: 6.5, cents: 18, delay: 0.1 } } },
+    // --------------------------------------------------------- the climax
+    { play: 'drum', hit: 'timpani', from: 0.7,
+      pattern: 'X . . . . . . . X . . . . . . .', fill: 'X . . . . . . . x x x x X X X X' },
+    // Big beat: a heavy breakbeat kick and a cracking backbeat.
+    { play: 'drum', hit: 'kick', from: 0.7, pattern: 'X . . . . . X . . X X . . . . .' },
+    { play: 'drum', hit: 'snare', from: 0.7, pattern: '. . . . X . . . . . . . X . . .' },
+    { play: 'drum', hit: 'hat', from: 0.7, pattern: 'x . x . x . x x x . x . x . x x' }
   ],
   effects: { lowpass: 9000, reverb: { seconds: 3.2, decay: 2.5, mix: 0.42 } }
 });

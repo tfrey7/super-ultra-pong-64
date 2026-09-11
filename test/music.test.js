@@ -265,7 +265,7 @@ test('the PlayStation: real seventh chords, a grainy crush, a resonant sweep ove
   assert.strictEqual(pad.voicing, 'seventh', 'the first era where a chord is a real chord');
   const stab = partsOf(arr, 'chords', 'rhythm')[0];
   assert.ok(stab.voice.filter.q >= 5 && stab.voice.filter.sweep.to < stab.voice.filter.freq, 'the stab squelches shut');
-  assert.strictEqual(partsOf(arr, 'drum').filter((p) => p.voice.wave === 'kick')[0].pattern.split(' ').filter((t) => t !== '.').length, 4, 'four on the floor');
+  assert.strictEqual(partsOf(arr, 'drum').filter((p) => p.voice && p.voice.wave === 'kick')[0].pattern.split(' ').filter((t) => t !== '.').length, 4, 'four on the floor');
 });
 
 test('the Nintendo 64: muffled at about 9 kHz, a fat string pad, brass stabs and a big reverb', () => {
@@ -306,11 +306,14 @@ test('the PlayStation 2: slow wide strings, a low drone that never stops, a deep
   assert.ok(arr.effects.lowpass <= 5000 && arr.effects.reverb.seconds >= 3, 'dark, and a long hall');
 });
 
-test('the Xbox: the melody on an overdriven saw, drop-tuned power chords spread wide, a heavy kick and snare', () => {
+test('the Xbox: Halo\'s monk choir on the tune, then an overdriven lead and drop-tuned power chords spread wide at the climax', () => {
   const arr = M.ARRANGEMENTS[9];
-  const lead = partsOf(arr, 'melody', 'full')[0];
-  assert.ok(lead.voice.wave === 'sawtooth' && lead.voice.drive >= 0.5, 'a saw through a drive carries the tune');
+  const choir = partsOf(arr, 'melody', 'full')[0];
+  assert.ok(choir.voice.filter.type === 'bandpass' && !choir.from, 'the choir (a formant band-pass) carries the tune from the start');
+  const lead = partsOf(arr, 'echo').find((p) => p.voice.drive);
+  assert.ok(lead.voice.wave === 'sawtooth' && lead.voice.drive >= 0.5 && lead.from >= 0.7, 'a saw through a drive doubles the tune at the climax');
   const riffs = partsOf(arr, 'chords', 'rhythm');
+  riffs.forEach((r) => assert.ok(r.from >= 0.7, 'the guitars are the climax'));
   const riff = riffs[0];
   riffs.forEach((r) => {
     assert.strictEqual(r.voicing, 'power');
@@ -322,8 +325,8 @@ test('the Xbox: the melody on an overdriven saw, drop-tuned power chords spread 
   const pi = arr.parts.indexOf(riff);
   const lowest = Math.min(...score.flat().filter((e) => e.part === pi).map((e) => e.midis[0]));
   assert.ok(lowest <= M.noteMidi('E2'), 'the riff goes down to the low strings: ' + lowest);
-  const kick = partsOf(arr, 'drum').find((p) => p.voice.wave === 'kick');
-  assert.ok(kick.voice.gain >= 0.45, 'a heavy kick');
+  assert.ok(arr.kit.kick.gain >= 0.45 && partsOf(arr, 'drum').some((p) => p.hit === 'kick'), 'a heavy kick');
+  assert.ok(partsOf(arr, 'drum').some((p) => p.hit === 'taiko' && p.from < 0.7), 'war drums in the build');
 });
 
 test('the Xbox 360: a tempo-locked wobble on the bass, pumping pads, the melody as arpeggios and a huge kick', () => {
@@ -463,6 +466,9 @@ test('on the real player: the wobble, the pump, the drive, the stereo spread and
     const music = M.createMusic({ AudioContext: FakeContext });
     music.unlock();
     const g = playingGame(era);
+    // The wobble, the pump and the guitars are climax layers since item 1243:
+    // play the Xbox and the 360 at match point, where a real match hears them.
+    if (era >= 9) { g.score.left = 5; g.score.right = 5; }
     for (let t = 0; t < seconds; t += 0.05) { log.ctx.currentTime = t; music.update(g); }
     assert.strictEqual(music.errors, 0, 'era ' + era);
     return { log, music, g };
@@ -516,6 +522,7 @@ test('the rally speeds the 3D eras up too, wobble included: the wobble LFO follo
     const music = M.createMusic({ AudioContext: FakeContext });
     music.unlock();
     const g = playingGame(10);
+    g.score.left = 5; g.score.right = 5;   // match point: the wobble is a climax layer (item 1243)
     g.rally = rally;
     for (let t = 0; t < 1; t += 0.05) { log.ctx.currentTime = t; music.update(g); }
     // A filter wobble's rate is perBeat / beat; the arrangement's is 2 a beat.

@@ -236,7 +236,9 @@ stack every layer without the output ever clipping.
 - **Chain.** A huge hall, and nothing else: the modern, clean, loud master.
 - **Epic devices.** The trailer build: string ostinato, low brass on the tune, choir on the B
   section, taiko on every beat, a riser into each section, and the achievement sting (a bright
-  two-note chime) when a point moves the machine up; the big-room drop from the current loop stays
-  as the climax's pulse.
+  two-note chime, B5 then E6) on the E major turnaround at the end of every loop from the climax up;
+  the big-room drop from the current loop stays as the climax's pulse. (Item 1243: an arrangement
+  cannot hear the point that moves the machine up, so the chime lives on the turnaround; a sting on
+  the point itself would be the arriving voice's `boot` sound in `src/sound.js`, not the music.)
 - **Plan.** Intro: the ostinato and the pulse. Build: brass and taiko. Climax: the choir, the full
   trailer percussion, the supersaw and every crash the engine has.
