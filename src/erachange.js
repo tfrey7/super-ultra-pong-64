@@ -115,38 +115,11 @@
          dots: ['#d82800', '#f8c000', '#00a844', '#2058d8'] }
   };
 
-  // The score's block font, plus a one-column middle dot for "1985 · NES".
-  var GLYPHS = Object.assign({}, R.DIGITS, R.LETTERS, {
-    '·': ['0', '0', '1', '0', '0']
-  });
-  var SPACE_CELLS = 2;
-
-  function cells(ch) {
-    var rows = GLYPHS[ch];
-    return rows ? rows[0].length : SPACE_CELLS;
-  }
-
-  function textWidth(text, cell, gap) {
-    var w = 0;
-    for (var i = 0; i < text.length; i++) w += (i ? gap : 0) + cells(text[i]) * cell;
-    return w;
-  }
-
-  /** One line of block text starting at left; returns where it ended. */
-  function drawRun(ctx, text, left, top, cell, gap) {
-    var x = left;
-    for (var i = 0; i < text.length; i++) {
-      var rows = GLYPHS[text[i]];
-      if (rows) {
-        for (var r = 0; r < rows.length; r++) {
-          for (var c = 0; c < rows[r].length; c++) {
-            if (rows[r][c] === '1') ctx.fillRect(x + c * cell, top + r * cell, cell, cell);
-          }
-        }
-      }
-      x += cells(text[i]) * cell + gap;
-    }
-    return x;
+  // Every signboard routine, and the block-font lettering they share, live in
+  // src/signboards.js. The page loads it first; under node --test there are no
+  // script tags, so it is required here, the way ladderEntry reaches the rules.
+  if (typeof R.drawSignboard !== 'function' && typeof module === 'object' && typeof require === 'function') {
+    require('./signboards.js');
   }
 
   function rgba(hex, a) {
