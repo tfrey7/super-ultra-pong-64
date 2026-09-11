@@ -108,13 +108,21 @@ the farthest corner from where the ball went out, and a check that once the ring
 canvas matches the new era drawn offscreen more closely than the old one -- or, when the two eras
 draw the very same frame (a `like: N` stand-in), matches the new era exactly.
 The changes alternate sides (item 1174): a change out of an even era (0 to 1, 2 to 3, ...) starts its ring at the left edge, a real miss past the player, and a change out of an odd era (1 to 2, 3 to 4, ...) starts it at the right edge, the player's own point put just past the computer's paddle -- and a check names the edge each ring came from.
+At every rung it also **times one second of ordinary play** on the page's own frame clock (item 1192), with the computer's paddle held on the ball so no point goes in mid-reading, and prints one check per era with its mean, p95 and max frame: an era whose mean is over 18.5 ms (the same line the ring check uses) FAILs, because the ring check alone lets an era that is already slow pass by comparing the ring with it.
+Last of all it plays **game feel** (`src/feel.js`, item 1205): a real twelve-hit rally on the
+Genesis, the Nintendo 64 and the Xbox 360, the computer's aim pinned so it returns everything,
+checking the rally counter shows where the era's intensity has it (N64 up) and that the frame rate
+with the layer on matches the same era with it taken out, with a frame of each on the tenth hit
+(`feel-era3-genesis.png`, `feel-era6-n64.png`, `feel-era10-xbox360.png`); `--feel` runs only that.
 `--ladder` runs only that walk (about a minute for all eleven rungs); `--scoring` runs only the
 rally and the scoring check (about fifteen seconds a run); `--reference` also copies its eleven era
 frames and ten change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
 `index.html?era=N` (N is 0 to 10) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
 plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
-it cannot find a browser, and `--port <n>` if 9333 is busy; every launch gets a fresh Chrome profile
+it cannot find a browser, and `--port <n>` if 9333 is busy -- the playtest refuses a port that is
+already listening, in one line with exit code 2, and never drives a page it did not open (item 1215);
+every launch gets a fresh Chrome profile
 that is deleted when Chrome exits, so two playtests on two ports can run at once. Use it for any change to
 `src/render.js`, `src/input.js`, `src/main.js` or `index.html`; `node --test` alone is enough for a
 change confined to the rules.
@@ -248,6 +256,14 @@ his emulator — never touch either.**
   in a `finally`. The playtest and every capture script under `docs/` already do. What it cannot
   cover is the script itself being killed outright (Task Manager, `taskkill /F`): nothing runs
   then, and that one folder stays.
+- **Two playtests on one `--port` used to drive each other's game** (item 1215). A Chrome that
+  cannot bind its debugging port starts anyway, with none, and the harness then attached to the
+  Chrome that held the number: on 2026-09-10 item 1181's run on 9341 spent a minute clicking item
+  1205's page and reported 16/21 checks that measured the wrong game. Since item 1215 the playtest
+  checks the port before it launches anything -- `playtest: port N is already in use ... pick another
+  with --port <n>`, exit 2 -- and after launch attaches only to its own checkout's `index.html`. On
+  that line, pick another port and run again; it is not a failed check. A capture script of your own
+  should do the same: `portTakenWhy(port)` and `pickOwnPage(targets, url)` in `tools/chrome.mjs`.
 - **Proof paths in a report must survive the landing.** The integrator deletes your worktree, so
   a picture cited at `G:/Claude Stuff/super-ultra-pong-64-<name>/...` is a dead link the moment the
   branch lands (item 1138). Cite the path the file will have in the main checkout.
@@ -302,6 +318,23 @@ his emulator — never touch either.**
   9952. Trust the call's own `cost` in the manifest, not `generationsUsed` (which records 0 for
   that image), for what one image costs.
 
+- **Game feel is one layer over every era, and only its amount is per era.** `src/feel.js` holds the
+  intensity table (0 at the arcade, 1 at the Xbox 360) and the point each effect switches on; an era
+  that already draws an effect itself is listed in its `OWNED` table and left alone (the Genesis,
+  SNES, Dreamcast and PS2 trails, the N64 rumble). An era card that gives its era a new trail or
+  shake adds its rung there rather than drawing a second one. Hit-stop and match-point slow motion
+  work by handing the rules less time, never inside the serve pause.
+- **The 3D eras run slower than 16.7 ms a frame in the playtest's headless, software-drawn Chrome,
+  with or without the feel layer.** Item 1205 measured one rally each: before the display layer
+  and the 3D textures landed, the Xbox 360 at 31.3 ms with the layer and 33.1 ms without; on master
+  9cc6910 merged in, the Nintendo 64 at 27.6 against 28.6 ms and the Xbox 360 at 66.5 against 65.0
+  ms. A frame check on those eras has to compare against the era itself, not 16.7 ms -- and a
+  switch that takes a layer out must leave the loop running (item 1205's first A/B threw every
+  frame, killed the game loop and timed an idle page at a perfect 16.7 ms).
+- **Two playtests on one `--port` share one Chrome.** The harness does not refuse a port already
+  listening, so a second run attaches to the first run's page and drives it (item 1181 did, to
+  item 1205's, around 22:25 EDT on 2026-09-10): odd FAILs such as "Inspected target navigated or
+  closed" or a dropped connection early in a run can be the other run. Pick an unusual port.
 - **An era's `ctx.canvas` is not the page's canvas, and not always 800 x 600** (item 1198). The
   display (`src/display.js`) hands eras 0-4 a field-sized offscreen canvas, sampled down to the
   machine's pixels afterwards, and eras 5-10 the native one itself (320 x 240 and up) with a
@@ -312,13 +345,23 @@ his emulator — never touch either.**
   playtest's pixel check reads the native frame through `PongDisplay.canvas()` and draws its
   comparisons through `PongDisplay.render()`.
 
+- **Six "holds full frame rate in ordinary play" FAILs, eras 5 to 10, are card 1216's, not yours**
+  (until 1216 lands). The playtest's Chrome runs `--disable-gpu`, so every canvas is drawn on the
+  CPU, and there the display layer's per-frame work puts the 3D eras at 18.8 to 26.3 ms a frame and
+  the Xbox 360 at 64.6 ms (item 1192, idle machine, master 1c8c0c3). With `?display=off` eras 5-9
+  hold 16.7 ms, and with the GPU allowed every era runs at 4.2 ms:
+  `node docs/measure/item1192/eraspeed.mjs` re-takes all four setups in about two minutes. A FAIL
+  on eras 0 to 4, or one far above those numbers, is new and is yours to look at.
+
 - **The ball carries more than its position and velocity** (item 1208): `ball.spin` bends its
   flight and `ball.burst` is a smash's extra speed, and each paddle has a smoothed `vy`. Anything
   that copies the ball to replay it -- the scripted scoring hand's `snapshotOf`/`copyOf`, the
   playtest's `state()` -- must copy spin and burst too, or it plans against a straight ball that
   is not coming. The spin read for the computer is `Pong.spinBend(state, x)` times
-  `rules.cpuSpinRead`; a spin change is re-measured with `node tools/beatability-sample.mjs`,
-  whose `track` row must stay between 35 and 60 percent (55.7 when item 1208 tuned it).
+  `rules.cpuSpinRead`, left on `state.right.spinRead` every step for whichever opponent moves
+  the paddle (the era profiles in `src/opponents.js` add it to their target). A spin or paddle
+  change is re-measured with `node tools/beatability-sample.mjs` (its `track` row between 35
+  and 60 percent: 58.3 after item 1208) and `--eras` (every era 30 to 65, the top the hardest).
 
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.

@@ -166,7 +166,7 @@ test('a hit off a fast paddle is a smash: a burst of speed, flagged for the voic
   assert.strictEqual(ev(plain.events).smash, false);
   assert.strictEqual(ev(smash.events).smash, true);
   assert.strictEqual(ev(smash.events).hitStop, r.smashHitStop);
-  assert.ok(ev(smash.events).hitStop > ev(plain.events).hitStop, 'a longer hit-stop for a feel layer');
+  assert.strictEqual(ev(plain.events).hitStop, undefined, 'a plain hit leaves the freeze to the feel layer');
 });
 
 test('the keyboard at full speed can smash', () => {

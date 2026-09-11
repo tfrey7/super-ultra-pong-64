@@ -84,8 +84,8 @@
     paddleSpeedSmoothing: 0.06,   // seconds a paddle's speed is averaged over
     smashBoost: 0.38,       // fraction of the rally speed added
     smashMaxSpeed: 940,
-    hitStop: 0.03,          // seconds of hit-stop a plain hit suggests to a feel layer
-    smashHitStop: 0.11,     // ...and a smash
+    smashHitStop: 0.11,     // seconds of hit-stop a smash asks a feel layer for; a
+                            // plain hit asks nothing, and the layer judges it itself
     cpuSpinRead: 0.8,       // how much of the coming bend the computer allows for
                             // (0 ignores spin, 1 reads it perfectly); see spinBend
     serveDelay: 0.9,        // seconds the ball waits at the centre
@@ -409,11 +409,11 @@
 
     state.rally += 1;
     state.lastEvent = 'paddle';
-    // A feel layer may read hitStop; the voice reads smash for its heavier hit.
-    emit(state, 'paddle', dirX > 0 ? 'left' : 'right', {
-      smash: smash, spin: b.spin, speed: speed,
-      hitStop: smash ? r.smashHitStop : r.hitStop
-    });
+    // The voice reads smash for its heavier hit; a feel layer takes a smash's
+    // hitStop (src/feel.js), and judges a plain hit by its own measure.
+    var extra = { smash: smash, spin: b.spin, speed: speed };
+    if (smash) extra.hitStop = r.smashHitStop;
+    emit(state, 'paddle', dirX > 0 ? 'left' : 'right', extra);
     rerollCpuAim(state);
   }
 
