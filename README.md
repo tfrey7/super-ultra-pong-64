@@ -16,6 +16,33 @@ the Xbox 360, each with its own sound -- and each arriving as a ring that
 spreads the new machine across the field from the spot where the ball went out,
 followed by its name card.
 
+## HOW TO PLAY
+
+1. **Put a coin in.** The game opens on an arcade cabinet showing INSERT COIN.
+   Click anywhere or press any key -- that is your coin, and the sound comes on
+   with it.
+2. **You are the paddle on the left.** Move the mouse up and down over the
+   screen, or use the arrow keys (or W and S). The computer plays the right.
+3. **Hit the ball back past the computer.** Where the ball meets your paddle
+   sets the angle: the middle sends it straight, the ends send it steep. Every
+   hit speeds the rally up.
+4. **Swing to curve it.** Move your paddle as the ball arrives and the ball
+   bends the way you swung. Swing hard and it is a smash -- a burst of speed and
+   a heavier hit.
+5. **Every point, whoever scores it, moves the machine up one era**, from the
+   1972 arcade to the 2005 Xbox 360: new look, new sound, a new arrangement of
+   the same tune, and a computer opponent that grows up with the machine. Hits
+   land harder the newer the machine -- a flash, a shake, a squash, a trail
+   behind the ball -- and from the Nintendo 64 on a rally counter counts your hits.
+6. **Eleven points is a match.** The tenth lands you on the Xbox 360 and the
+   next point is MATCH POINT -- the last moment plays in slow motion. The higher
+   score wins; then the tape rewinds through every machine back to 1972, the old
+   screen says THANKS FOR PLAYING, and the cabinet is ready for the next coin.
+
+Press **M** to mute or unmute the music. One whole match, from the coin to the
+thanks screen, is on one sheet in
+[`docs/shots/whole-match/whole-contact-sheet.png`](docs/shots/whole-match/whole-contact-sheet.png).
+
 ## Play it
 
 Open **`index.html`** in a browser. That is the whole install: no `npm install`,
@@ -124,7 +151,23 @@ node tools/playtest.mjs --ladder              # just the walk up the ladder
 node tools/playtest.mjs --ladder --reference  # and re-take the tracked era frames
 node tools/playtest.mjs --scoring             # just a rally and a point against the computer
 node tools/playtest.mjs --curve               # just the curved shot (--reference re-takes its film strip)
+node tools/playtest.mjs --whole               # one whole match, coin to thanks screen, about two minutes
+node tools/playtest.mjs --whole --reference   # and re-take docs/shots/whole-match/ and its contact sheet
 ```
+
+**The whole match** (item 1212, `--whole`, and the last section of a plain run)
+plays one match the way a player meets it, with everything on: it waits for the
+attract screen, puts a coin in with a click, swings a curved smash on the arcade
+machine, plays a real eleven-hit rally on the Genesis, the Nintendo 64 and the
+Xbox 360, lets the eleven points go in one rung at a time, films match point in
+slow motion, then the result, the rewind and the thanks screen, and waits for
+the cabinet to go back to attract. A recorder inside the page watches every frame
+and the checks read it at the end: a smash with spin, the rally counter, every
+era's arrangement of the theme playing, eleven points and a winner, slow motion
+on match point, the rewind reaching the arcade, and ordinary play on the five 2D
+machines holding a 16.7 ms frame (the 3D machines' times are printed, not judged:
+headless, software-drawn Chrome is card 1216's). The eight frames are stitched
+into `whole-contact-sheet.png`.
 
 The point against the computer is played by a scripted hand
 (`tools/scoring-rally.js`) that plans each return against the rules, so that
