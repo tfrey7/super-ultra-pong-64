@@ -220,16 +220,24 @@ test('era 0 and the dimmed attract frame draw no players', () => {
 });
 
 test('every era from 1 up draws both players, the right one mirrored, and writes no state', () => {
-  for (let e = 1; e <= 10; e++) {
-    const g = playing(e);
-    g.events = [{ type: 'paddle', side: 'left', era: e, time: g.time }];
-    const before = JSON.stringify(g, (k, v) => (k === 'rng' ? undefined : v));
-    const ctx = recorder();
-    assert.strictEqual(C.drawPlayers(ctx, g, null, R), true, 'era ' + e);
-    assert.strictEqual(JSON.stringify(g, (k, v) => (k === 'rng' ? undefined : v)), before, 'era ' + e + ' state untouched');
-    const mirrors = ctx.calls.filter(([k, a]) => k === 'scale' && a[0] === -1);
-    assert.strictEqual(mirrors.length, 1, 'era ' + e + ': one mirrored player');
-    assert.ok(ctx.calls.some(([k]) => k === 'fillRect'), 'era ' + e + ' drew its placeholder');
+  // An era that brings its own sheet (item 1233's era 9 was the first) loads it
+  // through src/sprites.js, which has no Image under node: a stand-in loader
+  // that never finishes keeps it on the placeholder, as a page is before decode.
+  const fake = fakeSprites();
+  try {
+    for (let e = 1; e <= 10; e++) {
+      const g = playing(e);
+      g.events = [{ type: 'paddle', side: 'left', era: e, time: g.time }];
+      const before = JSON.stringify(g, (k, v) => (k === 'rng' ? undefined : v));
+      const ctx = recorder();
+      assert.strictEqual(C.drawPlayers(ctx, g, null, R), true, 'era ' + e);
+      assert.strictEqual(JSON.stringify(g, (k, v) => (k === 'rng' ? undefined : v)), before, 'era ' + e + ' state untouched');
+      const mirrors = ctx.calls.filter(([k, a]) => k === 'scale' && a[0] === -1);
+      assert.strictEqual(mirrors.length, 1, 'era ' + e + ': one mirrored player');
+      assert.ok(ctx.calls.some(([k]) => k === 'fillRect'), 'era ' + e + ' drew its placeholder');
+    }
+  } finally {
+    fake.restore();
   }
 });
 
@@ -369,7 +377,8 @@ test('a block with only `sheet` still serves both sides, as before sheets existe
     assert.strictEqual(C.configFor(2, 'right').sheet, 'test-rival');
     // And no sheet anywhere is the placeholder on both sides, exactly as now.
     for (let e = 1; e <= 10; e++) {
-      if (e === 2) continue;
+      // era 2 is the block under test; an era that brings its own sheets is not "no sheet anywhere"
+      if (e === 2 || C.ERAS[e].sheet || C.ERAS[e].sheets) continue;
       assert.strictEqual(C.configFor(e, 'left').sheet, null, 'era ' + e + ' left is the placeholder');
       assert.deepStrictEqual(C.configFor(e, 'right'), Object.assign(C.configFor(e, 'left'), { side: 'right' }),
         'era ' + e + ': the two sides are the same config');
