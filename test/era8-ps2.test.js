@@ -134,7 +134,8 @@ test('cinematic letterbox: 52-pixel black bars over everything, the score a subt
   const bottom = ops.findIndex((o) => o.op === 'fillRect' && o.style === '#000000' && o.rect.join() === '0,548,800,52');
   assert.ok(top >= 0 && bottom >= 0, 'both bars');
   assert.ok(top > ops.findIndex(isBall), 'drawn after the ball');
-  const subtitle = ops.slice(bottom).filter((o) => o.op === 'fillRect' && o.style === '#c9d6e8');
+  // (The name plates' text in the bottom bar is HUD ink too: item 1232.)
+  const subtitle = ops.slice(bottom).filter((o) => o.op === 'fillRect' && o.style === '#c9d6e8' && o.rect[1] < 300);
   assert.ok(subtitle.length > 10, 'the score is drawn in HUD ink after the bars');
   for (const o of subtitle) {
     assert.ok(Math.abs(o.alpha - 0.85) < 1e-9, 'at 0.85 opacity');
@@ -339,6 +340,73 @@ test('era 8 plays exactly like era 1: drawing it every frame changes nothing abo
   const [, , , , , , left, right] = one.trail[one.trail.length - 1];
   assert.ok(left + right >= 2, `the run crossed serves (score ${left}-${right})`);
   assert.ok(eight.hits >= 3, `and had paddle hits to spark (${eight.hits})`);
+});
+
+// ------------------------------------------------ the AAA arena (item 1232)
+const isRain = (o) => o.op === 'stroke' && o.style === fx().C.hud;
+
+test('rain: one faint stroke of slanted streaks, before the ball; match point sets MATCH POINT in amber', () => {
+  fx().reset();
+  const ops = frame(rally({ score: { left: 3, right: 4 } }));
+  const stroke = ops.findIndex(isRain);
+  assert.ok(stroke >= 0, 'the rain is drawn');
+  assert.ok(stroke < ops.findIndex(isBall), 'under the ball');
+  assert.ok(ops[stroke].alpha <= 0.25, 'faint');
+  // Match point: the game's own test, through window.Pong as the page has it.
+  const saved = globalThis.Pong;
+  globalThis.Pong = Object.assign({}, Pong, { isMatchPoint: () => true });
+  try {
+    const mp = frame(rally({ score: { left: 3, right: 4 } }));
+    const amber = mp.filter((o) => o.op === 'fillRect' && o.style === fx().C.amber && o.rect[1] < 52);
+    assert.ok(amber.length > 10, 'MATCH POINT is set in amber light in the top bar');
+  } finally { globalThis.Pong = saved; }
+});
+
+test('a searchlight sweeps behind the towers: flare blue at 0.08, moving on a 9 s period', () => {
+  fx().reset();
+  const beam = (time) => frame(rally({ time })).find((o) => o.op === 'fill' && o.style === 'rgba(159,196,255,0.080)');
+  const a = beam(1), b = beam(3);
+  assert.ok(a && b, 'a thin triangle each frame');
+  assert.strictEqual(a.subpaths[0].length, 3);
+  assert.notDeepStrictEqual(a.subpaths, b.subpaths, 'it sweeps');
+  assert.deepStrictEqual(beam(1).subpaths, beam(10).subpaths, 'once every 9 s');
+});
+
+test('codec name plates in the bottom bar: P1 and CPU, a visor icon each in its player\'s visor colour', () => {
+  fx().reset();
+  const ops = frame(rally());
+  const inBar = (o) => o.op === 'fillRect' && o.rect[1] >= 548 && o.rect[1] + o.rect[3] <= 600;
+  const plates = ops.filter((o) => inBar(o) && o.style === '#0b1020' && o.rect[2] === 138);
+  assert.deepStrictEqual(plates.map((o) => o.rect[0]), [41, 621], 'two plates, at x 40 and 620');
+  assert.ok(ops.some((o) => inBar(o) && o.style === '#ffb347' && Math.abs(o.alpha - 0.8) < 1e-9), 'the amber visor');
+  assert.ok(ops.some((o) => inBar(o) && o.style === '#9fc4ff' && Math.abs(o.alpha - 0.8) < 1e-9), 'the flare-blue visor');
+  assert.ok(ops.filter((o) => inBar(o) && o.style === '#c9d6e8').length > 10, 'the names in HUD ink');
+});
+
+test('a point scored on this era types POINT: P1 a letter at a time, bursts the sparks again, then gives the score back', () => {
+  fx().reset();
+  const g = rally({ score: { left: 3, right: 4 } });
+  frame(g);
+  const hud = (ops) => ops.filter((o) => o.op === 'fillRect' && o.style === '#c9d6e8' && o.rect[1] < 52);
+  const scoreRects = hud(frame(g)).length;
+  g.score = { left: 4, right: 4 };
+  g.events = [{ type: 'score', side: 'left', time: g.time }];
+  const first = frame(g);
+  assert.strictEqual(first.filter(isSpark).length, 24, 'the sparks burst again at the exit');
+  const p = hud(first).length;                   // just the P
+  g.events = [];
+  g.time += 0.1;
+  const later = hud(frame(g)).length;            // POINT: P1 all typed
+  assert.ok(p > 0 && later > p, `the line grows as it types (${p} then ${later} cells)`);
+  assert.notStrictEqual(later, scoreRects, 'not the score while it holds');
+  g.time += 1.5;
+  const back = hud(frame(g));
+  assert.ok(back.some((o) => o.rect[0] < 400) && back.some((o) => o.rect[0] > 400), 'the score again');
+});
+
+test('headless, with no decoded art, the arena draws no image: the recorder never sees drawImage', () => {
+  fx().reset();
+  assert.doesNotThrow(() => run(rally(), 5));
 });
 
 test('the voice is the bible\'s PlayStation 2: taiko thump on a hit, soft pads on a wall, a big cinematic hit on a point', () => {
