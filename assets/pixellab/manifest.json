@@ -974,7 +974,9 @@
         "view": "side",
         "direction": "east",
         "no_background": true
-      }
+      },
+      "card": "item 1231",
+      "verdict": "raw: cut into era7-skater-right-sheet.png by assets/pixellab/era7-skater-cut.py"
     },
     {
       "name": "era7-skater-left-action",
@@ -1018,7 +1020,204 @@
         "view": "side",
         "direction": "east",
         "no_background": true
-      }
+      },
+      "card": "item 1231",
+      "verdict": "raw: cut into era7-skater-left-sheet.png by assets/pixellab/era7-skater-cut.py"
+    },
+    {
+      "name": "era7-skater-left",
+      "file": "era7-skater-left.png",
+      "prompt": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1636193142,
+      "date": "2026-09-11T03:34:25.613Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 1,
+      "seconds": 13.7,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 15348,
+      "sha256": "bec99701b5baeeac9d01e7c54a537d17a4fe3f6b7627f62979c331a51cea7e9d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 1636193142,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "rebuilt": "item 1231: this entry was lost when two generations ran at once and each rewrote the manifest; rebuilt from the tool's own printed seed and the prompt it was sent, the date taken from its twin generated alongside it",
+      "card": "item 1231",
+      "verdict": "raw: cut into era7-skater-left-sheet.png by assets/pixellab/era7-skater-cut.py"
+    },
+    {
+      "name": "era7-skater-right-action",
+      "file": "era7-skater-right-action.png",
+      "prompt": "three frames in one row of the same character side view facing right, a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates: frame 1 spinning swing with one arm flung out to the right, frame 2 stumbling with torso bent forward, frame 3 trick jump mid-air with both arms raised in celebration. cel-shaded Jet Set Radio style",
+      "size": {
+        "width": 108,
+        "height": 80
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1938212233,
+      "date": "2026-09-11T03:35:47.938Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 25.9,
+      "pixels": {
+        "width": 108,
+        "height": 80
+      },
+      "bytes": 4680,
+      "sha256": "8b9091553d748d0f55b93896d60cc68877da96baccb4a72c81d9397cb1cc095d",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "three frames in one row of the same character side view facing right, a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates: frame 1 spinning swing with one arm flung out to the right, frame 2 stumbling with torso bent forward, frame 3 trick jump mid-air with both arms raised in celebration. cel-shaded Jet Set Radio style",
+        "image_size": {
+          "width": 108,
+          "height": 80
+        },
+        "seed": 1938212233,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "rebuilt": "item 1231: this entry was lost when two generations ran at once and each rewrote the manifest; rebuilt from the tool's own printed seed and the prompt it was sent, the date taken from its twin generated alongside it",
+      "card": "item 1231",
+      "verdict": "raw: cut into era7-skater-right-sheet.png by assets/pixellab/era7-skater-cut.py"
+    },
+    {
+      "name": "era7-skater-left-sheet",
+      "file": "era7-skater-left-sheet.png",
+      "prompt": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1636193142,
+      "date": "2026-09-11T03:34:25.613Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 132,
+        "height": 504
+      },
+      "bytes": 23797,
+      "sha256": "623ed92c4e2997046a5211857f6a34e016120102a26079f089eb8fad3de43df4",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a swirl-orange jacket, big black headphones, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 1636193142,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "rebuilt": "item 1231: this entry was lost when two generations ran at once and each rewrote the manifest; rebuilt from the tool's own printed seed and the prompt it was sent, the date taken from its twin generated alongside it",
+      "card": "item 1231",
+      "verdict": "worn by era 7's left player (src/characters.js ERAS[7].sheets.left)",
+      "derivedFrom": [
+        "era7-skater-left.png",
+        "era7-skater-left-action.png"
+      ],
+      "derivedBy": "py -3.10 assets/pixellab/era7-skater-cut.py",
+      "how": "pixflux drew a 2 x 4 grid of 36 x 81 figures, not the 3 x 6 sheet asked for; each figure found as a cluster of pixels, the action row scaled to the standing height (nearest), paper white pulled to 224, laid out as the rig's six rows (idle 2, up 2, down 2, swing 3, miss 1, win 2) of 44 x 84 frames, feet on the bottom row"
+    },
+    {
+      "name": "era7-skater-right-sheet",
+      "file": "era7-skater-right-sheet.png",
+      "prompt": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1960749465,
+      "date": "2026-09-11T03:34:25.613Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 132,
+        "height": 504
+      },
+      "bytes": 22304,
+      "sha256": "0694229bddd4feaf4d39893843c562bd35184ffae902c932c085529ebf61be4f",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet, 3 columns by 6 rows of the same character, each frame 24x54, side view facing right: a tall lean inline skater teen in a bright blue hoodie and a black beanie, dark trousers, yellow inline skates, cel-shaded Jet Set Radio style, arm held out to the right holding a board. row 1 idle rolling in place, row 2 skating stride leaning up, row 3 skating stride leaning down, row 4 spin swing turning around, row 5 stumble torso forward, row 6 trick jump celebrating arms up",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 1960749465,
+        "outline": "single color black outline",
+        "shading": "flat shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "card": "item 1231",
+      "verdict": "worn by era 7's right player (src/characters.js ERAS[7].sheets.right)",
+      "derivedFrom": [
+        "era7-skater-right.png",
+        "era7-skater-right-action.png"
+      ],
+      "derivedBy": "py -3.10 assets/pixellab/era7-skater-cut.py",
+      "how": "pixflux drew a 2 x 4 grid of 36 x 81 figures, not the 3 x 6 sheet asked for; each figure found as a cluster of pixels, the action row scaled to the standing height (nearest), paper white pulled to 224, laid out as the rig's six rows (idle 2, up 2, down 2, swing 3, miss 1, win 2) of 44 x 84 frames, feet on the bottom row"
     }
   ]
 }
