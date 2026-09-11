@@ -369,8 +369,10 @@
     if (img) {
       var smooth = ctx.imageSmoothingEnabled;
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(img, Math.floor(-off), top, w, h);
-      ctx.drawImage(img, Math.floor(w - off), top, w, h);
+      // Only the top 36 rows: pixflux lettered nonsense into the bottom rows,
+      // and 36 rows into the 96-unit band is one row a native line.
+      ctx.drawImage(img, 0, 0, 320, 36, Math.floor(-off), top, w, h);
+      ctx.drawImage(img, 0, 0, 320, 36, Math.floor(w - off), top, w, h);
       ctx.imageSmoothingEnabled = smooth;
       return;
     }
