@@ -54,7 +54,10 @@
   var PADDLE_Z = 24;             // R6: 28 or less
   var BALL_RADIUS = 0.7;         // a big round ball (the stock table ball is 0.6)
   var BUFFER = { key: 'n64', w: 400, h: 300 };
-  var TILE = { key: 'n64-grass', size: 16, cell: 4 };
+  // Checker cells two texels wide: every cell is only two texels across when
+  // the table magnifies it, so the smoothing smears half of each cell -- the
+  // blur exaggerated, as the ladder asks, rather than a crisp checker.
+  var TILE = { key: 'n64-grass', size: 16, cell: 2 };
   var TEXELS_PER_UNIT = 16 / 200;   // one 16-texel tile every 200 field units
   var QUADS = { x: 8, y: 6 };       // fine subdivision: nearly perspective-correct
 

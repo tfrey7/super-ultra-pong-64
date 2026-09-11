@@ -177,8 +177,12 @@ test('the sound ladder has a rung for every era the rules know', () => {
 test('a rung above the VOICES rows keeps its voice on its look, and one with no voice yet plays the top row', () => {
   const path = require('node:path');
   const { R } = require('../tools/eralooks.js').loadRenderer(path.join(__dirname, '..'));
-  assert.deepStrictEqual(waves(6, 'paddle'), waves(4, 'paddle'), 'a placeholder rung borrows the Super Nintendo');
-  assert.deepStrictEqual(PongSound.echoFor(6), PongSound.echoFor(4));
+  // Any rung whose era card has not landed yet; a built rung carries its own voice.
+  const waiting = [6, 7, 8, 9, 10].find((e) => R.eraLook(e).placeholder && !R.eraLook(e).voice);
+  if (waiting !== undefined) {
+    assert.deepStrictEqual(waves(waiting, 'paddle'), waves(4, 'paddle'), 'a placeholder rung borrows the Super Nintendo');
+    assert.deepStrictEqual(PongSound.echoFor(waiting), PongSound.echoFor(4));
+  }
   const voice = { paddle: [{ wave: 'sine', freq: 659, dur: 0.1, gain: 0.2 }], effects: { echo: { time: 0.12, feedback: 0.25, mix: 0.2 } } };
   R.registerEra(Object.assign({}, R.eraLook(7), { era: 7, voice }));
   assert.deepStrictEqual(PongSound.voicesFor(7, 'paddle'), voice.paddle);
