@@ -133,8 +133,7 @@ test('the camera is held back until beat 3, pops home with one small overshoot, 
 
 test('through the engine: shards, then the red and yellow edge, then the wash, all inside the serve pause', () => {
   const g = intoEra5(420);
-  const seen = { shards: 0, edge: 0, wash: 0 };
-  let frames = 0;
+  const seen = { shards: 0, edge: 0, wash: 0, doneInPause: false };
   let m = R.eraChangeMoment(g);
   const before = JSON.stringify(g);
   const recBefore = spyRecorder();
@@ -150,12 +149,13 @@ test('through the engine: shards, then the red and yellow edge, then the wash, a
         rec.calls.some((c) => c[0] === 'stroke' && c[1] === accents[1] && c[2] === 3)) seen.edge++;
     if (m.wiping && m.p >= 0.8 && rec.calls.some((c) => c[0] === '#ffffff' && c[3] === 800 && c[4] === 600)) seen.wash++;
     assert.ok(g.serveDelay > 0, 'the ball is still held for the serve');
+    if (!m.wiping) seen.doneInPause = true;
     Pong.step(g, FRAME, {});
-    frames++;
     m = R.eraChangeMoment(g);
   }
   assert.ok(seen.shards > 5 && seen.edge > 20 && seen.wash > 5, JSON.stringify(seen));
-  assert.ok(frames * FRAME < g.rules.eraChangePause + FRAME, 'the whole moment lives inside the pause');
+  assert.ok(seen.doneInPause, 'the ring and its flourish finish while the serve is still held');
+  assert.strictEqual(A.arrivalLift(g), 0, 'and the camera is home');
 });
 
 test('the lift goes on era 5 only while its own arrival plays', () => {
