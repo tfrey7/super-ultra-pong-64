@@ -201,6 +201,9 @@ The point of the layout is that later eras are additions, not rewrites.
 | `src/sound.js` | **The voice.** Each era's notes (`VOICES` for eras 0 to 4, each 3D look's `voice` above them), and a player that plays the step's `state.events` through Web Audio -- oscillators, FM, noise, filters, unison, tremolo and drive, through each era's own echo, reverb and filter bus. Reads the state; never changes it. Silent until the first click or key. |
 | `src/main.js` | The loop that ties them together and hands `step` the real elapsed time. |
 | `src/eras/` | **One file per era**, each registering that era's look with the renderer. |
+| `src/table3d.js` | **The shared 3D table's camera and canvas drawing**: the projection every 3D era's arena lines up with, and the canvas table, boxes and ball that are the fallback when there is no WebGL. |
+| `src/field3d.js` | **The real 3D layer** (item 1273): the 3D eras' table, net, bats, ball and shadow, lit and rendered on WebGL through three.js with table3d's own camera, and copied into the era's frame where the table was. `T.field()` reaches it. |
+| `vendor/three.js` | **The one library the game loads**: three.js r186 with its glTF loader, bundled once into a plain script (`tools/three-bundle/entry.js` is what it was bundled from). Eras 5 to 10 draw their field through it; everything else is canvas 2D. |
 | `test/game.test.js` | The headless suite over `src/game.js`, plus the era-look checks. |
 | `test/sound.test.js` | The rules' event list, each era's voice, and the player through a recording stand-in for Web Audio. |
 | `tools/eralooks.js` | Draws fixed scenes on a recording canvas; `eralooks-today.json` beside it is what eras 0 and 1 drew before the ladder. |
@@ -239,6 +242,16 @@ stay in charge. The court is cut into horizontal screen strips, each an affine c
 the flat texture (the PlayStation's own trick), built once per camera and canvas size and then
 drawn as one image a frame. Headless, or before a tile decodes, nothing is drawn and the era's plain
 surface stands.
+
+**The 3D eras' field is real 3D** (item 1273). Eras 5 to 10 draw their field through the checked-in
+3D library, and everything else stays canvas 2D. `vendor/three.js` is three.js bundled once into
+one plain script, and `src/field3d.js` renders the table, the net, the bats, the ball and its shadow
+on WebGL, lit, through the camera `src/table3d.js` already uses. The result is copied into each
+era's frame where the canvas table used to be painted, so the arenas, the HUDs, the screens and the
+ring wipes are unchanged. Without WebGL (`?gl=off`, or a browser that refuses it) the canvas
+drawing above is what you see. The playtest's headless Chrome renders it in software, and
+`node tools/playtest.mjs --ladder --gl-off` times the fallback. How the layer works, and how to
+re-make the bundle, is in [docs/lessons/3d-layer.md](docs/lessons/3d-layer.md).
 
 `step` takes a **delta time in seconds** and never assumes 60fps; long frames are
 cut into substeps so a fast ball cannot pass through a paddle. Randomness goes

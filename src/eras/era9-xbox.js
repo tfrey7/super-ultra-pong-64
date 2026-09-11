@@ -1023,18 +1023,18 @@
     drawBackdrop(ctx, cam, T, state);
     drawHangar(ctx, cam, T, L);
     drawSteam(ctx, cam, T, state);
-    T.table(ctx, cam, tableStyle(ctx, cam, T, L, tile));
+    var gl = T.field(ctx, cam, tableStyle(ctx, cam, T, L, tile), state, P);   // through the 3D layer when it can (item 1273)
     drawBeacons(ctx, cam, T, state);
 
     // 3. on the table: the specular pool, then the hard shadows over it
     drawSpecular(ctx, cam, T, L, tile);
-    drawCastShadows(ctx, cam, T, L, state);
+    if (!gl) drawCastShadows(ctx, cam, T, L, state);
     drawPlayerShadows(ctx, cam, T, L, state);
 
     // 4. paddles, the far one (smaller rect.y + rect.h) first
     var sides = ['left', 'right'];
     if (state.right.y + state.right.h < state.left.y + state.left.h) sides.reverse();
-    for (var i = 0; i < sides.length; i++) {
+    for (var i = 0; !gl && i < sides.length; i++) {
       drawPaddle(ctx, cam, T, L, state[sides[i]], P.paddleInk(state, sides[i]));
     }
 
@@ -1060,7 +1060,7 @@
     drawTracker(ctx, T, state);
 
     // 7. the ball, last of everything on the table; hidden in the serve pause
-    if (live) T.ball(ctx, cam, state.ball, { fill: C.ball, texture: TEXTURE.ball });
+    if (live && !gl) T.ball(ctx, cam, state.ball, { fill: C.ball, texture: TEXTURE.ball });
 
     // 8. the HUD band: the shield bars
     drawShield(ctx, T, P, state, 'left');
