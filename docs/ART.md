@@ -317,6 +317,12 @@ between them.
   in frame and clear of the score HUD, with before and after shots, and each 3D arena's share of
   the frame before and after. A per-era camera override is the way to give different eras
   different framings, where one camera does not suit all six.
+  **Landed (item 1266):** the table, net, posts, legs and floor shadow are in `src/field3d.js`
+  (`tableGeometry()`), and each era's `CAMERA` is its ladder camera, solved by
+  `node tools/table3d-cameras.js --players` and tabled in docs/ERAS.md section 12. Both 250-unit
+  players fit whole under every camera at full size, so nothing shrank. The arena's share of the
+  picture went from 0.26-0.43 to 0.52-0.58. The Dreamcast's blimp moved below the score band, and
+  the Xbox and Xbox 360 backdrops were widened to the picture's edges.
 - **Cards 1253 to 1258, the polygon players, one per era from 5 to 10.** Each delivers its era's
   two characters as its page names them. They stand as section 8's 3D players do: 250 units tall,
   feet on the floor 1266 draws, the front foot 30 units behind the end, centred on the paddle's
