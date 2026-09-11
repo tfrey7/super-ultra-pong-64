@@ -17,12 +17,11 @@
  * Screenshots land in docs/shots/playtest/. This is a verification tool, not
  * part of the game: nothing in src/ knows it exists.
  */
-import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import os from 'node:os';
+import { launchChrome } from './chrome.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -362,19 +361,17 @@ async function main() {
   if (!CHROME) throw new Error('No Chrome found; pass --chrome <path to chrome.exe>');
   const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') +
     (ERA ? '?era=' + encodeURIComponent(ERA) : '');
-  // Never '.' as the fallback: that puts a Chrome profile in the repo root and dirties
-  // the worktree. os.tmpdir() always answers, and honours TEMP/TMP when they are set.
-  // One profile per debugging port, so two playtests on two ports can run at once.
-  const profile = path.join(os.tmpdir(), 'pong-playtest-profile-' + PORT);
-
-  const chrome = spawn(CHROME, [
+  // The profile is a fresh folder under the temp directory, deleted when Chrome
+  // exits -- on success, on an error and on Ctrl+C (tools/chrome.mjs, item 1169) --
+  // so two playtests on two ports never share one and none is left behind.
+  const chrome = launchChrome(CHROME, [
     // --mute-audio: the audio graph still runs and is still checked, but a
     // playtest never beeps through the speakers of the machine it runs on.
     '--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
-    '--user-data-dir=' + profile, '--no-first-run', '--no-default-browser-check',
+    '--no-first-run', '--no-default-browser-check',
     url
-  ], { stdio: 'ignore' });
+  ], { name: 'playtest' });
 
   let ws;
   try {
@@ -615,7 +612,7 @@ async function main() {
       ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots]);
   } finally {
     try { ws && ws.close(); } catch { /* already gone */ }
-    chrome.kill();
+    await chrome.close();
   }
 }
 
