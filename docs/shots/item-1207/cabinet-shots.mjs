@@ -13,7 +13,7 @@
  * open straight into play. Nothing in src/ knows this exists.
  */
 import { writeFileSync, existsSync } from 'node:fs';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -81,9 +81,9 @@ const REPORT = `(() => { const g = window.__pong, c = window.__pongCabinet, p = 
 
 async function main() {
   const base = pathToFileURL(path.join(ROOT, 'index.html')).href;
-  const chrome = launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
+  const chrome = await launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
-    '--no-first-run', '--no-default-browser-check', 'about:blank'], { name: 'cabinet' });
+    '--no-first-run', '--no-default-browser-check', 'about:blank'], { name: 'cabinet' }).catch(refusePortTaken);
   let s;
   const out = { chrome: CHROME, when: new Date().toISOString(), frames: [] };
   try {
