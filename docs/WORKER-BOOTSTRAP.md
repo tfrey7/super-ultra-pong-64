@@ -246,7 +246,15 @@ his emulator — never touch either.**
   era's own hook, not that the others have none.
 - **The first ring on a cold page has one long frame** (about 110-120 ms at raw progress 0.006).
   It is the ring engine's (item 1164), not your flourish's: item 1140 proved it by A/B with its
-  flourish removed. Do not chase it in an era file.
+  flourish removed. Do not chase it in an era file. (Item 1203 removed it by warming the real
+  looks at load, and item 1218 removed the Super Nintendo tilt's 13-25 ms frame at raw 0.12 the
+  same way; `docs/measure/item-1218/trace.mjs --timing --runs 20` re-times it.)
+- **A flourish that draws something no ring has drawn before brings a first-ring hitch back**,
+  as a GPU program built mid-ring (item 1218: the SNES tilt's turned strips). The cure is a
+  matching draw in `warmUp` in `src/erachange.js` -- and it has to be drawn on one of the ring's
+  layers and that layer copied onto the canvas, because a draw made straight onto the canvas
+  during the warm-up is thrown away unpainted by the clear that ends it (two tries that did that
+  changed nothing). A/B with the flourish off (`--no-flourish`) before you warm anything.
 - **Start Chrome only through `tools/chrome.mjs`, never with a hand-built `--user-data-dir`.** A
   capture script that spawns Chrome itself leaves its profile behind -- about 18 MB a run, and on
   2026-09-10 the flourish cards' scripts left more than forty such folders in `G:/claude-tmp` (item
