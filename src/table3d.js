@@ -11,8 +11,11 @@
  *   field y  0 (the top wall, the FAR edge) .. 600 (the bottom wall, the NEAR edge)
  *   z        height up off the table, in the same units
  *
- * Canvas 2D only, no per-pixel loops: paths, gradients, and tiles built once
- * from rectangles. It reads nothing but its arguments and writes no state.
+ * Canvas 2D, no per-pixel loops: paths, gradients, and tiles built once from
+ * rectangles. It reads nothing but its arguments and writes no state. Since
+ * item 1273 field() hands the table, net, bats and ball to the real 3D layer
+ * (src/field3d.js, three.js on WebGL) when the page has one, and everything
+ * below is the fallback it paints when it does not.
  *
  * UMD like src/game.js: window.PongTable3D in the page (loaded after
  * src/render.js and before the era files), require('../src/table3d.js') under
@@ -324,6 +327,29 @@
     return out;
   }
 
+  /**
+   * The field, through the real 3D layer (src/field3d.js, item 1273) when the
+   * page has WebGL: the table, its centre line, the net, both bats, the ball
+   * and its shadow, rendered lit and copied into ctx exactly where table()
+   * paints -- the same camera, the same field-to-screen mapping. Answers true
+   * when it drew, and the era then skips its own paddles and ball; otherwise it
+   * paints table() and answers false, so today's canvas drawing is the
+   * fallback (no WebGL, ?gl=off, node --test). style is table()'s; its #rrggbb
+   * surface, line and rail colour the slab. The era's `render` knobs ride along.
+   */
+  function field(ctx, cam, style, state, api) {
+    var F = root.PongField3D;
+    if (F && typeof F.draw === 'function' && state) {
+      var s = style || {};
+      var look = api && typeof api.eraLook === 'function' ? api.eraLook(state.era) : {};
+      var ink = api && typeof api.paddleInk === 'function'
+        ? { left: api.paddleInk(state, 'left'), right: api.paddleInk(state, 'right') } : null;
+      if (F.draw(ctx, cam, state, { surface: s.surface, line: s.line, rail: s.rail, ink: ink, render: look.render })) return true;
+    }
+    table(ctx, cam, style);
+    return false;
+  }
+
   // ------------------------------------------------------------------- fog
   /** 0 at the near edge, 1 at the far edge (and past), shaped by the fog spec. */
   function fogAmount(y, fog) {
@@ -620,6 +646,7 @@
     ball: ball,
     ballScreen: ballScreen,
     table: table,
+    field: field,
     shade: shade,
     mix: mix,
     rgba: rgba,

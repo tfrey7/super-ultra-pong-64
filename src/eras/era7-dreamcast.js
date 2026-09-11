@@ -752,11 +752,11 @@
       ? state.score.left + '-' + state.score.right : null;
 
     backdrop(ctx, T, cam, state, P, flash);                       // 1
-    T.table(ctx, cam, tableStyle(T));                             // 2
+    var gl = T.field(ctx, cam, tableStyle(T), state, P);         // 2, through the 3D layer when it can (item 1273)
 
     var sides = ['left', 'right'];                                // 4, the far paddle first
     if (state.right.y + state.right.h < state.left.y + state.left.h) sides.reverse();
-    for (var i = 0; i < sides.length; i++) {
+    for (var i = 0; !gl && i < sides.length; i++) {
       T.box(ctx, cam, state[sides[i]], 0, PADDLE.z, paddleStyle(ctx, T, P.paddleInk(state, sides[i])));
     }
 
@@ -772,7 +772,7 @@
         ctx.stroke();
       }
       drawBurst(ctx, state);
-      drawBall(ctx, T, cam, state);                               // 7, last on the table
+      if (!gl) drawBall(ctx, T, cam, state);                      // 7, last on the table (the 3D layer drew its own)
     }
 
     var mid = state.width / 2;                                    // 8, above the far edge

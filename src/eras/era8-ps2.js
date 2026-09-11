@@ -604,15 +604,15 @@
     // 1. backdrop
     backdrop(ctx, state, T, cam);
     // 2. the table: a dark glossy slab
-    T.table(ctx, cam, TABLE_STYLE);
+    var gl = T.field(ctx, cam, TABLE_STYLE, state, P);   // through the 3D layer when it can (item 1273)
     // 3. on the table: the mood, the mirrored paddles, the dust in the air
     vignette(ctx, state, T, cam);
-    reflections(ctx, state, T, cam, P);
+    if (!gl) reflections(ctx, state, T, cam, P);
     playerReflections(ctx, state, T, cam);
     dust(ctx, t);
     // 4. paddles, far one first, in their earned colours (R4)
     var sides = paddleOrder(state);
-    for (var i = 0; i < sides.length; i++) {
+    for (var i = 0; !gl && i < sides.length; i++) {
       T.box(ctx, cam, state[sides[i]], 0, PADDLE.z,
         { ink: P.paddleInk(state, sides[i]), shade: 'flat', light: PADDLE.light, texture: TEXTURE.paddle });
     }
@@ -623,7 +623,7 @@
     flare(ctx, T, cam);
     rain(ctx, state, t);
     // 7. the ball, crisp and white over every glow; hidden in the serve pause
-    if (state.serveDelay <= 0) T.ball(ctx, cam, state.ball, { fill: C.core, texture: TEXTURE.ball });
+    if (!gl && state.serveDelay <= 0) T.ball(ctx, cam, state.ball, { fill: C.core, texture: TEXTURE.ball });
     // 8. the letterbox over everything, the score as its subtitle
     letterbox(ctx, state, P);
     ctx.restore();
