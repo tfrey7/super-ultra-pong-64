@@ -21,6 +21,11 @@
  * It paints with fillStyle and fillRect only, like the stock frame, so the
  * recording canvas in tools/eralooks.js can check it headless. A dimmed frame
  * (the attract rally behind the title) is the stock frame, as in every era.
+ *
+ * Arrival flourish: none yet, so the plain ring brings this era in. An era
+ * brings its own by adding `flourish: function (ctx, p, origin, fromEra, toEra,
+ * info)` to its look -- called every frame of the ring that brings THIS era in,
+ * drawn over the ring's edge; the header of src/erachange.js is the contract.
  */
 (function (root) {
   'use strict';

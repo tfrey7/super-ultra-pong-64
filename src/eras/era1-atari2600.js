@@ -14,6 +14,12 @@
  * that vanishes into it is a broken game. PongRender.isLegible() is the check
  * that keeps a future addition honest, and the palette's length must match
  * RULES.paletteSize in src/game.js (a test pins that join).
+ *
+ * Arrival flourish: none yet, so the plain ring brings this era in. An era
+ * brings its own by adding `flourish: function (ctx, p, origin, fromEra, toEra,
+ * info)` to the look below -- called every frame of the ring that brings THIS
+ * era in, drawn over the ring's edge; the header of src/erachange.js is the
+ * full contract.
  */
 (function (root) {
   'use strict';

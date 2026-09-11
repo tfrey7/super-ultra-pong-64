@@ -20,6 +20,11 @@
  *
  * Like every renderer here it only sets fillStyle and calls fillRect, so the
  * headless suite can record a frame without a browser.
+ *
+ * Arrival flourish: none yet, so the plain ring brings this era in. An era
+ * brings its own by adding `flourish: function (ctx, p, origin, fromEra, toEra,
+ * info)` to its look -- called every frame of the ring that brings THIS era in,
+ * drawn over the ring's edge; the header of src/erachange.js is the contract.
  */
 (function (root) {
   'use strict';

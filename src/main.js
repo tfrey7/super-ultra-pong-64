@@ -55,15 +55,20 @@
     var sound = root.PongSound ? root.PongSound.createPlayer() : null;
     var last = 0;
 
+    // Every frame goes through the era change (src/erachange.js): a plain
+    // frame, or -- after a point that moved the machine up an era -- the new
+    // era spreading across the field in a ring from where the ball went out,
+    // then its name card, all inside the serve pause.
+    var drawField = PongRender.drawEraFrame || PongRender.draw;
+
     function drawFrame() {
       if (game.phase === 'title') {
-        PongRender.draw(ctx, attract, { ink: ATTRACT_INK });
+        // The demo rally climbs the ladder too: its ring plays, dimmed, with no
+        // card under the title.
+        drawField(ctx, attract, { ink: ATTRACT_INK, card: false });
         PongRender.drawTitle(ctx, game);
       } else {
-        PongRender.draw(ctx, game);
-        // A point that moved the machine up an era: the flash, the wipe and
-        // the name card, over the frame, for as long as the serve pause lasts.
-        if (PongRender.drawEraChange) PongRender.drawEraChange(ctx, game);
+        drawField(ctx, game);
       }
     }
 
