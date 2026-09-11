@@ -348,7 +348,8 @@ async function curveShot(s) {
       taken.push(f);
       return f;
     })();
-    if (REFERENCE) {
+    // The whole match swings too; its --reference keeps to its own folder.
+    if (REFERENCE && !WHOLE_ONLY) {
       const dir = path.join(ROOT, 'docs', 'shots', 'paddle-physics');
       mkdirSync(dir, { recursive: true });
       copyFileSync(file, path.join(dir, 'curve-strip.png'));
