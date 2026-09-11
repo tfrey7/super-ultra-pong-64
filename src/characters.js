@@ -94,15 +94,52 @@
   // One block per rung. Era 0 has none: the 1972 machine stays bars and a dot.
   var ERAS = {
     1:  { skin: '#d4a060', body: '#2c3c9c', scale: 2.5 },                    // Atari 2600
-    2:  { skin: '#fcbcb0', body: '#0000bc', scale: 2.5 },                    // NES
-    3:  { skin: '#eeaa88', body: '#222266', scale: 2.5, res: 2 },            // Genesis
-    4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
+    2:  { sheets: { left: 'era2-sheet-left', right: 'era2-sheet-right' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' }, // NES (item 1225: assets/pixellab/era2-players-sheet.mjs)
+    // Genesis (item 1226): the barbarian and the knight, pixflux sheets re-cut
+    // offline to 20 x 25 frames (assets/pixellab/era3-players-cut.mjs), so the
+    // scale is 3.2, not the bible's 2.6 for 12 x 52: 80 units tall, one paddle.
+    3:  { sheets: { left: 'era3-p1', right: 'era3-p2' }, frame: { w: 20, h: 25 },
+          hand: { x: 20, y: 13 }, scale: 3.2, fps: 10,
+          skin: '#eeaa88', body: '#222266', res: 1 },
+    // Super Nintendo (item 1227): two hover pilots, built from one pixellab pose
+    // each by assets/pixellab/era4-players-build.mjs. The glove is on the frame's
+    // right edge, so the figure stands wholly behind its paddle; at 1.2 a frame
+    // is 38 x 121 field units, the pad's back rim just past the wall. miss has
+    // two frames (the pad there and gone), so at fps 12 the conceding pad blinks.
+    4:  { skin: '#f8c8a0', body: '#384878', res: 2,
+          sheets: { left: 'era4-players-left', right: 'era4-players-right' },
+          frame: { w: 32, h: 101 }, hand: { x: 32, y: 41 }, scale: 1.2, fps: 12,
+          frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
-    8:  { skin: '#dcae8c', body: '#20242c', scale: 3.2, res: 4, round: true }, // PlayStation 2
-    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
-    10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
+    // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
+    // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
+    // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
+    // fps 3, not the bible's 8: the rig has one rate for idle, move and win,
+    // and at 8 a two-frame breath reads as a flicker.
+    8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
+          sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
+          frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3 },
+    // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
+    // cyborg, cut from pixellab by assets/pixellab/era9-derive.mjs; the hand on
+    // the shield at the paddle box's top (dz 24), 90 table units tall. A
+    // STAND-IN: Tim ruled sprite players out for the 3D eras (23:47 EDT,
+    // 2026-09-10); the polygon-model card swaps this block's sheets out.
+    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 1.667, res: 4, round: true,
+          sheets: { left: 'era9-armour-left', right: 'era9-armour-right' },
+          frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6 },
+    // Xbox 360 (item 1234, docs/ART.md era 10): two heavy soldiers, pixellab
+    // sheets reposed, graded, rimmed and grained offline by
+    // assets/pixellab/era10-derive.mjs at twice the bible's 32 x 66 (a 96 x 132
+    // frame holding a 48 x 66 figure cell), so the rig's unsmoothed draw of a
+    // pre-smoothed sheet reads HD. 0.68 table units a sheet pixel is the
+    // bible's 1.36 at that doubling: about 90 units tall on the table.
+    10: { skin: '#e2b294', body: '#2a2e36', res: 4, round: true,
+          sheets: { left: 'era10-soldier-left', right: 'era10-soldier-right' },
+          frame: { w: 96, h: 132 }, hand: { x: 84, y: 84 }, scale: 0.68,
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8 }
   };
 
   var FIRST_3D = 5;
@@ -360,7 +397,10 @@
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
-    var image = S.load(cfg.sheet);
+    // Headless there is no Image to load into, and the loader throws: that is
+    // "not loaded", and the placeholder draws (item 1225, the first real sheet).
+    var image;
+    try { image = S.load(cfg.sheet); } catch (e) { return null; }
     if (!S.ready(cfg.sheet)) return null;
     var rects = {};
     for (var row = 0; row < BEATS.length; row++) {

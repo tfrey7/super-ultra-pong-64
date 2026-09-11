@@ -88,3 +88,70 @@ Look file: [src/eras/era3-genesis.js](../../src/eras/era3-genesis.js).
    the shatter), `src/signboards.js`, `src/match.js`, and `advanceEra`'s call.
 5. Measure with `node tools/playtest.mjs --era 3` and watch its "holds full frame rate" line. This
    era sits right on it.
+
+## LESSONS: the AAA pass (item 1226)
+
+Tim: *"it shouldn't look like a _pong_ game from that era, it should look like a AAA game from
+that era, that just happens to be pong"*. This era was built to its page in `docs/ART.md` (Era 3)
+as a *Golden Axe* match: a barbarian and a knight holding the paddles as tower shields, in a
+torch-lit castle arena. It used 6 of its 12 pixellab generations.
+
+**What sold the flagship look**
+
+1. **People at the paddles.** The two warriors (`sheets: { left: 'era3-p1', right: 'era3-p2' }`
+   in `src/characters.js`) do more than anything else on the screen. Once a figure lunges with its
+   shield on a hit, the paddle reads as something being held. The magic pots filling across the
+   rally help too.
+2. **The interface is the era.** A stone panel across the top with a portrait per side and a
+   *Golden Axe* meter of magic pots (one per 2 hits of the rally) says 1989 Sega in a way no score
+   font does. The digits went down to 7-unit blocks to fit the panel's 16 native lines, and they
+   still read.
+3. **Things that move on their own.** Four torches with 3-frame flames (0.1 s each) and 2-frame
+   pennants, riding the near plane's wall at its scroll speed. The arena looks alive before the
+   ball moves.
+4. **Everything on the 512 colours**, generated art included (`tools/palette-snap.mjs --bits 3`),
+   so pixflux's pictures sit in the same world as the hand-drawn paddles.
+5. **Moments in the dressing, not over play.** A point flashes the loser's portrait red 3 times in
+   0.3 s and flares every torch; at match point the torches burn double speed and the panel's frame
+   turns gold. Nothing is drawn in the name card's band.
+
+Measured on the playtest, on the tree merged with master: ordinary play on the ladder ran 61 frames
+in 1.02 s at a mean of 16.7 ms (the line is 18.5), and the twelve-hit rally with the feel layer on
+ran 1,116 frames at a mean of 16.7 ms, p95 16.7 ms. The pictures are about ten `drawImage` calls a
+frame, and they cost nothing measurable. The tenth hit is `docs/shots/item-1226/rally-era3-genesis.png`.
+
+**What did not work**
+
+- **Asking pixflux for a sprite sheet.** The request was "3 columns by 6 rows" at 36 x 312, 1
+  generation each. Both players came back as ONE column of 11 small figures, about 16 x 20 (the
+  barbarian) and 12 x 24 (the knight), not the 12 x 52 frames the bible wanted. They were usable,
+  and in prompt order: 11 is idle 2 + up 2 + down 2 + swing 2 + miss 1 + win 2. So
+  `assets/pixellab/era3-players-cut.mjs` re-cuts them offline, for 0 generations, into the rig's
+  3 x 6 grid of 20 x 25 frames (swing's third frame repeats its first), feet down and the shield
+  edge on the right. The scale is 3.2, not 2.6, so a figure is 80 units tall, about one paddle; any
+  bigger and a 20-pixel-wide frame would not fit the 32 units behind the paddle.
+- **The panel came back with a stray golden axe** lying across its left half. Its right half was
+  clean stone, so the game draws that half twice, the left copy mirrored. That cost no re-roll.
+- **The wall came back with its own torch sconces baked in** (six of them), so the four animated
+  torches sit among six static glows. Next time, put "no torches, no lights" in the prompt. Its
+  bottom rows are a bright floor edge; only the top 36 rows are drawn.
+- **The computer's name tag ("BLAST PROCESSOR", from `src/opponents.js`) now sits on the stone
+  wall** rather than on dark sky. It still reads, but it is the busiest spot on the screen.
+- **The rig's tests assumed no era had a sheet.** Loading one under `node --test` threw (there is
+  no `Image`), and a test pinned every era but 2 as a placeholder. This card and item 1232 (the
+  PlayStation 2) each fixed both at the same time, and 1232 landed first. Its version (a stand-in
+  loader in the test, an era with art skipped) is the one that stands, and this branch took it at
+  the merge. Ten era cards editing one shared test is a conflict waiting to happen: take master's
+  side.
+
+**What a one-era game would copy**
+
+- The `ARENA` table in `src/eras/era3-genesis.js`: panel 43 units (16 native lines), wall band 96
+  (36 lines), torches at x 100/300/500/700, portraits 40 units at x 20 and 740, and 5 pots of 10 x
+  16. It is a *Golden Axe* status bar and set, sized to a 320 x 224 screen.
+- The six images (`era3-p1`, `era3-p2`, `era3-arena-wall`, `era3-torch`, `era3-portraits`,
+  `era3-panel`) and their manifest entries, which hold every seed and prompt.
+- For players, ask pixflux for **one figure strip per request**, or expect a stacked column and
+  re-cut it with `era3-players-cut.mjs`. Do not plan a sheet around the grid you asked for.
+- Every picture has a `fillRect` stand-in that draws until it decodes, so the page never shows a
+  hole and the headless tests can check colours on the recording canvas.
