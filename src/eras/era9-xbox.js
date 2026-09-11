@@ -125,6 +125,172 @@
     return { mode: 'steady', filled: filled, shown: filled, front: -1, blink: false };
   }
 
+  // ------------------------------------------------------------ the arrival
+  // The change into era 9 (docs/ERAS.md chapter 10, *Arrival flourish*), drawn
+  // over the engine's ring, which stays the truth of which era draws where:
+  //   1. ignition: a green orb swells at the spot the ball went out;
+  //   2. the edge: the ring itself is a glowing green energy sphere, its rim a
+  //      hard metal band with a sheen turning on it, tendrils of light reaching
+  //      from the orb to the rim;
+  //   3. arrival: a green pulse as it settles.
+  // Behind the sphere the table answers, read off the same engine moment: the
+  // light sits in the orb while the sphere spreads, so the metal sheen and the
+  // hard shadows radiate out from it, then it snaps out to its orbit in the last
+  // beat; the gamertags fade in over the paddles. The boot thrum is the voice's
+  // `boot` list below, played by the player -- the flourish never sounds a note.
+  var ARRIVAL = { orb: 90, ignite: 0.38, reach: 56, shell: 48, band: 8, tendrils: 10,
+                  edgeFrom: 0.25, edgeOut: 0.72, snap: 0.8, pulse: 0.12, glow: 0.5,
+                  tagFrom: 0.45, tagTo: 0.8 };
+
+  function clamp01(v) { return v > 0 ? (v < 1 ? v : 1) : 0; }
+
+  function rgba(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + (+a).toFixed(3) + ')';
+  }
+
+  /** The change into THIS era on screen now, or null: the engine's own moment (src/erachange.js). */
+  function arrivalOf(state) {
+    var m = typeof R.eraChangeMoment === 'function' ? R.eraChangeMoment(state) : null;
+    return m && m.wiping && m.era === 9 ? m : null;
+  }
+
+  /** The light: in the orb while the sphere spreads, snapping out to its orbit over the last beat. */
+  function arrivalLight(t, m) {
+    var L = lightAt(t);
+    if (!m) return L;
+    var k = clamp01((m.p - ARRIVAL.snap) / (1 - ARRIVAL.snap));
+    k = 1 - Math.pow(1 - k, 3);                        // a snap, not a drift
+    return { x: m.origin.x + (L.x - m.origin.x) * k, y: m.origin.y + (L.y - m.origin.y) * k, z: L.z };
+  }
+
+  /** How much of the gamertags shows: none as the sphere sets off, all of them by the last beat. */
+  function tagFade(m) {
+    return m ? clamp01((m.p - ARRIVAL.tagFrom) / (ARRIVAL.tagTo - ARRIVAL.tagFrom)) : 1;
+  }
+
+  /**
+   * The orb's radius t seconds after the point: it swells to 90 over the
+   * ignition, keyed off the time because the ring is under a unit wide at
+   * first, throbs with the thrum, and never reaches more than 56 past the ring.
+   */
+  function orbRadius(t, radius) {
+    var k = 1 - Math.pow(1 - clamp01(t / ARRIVAL.ignite), 3);
+    var r = ARRIVAL.orb * k + 4 * k * Math.sin(2 * Math.PI * 6 * t);
+    return Math.max(0, Math.min(r, radius + ARRIVAL.reach));
+  }
+
+  /** One tendril: 10 points on a curve from the orb out to the ring's edge, bent by a sway. */
+  function tendril(ox, oy, from, to, a, t, i) {
+    var sway = 0.35 * Math.sin(t * 7 + i * 1.7), mid = (from + to) / 2;
+    var x0 = ox + Math.cos(a) * from, y0 = oy + Math.sin(a) * from;
+    var cx = ox + Math.cos(a + sway) * mid, cy = oy + Math.sin(a + sway) * mid;
+    var x1 = ox + Math.cos(a) * to, y1 = oy + Math.sin(a) * to;
+    var out = [];
+    for (var k = 0; k < 10; k++) {
+      var u = k / 9, v = 1 - u;
+      out.push([v * v * x0 + 2 * v * u * cx + u * u * x1, v * v * y0 + 2 * v * u * cy + u * u * y1]);
+    }
+    return out;
+  }
+
+  var TAPER = [6, 3, 1];                               // each tendril thins from the orb out
+
+  /** The flourish hook (the header of src/erachange.js is the contract): the green sphere arrives. */
+  function greenSphere(ctx, p, origin, fromEra, toEra, info) {
+    // Only the arrival of THIS era, and never behind the title.
+    if (toEra !== 9 || !info || info.dim) return;
+    var A = ARRIVAL, R0 = info.radius || 0, t = info.t || 0, TAU = Math.PI * 2;
+    var ox = origin.x, oy = origin.y;
+    var settle = clamp01((p - A.snap) / (1 - A.snap));
+    var orb = orbRadius(t, R0);
+
+    ctx.globalCompositeOperation = 'lighter';
+    // 2. The sphere: a faint green body brightening into a glowing shell at the ring.
+    if (R0 > 2) {
+      var outer = R0 + 10, inner = Math.max(0, R0 - A.shell);
+      var body = ctx.createRadialGradient(ox, oy, 0, ox, oy, outer);
+      body.addColorStop(0, rgba(C.green, 0));
+      body.addColorStop(inner / outer, rgba(C.green, 0.1 * (1 - settle)));
+      body.addColorStop(R0 / outer, rgba(C.glow, A.glow * (1 - 0.6 * settle)));
+      body.addColorStop(1, rgba(C.glow, 0));
+      ctx.fillStyle = body;
+      ctx.beginPath();
+      ctx.arc(ox, oy, outer, 0, TAU);
+      ctx.fill();
+    }
+
+    // 2. Tendrils of light from the orb to the rim, while the edge crosses the field.
+    var edge = clamp01((p - A.edgeFrom) / 0.08) * (1 - clamp01((p - A.edgeOut) / 0.13));
+    if (edge > 0 && R0 > orb + 8) {
+      ctx.save();
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = C.green;
+      ctx.strokeStyle = rgba(C.green, 0.9 * edge);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      for (var i = 0; i < A.tendrils; i++) {
+        var pts = tendril(ox, oy, orb * 0.8, R0, i * TAU / A.tendrils + t * 0.6, t, i);
+        for (var b = 0; b < TAPER.length; b++) {
+          ctx.lineWidth = TAPER[b];
+          ctx.beginPath();
+          ctx.moveTo(pts[b * 3][0], pts[b * 3][1]);
+          for (var j = b * 3 + 1; j <= b * 3 + 3; j++) ctx.lineTo(pts[j][0], pts[j][1]);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    // 1. The orb at the miss, fading as the frame settles.
+    if (orb > 0.5) {
+      var fade = 1 - settle;
+      var g = ctx.createRadialGradient(ox, oy, 0, ox, oy, orb);
+      g.addColorStop(0, rgba('#e8ffb0', 0.5 * fade));
+      g.addColorStop(0.35, rgba(C.green, 0.45 * fade));
+      g.addColorStop(0.75, rgba(C.greenDark, 0.4 * fade));
+      g.addColorStop(1, rgba(C.greenDark, 0));
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(ox, oy, orb, 0, TAU);
+      ctx.fill();
+    }
+
+    // 2. The rim: a hard metal band with a sheen turning on it, a green-glow line inside.
+    if (R0 > 4) {
+      ctx.globalCompositeOperation = 'source-over';
+      var dx = Math.cos(t * 2) * R0, dy = Math.sin(t * 2) * R0;
+      var steel = ctx.createLinearGradient(ox - dx, oy - dy, ox + dx, oy + dy);
+      steel.addColorStop(0, C.steel);
+      steel.addColorStop(0.5, C.steelLight);
+      steel.addColorStop(1, C.steel);
+      ctx.strokeStyle = steel;
+      ctx.lineWidth = A.band;
+      ctx.beginPath();
+      ctx.arc(ox, oy, R0, 0, TAU);
+      ctx.stroke();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = C.glow;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(ox, oy, Math.max(0, R0 - A.band / 2 - 2), 0, TAU);
+      ctx.stroke();
+      // The sphere's own highlight, high on its left.
+      ctx.strokeStyle = rgba(C.specular, 0.35);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(ox, oy, R0 * 0.9, Math.PI * 1.1, Math.PI * 1.4);
+      ctx.stroke();
+    }
+
+    // 3. Arrival: a green full-frame pulse, well under the 0.35 a wash may reach.
+    if (settle > 0) {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = rgba(C.green, A.pulse * Math.abs(Math.sin(p * 6 * Math.PI)));
+      ctx.fillRect(0, 0, info.width || 800, info.height || 600);
+    }
+  }
+
   // ------------------------------------------------------------------ tiles
   // Built once, from paths, onto the table's own offscreen canvases. Null
   // under node --test, where the table falls back to flat gunmetal strips.
@@ -404,17 +570,19 @@
   }
 
   /** Step 5: a nameplate floating over a paddle, world-space, under the ball. */
-  function drawGamertag(ctx, cam, T, P, state, side) {
+  function drawGamertag(ctx, cam, T, P, state, side, fade) {
+    if (fade === undefined) fade = 1;
+    if (!(fade > 0)) return;                          // not yet faded in on the arrival
     var rect = state[side];
     var p = T.project(cam, rect.x + rect.w / 2, rect.y + rect.h / 2, TAG.z);
     var x = Math.round(Math.max(4, Math.min(state.width - TAG.w - 4, p.x - TAG.w / 2))) + 0.5;
     var y = Math.round(p.y - TAG.h / 2) + 0.5;
     ctx.save();
     roundRect(ctx, x, y, TAG.w, TAG.h, 5);
-    ctx.globalAlpha = TAG.alpha;
+    ctx.globalAlpha = TAG.alpha * fade;
     ctx.fillStyle = C.tagPlate;
     ctx.fill();
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = fade;
     ctx.strokeStyle = C.green;
     ctx.lineWidth = 1;
     ctx.stroke();
@@ -469,7 +637,8 @@
     var T = P.table3d;
     if (!T) return P.drawBase(ctx, state, opts);
     var cam = cameraFor(T, P.eraLook(state.era).camera || CAMERA);
-    var L = lightAt(state.time);
+    var arrival = arrivalOf(state);                    // null except while the green sphere spreads
+    var L = arrivalLight(state.time, arrival);
     var tile = tilesFor(T, ctx);
     remember(state);
 
@@ -506,7 +675,8 @@
       ctx.fill();
       ctx.restore();
     }
-    for (var s = 0; s < sides.length; s++) drawGamertag(ctx, cam, T, P, state, sides[s]);
+    var tags = tagFade(arrival);
+    for (var s = 0; s < sides.length; s++) drawGamertag(ctx, cam, T, P, state, sides[s], tags);
 
     // 7. the ball, last of everything on the table; hidden in the serve pause
     if (live) T.ball(ctx, cam, state.ball, { fill: C.ball });
