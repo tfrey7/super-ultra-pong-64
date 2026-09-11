@@ -1,0 +1,119 @@
+{
+ "when": "2026-09-11T01:42:02.567Z",
+ "runs": [
+  {
+   "label": "master run 1 (cold profile)",
+   "exitCode": 0,
+   "seconds": 11.6,
+   "baseline": {
+    "frames": 207,
+    "meanMs": 4.83,
+    "p95Ms": 4.3,
+    "maxMs": 121
+   },
+   "ringFrames": {
+    "frames": 355,
+    "meanMs": 4.21,
+    "p95Ms": 4.3,
+    "maxMs": 20.7
+   },
+   "firstHitchMs": 20.7,
+   "errors": []
+  },
+  {
+   "label": "branch run 1 (fresh profile)",
+   "exitCode": 0,
+   "seconds": 11.9,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "p95Ms": 4.3,
+    "maxMs": 4.4
+   },
+   "ringFrames": {
+    "frames": 338,
+    "meanMs": 4.65,
+    "p95Ms": 4.3,
+    "maxMs": 124.9
+   },
+   "firstHitchMs": 124.9,
+   "errors": []
+  },
+  {
+   "label": "master run 2 (warm, reused profile)",
+   "exitCode": 0,
+   "seconds": 11.9,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "ringFrames": {
+    "frames": 259,
+    "meanMs": 6.55,
+    "p95Ms": 4.3,
+    "maxMs": 275
+   },
+   "firstHitchMs": 275,
+   "errors": []
+  },
+  {
+   "label": "branch run 2 (fresh profile)",
+   "exitCode": 0,
+   "seconds": 12,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "ringFrames": {
+    "frames": 338,
+    "meanMs": 4.63,
+    "p95Ms": 4.3,
+    "maxMs": 116.7
+   },
+   "firstHitchMs": 116.7,
+   "errors": []
+  },
+  {
+   "label": "master run 3 (warm, reused profile)",
+   "exitCode": 0,
+   "seconds": 12,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "ringFrames": {
+    "frames": 359,
+    "meanMs": 4.17,
+    "p95Ms": 4.3,
+    "maxMs": 4.4
+   },
+   "firstHitchMs": null,
+   "errors": []
+  },
+  {
+   "label": "branch run 3 (fresh profile)",
+   "exitCode": 0,
+   "seconds": 12.2,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "p95Ms": 4.3,
+    "maxMs": 4.4
+   },
+   "ringFrames": {
+    "frames": 324,
+    "meanMs": 4.99,
+    "p95Ms": 4.3,
+    "maxMs": 166.7
+   },
+   "firstHitchMs": 166.7,
+   "errors": []
+  }
+ ]
+}
