@@ -228,4 +228,6 @@ def main():
         out, counts.pop() // 3, len(colors), len(BEATS), bpy.app.version_string))
 
 
-main()
+# Run as a script (blender --python), not when figure-gltf.py borrows the skeleton (item 1274).
+if __name__ == '__main__':
+    main()

@@ -272,6 +272,182 @@
     }
   }
 
+  // ------------------------------------------------------------ figures
+  // Item 1274: the players as standard glTF figures made in Blender
+  // (tools/blender/README.md is the contract), rigged and animated, lit by the
+  // table's own light. A figure's file is assets/models/<name>.glb, and the
+  // page reads it from <name>.glb.js, the same bytes as base64 in
+  // PongFigureFiles[name], because file:// refuses fetch. The name is the one
+  // the era's block in src/characters.js already gives (`figure`, else
+  // `model`), and until that name's file has loaded -- or when it has none --
+  // the polygon figures of src/models3d.js draw exactly as before.
+  var CLIP_OF = { idle: 'idle', up: 'move_up', down: 'move_down', swing: 'swing', win: 'celebrate', miss: 'lose' };
+  var CLIPS = ['idle', 'move_up', 'move_down', 'swing', 'celebrate', 'lose'];
+  var LOOPS = { idle: true, move_up: true, move_down: true };
+  var ALL_BEATS = { frames: { idle: 1, up: 1, down: 1, swing: 1, miss: 1, win: 1 } };   // beatOf may pick any beat
+  var BLEND_S = 0.12;          // a change of clip cross-fades over this long
+  var FIG_DIR = 'assets/models/';
+  var FIG_NAME = /^[a-z0-9][a-z0-9_-]*$/;
+  var figFiles = {};            // name -> { state: 'loading' | 'ready' | 'failed', gltf, pong, why }
+  var figAsked = {};            // name -> the script tag added for it
+  var figKept = {};             // side + ':' + name -> one posed instance
+  var figuresTaken = false;     // this draw stood the figures; src/models3d.js asks once (takeFigures)
+  var figuresOff = !!(root.location && /[?&](models|characters|figures)=off\b/.test(String(root.location.search || '')));
+
+  /** The clip a src/characters.js beat plays. */
+  function clipFor(beat) { return CLIP_OF[beat] || 'idle'; }
+
+  /** How far into a clip: a loop runs on the game clock, a one-shot from its beat's start, then holds. */
+  function clipTime(clip, duration, time, age) {
+    if (!(duration > 0)) return 0;
+    var at = LOOPS[clip] ? ((time % duration) + duration) % duration : Math.max(0, Math.min(duration, age || 0));
+    return Math.min(at, duration * 0.999);   // never exactly the end: a repeating action wraps it to 0
+  }
+
+  function base64Buffer(s) {
+    if (typeof root.atob === 'function') {
+      var bin = root.atob(s), u = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+      return u.buffer;
+    }
+    var b = Buffer.from(s, 'base64');
+    return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
+  }
+
+  /** A figure file, parsed, or null while it loads (or when there is none). The first ask loads it. */
+  function figure(name) {
+    if (typeof name !== 'string' || !FIG_NAME.test(name)) return null;
+    var f = figFiles[name];
+    if (f) return f.state === 'ready' ? f : null;
+    var files = root.PongFigureFiles;
+    if (files && typeof files[name] === 'string') {
+      f = figFiles[name] = { state: 'loading', gltf: null, pong: null, why: '' };
+      try {
+        new state3.three.GLTFLoader().parse(base64Buffer(files[name]), '', function (gltf) {
+          f.gltf = gltf;
+          f.pong = (gltf.scene && gltf.scene.userData && gltf.scene.userData.pong) || {};
+          f.state = 'ready';
+        }, function (e) { f.state = 'failed'; f.why = String((e && e.message) || e); });
+      } catch (e) { f.state = 'failed'; f.why = String((e && e.message) || e); }
+      return null;
+    }
+    if (!figAsked[name] && root.document && root.document.body) {
+      var s = root.document.createElement('script');
+      s.src = FIG_DIR + name + '.glb.js';
+      s.async = true;
+      s.onerror = function () { figFiles[name] = { state: 'failed', why: 'no ' + FIG_DIR + name + '.glb.js' }; };
+      figAsked[name] = s;
+      root.document.body.appendChild(s);
+    }
+    return null;
+  }
+
+  /** One side's posed copy of a figure: its own skeleton, mixer, ink materials and contact shadow. */
+  function kept(side, name, f) {
+    var key = side + ':' + name;
+    if (figKept[key]) return figKept[key];
+    var THREE = state3.three;
+    var body = THREE.SkeletonUtils.clone(f.gltf.scene);
+    var ink = [];
+    var inkName = f.pong.ink || 'ink';
+    body.traverse(function (o) {
+      if (!o.isMesh) return;
+      o.frustumCulled = false;      // a skinned mesh's bounds are its rest pose
+      var list = Array.isArray(o.material) ? o.material : [o.material];
+      var own = list.map(function (m) { var c = m.clone(); if (c.name === inkName) ink.push(c); return c; });
+      o.material = Array.isArray(o.material) ? own : own[0];
+    });
+    var mixer = new THREE.AnimationMixer(body);
+    var actions = {};
+    (f.gltf.animations || []).forEach(function (clip) {
+      var a = mixer.clipAction(clip);
+      a.play();
+      a.setEffectiveWeight(0);
+      actions[clip.name] = a;
+    });
+    var shadow = new THREE.Mesh(new THREE.CircleGeometry(1, 20),
+      new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.32, depthWrite: false }));
+    shadow.rotation.x = -Math.PI / 2;
+    state3.scene.add(body);
+    state3.scene.add(shadow);
+    figKept[key] = { side: side, name: name, body: body, mixer: mixer, actions: actions, ink: ink, shadow: shadow,
+      pong: f.pong, clip: null, since: 0, prev: null, prevAt: 0 };
+    return figKept[key];
+  }
+
+  /** Set a figure's clips for this frame, deterministically from the game clock: a frame drawn twice draws the same pose. */
+  function animate(k, clip, time, age) {
+    if (!k.actions[clip]) clip = k.actions.idle ? 'idle' : CLIPS.filter(function (c) { return k.actions[c]; })[0];
+    if (!clip) return;
+    if (k.clip === null || time < k.since) { k.clip = clip; k.since = time; k.prev = null; }
+    else if (clip !== k.clip) {
+      var was = k.actions[k.clip];
+      k.prev = k.clip;
+      k.prevAt = was ? was.time : 0;
+      k.clip = clip;
+      k.since = time;
+    }
+    var w = Math.min(1, (time - k.since) / BLEND_S);
+    for (var name in k.actions) k.actions[name].setEffectiveWeight(0);
+    var a = k.actions[clip];
+    a.time = clipTime(clip, a.getClip().duration, time, age);
+    a.setEffectiveWeight(k.prev && w < 1 ? w : 1);
+    if (k.prev && w < 1 && k.actions[k.prev]) {
+      k.actions[k.prev].time = k.prevAt;
+      k.actions[k.prev].setEffectiveWeight(1 - w);
+    }
+    k.mixer.update(0);
+  }
+
+  /**
+   * Stand both players' figures at their paddles for this frame. Answers true
+   * when both sides' files are ready and drawn; false leaves the polygon
+   * figures to src/characters.js. Placement is src/characters.js drawModels'
+   * own: the idle paddle hand on the paddle's outer face, at the block's
+   * modelScale, the right-hand player mirrored.
+   */
+  function poseFigures(state, look) {
+    for (var key in figKept) { figKept[key].body.visible = false; figKept[key].shadow.visible = false; }
+    var C = root.PongCharacters;
+    if (figuresOff || look.figures === false || !C || typeof C.configFor !== 'function' || !C.enabled) return null;
+    var era = Math.floor(state.era) || 0;
+    var sides = ['left', 'right'], pick = [];
+    for (var i = 0; i < 2; i++) {
+      var cfg = C.configFor(era, sides[i]);
+      if (!cfg || !cfg.is3d) return null;
+      var name = cfg.figure || cfg.model;
+      var f = figure(name);
+      if (!f || !state[sides[i]]) return null;
+      pick.push({ side: sides[i], cfg: cfg, f: f, name: name });
+    }
+    var mem = typeof C.memoryOf === 'function' ? C.memoryOf(state) : null;
+    var t = state.time || 0;
+    var slabs = {};
+    pick.forEach(function (it) {
+      var p = state[it.side], cfg = it.cfg;
+      var k = kept(it.side, it.name, it.f);
+      var mirror = it.side === 'right' ? -1 : 1;
+      var scale = cfg.modelScale || 1;
+      var hand = k.pong.hand || [0, 0, 0];      // file axes: x forward, y up, z toward the near edge
+      var outerX = mirror > 0 ? p.x : p.x + p.w;
+      var ax = outerX - mirror * 2.5, ay = p.y + p.h / 2;
+      k.body.position.set(ax - mirror * hand[0] * scale - W / 2, 0, ay - hand[2] * scale - H / 2);
+      k.body.scale.set(mirror * scale, scale, scale);
+      k.body.visible = true;
+      k.shadow.visible = true;
+      k.shadow.position.set(k.body.position.x, 0.5, k.body.position.z);
+      k.shadow.scale.set(16 * scale, 11 * scale, 1);
+      var memo = mem && mem[it.side];
+      var beat = typeof C.beatOf === 'function' ? C.beatOf(memo, t, p.vy || 0, ALL_BEATS).beat : 'idle';
+      var age = memo && memo.held ? t - memo.since : 0;
+      animate(k, clipFor(beat), t, age);
+      var ink = isHex(look.ink && look.ink[it.side]) ? look.ink[it.side] : null;
+      if (ink) k.ink.forEach(function (m) { m.color.set(ink); });
+      slabs[it.side] = cfg.slabZ || (hand[1] * scale + 6);
+    });
+    return slabs;
+  }
+
   /** How many device pixels the context draws per field unit. */
   function pixelScale(ctx) {
     if (typeof ctx.getTransform !== 'function') return 1;
@@ -286,12 +462,24 @@
    * it drew; false means the caller paints the canvas table as before.
    */
   function draw(ctx, cam, state, look) {
+    figuresTaken = false;
     if (switchedOff || !ctx || !cam || !state || !ensure()) return false;
     var t0 = root.performance && root.performance.now ? root.performance.now() : 0;
     look = look || {};
     var knobs = look.render || {};
     applyKnobs(knobs);
     pose(cam, state, look);
+    var slabs = poseFigures(state, look);
+    if (slabs) {
+      // The figures hold their bats: each blade stands as tall as the hand that grips it (src/models3d.js's slab).
+      ['left', 'right'].forEach(function (side) {
+        var bat = state3.parts.bats[side], h = slabs[side];
+        bat.blade.scale.y = h;
+        bat.blade.position.y = h / 2;
+        bat.handle.position.y = Math.max(SIZES.bat.z / 2, h - 6);
+      });
+      figuresTaken = true;
+    }
     var gl = state3.gl;
     var k = pixelScale(ctx) * (knobs.resolution || 1);
     var w = Math.max(1, Math.round(W * k)), h = Math.max(1, Math.round(H * k));
@@ -321,6 +509,17 @@
     on: function () { switchedOff = false; },
     /** Frames drawn through WebGL and their total ms, for the playtest's A/B. */
     stats: function () { return { frames: stats.frames, ms: stats.ms }; },
+    /** Figures (item 1274): the clip a beat plays, where in it, and a figure file's load state. */
+    CLIPS: CLIPS,
+    clipFor: clipFor,
+    clipTime: clipTime,
+    figureState: function (name) { var f = figFiles[name]; return f ? { state: f.state, why: f.why || '' } : null; },
+    /**
+     * Whether the last draw stood the glTF figures, answered ONCE: src/models3d.js
+     * asks as it is about to draw the polygon figures over the same frame, and
+     * skips them when these are already there.
+     */
+    takeFigures: function () { var t = figuresTaken; figuresTaken = false; return t; },
     /** The scene and renderer, for the cards that build inside this layer (item 1266, the model pipeline). */
     internals: function () { return ensure() ? { THREE: state3.three, renderer: state3.gl, scene: state3.scene, camera: state3.camera, parts: state3.parts } : null; }
   };
