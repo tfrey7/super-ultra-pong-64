@@ -42,6 +42,130 @@
         "detail": "low detail",
         "no_background": true
       }
+    },
+    {
+      "name": "snes-sky",
+      "file": "snes-sky.png",
+      "prompt": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",
+      "size": {
+        "width": 256,
+        "height": 48
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "highly detailed"
+      },
+      "seed": 134143913,
+      "date": "2026-09-11T01:16:21.270Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 18,
+      "pixels": {
+        "width": 256,
+        "height": 48
+      },
+      "bytes": 2862,
+      "sha256": "dec9b836616b876b1a22c2475032ca7e6de70e407fc5a34211d9b56741e96a54",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",
+        "image_size": {
+          "width": 256,
+          "height": 48
+        },
+        "seed": 134143913,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "snes-paddle",
+      "file": "snes-paddle.png",
+      "prompt": "a vertical pill-shaped metal pong paddle, light grey shaded body with shiny chrome end caps, 16-bit Super Nintendo sprite, pixel art",
+      "size": {
+        "width": 16,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 575168117,
+      "date": "2026-09-11T01:16:44.798Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 3,
+      "seconds": 22.9,
+      "pixels": {
+        "width": 16,
+        "height": 64
+      },
+      "bytes": 797,
+      "sha256": "8d269098b238bb1bc62f50556f216f511392ae2ab48c4e3941faf316aca9480a",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a vertical pill-shaped metal pong paddle, light grey shaded body with shiny chrome end caps, 16-bit Super Nintendo sprite, pixel art",
+        "image_size": {
+          "width": 16,
+          "height": 64
+        },
+        "seed": 575168117,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      }
+    },
+    {
+      "name": "snes-ball",
+      "file": "snes-ball.png",
+      "prompt": "a glowing round ball, white-hot centre, bright yellow then orange rim, shiny highlight, 16-bit Super Nintendo sprite, pixel art",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 1400847945,
+      "date": "2026-09-11T01:17:00.507Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 2,
+      "seconds": 15.1,
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 666,
+      "sha256": "047ecaec38580dd12de5465b1e3467c38c9b0fc05e5e384da8f553b863236dcd",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a glowing round ball, white-hot centre, bright yellow then orange rim, shiny highlight, 16-bit Super Nintendo sprite, pixel art",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1400847945,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      }
     }
   ]
 }
