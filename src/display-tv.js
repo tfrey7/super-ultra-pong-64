@@ -227,6 +227,9 @@
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
     ctx.imageSmoothingEnabled = !!row.smooth;
+    // 'low' is plain bilinear; the page's 'high' costs several times more per
+    // pixel in Chrome and a TV's own blur hides the difference.
+    ctx.imageSmoothingQuality = 'low';
     ctx.drawImage(post.c, 0, 0, W, H, rect.x, rect.y, rect.w, rect.h);
     if (k.scan) {
       ctx.imageSmoothingEnabled = true;
