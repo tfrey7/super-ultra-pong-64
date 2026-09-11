@@ -24,6 +24,10 @@ landed cards' reports. Where nothing has been learned yet, the page says so rath
 
 All eleven at their native resolution, side by side: [contact-sheet-native.png](../shots/eras/contact-sheet-native.png).
 
+**The realism ladder** (item 1265): from pong in the arcade and Atari eras to real table tennis in
+the 3D eras, one step per era. Why it exists is on [realism-ladder.md](realism-ladder.md), and the
+rungs themselves are in the art bible, [docs/ART.md](../ART.md), sections 6 to 9.
+
 ## The six headings every page answers
 
 The headings are fixed, and [test/lessons.test.js](../../test/lessons.test.js) fails if a page loses one or
