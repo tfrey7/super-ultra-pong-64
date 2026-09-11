@@ -95,11 +95,18 @@
         { wave: 'sine', freq: 784, dur: 0.08, gain: 0.1 }
       ],
       score: [
-        { wave: 'triangle', freq: 523, at: 0.00, dur: 0.50, gain: 0.18 },
-        { wave: 'triangle', freq: 659, at: 0.06, dur: 0.46, gain: 0.16 },
-        { wave: 'triangle', freq: 784, at: 0.12, dur: 0.42, gain: 0.16 },
-        { wave: 'sine', freq: 1047, at: 0.18, dur: 0.40, gain: 0.12 },
-        { wave: 'sawtooth', freq: 131, at: 0.00, dur: 0.30, gain: 0.05 }
+        // The orchestral hit (item 1140), the sound of the point that brings
+        // the Super Nintendo in: a brass stab on a C major chord, strings an
+        // octave over it, a timpani falling under it and a glockenspiel
+        // sparkle on top -- all of it through the echo.
+        { wave: 'sawtooth', freq: 262, at: 0.00, dur: 0.45, gain: 0.07 },
+        { wave: 'sawtooth', freq: 330, at: 0.00, dur: 0.45, gain: 0.07 },
+        { wave: 'sawtooth', freq: 392, at: 0.00, dur: 0.45, gain: 0.07 },
+        { wave: 'triangle', freq: 523, at: 0.00, dur: 0.70, gain: 0.12 },
+        { wave: 'triangle', freq: 784, at: 0.02, dur: 0.66, gain: 0.12 },
+        { wave: 'sine', freq: 98, slideTo: 62, at: 0.00, dur: 0.55, gain: 0.32 },
+        { wave: 'sawtooth', freq: 65, at: 0.00, dur: 0.40, gain: 0.06 },
+        { wave: 'sine', freq: 1568, at: 0.08, dur: 0.35, gain: 0.08 }
       ]
     }
   ];

@@ -22,10 +22,31 @@
  * The attract rally behind the title (opts.ink) keeps the stock dimmed frame,
  * so the title stays legible whatever era a state is in.
  *
- * Arrival flourish: none yet, so the plain ring brings this era in. An era
- * brings its own by adding `flourish: function (ctx, p, origin, fromEra, toEra,
- * info)` to its look -- called every frame of the ring that brings THIS era in,
- * drawn over the ring's edge; the header of src/erachange.js is the contract.
+ * Arrival flourish: THE FIELD TILTS INTO MODE 7 AND BACK. While the ring that
+ * brings this era in is growing, the whole field -- exactly the frame the ring
+ * engine has just composited, Genesis outside the ring and Super Nintendo
+ * inside it, ring edge and all -- tips back into perspective, recedes toward a
+ * dusk horizon and turns once around like an F-Zero floor, then sweeps back in
+ * from the horizon and settles flat, and the name card spins and zooms in over
+ * it. The ring stays the truth of which era draws where: the flourish only
+ * moves the picture the engine drew. (`flourish` below; the header of
+ * src/erachange.js is the hook's contract.)
+ *
+ * How it is drawn, cheaply and sharply: the composite is copied once into an
+ * offscreen canvas, and the tilted floor is built from horizontal strips of
+ * the screen. Each strip is clipped, given the one affine transform that lays
+ * the flat picture into it at that depth (turned about the field's centre,
+ * scaled by distance), and the copy is drawn through it -- about seventy
+ * drawImage calls, no per-pixel work. tiltPose and tiltStrips are pure and
+ * tested.
+ *
+ * The name card: the engine draws its card flat, after the flourish, so while
+ * this card is still rotating in the flourish holds the engine's copy back
+ * (this look's `card` is swapped for an invisible one) and draws its own --
+ * a copy of the engine's real card, cropped once per change -- spinning and
+ * zooming into the same rectangle. The frame it lands, the look's `card` is
+ * cleared and the engine's identical card takes over. Behind the title (a
+ * dimmed rally, no card) the field still tilts but no card is drawn.
  */
 (function (root) {
   'use strict';
@@ -315,8 +336,240 @@
     }
   }
 
+  // ------------------------------------------- the arrival: Mode 7 and back
+  var M7 = {
+    focal: 1000,          // the camera's focal length, field units
+    phiMax: 1.12,         // how far back the field tips at the most, radians (about 64 degrees)
+    recede: 3.1,          // how far it recedes: 1 is where it lies, 3.1 about a third the size
+    lift: 80,             // how far the floor's centre sinks down the screen while tipped
+    strips: 72,           // horizontal slices of the screen the tilted field is drawn in
+    settle: 0.88,         // raw ring progress by which the field lies flat again
+    cardFrom: 0.62,       // the card spins in over this stretch of raw progress...
+    cardTo: 0.9           // ...and lands, flat and full size, here
+  };
+  var CARD_GEOMETRY = { height: 170, pad: 36, cell: 7, gap: 5 };   // src/erachange.js's CARD
+  var INVISIBLE = 'rgba(0,0,0,0)';
+  var HELD_CARD = { box: INVISIBLE, border: null, inner: null, year: INVISIBLE,
+                    name: INVISIBLE, label: INVISIBLE, dots: null };
+
+  function smooth(a, b, x) {
+    if (x <= a) return 0;
+    if (x >= b) return 1;
+    var t = (x - a) / (b - a);
+    return t * t * (3 - 2 * t);
+  }
+
+  /**
+   * Where the tilt has got to at raw progress u (0..1) of the ring. Pure.
+   *   phi    how far back the field is tipped (radians)
+   *   k      how far it has receded (1 = where it lies)
+   *   theta  how far it has turned, 0 to one whole turn (spin < 0 turns the other way)
+   *   lift   how far its centre has sunk down the screen
+   *   flat   true when it lies exactly where it started (nothing to draw)
+   */
+  function tiltPose(u, spin) {
+    var tip = smooth(0, 0.3, u) * (1 - smooth(0.6, M7.settle, u));
+    var away = smooth(0.08, 0.42, u) * (1 - smooth(0.48, 0.86, u));
+    var turn = smooth(0.1, 0.86, u);
+    return {
+      phi: M7.phiMax * tip,
+      k: 1 + (M7.recede - 1) * away,
+      theta: (spin < 0 ? -1 : 1) * 2 * Math.PI * turn,
+      lift: M7.lift * tip,
+      flat: tip === 0 && away === 0 && (turn === 0 || turn === 1)
+    };
+  }
+
+  /**
+   * The tilted field as n horizontal strips of the screen, each with the affine
+   * transform [a, b, c, d, e, f] that lays the flat W x H picture into it. Pure.
+   *
+   * The field is a floor plane tipped back by phi about its centre line and
+   * pushed k focal lengths away: a floor point at depth d (up the field is far)
+   * lands at screen y = cy - F d cos(phi) / (F k + d sin(phi)). Each strip finds
+   * the depth it shows by inverting that, and within it the floor is scaled by
+   * F / z across and by dY/dd down, after turning it by theta about the centre.
+   */
+  function tiltStrips(pose, W, H, n) {
+    var F = M7.focal;
+    var cx = W / 2, cy = H / 2 + pose.lift;
+    var sin = Math.sin(pose.phi), cos = Math.cos(pose.phi);
+    var ct = Math.cos(pose.theta), st = Math.sin(pose.theta);
+    // How far the turned field reaches up and down its own depth from the centre.
+    var reach = Math.abs(st) * W / 2 + Math.abs(ct) * H / 2;
+    var near = sin > 1e-6 ? Math.min(reach, (F * pose.k - 0.25 * F) / sin) : reach;
+    var depthY = function (d) { return cy - F * d * cos / (F * pose.k + d * sin); };
+    var top = Math.max(0, depthY(reach));
+    var bottom = Math.min(H, depthY(-near));
+    var out = [];
+    if (!(bottom > top) || !(n > 0)) return out;
+    var h = (bottom - top) / n;
+    for (var i = 0; i < n; i++) {
+      var y0 = top + i * h;
+      var ym = y0 + h / 2;
+      var v = cy - ym;
+      var den = F * cos - v * sin;
+      if (!(den > 1e-6)) continue;
+      var d = v * F * pose.k / den;
+      var z = F * pose.k + d * sin;
+      var s = F / z;
+      var dy = -F * F * pose.k * cos / (z * z);
+      var a = s * ct, c = s * st, b = dy * st, e = -dy * ct;
+      out.push({
+        y0: y0, y1: y0 + h, depth: d, scale: s,
+        m: [a, b, c, e, cx - a * W / 2 - c * H / 2, (ym - dy * d) - b * W / 2 - e * H / 2]
+      });
+    }
+    return out;
+  }
+
+  /** Where the engine draws this era's name card, from its text. Pure. */
+  function cardRect(W, H, text, api) {
+    var P = api || R;
+    var glyphs = Object.assign({}, P.DIGITS, P.LETTERS);
+    var textW = 0;
+    for (var i = 0; i < text.length; i++) {
+      var rows = glyphs[text[i]];
+      var cols = rows ? rows[0].length : (text[i] === '·' ? 1 : 2);
+      textW += (i ? CARD_GEOMETRY.gap : 0) + cols * CARD_GEOMETRY.cell;
+    }
+    var w = Math.min(W - 40, textW + CARD_GEOMETRY.pad * 2);
+    return { x: W / 2 - w / 2, y: H / 2 - CARD_GEOMETRY.height / 2, w: w, h: CARD_GEOMETRY.height };
+  }
+
+  /** The card's spin and zoom at raw progress u: angle 0, scale 1, alpha 1 once landed. Pure. */
+  function cardPose(u, spin) {
+    var e = (u - M7.cardFrom) / (M7.cardTo - M7.cardFrom);
+    if (e <= 0) return { shown: false, landed: false, angle: 0, scale: 0, alpha: 0 };
+    if (e >= 1) return { shown: true, landed: true, angle: 0, scale: 1, alpha: 1 };
+    var x = e - 1;
+    var back = 1 + 2.70158 * x * x * x + 1.70158 * x * x;     // ease out with a little overshoot
+    var out = 1 - Math.pow(1 - e, 3);
+    return {
+      shown: true, landed: false,
+      angle: (spin < 0 ? 1 : -1) * 1.5 * Math.PI * (1 - out),
+      scale: 0.12 + 0.88 * back,
+      alpha: Math.min(1, e * 4)
+    };
+  }
+
+  // The page's canvases, made once; null under node --test.
+  var snap = null, cardFull = null, cardImg = null;
+  var cardFor = null, cardAt = null;
+
+  function canvasOf(c, w, h) {
+    if (typeof document === 'undefined' || !document.createElement) return null;
+    c = c || document.createElement('canvas');
+    if (c.width !== w) c.width = w;
+    if (c.height !== h) c.height = h;
+    return c;
+  }
+
+  function drawBackdrop(ctx, W, H, horizon, state) {
+    var y = Math.max(24, Math.min(H - 24, horizon));
+    var sky = ctx.createLinearGradient(0, 0, 0, y);
+    for (var i = 0; i < SKY_STOPS.length; i++) sky.addColorStop(SKY_STOPS[i][0], SKY_STOPS[i][1]);
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, y);
+    ctx.fillStyle = '#0d0a2e';
+    ctx.fillRect(0, y, W, H - y);
+    var t = state.time || 0;
+    ctx.fillStyle = '#ffffff';
+    for (var s = 0; s < STARS.length; s++) {
+      ctx.globalAlpha = 0.35 + 0.3 * Math.sin(t * 1.7 + STARS[s].phase);
+      ctx.fillRect(STARS[s].x, STARS[s].y * (y - 12) / HORIZON, 2, 2);
+    }
+    ctx.globalAlpha = 1;
+    var glow = ctx.createLinearGradient(0, y - 30, 0, y + 30);
+    glow.addColorStop(0, 'rgba(245, 154, 92, 0)');
+    glow.addColorStop(0.5, 'rgba(255, 220, 170, 0.85)');
+    glow.addColorStop(1, 'rgba(245, 154, 92, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, y - 30, W, 60);
+  }
+
+  /** The engine's own card, cropped once per change into a canvas of its own. */
+  function croppedCard(state, W, H, era, duration) {
+    if (cardFor === state.eraChangedAt && cardImg) return cardImg;
+    if (typeof R.drawEraFrame !== 'function') return null;
+    var rect = cardRect(W, H, R.eraCardText(era));
+    cardFull = canvasOf(cardFull, W, H);
+    cardImg = canvasOf(cardImg, Math.ceil(rect.w), rect.h);
+    if (!cardFull || !cardImg) return null;
+    var fx = cardFull.getContext('2d');
+    fx.setTransform(1, 0, 0, 1, 0, 0);
+    fx.clearRect(0, 0, W, H);
+    // The same moment just after the ring: the plain frame with the engine's card on it.
+    var held = LOOK.card;
+    LOOK.card = null;
+    R.drawEraFrame(fx, Object.assign({}, state, { time: (state.eraChangedAt || 0) + duration + 0.001 }), {});
+    LOOK.card = held;
+    var cx = cardImg.getContext('2d');
+    cx.setTransform(1, 0, 0, 1, 0, 0);
+    cx.clearRect(0, 0, cardImg.width, cardImg.height);
+    cx.drawImage(cardFull, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
+    cardFor = state.eraChangedAt;
+    cardAt = rect;
+    return cardImg;
+  }
+
+  /**
+   * The arrival flourish (see the header). Drawn over the ring's edge every
+   * frame of the ring that brings era 4 in; under node --test there is no
+   * canvas to copy, so it leaves the plain ring and the engine's card alone.
+   */
+  function flourish(ctx, p, origin, fromEra, toEra, info) {
+    var W = info.width, H = info.height, state = info.state;
+    var canvas = ctx.canvas;
+    if (!canvas || typeof ctx.drawImage !== 'function') return;
+    snap = canvasOf(snap, canvas.width, canvas.height);
+    if (!snap) return;
+    var u = info.duration > 0 ? Math.max(0, Math.min(1, info.t / info.duration)) : 1;
+    var spin = origin.x < W / 2 ? 1 : -1;
+
+    var pose = tiltPose(u, spin);
+    if (!pose.flat) {
+      var sx = snap.getContext('2d');
+      sx.setTransform(1, 0, 0, 1, 0, 0);
+      sx.clearRect(0, 0, snap.width, snap.height);
+      sx.drawImage(canvas, 0, 0);
+      var strips = tiltStrips(pose, W, H, M7.strips);
+      drawBackdrop(ctx, W, H, strips.length ? strips[0].y0 : H / 2, state);
+      for (var i = 0; i < strips.length; i++) {
+        var sp = strips[i];
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, sp.y0 - 0.5, W, sp.y1 - sp.y0 + 1);
+        ctx.clip();
+        // Far strips sink into the dusk; the near ones stay full strength.
+        ctx.globalAlpha = Math.max(0.55, Math.min(1, 1.3 - 0.3 * (1 / sp.scale)));
+        ctx.transform(sp.m[0], sp.m[1], sp.m[2], sp.m[3], sp.m[4], sp.m[5]);
+        ctx.drawImage(snap, 0, 0, snap.width, snap.height, 0, 0, W, H);
+        ctx.restore();
+      }
+    }
+
+    if (info.dim) return;          // the rally behind the title has no card
+    var cp = cardPose(u, spin);
+    LOOK.card = cp.landed ? null : HELD_CARD;
+    if (!cp.shown) return;
+    var img = croppedCard(state, W, H, toEra, info.duration);
+    if (!img) { LOOK.card = null; return; }
+    ctx.save();
+    ctx.globalAlpha = cp.alpha;
+    ctx.translate(W / 2, H / 2);
+    ctx.rotate(cp.angle);
+    ctx.scale(cp.scale, cp.scale);
+    ctx.drawImage(img, 0, 0, cardAt.w, cardAt.h, cardAt.x - W / 2, cardAt.y - H / 2, cardAt.w, cardAt.h);
+    ctx.restore();
+  }
+
   function draw(ctx, state, opts, api) {
     var P = api || R;
+    // Past the ring (or a frame that skipped over its end), the engine's card is never held back.
+    if (LOOK.card === HELD_CARD && !(state.time - (state.eraChangedAt || 0) < ((R.ERA_CHANGE && R.ERA_CHANGE.wipe) || 1.5))) {
+      LOOK.card = null;
+    }
     if (opts && opts.ink) return P.drawBase(ctx, state, opts);
 
     ctx.save();
@@ -341,11 +594,18 @@
     ctx.restore();
   }
 
-  R.registerEra({
+  var LOOK = {
     era: 4,
     name: '1991 Super Nintendo',
     like: 1,              // paddle colours: the ones the session earned in era 1
     horizon: HORIZON,
-    draw: draw
-  });
+    draw: draw,
+    flourish: flourish,
+    // The arrival's pure parts, for the tests.
+    arrival: {
+      M7: M7, tiltPose: tiltPose, tiltStrips: tiltStrips,
+      cardRect: cardRect, cardPose: cardPose, heldCard: HELD_CARD
+    }
+  };
+  R.registerEra(LOOK);
 })(typeof globalThis !== 'undefined' ? globalThis : this);
