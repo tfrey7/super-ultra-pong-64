@@ -10,7 +10,8 @@
  *
  *   era2-court-raw.png  (200x148)  -> era2-court.png  (200x148, one NES colour
  *       per pixel; every entry as bright as the ball's core is held back, so
- *       the court can never out-shine the ball -- ERAS.md R1)
+ *       the court can never out-shine the ball -- ERAS.md R1; then PAINT_OUT
+ *       takes out the two marks that read as a 3 and the pitch's halfway line)
  *   era2-ball-raw2.png  (32x32)    -> era2-ball.png   (12x12, the ball's own box
  *       at the canvas's real pixels, inked only in NES $30/$10/$00/$0F, each
  *       pixel either opaque or clear)
@@ -190,6 +191,37 @@ export function inkCounts(img) {
   return counts;
 }
 
+/*
+ * What the generator drew that the game must not show (item 1191), in court
+ * pixels. Two small light-grey boxes with a dark glyph sat against each goal
+ * line, level with the paddles, and both read as the digit 3 beside the real
+ * score; the box is painted back to the floor, keeping the goal line it leans
+ * on (x 14 and x 184). And the pitch's own halfway line, column 99, ran just
+ * left of the game's dotted centre line: its lone pixels inside the pitch go
+ * to the floor too, so only the game's line shows. Where another line crosses
+ * it (the centre circle, the centre spot's rim, the pitch outlines) the
+ * crossing pixel has a dark neighbour and stays.
+ */
+export const PAINT_OUT = [
+  { x: 15, y: 69, w: 7, h: 8 },   // the left "3", inside the left goal mouth
+  { x: 177, y: 69, w: 7, h: 8 }   // the right "3", inside the right goal mouth
+];
+export const HALFWAY = { x: 99, y0: 40, y1: 106 };
+
+/** The court with PAINT_OUT and the pitch's halfway line put back to its floor colour. */
+export function paintOut(img) {
+  const out = { width: img.width, height: img.height, rgba: Buffer.from(img.rgba) };
+  const counts = inkCounts(img);
+  const floor = rgbOf(Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0]);
+  const at = (x, y) => (y * out.width + x) * 4;
+  const set = (x, y) => { const i = at(x, y); out.rgba[i] = floor[0]; out.rgba[i + 1] = floor[1]; out.rgba[i + 2] = floor[2]; };
+  const dark = (x, y) => { const i = at(x, y); return luma(hexOf(img.rgba[i], img.rgba[i + 1], img.rgba[i + 2])) < 0.3; };
+  for (const r of PAINT_OUT) for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) set(x, y);
+  const { x, y0, y1 } = HALFWAY;
+  for (let y = y0; y <= y1; y++) if (dark(x, y) && !dark(x - 1, y) && !dark(x + 1, y)) set(x, y);
+  return out;
+}
+
 /** The era file with its embed block rewritten, keeping the file's own line endings. */
 export function embed(src, art) {
   const eol = src.includes('\r\n') ? '\r\n' : '\n';
@@ -210,7 +242,7 @@ export function main(log = console.log) {
   const courtInks = [...new Set(pal)].filter((c) => luma(c) < COURT_LUMA_MAX);
   const ballInks = [pal[0x30], pal[0x10], pal[0x00], pal[0x0F]];
 
-  const court = quantize(decodePng(fs.readFileSync(path.join(HERE, 'era2-court-raw.png'))), courtInks);
+  const court = paintOut(quantize(decodePng(fs.readFileSync(path.join(HERE, 'era2-court-raw.png'))), courtInks));
   const ball = shrink(decodePng(fs.readFileSync(path.join(HERE, 'era2-ball-raw2.png'))), BALL_SIZE, ballInks);
   if (!inkCounts(ball)[pal[0x30]]) throw new Error('the shrunk ball has no $30 core; R1 wants one');
 
