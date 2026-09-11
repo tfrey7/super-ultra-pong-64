@@ -40,7 +40,7 @@ const BOY = {
     '.hkkaaaka.',
     '..kkaaaaaa',
     '..kaaaaaa.',
-    '..kaaaakk.',
+    '..kaaaaa..',
     '...kaaaa..',
     '....kaa...',
     '.....aa...'],
@@ -51,7 +51,7 @@ const BOY = {
     'h.kkaaaka.',
     '..kkaaaaaa',
     '..kaaaaaa.',
-    '..kaaaakk.',
+    '..kaaaaa..',
     '...kaaaa..',
     '....kaa...',
     '.....aa...',
@@ -65,7 +65,7 @@ const BOY = {
     '.hkkaaaa..',
     '..kkaaakaa',
     '..kaaaaaa.',
-    '..kaaaakk.',
+    '..kaaaaa..',
     '...kaaaa..',
     '....kaaa..'],
   away: [
@@ -86,10 +86,10 @@ const BOY = {
     '..kkkkkkk.',
     'hhhhhhhhh.',
     'h.kkaakk..',
-    '..kkaaaaaa',
+    '..kkaaaaa.',
     '..kaaaaaa.',
-    '..kaakkkk.',
-    '...kakkk..',
+    '..kaaaka..',
+    '...kaaka..',
     '....kaa...',
     '.....aa...']
 };
@@ -102,7 +102,7 @@ const RIVAL = {
     '.nnaaanaa.',
     '.nnaaaaaaa',
     '..naaaaaa.',
-    '..naaaann.',
+    '..naaaaa..',
     '...kaaaa..',
     '....kaa...',
     '.....aa...'],
@@ -113,7 +113,7 @@ const RIVAL = {
     '.nnaaanaa.',
     '.nnaaaaaaa',
     '..naaaaaa.',
-    '..naaaann.',
+    '..naaaaa..',
     '...kaaaa..',
     '....kaa...',
     '.....aa...',
@@ -127,7 +127,7 @@ const RIVAL = {
     '.nnaaaaaa.',
     '.nnaaaanaa',
     '..naaaaaa.',
-    '..naaaann.',
+    '..naaaaa..',
     '...kaaaa..',
     '....kaaa..'],
   away: [
@@ -146,12 +146,12 @@ const RIVAL = {
     '..........',
     '...hhhh...',
     '..hhhhhh..',
-    '.hhhhhhhhh',
+    '.hhhhhhhh.',
     '.nnaannn..',
-    '.nnaaaaaaa',
+    '.nnaaaaaa.',
     '..naaaaaa.',
-    '..naannnn.',
-    '...kannn..',
+    '..naaana..',
+    '...kaana..',
     '....kaa...',
     '.....aa...']
 };
@@ -249,7 +249,7 @@ const TORSO = {
     '.kbbbbbbb.',
     '.kbbbbbbb.']
 };
-const WIN_FIST = { 2: '_______kk_', 3: '_______aak', 4: '_______aak', 5: '_______ka_', 6: '________a_', 7: '________a_', 8: '________a_', 9: '________a_', 10: '_______aa_' };
+const WIN_FIST = { 0: '________kk', 1: '________aa', 2: '________aa', 3: '________ka', 4: '_________a', 5: '_________a', 6: '_________a', 7: '_________a', 8: '_________a', 9: '_________a', 10: '_________a', 11: '_________a', 12: '________aa' };
 
 // ---- hips, 4 rows (24-27) ------------------------------------------------------------
 const HIPS = [
@@ -266,8 +266,8 @@ const LEGS = {
     '.kkkk.kkkk'],
   bend: [
     ...Array(4).fill('..aaa.aaa.'),
-    '.aaa...aaa', '.aaa...aaa', '.aaa...aaa', '.aaa...aaa',
-    ...Array(6).fill('..aaa.aaa.'),
+    '...aaa.aaa', '...aaa.aaa', '...aaa.aaa', '...aaa.aaa',
+    '..aaa.aaa.', '..aaa.aaa.', ...Array(4).fill('..aaa.aaa.'),
     '..kkd.kkd.',
     '.kkkk.kkkk'],
   apart: [
@@ -305,7 +305,7 @@ const POSES = {
   swing1: ['front', 'contact', 'lunge', 1],
   swing2: ['front', 'follow', 'lunge', 0],
   miss0: ['away', 'slump', 'together', 1],
-  win0: ['win', 'win', 'stand', 0, WIN_FIST]
+  win0: ['win', 'win', 'bend', 2, WIN_FIST]
 };
 
 function frameOf(heads, [head, torso, legs, lift, over]) {
@@ -331,7 +331,8 @@ function sheet(id, heads, map, palette, prompt) {
     frames[name] = frameOf(heads, pose).map((r) => r.replace(/[hn]/g, (c) => map[c] || c));
   }
   // the win's hop: the whole held pose two rows up
-  frames.win1 = { from: 'win0', dy: -2 };
+  frames.win1 = frameOf(heads, ['win', 'win', 'stand', 0, WIN_FIST]).map((r) => r.replace(/[hn]/g, (c) => map[c] || c));
+  frames.win1 = frames.win1.slice(1).concat(['..........']);   // off the floor a row
   return { format: 'pgrid-v1', id, era: 2, prompt, reference: `assets/pixellab/era2-sheet-${id === 'era2-boy' ? 'left' : 'right'}.png`,
     frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 },
     beats: { idle: 2, up: 2, down: 2, swing: 3, miss: 1, win: 2 }, palette, frames };
