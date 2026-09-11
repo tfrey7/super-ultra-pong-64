@@ -369,6 +369,26 @@ test('the same second of play runs the same at any frame rate', () => {
     `y drifted: ${fast.ball.y} vs ${slow.ball.y}`);
 });
 
+test('a slow machine plays at full pace, not in slow motion (item 1247)', () => {
+  // A software-drawn 1920x1080 page draws the 3D eras at 59-121 ms a frame.
+  // The rules used to take at most 50 ms of each, so the game itself ran at
+  // 72% of its pace from the PlayStation and 40% on the Xbox 360: "each time
+  // this thing transitions eras i think it gets slower and slower".
+  function second(frameMs) {
+    const g = newGame(0.3);
+    endServeDelay(g);
+    placeBall(g, 100, 300, 340, 0);
+    const t0 = g.time;
+    for (let ms = 0; ms < 960; ms += frameMs) Pong.step(g, frameMs / 1000, {});
+    return { g, game: g.time - t0 };
+  }
+  const smooth = second(16), slow = second(120);
+  assert.ok(Math.abs(slow.game - smooth.game) < 0.02,
+    `a second of 120 ms frames hands the rules ${slow.game.toFixed(3)} s, 16 ms frames ${smooth.game.toFixed(3)} s`);
+  assert.ok(Math.abs(slow.g.ball.x - smooth.g.ball.x) < 3,
+    `the ball went as far: ${slow.g.ball.x.toFixed(1)} vs ${smooth.g.ball.x.toFixed(1)}`);
+});
+
 test('a zero or negative frame time changes nothing', () => {
   const g = newGame();
   endServeDelay(g);
