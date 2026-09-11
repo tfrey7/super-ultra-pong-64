@@ -1,0 +1,230 @@
+{
+ "label": "before",
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1164",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "when": "2026-09-11T00:41:00.359Z",
+ "results": [
+  {
+   "run": 1,
+   "leg": "era 4 flourish on",
+   "port": 9361,
+   "baseline": {
+    "frames": 60,
+    "meanMs": 16.66,
+    "medianMs": 16.7,
+    "p95Ms": 16.7,
+    "maxMs": 16.8
+   },
+   "ring": {
+    "frames": 91,
+    "meanMs": 16.67,
+    "medianMs": 16.7,
+    "p95Ms": 16.8,
+    "maxMs": 16.8
+   },
+   "longFrames": [],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 1,
+   "leg": "plain ring",
+   "port": 9362,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "ring": {
+    "frames": 342,
+    "meanMs": 4.65,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 137.4
+   },
+   "longFrames": [
+    {
+     "ms": 137.4,
+     "rawBefore": 0.005533333333333464,
+     "rawAfter": 0.03886666666666668
+    },
+    {
+     "ms": 16.7,
+     "rawBefore": 0.04446666666666695,
+     "rawAfter": 0.055600000000000094
+    },
+    {
+     "ms": 25,
+     "rawBefore": 0.3306000000000022,
+     "rawAfter": 0.34726666666666883
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 2,
+   "leg": "era 4 flourish on",
+   "port": 9363,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "ring": {
+    "frames": 339,
+    "meanMs": 4.66,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 125.1
+   },
+   "longFrames": [
+    {
+     "ms": 125.1,
+     "rawBefore": 0.005533333333333464,
+     "rawAfter": 0.03886666666666668
+    },
+    {
+     "ms": 16.7,
+     "rawBefore": 0.04440000000000014,
+     "rawAfter": 0.05553333333333329
+    },
+    {
+     "ms": 16.6,
+     "rawBefore": 0.11106666666666747,
+     "rawAfter": 0.1221333333333341
+    },
+    {
+     "ms": 20.8,
+     "rawBefore": 0.3304666666666692,
+     "rawAfter": 0.3443333333333361
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 2,
+   "leg": "plain ring",
+   "port": 9364,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "ring": {
+    "frames": 343,
+    "meanMs": 4.63,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 129.2
+   },
+   "longFrames": [
+    {
+     "ms": 129.2,
+     "rawBefore": 0.005533333333333168,
+     "rawAfter": 0.03886666666666638
+    },
+    {
+     "ms": 16.6,
+     "rawBefore": 0.044466666666666065,
+     "rawAfter": 0.05553333333333299
+    },
+    {
+     "ms": 25,
+     "rawBefore": 0.33053333333333573,
+     "rawAfter": 0.34720000000000234
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 3,
+   "leg": "era 4 flourish on",
+   "port": 9365,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.4
+   },
+   "ring": {
+    "frames": 338,
+    "meanMs": 4.67,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 125
+   },
+   "longFrames": [
+    {
+     "ms": 125,
+     "rawBefore": 0.005600000000000271,
+     "rawAfter": 0.038933333333333486
+    },
+    {
+     "ms": 20.8,
+     "rawBefore": 0.044466666666666654,
+     "rawAfter": 0.05833333333333357
+    },
+    {
+     "ms": 16.6,
+     "rawBefore": 0.1084000000000005,
+     "rawAfter": 0.11946666666666712
+    },
+    {
+     "ms": 25,
+     "rawBefore": 0.33060000000000284,
+     "rawAfter": 0.34726666666666944
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  },
+  {
+   "run": 3,
+   "leg": "plain ring",
+   "port": 9366,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "ring": {
+    "frames": 343,
+    "meanMs": 4.6,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 125
+   },
+   "longFrames": [
+    {
+     "ms": 125,
+     "rawBefore": 0.005533333333333464,
+     "rawAfter": 0.03886666666666668
+    },
+    {
+     "ms": 16.7,
+     "rawBefore": 0.04439999999999985,
+     "rawAfter": 0.05553333333333329
+    },
+    {
+     "ms": 20.8,
+     "rawBefore": 0.3305333333333363,
+     "rawAfter": 0.3444000000000029
+    }
+   ],
+   "eraAfter": 4,
+   "errors": []
+  }
+ ]
+}

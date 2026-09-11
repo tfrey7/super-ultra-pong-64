@@ -1,0 +1,77 @@
+{
+ "label": "control",
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1164",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "when": "2026-09-11T00:49:14.861Z",
+ "results": [
+  {
+   "run": 1,
+   "leg": "control, no point",
+   "port": 9441,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 408,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "longFrames": [],
+   "eraAfter": 3,
+   "errors": []
+  },
+  {
+   "run": 2,
+   "leg": "control, no point",
+   "port": 9442,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.4
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 408,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.5
+   },
+   "longFrames": [],
+   "eraAfter": 3,
+   "errors": []
+  },
+  {
+   "run": 3,
+   "leg": "control, no point",
+   "port": 9443,
+   "baseline": {
+    "frames": 240,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "baselineLong": [],
+   "ring": {
+    "frames": 408,
+    "meanMs": 4.17,
+    "medianMs": 4.2,
+    "p95Ms": 4.3,
+    "maxMs": 4.3
+   },
+   "longFrames": [],
+   "eraAfter": 3,
+   "errors": []
+  }
+ ]
+}
