@@ -1,0 +1,11 @@
+measured 2026-09-11T00:39:26.834Z
+the break, in a temp copy of src/game.js: state.score[side] += 1;  ->  if (side !== 'left') state.score[side] += 1;   // BROKEN ON PURPOSE (item 1160 drill)
+playtest exit 1
+PASS  rallies happen: the ball bounces off the paddles  -- 4 hits in the current rally, score 0-3
+FAIL  the player can score against the computer  -- score after 45.0s of scripted play: player 0, computer 3; 8 returns planned against the rules, 0 of them beyond every aim it can roll
+
+screenshots:
+  G:\claude-tmp\pong-item1160-broken\docs\shots\playtest\rally.png
+
+1/2 checks passed
+VERDICT: the check FAILED against broken scoring, as it must

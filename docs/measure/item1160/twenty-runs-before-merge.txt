@@ -1,0 +1,162 @@
+﻿loop pid 20548 start 1789086762
+run 1 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 7.5s of scripted play: player 1, computer 0; 0 of 1 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 2 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 13.0s of scripted play: player 1, computer 0; 0 of 2 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 3 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 18.0s of scripted play: player 1, computer 0; 0 of 3 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 4 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 13.5s of scripted play: player 1, computer 0; 1 of 2 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 5 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 23.2s of scripted play: player 1, computer 0; 0 of 4 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 6 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 7.7s of scripted play: player 1, computer 0; 0 of 1 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 7 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 14.4s of scripted play: player 1, computer 0; 0 of 2 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 8 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 11.5s of scripted play: player 1, computer 0; 0 of 2 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 9 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 8.6s of scripted play: player 1, computer 0; 0 of 1 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 10 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 14.7s of scripted play: player 1, computer 0; 0 of 2 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 11 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 7.7s of scripted play: player 1, computer 0; 0 of 1 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 12 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 7.7s of scripted play: player 1, computer 0; 0 of 1 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 13 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 23.7s of scripted play: player 1, computer 0; 0 of 4 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 14 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 20.8s of scripted play: player 1, computer 0; 0 of 3 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 15 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 8.0s of scripted play: player 1, computer 0; 0 of 1 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 16 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 8.2s of scripted play: player 1, computer 0; 0 of 1 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 17 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 14.2s of scripted play: player 1, computer 0; 0 of 2 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 18 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 14.9s of scripted play: player 1, computer 0; 0 of 2 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 19 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 7.6s of scripted play: player 1, computer 0; 0 of 1 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+run 20 exit 0
+PASS  rallies happen: the ball bounces off the paddles  -- 0 hits in the current rally, score 1-0
+PASS  the player can score against the computer  -- score after 13.1s of scripted play: player 1, computer 0; 0 of 2 incoming balls had a shot the rules say it cannot return
+
+screenshots:
+  G:\Claude Stuff\super-ultra-pong-64-item-1160\docs\shots\playtest\rally.png
+
+2/2 checks passed
+done 1789087060
