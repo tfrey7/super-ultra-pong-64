@@ -497,6 +497,9 @@ async function walkLadder(s, baseUrl) {
     const after = await playUntil(s, geo, 15000, outRight ? track : dodge, (x) => points(x) > before);
     moves.push({ from: g.era, to: after.era, scored: points(after) > before,
       score: `${after.score.left}-${after.score.right}` });
+    // The eleventh point ends the match (item 1211): film its finale straight
+    // away, even if a stray point on the way up got it there a rung early.
+    if (after.phase === 'over') break;
     // Below the top, that point started a change: film it while it plays.
     if (rung < eras.length - 1 && points(after) > before) {
       changes.push(Object.assign(await filmChange(s, clip, g.era), { want: outRight ? 'right' : 'left' }));
