@@ -310,13 +310,16 @@ the Atari on a 1970s colour TV over RF (soft scanlines, colour bleed, a slow
 rolling band and a little snow), the NES and Genesis on a 1980s TV over
 composite (scanlines, phosphor-triad grain, red and blue fringes, a rounded
 tube with a vignette) and the Super Nintendo over S-video (fine scanlines, a
-mild glow). The Genesis's screen has no glow (item 1201): it draws the heaviest
-picture of the five, and with the glow on it lost frames in the playtest's
-software-drawn Chrome (18.2 ms a frame against 16.7 with no screen);
-`docs/measure/item1201/overlaycost.mjs` times every era with its screen on and
-off, and its ring. The tube is pre-drawn once per picture size and multiplied over
+mild glow). The tube is pre-drawn once per picture size and multiplied over
 each frame; the glow and fringes are the native frame drawn again, added at low
-alpha -- no per-pixel work. The playtest's pixel checks read the native picture
+alpha on a native-sized copy of the picture, which the page gets with one plain
+draw (item 1240) -- no per-pixel work, and one blend over the page's own pixels.
+Item 1201 had taken the Genesis's glow off when those blends were still made on
+the page (18.2 ms a frame against 16.7 with no screen, in the playtest's
+software-drawn Chrome); since item 1240 every 2D era and every ring between two
+of them holds 16.7 ms with its screen on, the Genesis's glow included.
+`docs/measure/item1201/overlaycost.mjs` times every era with its screen on and
+off, and its ring. The playtest's pixel checks read the native picture
 from before the overlay; the reference frames show what the page shows, and
 `docs/shots/crt/` holds a before-and-after pair per era (`pairs.py` rebuilds
 them). `src/display-tv.js` is where the TV overlays of eras 5-10 plug in. `index.html?display=off` draws

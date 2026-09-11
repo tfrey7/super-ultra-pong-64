@@ -109,18 +109,22 @@ test('fringes and glow blend on a native-sized copy, and the page gets plain dra
   });
 });
 
-test('the Genesis keeps its fringes but has no glow, so it holds full frame rate (item 1201)', () => {
+test('the Genesis has its glow back (item 1240), and a row can still turn its glow off', () => {
   withDocument(() => {
     const native = { width: 320, height: 224 };
     const log = [];
     const rect = { x: 0, y: 0, w: 800, h: 600 };
-    assert.strictEqual(D.row(3).glow, 0, 'the Genesis row sets its own glow');
-    assert.strictEqual(D.row(2).glow, undefined, 'the NES keeps its kind\'s glow');
-    const post = drawOnPost(() =>
+    assert.strictEqual(D.row(3).glow, undefined, 'the Genesis keeps its kind\'s glow again');
+    assert.strictEqual(D.row(2).glow, undefined, 'and so does the NES');
+    const lit = drawOnPost(() =>
       D.OVERLAYS['crt-composite'](recorder({ width: 800, height: 600 }, log), rect, D.row(3), { era: 3, time: 1, native }));
+    assert.strictEqual(lit.log.filter((c) => c[0] === 'drawImage' && c[1] === 'lighter').length, 3, 'two fringes and a glow');
+    log.length = 0;
+    const dark = drawOnPost(() =>
+      D.OVERLAYS['crt-composite'](recorder({ width: 800, height: 600 }, log), rect, { ...D.row(3), glow: 0 }, { era: 3, time: 1, native }));
     const draws = log.filter((c) => c[0] === 'drawImage');
     assert.strictEqual(draws.filter((c) => c[1] === 'multiply').length, 1, 'the tube');
-    assert.strictEqual(post.log.filter((c) => c[0] === 'drawImage' && c[1] === 'lighter').length, 2, 'two fringes, no glow');
+    assert.strictEqual(dark.log.filter((c) => c[0] === 'drawImage' && c[1] === 'lighter').length, 2, 'a row glow of 0: two fringes, no glow');
   });
 });
 

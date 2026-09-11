@@ -89,18 +89,17 @@
   // scanlines each; every other machine drew one line per native row). A row
   // may also set its own `glow`, in place of its kind's.
   //
-  // The Genesis has no glow (item 1201). It draws the heaviest picture of the
-  // five, and in the playtest's software-drawn Chrome the composite screen's
-  // four page-sized blends tipped it past a frame: on the ladder walk 18.18 ms
-  // with the screen on against 16.66 ms off, and its rings in and out at 23.5
-  // and 25.9 ms against 16.67. Taking either the fringes or the glow out put it
-  // back on 16.67 ms; the fringes are the Genesis-over-composite look, the glow
-  // at 0.27 alpha barely shows, so the glow went (docs/measure/item1201).
+  // The Genesis lost its glow in item 1201, when the fringes and glow were
+  // still blended over the page: four page-sized blends tipped it past a frame
+  // in the playtest's software-drawn Chrome (18.18 ms against 16.66 off). Since
+  // item 1240 they blend on the native picture, and with the glow back the
+  // Genesis and both its rings hold 16.67 ms (docs/measure/item1201/
+  // overlaycost-1240-genesisglow.json), so it has its glow again.
   var USE = [
     { era: 0, overlay: 'crt-mono',      strength: 1,    lines: 240 },
     { era: 1, overlay: 'crt-rf',        strength: 1,    lines: 192 },
     { era: 2, overlay: 'crt-composite', strength: 1,    lines: 240 },
-    { era: 3, overlay: 'crt-composite', strength: 0.9,  lines: 224, glow: 0 },
+    { era: 3, overlay: 'crt-composite', strength: 0.9,  lines: 224 },
     { era: 4, overlay: 'crt-svideo',    strength: 1,    lines: 224 }
   ];
 
