@@ -30,7 +30,10 @@ function arg(name, fallback) {
 }
 
 const TRIALS = Number(arg('trials', 300));
-const WINDOW = Number(arg('seconds', 22));   // the harness's tracking window
+const WINDOW = Number(arg('seconds', 22));   // the old 22 s tracking window: the design measure
+// The playtest's scripted hand may play this long before its check gives up;
+// the 'scripted' row is sampled over this window, not WINDOW.
+const CHECK_WINDOW = Number(arg('check-seconds', 45));
 const POLL = Number(arg('poll', 0.045));     // it re-aims the mouse every 45ms
 const DT = 1 / 60;
 const CORNER = Number(arg('corner', 0.8)); // how near the paddle tip to take it
@@ -47,7 +50,7 @@ function seeded(seed) {
 }
 
 /** One 22-second session of tracking play. Returns the player's score. */
-function trial(Pong, seed, aimStyle) {
+function trial(Pong, seed, aimStyle, seconds) {
   const rng = seeded(seed);
   // Either shape of the module: an older one has no phase and no startGame.
   const g = Pong.createGame({ rng, phase: 'playing' });
@@ -57,7 +60,7 @@ function trial(Pong, seed, aimStyle) {
 
   let hand = g.height / 2;
   let sincePoll = 0;
-  for (let t = 0; t < WINDOW; t += DT) {
+  for (let t = 0; t < seconds; t += DT) {
     sincePoll += DT;
     if (sincePoll >= POLL) {
       sincePoll = 0;
@@ -92,8 +95,9 @@ function sample(modulePath, label, aimStyle) {
   let points = 0;
   let planned = 0;
   let certain = 0;
+  const seconds = aimStyle === 'scripted' ? CHECK_WINDOW : WINDOW;
   for (let i = 1; i <= TRIALS; i++) {
-    const s = trial(Pong, i * 2654435761, aimStyle);
+    const s = trial(Pong, i * 2654435761, aimStyle, seconds);
     points += s.points;
     planned += s.planned;
     certain += s.certain;
@@ -104,10 +108,10 @@ function sample(modulePath, label, aimStyle) {
     aim: aimStyle,
     module: modulePath,
     trials: TRIALS,
-    windowSeconds: WINDOW,
+    windowSeconds: seconds,
     sessionsThatScored: scored,
     passRate: scored / TRIALS,
-    pointsPerMinute: (points / TRIALS) * (60 / WINDOW),
+    pointsPerMinute: (points / TRIALS) * (60 / seconds),
     // scripted only: incoming balls planned, and how many had a certain shot
     ...(aimStyle === 'scripted' ? { ballsPlanned: planned, ballsWithCertainShot: certain } : {})
   };

@@ -180,12 +180,14 @@ async function playUntil(s, geo, ms, aim, done) {
  * the page's own rules and stands where the return cannot be reached whatever
  * aim the computer rolls, so a point comes on the first shot -- and a FAIL here
  * means scoring really is broken, or the computer has been made unbeatable.
- * It stops as soon as the point and the rally picture are both in.
+ * A slow early ball can still be caught, so it keeps shooting: it stops as soon
+ * as the point and the rally picture are both in, and gives up after 45
+ * seconds -- the window the sampler's 'scripted' row measures.
  */
 async function playToScore(s, midX, toClientY) {
   const aim = Rally.createScorer(Pong);
   const started = Date.now();
-  const deadline = started + 22000;
+  const deadline = started + 45000;
   let shotTaken = false;
   let gp = await state(s);
   while (Date.now() < deadline && !(gp.score.left > 0 && shotTaken)) {

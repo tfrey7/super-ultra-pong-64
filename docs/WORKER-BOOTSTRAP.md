@@ -173,7 +173,8 @@ his emulator — never touch either.**
   the computer" used to give 22 seconds of plain ball-tracking and passed only 44% of the time --
   the computer is beatable by design, not beatable every 22 seconds. Since item 1160 the harness
   plays `tools/scoring-rally.js` instead, which asks the rules where to stand so the computer
-  cannot return the shot whatever aim it rolls. A FAIL on that line now means scoring is really
+  cannot return the shot, and keeps shooting for up to 45 seconds (it stops at the point, usually
+  inside fifteen). A FAIL on that line now means scoring is really
   broken, or the computer has been made unbeatable -- both regressions. `node tools/playtest.mjs
   --scoring` runs just that check in about ten seconds. `node tools/beatability-sample.mjs` still
   measures how beatable the game itself is: its `track` and `corner` rows are the design, its
