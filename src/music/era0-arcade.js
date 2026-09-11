@@ -24,6 +24,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, {
   era: 0,
   year: 1972,
+  level: 3.5,   // dB on the whole bus: item 1275's balance
   voices: 1,
   kit: null,
   chain: { tone: 5000 },
