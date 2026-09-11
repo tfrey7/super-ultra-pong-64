@@ -42,7 +42,10 @@ const CATEGORIES = [
   'devtools.timeline', 'disabled-by-default-devtools.timeline', 'disabled-by-default-devtools.timeline.frame',
   'toplevel', 'blink', 'blink.user_timing', 'cc', 'gpu', 'viz', 'audio', 'media', 'v8', 'loading',
   'disabled-by-default-gpu.service', 'disabled-by-default-audio', 'disabled-by-default-cc.debug.scheduler.frames',
-  'benchmark', 'renderer.scheduler', 'mojom', 'ipc'
+  'benchmark', 'renderer.scheduler', 'mojom', 'ipc',
+  // What the GPU process is drawing and compiling: Skia's ops and ANGLE's work.
+  ...(process.argv.includes('--skia') ? ['skia', 'disabled-by-default-skia', 'disabled-by-default-skia.gpu',
+    'disabled-by-default-skia.shaders', 'gpu.angle', 'disabled-by-default-gpu.angle'] : [])
 ];
 
 async function leg(n) {
