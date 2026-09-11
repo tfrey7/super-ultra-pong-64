@@ -49,6 +49,18 @@ for (const e of inside) {
 const rows = [...seen.entries()].sort((a, b) => b[1].max - a[1].max).slice(0, TOP);
 for (const [l, r] of rows) console.log(`  max ${r.max.toFixed(1).padStart(7)} ms  total ${r.ms.toFixed(1).padStart(7)} ms  x${String(r.n).padEnd(4)} ${l}`);
 
+// --cut <out.trace.json.gz>: the trace cut to 150 ms either side of that task
+// (metadata kept), small enough to commit; it opens as-is in DevTools.
+if (process.argv.includes('--cut')) {
+  const out = process.argv[process.argv.indexOf('--cut') + 1];
+  const lo = t0 - 150000, hi = t1 + 150000;
+  const kept = ev.filter((e) => e.ph === 'M' || (e.ts >= lo && e.ts <= hi) || (e.ph === 'X' && e.ts < hi && e.ts + (e.dur || 0) > lo));
+  const { writeFileSync } = await import('node:fs');
+  const { gzipSync } = await import('node:zlib');
+  writeFileSync(out, gzipSync(JSON.stringify({ traceEvents: kept })));
+  console.log(`\ncut ${kept.length} of ${ev.length} events to ${out}`);
+}
+
 // The GPU process during the same window.
 const gpuMain = [...names.entries()].filter(([k, n]) => n === 'CrGpuMain' || (procs.get(Number(k.split(':')[0])) === 'GPU Process' && /Main|Viz/.test(n)));
 console.log('\nGPU process threads during that task:');
