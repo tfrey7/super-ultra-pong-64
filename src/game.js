@@ -310,7 +310,16 @@
     p.y = clamp(p.y + dir * r.playerKeySpeed * dt, 0, state.height - p.h);
   }
 
+  // Each era's opponent (src/opponents.js, item 1209) moves the paddle when it
+  // is loaded; the plain chase below is what it was before, and the fallback.
+  function opponents() {
+    if (typeof module === 'object' && typeof require === 'function') return require('./opponents.js');
+    return typeof globalThis !== 'undefined' ? globalThis.PongOpponents : null;
+  }
+
   function stepCpu(state, dt) {
+    var opp = state.rules.cpuProfiles !== false && opponents();
+    if (opp) return opp.stepCpu(state, dt);
     var p = state.right;
     var r = state.rules;
     var b = state.ball;

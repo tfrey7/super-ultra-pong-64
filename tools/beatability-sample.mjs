@@ -11,6 +11,7 @@
  *
  *   node tools/beatability-sample.mjs
  *   node tools/beatability-sample.mjs --trials 400 --against ../other/src/game.js
+ *   node tools/beatability-sample.mjs --eras          # every era's opponent, pinned (item 1209)
  *
  * Writes tools/beatability-sample.json beside itself. No dependencies, no
  * browser: this drives the pure rules the same way the harness drives the page.
@@ -50,10 +51,10 @@ function seeded(seed) {
 }
 
 /** One 22-second session of tracking play. Returns the player's score. */
-function trial(Pong, seed, aimStyle, seconds) {
+function trial(Pong, seed, aimStyle, seconds, era) {
   const rng = seeded(seed);
   // Either shape of the module: an older one has no phase and no startGame.
-  const g = Pong.createGame({ rng, phase: 'playing' });
+  const g = Pong.createGame({ rng, phase: 'playing', era: era || 0 });
   if (g.phase === 'title' && Pong.startGame) Pong.startGame(g);
   g.aimStyle = aimStyle;   // read by aim(); the rules themselves ignore it
   if (aimStyle === 'scripted') g.scorer = Rally.createScorer(Pong);
@@ -67,6 +68,9 @@ function trial(Pong, seed, aimStyle, seconds) {
       hand = aim(g);
     }
     Pong.step(g, DT, { pointerY: hand, up: false, down: false });
+    // --eras: a point moves the machine up, so put it back -- this session
+    // measures one era's opponent and nothing else.
+    if (era !== undefined && g.era !== era) g.era = era;
   }
   return { points: g.score.left, planned: g.scorer ? g.scorer.planned : 0,
     certain: g.scorer ? g.scorer.certain : 0 };
@@ -89,7 +93,7 @@ function aim(g) {
   return centre - away * (g.left.h / 2) * CORNER;
 }
 
-function sample(modulePath, label, aimStyle) {
+function sample(modulePath, label, aimStyle, era) {
   const Pong = require(modulePath);
   let scored = 0;
   let points = 0;
@@ -97,7 +101,7 @@ function sample(modulePath, label, aimStyle) {
   let certain = 0;
   const seconds = aimStyle === 'scripted' ? CHECK_WINDOW : WINDOW;
   for (let i = 1; i <= TRIALS; i++) {
-    const s = trial(Pong, i * 2654435761, aimStyle, seconds);
+    const s = trial(Pong, i * 2654435761, aimStyle, seconds, era);
     points += s.points;
     planned += s.planned;
     certain += s.certain;
@@ -109,6 +113,7 @@ function sample(modulePath, label, aimStyle) {
     module: modulePath,
     trials: TRIALS,
     windowSeconds: seconds,
+    ...(era !== undefined ? { era } : {}),
     sessionsThatScored: scored,
     passRate: scored / TRIALS,
     pointsPerMinute: (points / TRIALS) * (60 / seconds),
@@ -123,18 +128,30 @@ if (against) modules.push([path.resolve(against), 'comparison']);
 
 const runs = [];
 const STYLES = (arg('styles', 'track,corner,scripted')).split(',');
-for (const style of STYLES) {
-  for (const [mod, label] of modules) runs.push(sample(mod, label, style));
+const ERAS_MODE = process.argv.includes('--eras');
+if (ERAS_MODE) {
+  // One row per era: the flat tracking hand against that era's opponent, with
+  // the machine pinned to the era for the whole session (item 1209).
+  const Pong = require(modules[0][0]);
+  const top = Pong.TOP_ERA === undefined ? 0 : Pong.TOP_ERA;
+  for (let era = 0; era <= top; era++) {
+    for (const [mod, label] of modules) runs.push(sample(mod, label, 'track', era));
+  }
+} else {
+  for (const style of STYLES) {
+    for (const [mod, label] of modules) runs.push(sample(mod, label, style));
+  }
 }
 
 for (const r of runs) {
-  console.log(`${r.aim.padEnd(6)} ${r.label}: ${r.sessionsThatScored}/${r.trials} ` +
+  console.log((r.era !== undefined ? `era ${String(r.era).padStart(2)} ` : '') +
+    `${r.aim.padEnd(6)} ${r.label}: ${r.sessionsThatScored}/${r.trials} ` +
     `sessions scored in ${r.windowSeconds}s (${(r.passRate * 100).toFixed(1)}%), ` +
     `${r.pointsPerMinute.toFixed(2)} player points per minute` +
     (r.ballsPlanned !== undefined
       ? `; ${r.ballsWithCertainShot} of ${r.ballsPlanned} incoming balls had a certain shot` : ''));
 }
 
-const out = path.join(HERE, 'beatability-sample.json');
+const out = path.join(HERE, ERAS_MODE ? 'beatability-eras.json' : 'beatability-sample.json');
 writeFileSync(out, JSON.stringify({ measuredAt: new Date().toISOString(), runs }, null, 2));
 console.log('wrote ' + out);
