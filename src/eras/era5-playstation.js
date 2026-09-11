@@ -406,7 +406,8 @@
    * point FINAL ROUND is held there. Everything sits above the far edge (R8).
    */
   var BARS = { w: 110, h: 4, top: 4, inner: 14, frame: '#1a1a1f', back: '#4a4e59', per: 0.1, chunkS: 0.4 };
-  var LABELS = { cell: 2, gap: 2, top: 11 };
+  // The labels have their own inks, a shade under the score's, so the score stays the only #e8e8e8 on screen.
+  var LABELS = { cell: 2, gap: 2, top: 11, ink: '#c8ccd6', shadow: '#1a1a1f' };
   var CALL = { cell: 2, gap: 2, top: 12, lineTwo: 21, pointS: 0.8 };
 
   /** How full each player's bar is: 1 less a tenth per point the OTHER side has, never below 0. */
@@ -477,9 +478,9 @@
         c.fillRect((s ? outer - fw - cw : outer + fw) * k, BARS.top * k, cw * k, BARS.h * k);
       }
       var label = s ? 'CPU' : 'P1', lx = outer + dir * 11;
-      c.fillStyle = PAL.hudShadow;
+      c.fillStyle = LABELS.shadow;
       P.drawText(c, label, (lx + 1) * k, (LABELS.top + 1) * k, LABELS.cell * k, LABELS.gap * k);
-      c.fillStyle = PAL.hud;
+      c.fillStyle = LABELS.ink;
       P.drawText(c, label, lx * k, LABELS.top * k, LABELS.cell * k, LABELS.gap * k);
     }
     var call = hudCall(state, moment);
