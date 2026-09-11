@@ -281,6 +281,105 @@ test('an era sheet is loaded through src/sprites.js and drawn one pre-cut frame 
   }
 });
 
+/** A stand-in PongSprites whose images are made loaded on demand; answers { made, restore }. */
+function fakeSprites() {
+  const made = [];
+  const saved = globalThis.PongSprites;
+  globalThis.PongSprites = Sprites.create({
+    makeImage() {
+      const img = { src: '', complete: false, naturalWidth: 0 };
+      made.push(img);
+      return img;
+    }
+  });
+  const loadAll = () => {
+    for (const img of made) {
+      if (img.complete) continue;
+      img.complete = true; img.naturalWidth = 120; img.onload();
+    }
+  };
+  return { made, loadAll, restore() { globalThis.PongSprites = saved; } };
+}
+
+/** Which image each drawImage in a draw used, left player first by x. */
+function imagesDrawn(ctx) {
+  return ctx.calls.filter(([k]) => k === 'drawImage').map(([, a]) => a[0]);
+}
+
+test('sheets: { left, right } -- each side wears its own sheet, the right one still mirrored', () => {
+  const fake = fakeSprites();
+  const saved = C.ERAS[4];
+  try {
+    C.ERAS[4] = { sheets: { left: 'test-knight', right: 'test-barbarian' },
+                  frame: { w: 20, h: 40 }, hand: { x: 20, y: 20 }, scale: 2 };
+    assert.strictEqual(C.configFor(4).sheet, 'test-knight', 'configFor(era) is the left side');
+    assert.strictEqual(C.configFor(4, 'left').sheet, 'test-knight');
+    assert.strictEqual(C.configFor(4, 'right').sheet, 'test-barbarian');
+    assert.deepStrictEqual(C.configFor(4, 'right').frame, { w: 20, h: 40 }, 'the sides share the block\'s frame');
+    assert.strictEqual(C.configFor(4, 'right').scale, 2);
+
+    const g = playing(4);
+    C.drawPlayers(recorder(), g, null, R);            // starts both loads
+    const byName = (n) => fake.made.find((img) => img.src.endsWith('assets/pixellab/' + n + '.png'));
+    assert.ok(byName('test-knight'), 'the left sheet is loaded');
+    assert.ok(byName('test-barbarian'), 'the right sheet is loaded');
+    fake.loadAll();
+
+    // Draw each side on its own to see which image it used and whether it was mirrored.
+    const ctx = recorder();
+    C.drawPlayers(ctx, g, null, R);
+    const calls = ctx.calls;
+    const draws = calls.map((c, i) => [c, i]).filter(([[k]]) => k === 'drawImage');
+    assert.strictEqual(draws.length, 2, 'one drawImage a player');
+    for (const [[, a], i] of draws) {
+      // The mirror is the scale(-1, 1) between this player's save and its drawImage.
+      let s = i; while (s >= 0 && calls[s][0] !== 'save') s--;
+      const mirrored = calls.slice(s, i).some(([k, b]) => k === 'scale' && b[0] === -1);
+      if (a[0] === byName('test-knight')) assert.ok(!mirrored, 'the player\'s knight faces right, unmirrored');
+      else if (a[0] === byName('test-barbarian')) assert.ok(mirrored, 'the computer\'s barbarian is mirrored');
+      else assert.fail('a draw used neither sheet');
+    }
+    assert.deepStrictEqual(new Set(imagesDrawn(ctx)), new Set([byName('test-knight'), byName('test-barbarian')]),
+      'both sheets drawn, one each');
+  } finally {
+    fake.restore();
+    C.ERAS[4] = saved;
+  }
+});
+
+test('a block with only `sheet` still serves both sides, as before sheets existed', () => {
+  const fake = fakeSprites();
+  const saved = C.ERAS[2];
+  try {
+    C.ERAS[2] = { sheet: 'test-one-player', frame: { w: 20, h: 40 }, hand: { x: 20, y: 20 }, scale: 2 };
+    assert.strictEqual(C.configFor(2, 'left').sheet, 'test-one-player');
+    assert.strictEqual(C.configFor(2, 'right').sheet, 'test-one-player');
+    const g = playing(2);
+    C.drawPlayers(recorder(), g, null, R);
+    assert.strictEqual(fake.made.length, 1, 'one sheet, loaded once for both sides');
+    fake.loadAll();
+    const ctx = recorder();
+    C.drawPlayers(ctx, g, null, R);
+    assert.deepStrictEqual(imagesDrawn(ctx), [fake.made[0], fake.made[0]], 'both players wear it');
+    assert.strictEqual(ctx.calls.filter(([k, a]) => k === 'scale' && a[0] === -1).length, 1, 'the right one mirrored');
+
+    // A `sheets` that names one side only: the other falls back to `sheet`.
+    C.ERAS[2] = { sheet: 'test-one-player', sheets: { right: 'test-rival' } };
+    assert.strictEqual(C.configFor(2, 'left').sheet, 'test-one-player');
+    assert.strictEqual(C.configFor(2, 'right').sheet, 'test-rival');
+    // And no sheet anywhere is the placeholder on both sides, exactly as now.
+    for (let e = 1; e <= 10; e++) {
+      if (e === 2) continue;
+      assert.strictEqual(C.configFor(e, 'left').sheet, null, 'era ' + e + ' left is the placeholder');
+      assert.deepStrictEqual(C.configFor(e, 'right'), Object.assign(C.configFor(e, 'left'), { side: 'right' }),
+        'era ' + e + ': the two sides are the same config');
+    }
+  } finally {
+    fake.restore();
+    C.ERAS[2] = saved;
+  }
+});
+
 test('no per-pixel work, and index.html loads the rig after the eras and before the loop', () => {
   const src = fs.readFileSync(path.join(ROOT, 'src', 'characters.js'), 'utf8');
   assert.ok(!/getImageData|putImageData|createImageData/.test(src), 'no per-pixel canvas calls');
