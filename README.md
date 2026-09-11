@@ -148,8 +148,14 @@ give `draw(ctx, state, opts, PongRender)` to take over the whole frame
 (`PongRender.drawBase` is the stock frame to paint over). A brand-new rung is one
 new file, one `<script>` line in `index.html`, and one entry in `Pong.ERAS`.
 
-**Open the page at any era** with a query: `index.html?era=3`. The playtest
-takes `--era 3` for the same thing.
+**Open the page at any era** with a query, so you can look at one machine
+without playing up to it: `index.html?era=0` is the arcade machine (the same as
+no query), `?era=2` the NES, `?era=4` the Super Nintendo. Anything above 4 opens
+on 4, and anything that is not a number opens on 0. The match still starts on
+the title screen, its score at 0-0, and climbs from that era -- so `?era=3` is
+one point from the top -- and a reload comes back to the era in the address.
+The playtest takes `--era 3` for the same thing, and `--ladder` walks the whole
+ladder from era 0 instead.
 
 **The change is a moment.** When a point moves the machine up a rung the field
 flashes, a band of the new machine's colours wipes across it, and a name card
