@@ -253,7 +253,8 @@ his emulator — never touch either.**
   era's own hook, not that the others have none.
 - **The first ring on a cold page used to have one long frame** (about 100-120 ms). It was the
   ring engine's, not a flourish's (item 1140 proved it by A/B), and item 1203 removed it; section
-  8a says why, and what to reach for if a long frame comes back.
+  8a says why, and what to reach for if a long frame comes back. Item 1218 removed the next one,
+  the Super Nintendo tilt's 13-25 ms frame at raw 0.12, the same way.
 - **Start Chrome only through `tools/chrome.mjs`, never with a hand-built `--user-data-dir`.** A
   capture script that spawns Chrome itself leaves its profile behind -- about 18 MB a run, and on
   2026-09-10 the flourish cards' scripts left more than forty such folders in `G:/claude-tmp` (item
@@ -404,6 +405,13 @@ Item 1203 traced 100-117 ms of shader compiles there, for era looks nothing had 
   `--timing` times the ring with no trace (tracing slows every frame), `--from-load` records from
   before the page loads (the warm-up's own work), and `--skia` names each GPU program built.
 - **Commit one or two representative traces, not one per leg**: each is 1-2 MB gzipped.
+- **A flourish that draws something no ring has drawn before brings a hitch back** as a GPU
+  program built mid-ring (item 1218: the Super Nintendo tilt's first turned strip, 13-25 ms at raw
+  0.12 on 15 of 20 cold legs). A/B with the flourish off first -- item 1218's copy of the recorder,
+  `docs/measure/item-1218/trace.mjs`, takes `--no-flourish` and `--at-raw <r>` -- then add a
+  matching draw to `warmUp`. **Draw it on one of the ring's layers and copy that layer onto the
+  canvas**: a draw made straight onto the canvas during the warm-up is thrown away unpainted by the
+  clear that ends it, and two tries that did that changed nothing (8 of 8 and 6 of 8 legs still long).
 
 ## 9. Talk in the room as you go (item 1170)
 
