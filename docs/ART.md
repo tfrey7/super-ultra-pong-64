@@ -161,6 +161,153 @@ Anything a page does not list is drawn in code.
 
 ---
 
+## The realism ladder: from Atari pong to table tennis (item 1265)
+
+Tim, 2026-09-11: *"ok as far as art style goes: i was imagining it starting out as pong in the
+atari world and becoming more and more like real life table tennis, where finally in the 3d eras
+you can see the characters standing around the tables"*.
+
+This sits on top of the flagship rule above and changes none of it: each era still looks like
+that year's AAA game, and the characters that landed stay who they are. The ladder decides four
+other things per era: **what the playfield is, what the ball and the bats look like, where the
+view sits, and how much of each player you see.** Each era page below opens with its rung.
+
+### 6. What the ladder never changes
+
+- **Play.** Shared rule 1 stands whole. The table top is the rules' field, 800 by 600 field
+  units: the top and bottom walls are the table's side edges, the left and right edges its ends.
+  The paddle rectangle is the whole hit zone and moves along its end of the table. The ball is the
+  ball. The ladder changes how things are drawn and never how they move.
+- **Pong's bar is a table tennis bat seen from above.** A bat held upright, blade toward the net,
+  looks from straight overhead like a thin bar as long as its blade. So the bar never changes
+  shape in play. Each rung adds something around it: a handle, a hand, a table under it, and
+  finally a whole player standing behind it.
+- **The sizes are already close to real.** A 40 mm ball on a 2.74 m table is 11.7 units in 800,
+  and the ball is 12. The table is deeper than a real one: a real top would be 800 by 445, and the
+  ladder keeps the rules' 600 rather than shrink play to match. The blade (84 units, about 29 cm)
+  is twice a real blade's width. Both are kept, because both are play.
+- **Readability wins every tie with realism.** ERAS.md's R1 to R10 hold on every rung. The net is
+  the one thing a real table has that stands up in play, so it is the one thing the ladder limits
+  (below).
+
+### 7. The rungs
+
+| Era | Machine | Playfield | Ball | Bats | View | Each player |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | 1972 arcade | a bare court: black, dashed centre line | the square dot | white bars | flat, top-down | nothing |
+| 1 | 1977 Atari 2600 | a bare court in the *Combat* arena: playfield wall and stand | the 2 x 4 block | bars in the earned inks | flat, top-down | a block: the one-colour athlete |
+| 2 | 1985 NES | **the table appears**: the court's border becomes the table's white edge lines, the net and its two posts cross the middle, a centre line runs end to end, the tennis lines go | a round white ball with its shadow sprite | **the bar gains a handle**, gripped by one fist | flat, top-down | a side figure with a bat, the whole small sprite |
+| 3 | 1989 Genesis | **a drawn table with every marking**: a table-tennis blue top, white edge and centre lines, the net as a band with posts and a shadow, the arena's stone floor round it | the landed chrome orb, its shadow on the blue | **bats that read as bats**: rubber in the earned ink on the inner face, black on the outer, a wood edge, a handle | flat, top-down | a side figure with a bat, as landed |
+| 4 | 1991 Super Nintendo | **the table in perspective**: the whole top tilted back in Mode 7, net and lines foreshortened with it | the landed glowing orb, its shadow on the table | as era 3, foreshortened | **tilted**: far edge at least 0.85 of the near edge's width | **the upper body**: waist up behind each end, the end of the table hiding the legs |
+| 5 | 1994 PlayStation | **a real table tennis table in 3D**: top, edge and centre lines, net on posts, legs to a floor | ERAS.md's era 5 ball, unchanged | 3D bats: a blade with rounded top, rubber and handle | **full 3D with the players in frame** | **a whole standing character behind its end**, bat in hand |
+| 6 | 1996 Nintendo 64 | the table as era 5, in the era's toy colours and fog | ERAS.md's era 6 ball | as era 5 | as era 5 | as era 5: the penguin and the frog |
+| 7 | 1999 Dreamcast | the table as era 5, cel-shaded and ink-outlined | ERAS.md's era 7 ball | as era 5, cel bands | as era 5 | as era 5: the two skaters |
+| 8 | 2000 PlayStation 2 | the table as era 5, glossy, inside the letterbox | ERAS.md's era 8 ball | as era 5, with reflections | as era 5, inside the bars | as era 5: the two operatives |
+| 9 | 2001 Xbox | the table as era 5, bump-mapped plate, hard shadows from the ball | ERAS.md's era 9 ball | as era 5, specular | as era 5 | as era 5: the marine and the cyborg |
+| 10 | 2005 Xbox 360 | the table as era 5, bloom, grade and depth of field | ERAS.md's era 10 ball | as era 5, rim-lit | as era 5 | as era 5: the two soldiers |
+
+So eras 0 and 1 are pure pong, the arcade and the Atari. Eras 2 to 4 walk to table tennis one
+step each: the table, then its markings and real bats, then the tilt and the bodies. Eras 5 to 10
+are the same real table tennis in 3D, and what changes between them is the machine's treatment,
+already written in ERAS.md and on each page.
+
+### 8. The numbers every rung builds to
+
+**The table in 2D (eras 2 to 4).** Its ends are drawn at the paddles' **outer faces**, x 32 and
+768, so each bat stands on its end of the table and each player stands on the floor behind it, in
+the 32 units shared rule 2 gives. A ball past x 32 has gone off the end, which is a point in real
+table tennis too. The edge lines are 6 field units wide, and the centre line (y 300, from end to
+end) is 3. All of them use the court-line colour the era already has, darker than the ball's core
+(R1). The net is at x 400, across the whole top, 8 units wide, with a post 10 units square on each
+side edge. Every line and the net are drawn before the ball.
+
+**The table in 3D (eras 5 to 10).** The top stays the slab each era builds now, 0 to 800 by 0 to
+600, so every arena, rail and R3 measurement holds; its ends are x 0 and 800. On it, drawn as
+world shapes on the table (ERAS.md's step 3):
+
+- edge lines 6 units wide round all four edges, and the centre line along y 300, 3 units wide, in
+  the era's line colour;
+- the **net** across x 400, 24 units tall, from a post at y -20 to a post at y 620, its body a
+  mesh at 0.5 opacity or less and its top tape the era's line colour. A real net would be 45 units
+  (15.25 cm); 24 keeps it below the bats' 28 (R6's paddle height). The side camera's eye is at
+  x 400, so it sees the net nearly edge on: it covers about as much as the centre line does. It is
+  drawn before the ball every frame, so the ball always passes over it;
+- **legs** under the top to a **floor 110 units below it**, in the era's rail colours. They stand
+  inside the top's footprint, so nothing is drawn between the camera and the near edge (R6).
+
+**The players in 3D.** They are a real player's proportions against a real table: a 76 cm table
+top against a 175 cm player puts the top at **0.43 of the player's height**. Real scale here
+would make a player 510 units tall, taller than the table is deep, so the ladder takes the
+players and the table's height at half scale together: the **floor 110 units below the top and a
+player 250 units tall**. Each stands with the front foot **30 units behind its end** (x -30 on the
+left, 830 on the right), centred on its paddle's `y` and following it along the end. It faces the
+net, and holds the bat's handle in its near hand, reaching over its end. Feet stay on the floor in
+every beat except win's hop.
+
+**The camera in 3D.** It is the side camera ERAS.md section 2.1 describes, standing in front of
+the near edge and looking across, pulled back and raised until **both players are whole, feet to
+head, with the paddle at `y` 300**. With the paddle at either wall, no more than the head may pass
+behind the HUD band. R3's four conditions still hold, measured by `tools/table3d-cameras.js`. If no
+camera holds both whole figures and passes R3, the players and the floor shrink together, keeping
+the 0.43, to the largest size that passes, and the card names that size.
+
+**The bat in 3D.** The paddle box stays the hit zone and R5's true footprint. It is drawn as a
+**blade**: the top corners rounded to a 10-unit radius, the inner face and top in rubber of the
+earned ink, and the outer face black rubber (`#1a1a1a` before the era's grade). The near face keeps
+the earned ink at full saturation, after any grade (R4). A **handle**, a box 20 x 6 x 6 in wood
+(`#b07a44` *(new)*, through the era's treatment), comes off the outer face's middle at `z` 14, and
+the player's hand is on its far end.
+
+**The bat in 2D.** The bar keeps its rectangle. From era 2 a handle comes off the outer face's
+middle into the player's room: 3 native pixels long on the NES, 4 on the Genesis and the Super
+Nintendo, in the era's nearest wood brown. The figure's hand pixel, which the rig already puts at
+the paddle's outer middle, is where the handle ends. From era 3 the bar is split along its length:
+the inner half is rubber in the earned ink, the outer half black rubber, with a 1-pixel wood line
+between them.
+
+### 9. What each queued card delivers
+
+- **Eras 0 and 1: no card.** Both are pinned to the pixel (`tools/eralooks-today.json`) and stay as
+  they are.
+- **Card 1267, eras 2 to 4, the field becomes a table.** It delivers rungs 2, 3 and 4 as the table
+  above and section 8's 2D numbers give them: era 2's tennis paint turned into the table (edge
+  lines, net and posts, and the centre line kept; the service lines, singles sidelines and centre
+  marks painted out) and the handle; era 3's blue top, full markings, net band and shadow, and the
+  two-rubber bats; era 4's Mode 7 tilt of the table in play, at 0.85 or more, with the pointer
+  still reaching the same field `y`. One snag for its planner: **era 4's upper-body view cannot be
+  drawn by the era file**, because the rig draws the players after the era's frame, so nothing
+  the era draws covers a leg. The two ways that stay inside 1267's files are a re-cut sheet under
+  the same pixellab names, its frames holding the pilot from the waist up and made offline from the
+  landed sheet (0 generations), or, failing that, a finding naming the one line of era 4's block in
+  `src/characters.js` that would crop it.
+- **Card 1266, the 3D table and camera.** It delivers section 8's 3D table (lines, net and posts,
+  legs, floor) and the camera, in `src/table3d.js`, keeping the projection's contract. The
+  stand-ins stay where the rig draws them. Placing figures on the floor is the polygon cards'
+  work, so 1266's screenshots show the camera's room for them rather than the figures standing.
+  **Card 1263** (a per-era camera, so the Dreamcast arena shows) works in the same camera code:
+  1266's pulled-back camera gives every arena much of the room 1263 asks for, and whichever of
+  the two lands second merges onto the other.
+- **Cards 1253 to 1258, the polygon players, one per era from 5 to 10.** Each delivers its era's
+  two characters as its page names them. They stand as section 8's 3D players do: 250 units tall,
+  feet on the floor 1266 draws, the front foot 30 units behind the end, centred on the paddle's
+  `y`, the near hand on the bat's handle, and the whole body in frame. That staging replaces each
+  card's own line saying the figure holds its paddle where the look card placed the stand-in: the
+  stand-ins were placed for the shield-and-board grips the ladder retires. Each card sets it in
+  its own era's block in `src/characters.js`, after 1266 has landed. What each player wears and how
+  each beat reads stay as the page gives them. Only the grip changes, to a bat held by its
+  handle:
+
+  | Card | Era | The two characters | Budget each (from the card) |
+  | --- | --- | --- | --- |
+  | 1253 | 5 PlayStation | the red-gi and blue-top fighters | about 200 triangles |
+  | 1254 | 6 Nintendo 64 | the penguin and the frog | from 1248's measurements |
+  | 1255 | 7 Dreamcast | the orange and blue skaters | from 1248's measurements |
+  | 1256 | 8 PlayStation 2 | the midnight and slate operatives | from 1248's measurements |
+  | 1257 | 9 Xbox | the space marine and the steel cyborg | from 1248's measurements |
+  | 1258 | 10 Xbox 360 | the green-trim and grey-trim soldiers | about 1200 triangles |
+
+---
+
 ## Era 0: 1972 arcade Pong
 
 **It stays 1972 Pong: two white bars, a square dot and a dashed centre line on black**, because
