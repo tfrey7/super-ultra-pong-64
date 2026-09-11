@@ -288,9 +288,11 @@ between them.
   a whole figure. Standing figures on the floor is the polygon cards' work. If the stand-ins should
   move before those cards land, that is one `anchor` line per era block in `src/characters.js`, and
   a small card of its own.
-  **Card 1263** (a per-era camera, so the Dreamcast arena shows) works in the same camera code:
-  1266's pulled-back camera gives every arena much of the room 1263 asks for, and whichever of
-  the two lands second merges onto the other.
+  **Card 1263** (a per-era camera, so the Dreamcast arena shows) was folded into 1266, because
+  both work on the same camera. So 1266 also owes era 7's skyline, posters, water tower and blimp
+  in frame and clear of the score HUD, with before and after shots, and each 3D arena's share of
+  the frame before and after. A per-era camera override is the way to give different eras
+  different framings, where one camera does not suit all six.
 - **Cards 1253 to 1258, the polygon players, one per era from 5 to 10.** Each delivers its era's
   two characters as its page names them. They stand as section 8's 3D players do: 250 units tall,
   feet on the floor 1266 draws, the front foot 30 units behind the end, centred on the paddle's
