@@ -3,7 +3,7 @@
  * own resolution.
  *
  * The renderer draws in field units (800 x 600). This file decides how many
- * real pixels those units get. Each frame is drawn into ONE offscreen canvas at
+ * real pixels those units get. Each frame ends in ONE offscreen canvas at
  * the native size of the machine on screen -- 256 x 240 for the NES, 320 x 240
  * for the PlayStation, the 720 lines of 720p for the Xbox 360 -- and then put on
  * the page with a single drawImage, scaled up to fill it. The 2D machines are
@@ -36,7 +36,7 @@
  * ?display=off turns the whole layer off: the frame is drawn straight onto the
  * page's canvas in field units, as before this file existed. The playtest reads
  * the native frame (pre-overlay) through PongDisplay.canvas(), and draws its
- * comparison frames through PongDisplay.prepare() at the same size.
+ * comparison frames through PongDisplay.render(), the same pipeline.
  *
  * Canvas 2D, a plain script, no per-pixel work.
  */
@@ -118,28 +118,74 @@
   }
 
   // ------------------------------------------------------ the offscreen frame
-  var off = null;     // the one native canvas, made once and reused
+  // A 3D era draws straight into the native canvas, scaled. A 2D era draws in
+  // field units onto a field-sized canvas and is then SAMPLED down to the
+  // native one with smoothing off: every native pixel is one whole colour, the
+  // way the machine's were. Drawing the block font straight into a canvas a
+  // quarter the size left grey seams between its blocks (each fillRect edge is
+  // antialiased at a fractional pixel), which no machine ever showed.
+  // Both canvases are made once and reused; a size is set only when it changes.
 
-  function canvas() { return off; }
+  function blank(c, w, h) {
+    if (c.width !== w) c.width = w;
+    if (c.height !== h) c.height = h;
+    var x = c.getContext('2d');
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.globalAlpha = 1;
+    x.globalCompositeOperation = 'source-over';
+    x.clearRect(0, 0, w, h);
+    return x;
+  }
 
-  /**
-   * The context to draw this frame into: the native canvas, sized for the
-   * era (resized only when the era's size changes), cleared, scaled so the
-   * caller keeps drawing in field units. Null when there is no document.
-   */
-  function begin(era, fieldW, fieldH) {
+  /** The context a frame is drawn into, in field units, on a set of surfaces. */
+  function surfaces(set, era, fieldW, fieldH) {
     if (typeof document === 'undefined' || !document.createElement) return null;
     var r = row(era);
-    if (!off) off = document.createElement('canvas');
-    if (off.width !== r.w) off.width = r.w;
-    if (off.height !== r.h) off.height = r.h;
-    var ctx = off.getContext('2d');
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.clearRect(0, 0, r.w, r.h);
-    prepare(ctx, era, fieldW, fieldH);
-    return ctx;
+    set.era = era; set.fw = fieldW || 800; set.fh = fieldH || 600;
+    if (!set.native) set.native = document.createElement('canvas');
+    if (r.smooth) {
+      var n = blank(set.native, r.w, r.h);
+      prepare(n, era, set.fw, set.fh);
+      return n;
+    }
+    if (!set.field) set.field = document.createElement('canvas');
+    return blank(set.field, set.fw, set.fh);
+  }
+
+  /** A 2D era's field-sized picture sampled down into the native canvas. */
+  function finish(set) {
+    var r = row(set.era);
+    if (r.smooth || !set.field || !set.native) return;
+    var n = blank(set.native, r.w, r.h);
+    n.imageSmoothingEnabled = false;
+    n.drawImage(set.field, 0, 0, set.fw, set.fh, 0, 0, r.w, r.h);
+  }
+
+  var live = {};      // the page's own surfaces
+
+  /** The native picture of the last frame -- before any overlay. */
+  function canvas() { return live.native || null; }
+
+  /**
+   * The context to draw this frame into, in field units. Null when there is
+   * no document. present() then puts it on the page.
+   */
+  function begin(era, fieldW, fieldH) {
+    return surfaces(live, era, fieldW, fieldH);
+  }
+
+  /**
+   * One frame through the same pipeline the page uses, on its own canvases:
+   * draw(ctx) paints it in field units; returns the native canvas. The
+   * playtest draws its comparison frames with it.
+   */
+  function render(era, fieldW, fieldH, draw) {
+    var set = {};
+    var ctx = surfaces(set, era, fieldW, fieldH);
+    if (!ctx) return null;
+    draw(ctx);
+    finish(set);
+    return set.native;
   }
 
   /**
@@ -148,6 +194,8 @@
    * then the row's overlay over it. Returns the rectangle it drew into.
    */
   function present(pageCtx, era, time) {
+    finish(live);
+    var off = live.native;
     var r = row(era);
     var page = pageCtx.canvas;
     var rect = fitRect(page.width, page.height, r.aspect);
@@ -181,6 +229,7 @@
     prepare: prepare,
     begin: begin,
     present: present,
+    render: render,
     canvas: canvas,
     enabledFor: enabledFor,
     enabled: enabledFor(root.location && root.location.search)

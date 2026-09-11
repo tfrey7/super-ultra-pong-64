@@ -247,9 +247,10 @@ async function filmChange(s, clip, from) {
     const live = native ? D.canvas() : document.getElementById('field');
     const w = live.width, h = live.height, band = 90 * h / g.height;
     const pix = (c) => c.getContext('2d').getImageData(0, 0, w, h).data;
-    const render = (era) => { const c = document.createElement('canvas'); c.width = w; c.height = h;
-      const x = c.getContext('2d'); if (native) D.prepare(x, D.shownEra(g), g.width, g.height);
-      R.draw(x, era === g.era ? g : Object.assign({}, g, { era: era })); return pix(c); };
+    const drawAs = (era) => (x) => R.draw(x, era === g.era ? g : Object.assign({}, g, { era: era }));
+    const render = (era) => { if (native) return pix(D.render(D.shownEra(g), g.width, g.height, drawAs(era)));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      drawAs(era)(c.getContext('2d')); return pix(c); };
     const L = pix(live), N = render(${from + 1}), O = render(${from});
     let asNew = 0, asOld = 0, counted = 0;
     for (let y = 0; y < h; y++) {

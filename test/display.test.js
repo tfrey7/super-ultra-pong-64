@@ -68,13 +68,23 @@ test('present puts the frame on the page with ONE drawImage, then the overlay', 
   };
   // No document under node: begin() has no canvas to make, so stand one in.
   const made = [];
+  const sampled = [];
   globalThis.document = { createElement: () => {
-    const c = { width: 0, height: 0, getContext: () => ({ setTransform() {}, clearRect() {} }) };
+    const c = { width: 0, height: 0 };
+    const x = { canvas: c, setTransform() {}, clearRect() {},
+      drawImage(src, ...a) { sampled.push([this.imageSmoothingEnabled, src.width, src.height, ...a]); } };
+    c.getContext = () => x;
     made.push(c); return c; } };
   try {
     for (const era of [2, 7, 2, 10]) D.begin(era, 800, 600);
-    assert.strictEqual(made.length, 1, 'one offscreen canvas, reused across frames and eras');
+    assert.strictEqual(made.length, 2, 'the native canvas and a field-sized one for the 2D eras, made once');
+    for (const era of [0, 5, 9, 3]) D.begin(era, 800, 600);
+    assert.strictEqual(made.length, 2, 'and reused across frames and eras');
+    D.begin(10, 800, 600);
+    D.present(page, 10, 0);
     assert.deepStrictEqual([D.canvas().width, D.canvas().height], [960, 720]);
+    assert.strictEqual(sampled.length, 0, 'a 3D era draws straight into the native canvas');
+    calls.length = 0;
     D.begin(2, 800, 600);
     let seen = null;
     D.registerOverlay('probe', (ctx, rect, row) => { seen = { rect, era: row.era }; });
@@ -83,6 +93,13 @@ test('present puts the frame on the page with ONE drawImage, then the overlay', 
     D.row(2).overlay = 'none';
     delete D.OVERLAYS.probe;
     assert.deepStrictEqual(calls, [['drawImage', false, 0, 0, 256, 240, 0, 0, 1600, 1200]]);
+    assert.deepStrictEqual(sampled, [[false, 800, 600, 0, 0, 800, 600, 0, 0, 256, 240]],
+      'a 2D era is sampled hard from the field-sized picture into its native pixels');
+    let drew = null;
+    const out = D.render(3, 800, 600, (x) => { drew = x; });
+    assert.ok(drew, 'render hands the draw a context');
+    assert.deepStrictEqual([out.width, out.height], [320, 224], 'and returns the native picture');
+    assert.notStrictEqual(out, D.canvas(), 'on canvases of its own, never the page\'s');
     assert.deepStrictEqual(rect, { x: 0, y: 0, w: 1600, h: 1200 }, 'a 4:3 picture fills the canvas');
     assert.deepStrictEqual(seen, { rect, era: 2 }, 'the row\'s overlay drew over it');
     calls.length = 0;

@@ -75,6 +75,8 @@
       if (canvas.height !== h) canvas.height = h;
     }
 
+    var titleCanvas = null;
+
     function drawFrame() {
       if (display) {
         fitCanvas();
@@ -86,10 +88,20 @@
         display.present(ctx, era, game.time);
         if (game.phase === 'title') {
           // The title is the cabinet's own lettering, kept sharp over the
-          // machine's picture rather than squeezed into its pixels.
+          // machine's picture rather than squeezed into its pixels: drawn at
+          // field size and scaled up hard, so its blocks have no seams.
+          if (!titleCanvas) {
+            titleCanvas = document.createElement('canvas');
+            titleCanvas.width = game.width;
+            titleCanvas.height = game.height;
+          }
+          var tctx = titleCanvas.getContext('2d');
+          tctx.clearRect(0, 0, game.width, game.height);
+          PongRender.drawTitle(tctx, game);
           ctx.save();
-          ctx.setTransform(canvas.width / game.width, 0, 0, canvas.height / game.height, 0, 0);
-          PongRender.drawTitle(ctx, game);
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(titleCanvas, 0, 0, canvas.width, canvas.height);
           ctx.restore();
         }
         return;

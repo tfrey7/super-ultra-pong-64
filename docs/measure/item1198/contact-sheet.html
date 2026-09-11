@@ -48,8 +48,8 @@
     g.serveDelay = 0; g.time = 12;
     g.ball.x = 520; g.ball.y = 230;
     g.left.y = 250; g.right.y = 180;
-    var ctx = D.begin(e, g.width, g.height);
-    R.draw(ctx, g);
+    // The page's own pipeline: drawn in field units, ending in the native picture.
+    var nat = D.render(e, g.width, g.height, function (ctx) { R.draw(ctx, g); });
     var row = D.row(e);
     var fig = document.createElement('figure');
     var c = document.createElement('canvas');
@@ -57,7 +57,7 @@
     var x = c.getContext('2d');
     x.imageSmoothingEnabled = !!row.smooth;
     x.imageSmoothingQuality = 'high';
-    x.drawImage(D.canvas(), 0, 0, row.w, row.h, 0, 0, c.width, c.height);
+    x.drawImage(nat, 0, 0, row.w, row.h, 0, 0, c.width, c.height);
     var cap = document.createElement('figcaption');
     cap.innerHTML = '<b>' + e + ' ' + entry.year + ' ' + entry.machine + '</b> &middot; ' +
       row.w + ' x ' + row.h + ' &middot; ' + (row.smooth ? 'soft' : 'hard') + ' scaling';
