@@ -45,7 +45,7 @@ test('every texture a 3D era names is one of the embedded tiles', () => {
     // The ball's skin goes through ball()'s texture, or (era 5's faceted gem,
     // which draws its own ball) straight through textureOver.
     assert.ok(/texture: TEXTURE\.court/.test(src) && /texture: TEXTURE\.paddle/.test(src) &&
-      /texture: TEXTURE\.ball|textureOver\([^)]*TEXTURE\.ball/.test(src),
+      (/texture: TEXTURE\.ball/.test(src) || /T\.textureOver\([\s\S]*?TEXTURE\.ball\);/.test(src)),
       `${era} hands the court, the paddles and the ball their textures`);
   }
 });
