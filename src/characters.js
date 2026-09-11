@@ -99,7 +99,7 @@
   // One block per rung. Era 0 has none: the 1972 machine stays bars and a dot.
   var ERAS = {
     1:  { skin: '#d4a060', body: '#2c3c9c', scale: 2.5 },                    // Atari 2600
-    2:  { skin: '#fcbcb0', body: '#0000bc', scale: 2.5 },                    // NES
+    2:  { sheets: { left: 'era2-sheet-left', right: 'era2-sheet-right' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' }, // NES (item 1225: assets/pixellab/era2-players-sheet.mjs)
     3:  { skin: '#eeaa88', body: '#222266', scale: 2.5, res: 2 },            // Genesis
     4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
@@ -370,8 +370,9 @@
    * (the placeholder draws meanwhile), and null for good if it failed.
    *
    * Null too when the loader cannot make an image at all -- under node --test
-   * there is no Image, and the default loader's `new Image()` throws (item
-   * 1249). Nothing is remembered about that, so a loader installed later (a
+   * there is no Image, and the default loader's `new Image()` throws: that is
+   * "not loaded", and the placeholder draws (items 1225 and 1249 each found
+   * it, from eras 2 and 8). Nothing is remembered about that, so a loader installed later (a
    * test's stand-in) is asked afresh on the next frame.
    */
   var cut = {};
