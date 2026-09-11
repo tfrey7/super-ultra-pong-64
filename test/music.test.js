@@ -263,6 +263,22 @@ test('an era change cross-fades at the same bar and beat: the song position carr
   assert.ok(after.bar * 16 + after.step !== 0 || before.bar * 16 + before.step > TOTAL - 40, 'did not restart');
 });
 
+test('back on the title screen the tune fades away and books nothing more', () => {
+  const { FakeContext, log } = recorder();
+  const music = M.createMusic({ AudioContext: FakeContext });
+  music.unlock();
+  const g = playingGame(0);   // the arcade: its hum is a drone that would run on
+  music.update(g);
+  assert.strictEqual(music.era, 0);
+  g.phase = 'title';
+  log.ctx.currentTime = 0.5;
+  assert.strictEqual(music.update(g), 0);
+  assert.strictEqual(music.era, null);
+  const before = log.started.length;
+  for (let t = 0.5; t < 3; t += 0.05) { log.ctx.currentTime = t; music.update(g); }
+  assert.strictEqual(log.started.length, before, 'nothing new on the title screen');
+});
+
 test('the tempo climbs a little as a rally goes on, capped', () => {
   assert.ok(M.stepSeconds(10) < M.stepSeconds(0));
   assert.strictEqual(M.stepSeconds(100), M.stepSeconds(1000));

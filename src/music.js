@@ -569,8 +569,14 @@
      * on the title screen.
      */
     function update(game) {
-      if (!ctx || !music.available || !game || game.phase === 'title') return 0;
+      if (!ctx || !music.available || !game) return 0;
       try {
+        if (game.phase === 'title') {
+          // Back on the title screen (a finished match): the tune fades away.
+          if (current) { fadeOut(current); current = null; music.era = null; }
+          retireFaded();
+          return 0;
+        }
         var era = Math.max(0, Math.floor(game.era || 0));
         if (!current || current.era !== era) switchTo(era);
         if (game.time !== lastTime) {
@@ -604,14 +610,7 @@
       var t = ctx.currentTime;
       var first = !current;
       if (first) nextTime = t + 0.05;
-      if (current) {
-        current.bus.gain.cancelScheduledValues(t);
-        current.bus.gain.setValueAtTime(current.bus.gain.value, t);
-        current.bus.gain.linearRampToValueAtTime(0.0001, t + FADE_S);
-        current.until = t + FADE_S + 0.1;
-        fading.push(current);
-        music.crossfades += 1;
-      }
+      if (current) { fadeOut(current); music.crossfades += 1; }
       var arr = arrangementFor(era);
       var bus = ctx.createGain();
       bus.gain.setValueAtTime(first ? 1 : 0.0001, t);
@@ -626,6 +625,15 @@
         if (arr.effects) current.fxIn = effectsChain(arr.effects, bus);
         if (arr.drone) startDrones(current);
       }
+    }
+
+    function fadeOut(track) {
+      var t = ctx.currentTime;
+      track.bus.gain.cancelScheduledValues(t);
+      track.bus.gain.setValueAtTime(track.bus.gain.value, t);
+      track.bus.gain.linearRampToValueAtTime(0.0001, t + FADE_S);
+      track.until = t + FADE_S + 0.1;
+      fading.push(track);
     }
 
     function scoreOf(arr) {
