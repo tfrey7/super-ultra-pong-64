@@ -5,6 +5,9 @@ Look file: [src/eras/era7-dreamcast.js](../../src/eras/era7-dreamcast.js). Chapt
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Jet Set Radio* (2000) + *Soulcalibur*. Added: contact effects: the impact burst and speed lines.
+  Changed: cel shading with ink outlines at 640x480, no fog.
 - **Native resolution here:** 640 x 480, the VGA box's picture, scaled up soft. The era itself
   draws straight onto the canvas at full resolution, with no low-resolution buffer, no smoothing
   and no post pass. Next to the Nintendo 64's smear, the first thing a player sees is how sharp it

@@ -1325,3 +1325,325 @@ is generated `highly detailed` and drawn with smoothing on, never shown at its o
 
 Drawn in code instead: the rim-light glow pass, the grain over the players, the ash, the banner's ripple,
 the gamerpic frames and the toast's new text.
+
+---
+
+## Reference games
+
+Tim: *"get a big brain to do some actual research on actual games from these eras. pick
+a game to two to model for each era. Then have the big brain file its plan as work items"*; and:
+*"to facilitate the build up, each era should add 1 thing and change 1 thing from the previous era.
+interpret that as you will. That means by the end the final era will be the most complex"*.
+
+**Style, never copies.** Every era from 1 up is built *in the manner of* one or two real games of
+its machine, named below with the reasons they were picked, the machine's real numbers to build
+to, and the sources those numbers came from. They are style targets only: no game's name,
+character, logo, sprite, model or music appears in pong, and each entry's **Not:** line names what
+stays out (ERAS.md rule 1.9). Era 0 is Pong itself, the AAA game of 1972 by definition. The ten
+era cards that follow item 1286 cite this section by its name.
+
+**The add-one / change-one ladder.** Each era adds one element no earlier era had and changes one
+inherited element, rendered the reference's way; everything else carries forward untouched, so
+era 10 holds all ten additions. Where an era already landed with more than one new thing, this list
+says which counts and the era card leaves the rest.
+
+- **Era 0**, 1972 arcade Pong | reference: *Pong* itself | Holds: the court, the bars, the dot, the digits | Changed: nothing.
+- **Era 1**, 1977 Atari 2600 | reference: *Combat* | Added: the arena (a playfield wall and a flickering stand round the court) | Changed: colour: bars, ball and digits in the TIA's inks.
+- **Era 2**, 1985 NES | reference: *Super Mario Bros.* + *Tennis* | Added: the game speaks: a scoreline band with names, the rally count and the umpire's calls | Changed: the arena as Tennis's hall: a green table, a tile crowd, an umpire.
+- **Era 3**, 1989 Sega Genesis | reference: *Golden Axe* + *Altered Beast* | Added: depth: line-scrolled parallax planes behind the arena | Changed: the HUD as a status bar with portraits and a meter of pots.
+- **Era 4**, 1991 Super Nintendo | reference: *F-Zero* + *Super Mario World* | Added: the camera: the table in perspective on one Mode 7 plane | Changed: the table top: 1991's blue, foreshortened, its shadow and halo by colour math.
+- **Era 5**, 1994 PlayStation | reference: *Ridge Racer* + *Tekken* | Added: real 3D: lit polygons, the players standing whole | Changed: the picture through the PlayStation's limits: 320x240, no filtering, flat and Gouraud, affine swim, jitter, dither.
+- **Era 6**, 1996 Nintendo 64 | reference: *Super Mario 64* + *Wave Race 64* | Added: shadows under the players and the ball (blob discs) | Changed: smooth: three-point-filtered tiny textures, fog to the far wall, anti-aliased smooth shading.
+- **Era 7**, 1999 Dreamcast | reference: *Jet Set Radio* (2000) + *Soulcalibur* | Added: contact effects: the impact burst and speed lines | Changed: cel shading with ink outlines at 640x480, no fog.
+- **Era 8**, 2000 PlayStation 2 | reference: *Metal Gear Solid 2* (E3 2000) + *Tekken Tag Tournament* | Added: weather and particles: rain, dust, sparks | Changed: the film presentation: letterbox, a drifting camera, the field mirrored in the slab as mirrored geometry, 512x448 interlaced.
+- **Era 9**, 2001 Xbox | reference: *Halo: Combat Evolved* + *Project Gotham Racing* | Added: a dynamic light with cast shadows (the ball is the light) | Changed: per-pixel materials: bump-mapped plate, specular bats and ball.
+- **Era 10**, 2005 Xbox 360 | reference: *Gears of War* (2006) + *Project Gotham Racing 3* | Added: achievements: the toast and the gamerscore | Changed: HD 720p with the full post chain (bloom, depth of field, motion blur, grain, grade) over everything the ladder built.
+
+### Era 0 reference: 1972 arcade Pong
+
+- **Pick:** Pong itself.
+- **Why:** the AAA game of 1972, by definition.
+- **Take:** nothing new; pinned to the pixel by `tools/eralooks-today.json`.
+- **Not:** anything.
+
+### Era 1 reference: 1977 Atari 2600
+
+- **Launch:** September 11, 1977, with nine cartridges.
+- **Candidates:** Combat (the pack-in 1977 to 1982), Video Olympics (the machine's own Pong:
+  excluded, it IS pong), Air-Sea Battle, Street Racer.
+- **Pick:** Combat.
+- **Why:** the cartridge in every box; two one-colour vehicles facing each other in an arena of
+  playfield blocks, the score along the top in each player's colour.
+- **Added:** the arena (a playfield wall and a flickering stand round the court).
+- **Changed:** colour: bars, ball and digits in the TIA's inks.
+- **Take:** 160 colour clocks x 192 lines; the 128-colour NTSC palette (16 hues x 8 luminances):
+  the twelve inks become real entries; four colour registers a scanline (COLUBK background, COLUPF
+  playfield, COLUP0, COLUP1), the ball in the playfield's colour, missiles in their player's; score
+  mode (the playfield's left half in player 0's colour, right half in player 1's) for the digits;
+  the playfield a 20-bit register reflected or copied to 40 blocks of 4 clocks (the wall and stand
+  on a 4-pixel grid, symmetric); players 8 pixels wide (x2, x4, duplicated); registers hold one
+  line (racing the beam); TIA sound 2 channels, 4-bit volume, 5-bit frequency divider, 4-bit
+  waveform; Combat's round 2:16.
+- **Not:** tank, biplane and jet shapes, its mazes, its name; nothing from Video Olympics.
+- **Sources:**
+  - https://en.wikipedia.org/wiki/Television_Interface_Adaptor
+  - https://en.wikipedia.org/wiki/Combat_(video_game)
+  - https://dfarq.homeip.net/atari-2600-launch-titles/
+  - https://www.atariarchive.org/blog/air-sea-battle-target-fun-september-1977/
+
+### Era 2 reference: 1985 NES
+
+- **Launch:** North America October 18, 1985, 17 launch titles.
+- **Candidates:** Super Mario Bros. (September 13, 1985 Japan, the NES pack-in), Tennis (January
+  14, 1984 Japan, a 1985 launch title with Mario as the umpire in a chair), Duck Hunt, Excitebike,
+  Kung Fu.
+- **Pick:** Super Mario Bros. and Tennis.
+- **Why:** Super Mario Bros. for the figures, tiles and sound; Tennis for the racket sport's
+  presentation.
+- **Added:** the game speaks: a scoreline band with names, the rally count and the umpire's calls.
+- **Changed:** the arena as Tennis's hall: a green table, a tile crowd, an umpire.
+- **Take:** 256x240; a 64-entry palette of about 54 or 55 distinct colours ($0F black, $30 the
+  brightest white, $0D forbidden); 4 background palettes and 4 sprite palettes of 3 colours plus a
+  shared backdrop (a figure is 3 colours plus transparent per palette); 64 sprites, 8 per scanline
+  (the ninth dropped: real games flickered), 8x8 or 8x16, flips, a behind-background priority bit;
+  one palette per 16x16 attribute area of background; Super Mario Bros.' big figure is a 16x32
+  rectangle; the 2A03's two pulses (12.5, 25, 50 percent), triangle, noise, DPCM; Tennis's umpire
+  and calls; a 1985 table is GREEN (tables "have traditionally been green"; blue arrived at the
+  1991 Worlds), NES green $0A or $1A under white $30 lines.
+- **Not:** Mario, the kingdom, Tennis's perspective court (rung 2 stays flat), any Nintendo mark.
+- **Sources:**
+  - https://en.wikipedia.org/wiki/Tennis_(1984_video_game)
+  - https://en.wikipedia.org/wiki/Super_Mario_Bros.
+  - https://www.nesdev.org/wiki/PPU_OAM
+  - https://www.nesdev.org/wiki/PPU_palettes
+  - https://www.nippon.com/en/japan-topics/c11705/an-all-new-take-on-the-table-tennis-table.html
+
+### Era 3 reference: 1989 Sega Genesis
+
+- **Launch:** North America August 1989, Altered Beast the pack-in until 1991.
+- **Candidates:** Altered Beast, Golden Axe (arcade January 1989; Mega Drive December 23, 1989
+  Japan, January 1990 North America), Ghouls 'n Ghosts, The Revenge of Shinobi, Phantasy Star II.
+- **Pick:** Golden Axe and Altered Beast.
+- **Why:** Golden Axe for the characters and the interface (a barbarian, an amazon, a dwarf; life
+  bars and magic pots); Altered Beast for the pack-in's scale (large System-16 sprites, parallax, a
+  graveyard).
+- **Added:** depth: line-scrolled parallax planes behind the arena.
+- **Changed:** the HUD as a status bar with portraits and a meter of pots.
+- **Take:** 320x224 (H40) or 256x224; a 512-colour palette (3 bits a channel), 4 palettes of 16,
+  61 on screen (a figure is 15 colours plus transparent); sprites up to 32x32 (4x4 cells), 80 a
+  frame, 20 a line at 320; planes A and B plus the window, horizontal scroll per line or per cell
+  (parallax is line-scrolled bands); YM2612 six 4-op FM channels (channel 6 as 8-bit PCM) and the
+  SN76489's three squares and noise; the table stays green (1989 is before 1991).
+- **Not:** Ax Battler, Gilius, the werewolf, the logo, "Rise from your grave".
+- **Sources:**
+  - https://en.wikipedia.org/wiki/Sega_Genesis
+  - https://en.wikipedia.org/wiki/Golden_Axe_(video_game)
+  - https://en.wikipedia.org/wiki/Altered_Beast
+  - https://megacatstudios.com/blogs/retro-development/sega-genesis-mega-drive-vdp-graphics-guide-v1-2a-03-14-17
+  - https://wiki.megadrive.org/index.php?title=VDP_Sprites
+
+### Era 4 reference: 1991 Super Nintendo
+
+- **Launch:** North America August 23, 1991, Super Mario World the pack-in; F-Zero and Pilotwings
+  launch titles, both November 21, 1990 in Japan.
+- **Candidates:** F-Zero, Super Mario World, Pilotwings, SimCity, Gradius III.
+- **Pick:** F-Zero and Super Mario World.
+- **Why:** F-Zero for the perspective and the interface (a Mode 7 floor rotated and scaled per
+  scanline; power meter, speedometer, lap, rank, track map); Super Mario World for the figures and
+  palette (the saturated 16x32 figure, a reserve box and counters along the top, Kondo writing for
+  eight voices).
+- **Added:** the camera: the table in perspective on one Mode 7 plane.
+- **Changed:** the table top: 1991's blue, foreshortened, its shadow and halo by colour math.
+- **Take:** 256x224 (also 512x224 and 512x448 interlaced); 32,768 colours, 256 on screen; sprites
+  128 a frame, 32 a scanline and 34 slivers, sizes 8x8 to 64x64, 4 bits a pixel (15 plus
+  transparent) from 8 sprite palettes; Mode 7 is ONE background layer (a 128x128 tilemap of 8x8
+  tiles, 1024x1024 pixels, 8 bits a pixel) rotated and scaled by an affine matrix changed per
+  scanline, no other background in that mode, only sprites: the floor and the table are one plane
+  with one horizon; colour math for translucent panels; the S-DSP's 8 voices of 16-bit BRR samples
+  at 32 kHz with the echo; the table turns BLUE here: blue San-Ei tables at the 1991 World
+  Championships in Chiba, then Barcelona 1992.
+- **Not:** the Blue Falcon or any machine, Mario, Yoshi, the cape.
+- **Sources:**
+  - https://en.wikipedia.org/wiki/F-Zero_(video_game)
+  - https://en.wikipedia.org/wiki/Super_Mario_World
+  - https://en.wikipedia.org/wiki/Super_Nintendo_Entertainment_System_technical_specifications
+  - https://snes.nesdev.org/wiki/Sprites
+  - https://snes.nesdev.org/wiki/Mode_7
+  - https://en.wikipedia.org/wiki/Mode_7
+  - https://www.nippon.com/en/japan-topics/c11705/an-all-new-take-on-the-table-tennis-table.html
+
+### Era 5 reference: 1994 PlayStation
+
+- **Launch:** Japan December 3, 1994; North America September 9, 1995; Ridge Racer launched with it
+  in both; Tekken in arcades December 9, 1994 on System 11, PlayStation hardware, and on the
+  console March 31, 1995 Japan, November 8, 1995 North America, the first PlayStation
+  million-seller.
+- **Candidates:** Ridge Racer, Tekken, Battle Arena Toshinden, Motor Toon Grand Prix, Jumping
+  Flash!.
+- **Pick:** Ridge Racer and Tekken.
+- **Why:** Ridge Racer for the arena and the machine's look (a textured city with the affine swim,
+  jitter and dither, under techno); Tekken for two characters facing each other and the HUD
+  (polygon fighters on a flat stage with a 2D backdrop at 60 fps, two long health bars and a round
+  timer).
+- **Added:** real 3D: lit polygons, the players standing whole.
+- **Changed:** the picture through the PlayStation's limits: 320x240, no filtering, flat and
+  Gouraud, affine swim, jitter, dither.
+- **Take:** 320x240 (256x224 to 640x240); a 16-bit framebuffer in 1 MB VRAM with a 2 KB texture
+  cache (textures tiny: 64x64 at 4 bits or smaller); flat or Gouraud shading; 360,000 flat polygons
+  a second, 90,000 textured, lit and Gouraud; affine texture mapping with no perspective correction
+  (swim), no sub-pixel precision and fixed-point maths (jitter), no Z-buffer (an ordering table),
+  dithering; SPU 24 ADPCM voices, 44.1 kHz, 512 KB, hardware reverb; in the layer:
+  `render.resolution` 0.4 (320x240), `render.filter` false, `render.lighting` flat, the affine warp
+  on the slab's texture through `PongField3D.internals()`.
+- **Not:** Ridge City's logos and cars, any fighter, the Namco names.
+- **Sources:**
+  - https://en.wikipedia.org/wiki/PlayStation_technical_specifications
+  - https://en.wikipedia.org/wiki/Ridge_Racer_(video_game)
+  - https://en.wikipedia.org/wiki/Tekken_(video_game)
+  - https://pikuma.com/blog/how-to-make-ps1-graphics
+  - https://www.howtogeek.com/why-did-the-playstation-1-have-wobbly-graphics/
+
+### Era 6 reference: 1996 Nintendo 64
+
+- **Launch:** North America September 29, 1996; Super Mario 64 and Pilotwings 64 launch titles; Wave
+  Race 64 November 4, 1996; Mario Kart 64 is 1997 in North America, excluded.
+- **Candidates:** Super Mario 64, Wave Race 64, Pilotwings 64.
+- **Pick:** Super Mario 64 and Wave Race 64.
+- **Why:** Super Mario 64 for the world, the camera and the shadows (a camera operated by Lakitu; "a
+  faux shadow directly beneath each object regardless of the area's lighting", Koizumi's "iron-clad
+  necessity"; a power meter of eight pie segments; painted skies in fog; "the most visually
+  impressive game of all time"); Wave Race 64 for the announcer (its "hyperexcited" calls are what
+  the feel layer's rally callouts from era 6 up already are).
+- **Added:** shadows under the players and the ball (blob discs).
+- **Changed:** smooth: three-point-filtered tiny textures, fog to the far wall, anti-aliased smooth
+  shading.
+- **Take:** 320x240 typical (256x224 to 640x480), 16 or 32-bit framebuffer, 4 MB RDRAM; TMEM 4,096
+  bytes: one texture at a time of at most 32x64 texels at 16 bits or 64x64 at 4 bits; three-point
+  filtering ("linearly interpolates the three nearest texels"); perspective-correct textures,
+  Z-buffer, anti-aliasing, fog, mip-mapping; about 100,000 polygons a second; a soft dark disc
+  under every object whatever the light does; audio mixed on the RSP, 16 to 24 channels of 16-bit
+  ADPCM; Super Mario 64 ran at 30 fps (the layer keeps 60: readability wins). In the layer:
+  `render.filter` true, `render.fog` to the far wall, `render.lighting` lambert, a slab texture no
+  bigger than 32x64 at 16 bits.
+- **Not:** Mario, Lakitu, the castle, the riders.
+- **Sources:**
+  - https://en.wikipedia.org/wiki/Nintendo_64_technical_specifications
+  - https://en.wikipedia.org/wiki/Super_Mario_64
+  - https://en.wikipedia.org/wiki/Wave_Race_64
+  - http://filthypants.blogspot.com/2014/12/n64-3-point-texture-filtering-in.html
+  - https://ultra64.ca/files/documentation/online-manuals/man/pro-man/pro14/14-01.html
+
+### Era 7 reference: 1999 Dreamcast
+
+- **Launch:** North America September 9, 1999; Soulcalibur (August 5, 1999 Japan) and Sonic
+  Adventure launched with it; Jet Set Radio June 29, 2000 Japan, October 31, 2000 North America as
+  Jet Grind Radio: one year past the rung.
+- **Candidates:** Soulcalibur, Sonic Adventure, Jet Set Radio, Power Stone, NFL 2K.
+- **Pick:** Jet Set Radio and Soulcalibur.
+- **Why:** Jet Set Radio for the look (the Guinness record as the first cel-shaded video game:
+  "exaggerated shapes, thick lines, and flat, bright colors", graffiti, inline skaters, a pirate
+  radio DJ; the look era 7 already wears); Soulcalibur for the two-fighter arena (stages "in full
+  3D polygons", a 98 on Metacritic, IGN's last perfect score for nearly a decade; two characters on
+  a ring with an edge, health bars and a timer, 60 fps). Tim may choose the strict 1999 look
+  instead (the chief asks him); this entry stands until he does.
+- **Added:** contact effects: the impact burst and speed lines.
+- **Changed:** cel shading with ink outlines at 640x480, no fog.
+- **Take:** 640x480 through VGA at 60 Hz; 16.77 million colours; PowerVR2 at 100 MHz drawing tile
+  by tile, more than 3 million polygons a second in play (7 million raw); trilinear filtering,
+  Z-buffer, bump mapping; SH-4 at 200 MHz; 16 MB main, 8 MB video, 2 MB audio; AICA 64 voices with
+  an ARM7; cel: two or three hard bands a face and an ink outline outside every silhouette, flat
+  poster fills, big slanted type; no fog.
+- **Not:** Beat, the GG's, Professor K, the Soulcalibur cast, any Sega mark.
+- **Sources:**
+  - https://en.wikipedia.org/wiki/Dreamcast
+  - https://en.wikipedia.org/wiki/Soulcalibur_(video_game)
+  - https://en.wikipedia.org/wiki/Jet_Set_Radio
+  - https://en.wikipedia.org/wiki/Sonic_Adventure
+
+### Era 8 reference: 2000 PlayStation 2
+
+- **Launch:** Japan March 4, 2000; North America October 26, 2000; Tekken Tag Tournament a launch
+  title in both, SSX in North America; Metal Gear Solid 2 shown at E3 May 2000 "praising its level
+  of realism", released November 13, 2001.
+- **Candidates:** Tekken Tag Tournament, SSX, Metal Gear Solid 2 (the E3 2000 demo), Ridge Racer V,
+  Dead or Alive 2: Hardcore.
+- **Pick:** Metal Gear Solid 2's E3 2000 demo and Tekken Tag Tournament.
+- **Why:** Metal Gear Solid 2's E3 2000 demo for the look (the tanker in the rain at night,
+  letterboxed real-time cutscenes, the Codec's portraits: what 2000 saw of the machine, and what
+  era 8 already is); Tekken Tag Tournament for two fighters at 60 fps with two health bars a side
+  and a timer.
+- **Added:** weather and particles: rain, dust, sparks.
+- **Changed:** the film presentation: letterbox, a drifting camera, the field mirrored in the slab
+  as mirrored geometry, 512x448 interlaced.
+- **Take:** 640x448 or 512x448 interlaced (480p optional); 32-bit RGBA; the Graphics Synthesizer
+  at 147 MHz with 4 MB eDRAM and 2.352 gigapixels a second through 16 pipelines (particles and
+  multipass cheap; 75 million small polygons a second, 20 to 25 million with lighting and bones);
+  NO pixel shaders and no hardware bump mapping: reflections are mirrored geometry under a
+  translucent floor, glow is multipass alpha; VU0 and VU1 programmable vertex units; SPU2 48 voices
+  at 48 kHz, 2 MB.
+- **Not:** Snake, the Codec frequencies, the Tekken cast, the Konami and Namco names.
+- **Sources:**
+  - https://en.wikipedia.org/wiki/PlayStation_2_technical_specifications
+  - https://en.wikipedia.org/wiki/Metal_Gear_Solid_2:_Sons_of_Liberty
+  - https://en.wikipedia.org/wiki/Tekken_Tag_Tournament
+  - https://en.wikipedia.org/wiki/SSX_(video_game)
+
+### Era 9 reference: 2001 Xbox
+
+- **Launch:** North America November 15, 2001; Halo: Combat Evolved, Project Gotham Racing and Dead
+  or Alive 3 launch titles.
+- **Candidates:** Halo, Project Gotham Racing, Dead or Alive 3, Munch's Oddysee.
+- **Pick:** Halo and Project Gotham Racing.
+- **Why:** Halo for the lighting, the HUD and the hangar (a million copies in five months, six
+  million by 2005; "a blue bar in the corner" for the shield, a health meter, a motion tracker;
+  per-pixel bump and specular on grey metal under dynamic light; a monk chant); Project Gotham
+  Racing for the night city and the reflections (London, New York, San Francisco, Tokyo; Kudos for
+  style).
+- **Added:** a dynamic light with cast shadows (the ball is the light).
+- **Changed:** per-pixel materials: bump-mapped plate, specular bats and ball.
+- **Take:** 640x480 (480i, 480p, 720p, 1080i supported), 32-bit colour; NV2A at 233 MHz, a GeForce
+  3 derivative with a second vertex pipeline: programmable vertex and pixel shaders, 4 pixel
+  pipelines with 2 texture units each, 115 million vertices a second, 932 megapixels a second,
+  "true reflective bump mapping" and "per-pixel lighting"; 64 MB unified; 8 GB disk; 64 3D voices,
+  256 stereo voices, Dolby Digital 5.1.
+- **Not:** the Master Chief's silhouette, helmet or visor shape (item 1234 dropped two gamerpics for
+  looking like "one famous franchise helmet": ERAS.md rule 1.9), the Covenant, the ring, licensed
+  cars.
+- **Sources:**
+  - https://en.wikipedia.org/wiki/Xbox_technical_specifications
+  - https://en.wikipedia.org/wiki/GeForce_3_series
+  - https://www.gamespot.com/articles/inside-the-xbox-gpu/1100-2764159/
+  - https://en.wikipedia.org/wiki/Halo:_Combat_Evolved
+  - https://en.wikipedia.org/wiki/Project_Gotham_Racing_(video_game)
+
+### Era 10 reference: 2005 Xbox 360
+
+- **Launch:** North America November 22, 2005 with 18 launch titles: Project Gotham Racing 3,
+  Perfect Dark Zero, Kameo, Call of Duty 2, Condemned; Gears of War shown at GDC 2005, released
+  November 7, 2006.
+- **Candidates:** Gears of War, Project Gotham Racing 3, Perfect Dark Zero, Call of Duty 2, Kameo,
+  Condemned.
+- **Pick:** Gears of War and Project Gotham Racing 3.
+- **Why:** Gears of War for the look (Unreal Engine 3's "destroyed beauty": a desaturated brown and
+  grey palette, normal-mapped bulky characters, bloom and depth of field, the roadie-run camera;
+  IGN: "the most gorgeous looking game on the Xbox 360"; the look era 10 already wears); Project
+  Gotham Racing 3 for HD and the 2005 launch (cars of 80,000 to 100,000 polygons, HD cities, Gotham
+  TV replays). Tim may choose the strict 2005 look instead (the chief asks him); this entry stands
+  until he does.
+- **Added:** achievements: the toast and the gamerscore.
+- **Changed:** HD 720p with the full post chain (bloom, depth of field, motion blur, grain, grade)
+  over everything the ladder built.
+- **Take:** 1280x720 native for most games (the 4:3 field takes the 960x720 middle, as landed),
+  scaled to 1080i/p; Xenos at 500 MHz with 10 MB eDRAM (anti-aliasing at 720p), 240 GFLOPS, unified
+  shaders; three cores at 3.2 GHz; 512 MB GDDR3; 8.5 GB DVD; Dolby Digital 5.1 required; HDR with
+  bloom, depth of field, motion blur, a grade and grain; normal-mapped everything, rim light;
+  achievements: the toast and the gamerscore, new in 2005; the budget is the post chain, not the
+  polygons.
+- **Not:** the COG cog, Marcus Fenix's armour, the Locust, licensed cars, the real Blades dashboard
+  art.
+- **Sources:**
+  - https://en.wikipedia.org/wiki/Xbox_360_technical_specifications
+  - https://en.wikipedia.org/wiki/Gears_of_War_(video_game)
+  - https://en.wikipedia.org/wiki/Project_Gotham_Racing_3
+  - https://en.wikipedia.org/wiki/Xbox_360_launch
+  - https://news.microsoft.com/source/2005/11/14/microsoft-announces-xbox-360-day-one-launch-lineup-strongest-launch-in-the-history-of-video-game-consoles/

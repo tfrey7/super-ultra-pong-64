@@ -5,6 +5,10 @@ Look file: [src/eras/era6-n64.js](../../src/eras/era6-n64.js). Chapter 7 of [doc
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Super Mario 64* + *Wave Race 64*. Added: shadows under the players and the ball (blob discs).
+  Changed: smooth: three-point-filtered tiny textures, fog to the far wall, anti-aliased smooth
+  shading.
 - **Native resolution here:** 320 x 240, scaled up soft.
 - **Texture budget:** tiny. The grass is textured from a **16 x 16 tile** through 8 x 6 finely cut
   quads, under the pixellab wood-grain court (`court-grain`).

@@ -5,6 +5,9 @@ Look file: [src/eras/era1-atari2600.js](../../src/eras/era1-atari2600.js).
 
 ## THE MACHINE
 
+- **Reference game** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *Combat*. Added: the arena (a playfield wall and a flickering stand round the court). Changed:
+  colour: bars, ball and digits in the TIA's inks.
 - **Picture:** the 1972 field and frame, but each paddle and its score wear a colour. The first
   point of a session picks those colours (`state.paddleColour` holds a palette index), and every
   later era keeps them (`like: 1`).

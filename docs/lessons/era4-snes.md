@@ -5,6 +5,9 @@ Look file: [src/eras/era4-snes.js](../../src/eras/era4-snes.js).
 
 ## THE MACHINE
 
+- **Reference games** (the art bible's [Reference games](../ART.md#reference-games), item 1286):
+  *F-Zero* + *Super Mario World*. Added: the camera: the table in perspective on one Mode 7 plane.
+  Changed: the table top: 1991's blue, foreshortened, its shadow and halo by colour math.
 - **Picture:** a dusk sky running from night blue to a warm horizon, a mountain line and stars.
   Below the horizon is a **Mode 7 floor**: a checkerboard laid out in perspective, sliding slowly
   toward you the way F-Zero's track did. The paddles and the ball are shaded sprites floating over
