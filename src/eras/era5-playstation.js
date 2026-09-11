@@ -89,12 +89,12 @@
   var HUD = { cell: 3, gap: 2, top: 9, offset: 44, shadow: 1 };
 
   /** The wobbling, snapping camera for this frame: a pure function of state.time. */
-  function cameraAt(T, state, spec) {
+  function cameraAt(T, state, spec, lift) {
     spec = spec || CAMERA;
     var t = state.time || 0;
     return T.camera({
       tilt: spec.tilt,
-      height: spec.height + MOTION.height * Math.sin(t * MOTION.heightRate),
+      height: spec.height + (lift || 0) + MOTION.height * Math.sin(t * MOTION.heightRate),
       fov: spec.fov,
       screenY: spec.screenY,
       panX: (spec.panX || 0) + MOTION.pan * Math.sin(t * MOTION.panRate),
@@ -326,12 +326,217 @@
     }
   }
 
+  // ------------------------------------------------------------ the arrival (item 1151)
+  /*
+   * THE PLAYSTATION ARRIVES (docs/ERAS.md chapter 6, "Arrival flourish"), three beats
+   * on the ring's eased progress p:
+   *   1. ignition (p 0 to 0.25): the Super Nintendo picture breaks into 12 polygons at
+   *      the point. Each carries its own piece of that picture, mapped with ONE affine
+   *      transform (so it swims), and tilts up into perspective as it flies outward --
+   *      foreshortened, receding, turning -- with every vertex jittered and snapped to
+   *      the 2.5-pixel chunk grid, flat-shaded in the four accents.
+   *   2. the edge (p 0.25 to 0.8): the ring's edge is a wobbling, snapped 16-gon, red
+   *      outside and yellow just inside, over a stippled band.
+   *   3. arrival (p 0.8 to 1): the table pops in like a model loading. The camera, held
+   *      back at 1190 while the ring grows, eases to 1150 with one small overshoot,
+   *      under a white wash fading from 0.3.
+   * The ring stays the truth of which era draws where; the boot chime is the voice's
+   * `boot` list below, which the sound player sounds for the point (a flourish plays
+   * nothing). The shards fly to the chapter's 1.6 R but are held inside R + 60
+   * (section 4's law), and the overshoot is floored so every pose stays measured (R3).
+   */
+  var ARRIVAL = {
+    ignition: 0.25, settle: 0.8,
+    shards: 12, sizeMin: 18, sizeMax: 40, fly: 1.6, reach: 60, grow: 40,
+    tiltMax: 1.25, recede: 0.8, snap: 2.5, jitter: 1.25, jitterRate: 30,
+    sides: 16, wobble: 6, wobbleRate: 40, red: 5, yellow: 3, band: 10, inset: 4,
+    from: 1190, overshoot: 1.2, floor: -3, wash: 0.3
+  };
+
+  function clamp01(v) { return v > 0 ? (v < 1 ? v : 1) : 0; }
+  function snapTo(v, g) { return Math.round(v / g) * g; }
+
+  /** The 12 shards of an arrival at `origin`: a seeded LCG gives each a size, direction, spin and speed. */
+  function shardsFor(origin) {
+    var s = (1994 + Math.round(origin.x) * 7919 + Math.round(origin.y) * 104729) >>> 0;
+    function rnd() { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }
+    var out = [];
+    for (var i = 0; i < ARRIVAL.shards; i++) {
+      out.push({
+        dir: (i + rnd() * 0.8) * 2 * Math.PI / ARRIVAL.shards,
+        size: ARRIVAL.sizeMin + rnd() * (ARRIVAL.sizeMax - ARRIVAL.sizeMin),
+        spin: (rnd() < 0.5 ? -1 : 1) * (1.5 + rnd() * 3),
+        speed: 0.6 + rnd() * 0.4,
+        turn: rnd() * 2 * Math.PI,
+        home: 8 + rnd() * 24,
+        accent: PAL.accents[i % PAL.accents.length]
+      });
+    }
+    return out;
+  }
+
+  /**
+   * One shard at eased progress p: `src`, its triangle in the old picture (field
+   * units), `dst`, where that triangle is on screen this frame (jittered, snapped),
+   * `alpha` and `shade` (how much flat accent covers the picture as it turns).
+   */
+  function shardPose(sh, origin, p, radius, t, index) {
+    var u = clamp01(p / ARRIVAL.ignition);
+    var size = sh.size * clamp01(radius / ARRIVAL.grow);           // pops in as the ring opens
+    var far = Math.min(ARRIVAL.fly * radius, radius + ARRIVAL.reach - size);
+    var dist = Math.max(sh.home, sh.speed * far);
+    var hx = origin.x + Math.cos(sh.dir) * sh.home, hy = origin.y + Math.sin(sh.dir) * sh.home;
+    var cx = origin.x + Math.cos(sh.dir) * dist, cy = origin.y + Math.sin(sh.dir) * dist;
+    var k = 1 / (1 + ARRIVAL.recede * u);                           // recedes into perspective
+    var lean = Math.cos(ARRIVAL.tiltMax * u);                       // tilts up off the picture plane
+    var ca = Math.cos(sh.spin * u), sa = Math.sin(sh.spin * u);
+    var frame = Math.floor((t || 0) * ARRIVAL.jitterRate);
+    var src = [], dst = [];
+    for (var v = 0; v < 3; v++) {
+      var a = sh.turn + v * 2 * Math.PI / 3;
+      var lx = Math.cos(a) * size, ly = Math.sin(a) * size;
+      src.push({ x: hx + lx, y: hy + ly });
+      var n = (index * 3 + v) * 12.9898 + frame * 78.233;
+      dst.push({
+        x: snapTo(cx + (lx * ca - ly * sa) * k + ARRIVAL.jitter * Math.sin(n), ARRIVAL.snap),
+        y: snapTo(cy + (lx * sa + ly * ca) * lean * k + ARRIVAL.jitter * Math.cos(n * 1.7), ARRIVAL.snap)
+      });
+    }
+    var alpha = u < 1 ? 1 - clamp01((u - 0.75) / 0.25) : 0;
+    return { u: u, src: src, dst: dst, alpha: alpha, shade: 0.3 + 0.35 * (1 - Math.abs(ca)) };
+  }
+
+  /** The edge of beat 2: a 16-gon wobbling about the ring, `inset` inside it, snapped to the chunk grid. */
+  function edgePolygon(origin, radius, time, inset) {
+    var pts = [];
+    for (var i = 0; i < ARRIVAL.sides; i++) {
+      var a = i * 2 * Math.PI / ARRIVAL.sides;
+      var r = Math.max(0, radius - (inset || 0) + ARRIVAL.wobble * Math.sin(i * 2.3 + (time || 0) * ARRIVAL.wobbleRate));
+      pts.push({ x: snapTo(origin.x + r * Math.cos(a), ARRIVAL.snap), y: snapTo(origin.y + r * Math.sin(a), ARRIVAL.snap) });
+    }
+    return pts;
+  }
+
+  function easeOutBack(u) {
+    var c1 = ARRIVAL.overshoot, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2);
+  }
+
+  /** Field units the camera is held above its rest height at eased progress p: 40 until beat 3, then home with one overshoot. */
+  function liftAt(p) {
+    if (!(p < 1)) return 0;
+    var hold = ARRIVAL.from - CAMERA.height;
+    if (!(p >= ARRIVAL.settle)) return hold;
+    var u = clamp01((p - ARRIVAL.settle) / (1 - ARRIVAL.settle));
+    return Math.max(ARRIVAL.floor, hold * (1 - easeOutBack(u)));
+  }
+
+  // Private memory (bible rule 1.4): which point's arrival is playing, so the lift is
+  // never put on era 5's picture while it is the one being LEFT.
+  var arrivingAt = null;
+  var oldPic = { at: null, from: null, dim: null };
+
+  /** The picture being left, drawn once per arrival into its own buffer; null with no document. */
+  function oldPicture(state, fromEra, W, H, dim) {
+    var T = R.table3d;
+    var off = T && T.offscreen('ps1-arrival-old', W, H);
+    if (!off || typeof off.ctx.setTransform !== 'function') return null;
+    if (oldPic.at !== state.eraChangedAt || oldPic.from !== fromEra || oldPic.dim !== dim) {
+      off.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      off.ctx.clearRect(0, 0, W, H);
+      off.ctx.save();
+      R.draw(off.ctx, Object.assign({}, state, { era: fromEra }), dim ? { ink: dim } : undefined);
+      off.ctx.restore();
+      oldPic = { at: state.eraChangedAt, from: fromEra, dim: dim };
+    }
+    return off.canvas;
+  }
+
+  function polyPath(c, pts, reverse) {
+    for (var i = 0; i < pts.length; i++) {
+      var q = pts[reverse ? pts.length - 1 - i : i];
+      if (i) c.lineTo(q.x, q.y);
+      else c.moveTo(q.x, q.y);
+    }
+    c.closePath();
+  }
+
+  /** The flourish hook (the header of src/erachange.js is the contract). */
+  function arrival(ctx, p, origin, fromEra, toEra, info) {
+    if (toEra !== 5 || !info || !info.state) return;   // a look borrowed is not a flourish borrowed
+    var T = R.table3d, state = info.state, r = info.radius, dim = info.dim || null;
+    arrivingAt = state.eraChangedAt;
+
+    if (p < ARRIVAL.ignition) {                         // 1. ignition: the old picture shatters and lifts
+      var pic = oldPicture(state, fromEra, info.width, info.height, dim);
+      var shards = shardsFor(origin);
+      for (var i = 0; i < shards.length; i++) {
+        var pose = shardPose(shards[i], origin, p, r, info.t, i);
+        if (!(pose.alpha > 0)) continue;
+        var s = pose.src, d = pose.dst;
+        ctx.save();
+        ctx.globalAlpha = pose.alpha;
+        ctx.beginPath();
+        polyPath(ctx, d);
+        var m = pic && affine(s[0].x, s[0].y, s[1].x, s[1].y, s[2].x, s[2].y, d[0].x, d[0].y, d[1].x, d[1].y, d[2].x, d[2].y);
+        if (m) {
+          ctx.save();
+          ctx.clip();
+          ctx.imageSmoothingEnabled = false;
+          ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+          ctx.drawImage(pic, 0, 0, info.width, info.height);
+          ctx.restore();
+          ctx.beginPath();
+          polyPath(ctx, d);
+          ctx.globalAlpha = pose.alpha * pose.shade;
+        }
+        ctx.fillStyle = dim || shards[i].accent;
+        ctx.fill();
+        ctx.restore();
+      }
+    } else if (p < ARRIVAL.settle) {                    // 2. the edge: a wobbling, snapped 16-gon
+      if (!(r > 1)) return;
+      var time = state.time || 0;
+      var outer = edgePolygon(origin, r, time, 0);
+      var tile = !dim && T ? T.ditherTile(PAL.void, PAL.base, 8, ARRIVAL.snap) : null;
+      if (tile) {
+        ctx.beginPath();
+        polyPath(ctx, outer);
+        polyPath(ctx, edgePolygon(origin, r, time, ARRIVAL.band), true);
+        ctx.fillStyle = tile;
+        ctx.fill('evenodd');
+      }
+      ctx.lineJoin = 'miter';
+      ctx.beginPath();
+      polyPath(ctx, outer);
+      ctx.lineWidth = ARRIVAL.red;
+      ctx.strokeStyle = dim || PAL.accents[0];
+      ctx.stroke();
+      ctx.beginPath();
+      polyPath(ctx, edgePolygon(origin, r, time, ARRIVAL.inset));
+      ctx.lineWidth = ARRIVAL.yellow;
+      ctx.strokeStyle = dim || PAL.accents[1];
+      ctx.stroke();
+    } else if (!dim) {                                  // 3. arrival: the model pops in under a white wash
+      ctx.globalAlpha = ARRIVAL.wash * (1 - clamp01((p - ARRIVAL.settle) / (1 - ARRIVAL.settle)));
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, info.width, info.height);
+    }
+  }
+
+  /** The arrival's camera lift for this state: only while era 5's own arrival is on screen. */
+  function arrivalLift(state) {
+    if (arrivingAt === null || arrivingAt !== state.eraChangedAt || typeof R.eraChangeMoment !== 'function') return 0;
+    var m = R.eraChangeMoment(state);
+    return m && m.era === 5 && m.wiping ? liftAt(m.p) : 0;
+  }
+
   function draw(ctx, state, opts, api) {
     var P = api || R;
     if (opts && opts.ink) return P.drawBase(ctx, state, opts);
     var T = P.table3d;
     if (!T) return P.drawBase(ctx, state, opts);
-    var cam = cameraAt(T, state, P.eraLook(state.era).camera);
+    var cam = cameraAt(T, state, P.eraLook(state.era).camera, arrivalLift(state));
     var buf = T.offscreen(BUFFER.key, BUFFER.w, BUFFER.h);
     if (buf && typeof buf.ctx.setTransform !== 'function') buf = null;
 
@@ -394,6 +599,12 @@
                 { wave: 'triangle', freq: 196, at: 0.9, dur: 0.6, gain: 0.08 } ],
       effects: { reverb: { seconds: 1.2, decay: 2.5, mix: 0.25 } }
     },
-    draw: draw
+    draw: draw,
+    flourish: arrival,
+    // The arrival's pure parts, for the tests (item 1151).
+    arrival: {
+      ARRIVAL: ARRIVAL, shardsFor: shardsFor, shardPose: shardPose,
+      edgePolygon: edgePolygon, liftAt: liftAt, arrivalLift: arrivalLift
+    }
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
