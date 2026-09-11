@@ -115,6 +115,8 @@ async function measure(setup, gpu, overlay) {
         await sleep(30);
       }
       const d = await timing;
+      const native = await s.eval('(() => { const D = window.PongDisplay; const c = D && D.enabled && D.canvas(); ' +
+        'return c ? c.width + "x" + c.height : "page"; })()');
       let ring = null;
       if (era < 10) {
         await s.eval(`(() => { const g = window.__pong; g.startEra = 0; g.serveDelay = 0;
@@ -131,8 +133,6 @@ async function measure(setup, gpu, overlay) {
           requestAnimationFrame(tick);
         })`));
       }
-      const native = await s.eval('(() => { const D = window.PongDisplay; const c = D && D.enabled && D.canvas(); ' +
-        'return c ? c.width + "x" + c.height : "page"; })()');
       rows.push({ setup, gpu, overlay: overlay ? kind : 'none', era, native, ...stats(d), ring });
       console.log(`${setup.padEnd(12)} era ${String(era).padStart(2)} (${native.padEnd(8)} ${(overlay ? kind : 'none').padEnd(14)}): ` +
         `mean ${rows.at(-1).mean} ms, p95 ${rows.at(-1).p95} ms over ${rows.at(-1).frames} frames` +
