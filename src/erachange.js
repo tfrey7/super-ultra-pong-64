@@ -378,6 +378,7 @@
   R.ERA_CHANGE = {
     wipe: WIPE_S, edgePad: EDGE_PAD, styles: STYLES,
     wipeProgress: wipeProgress, easeWipe: easeWipe,
-    ringReach: ringReach, ringRadius: ringRadius, wipeOrigin: wipeOrigin
+    ringReach: ringReach, ringRadius: ringRadius, wipeOrigin: wipeOrigin,
+    composite: composite   // the finale's rewind (src/match.js) runs the ring backwards
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
