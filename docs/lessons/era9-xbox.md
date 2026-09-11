@@ -137,6 +137,15 @@ happens to be Pong, to its page in [docs/ART.md](../ART.md).*
   opened off disk by hand has its canvas tainted by the players. Nothing in the game reads pixels
   back, and the playtest's Chrome is started with file access, so nothing breaks today. The
   hangar and the beacon, which the era draws itself, are embedded in `src/textures3d.js`.
+- **The gamertags at `z` 60 covered the players' chests.** The bible put them "at the players'
+  head height", but a 90-unit player's head is at about 100, so the tags float at 118 now.
+
+**What it costs.** Nothing measurable. `docs/measure/item1233/era9ab.mjs` times era 9 on this
+branch and on master in the same minute, three rounds each, with era 8 beside it to show the
+machine's load (`era9ab.json`, 12 rows). Era 9 ran 0.86 to 1.02 times era 8 on the branch, and 0.90
+to 0.97 times on master. In the one quiet round the branch held 17.24 ms a frame, inside the
+playtest's 18.5 ms line, in software-drawn Chrome. With other runs loading the machine, every 3D era
+(master's included) read 36 to 53 ms, which is card 1216's known slowness.
 
 **What a one-era game would copy**
 
