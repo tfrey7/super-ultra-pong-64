@@ -9,11 +9,13 @@ project's `CLAUDE.md` and none of ours. This is the two-minute on-ramp. Read it,
 1972 arcade machine (black screen, two white bars, a square ball, a dashed centre line) and the
 game is meant to grow up through the eras around it as the session goes on. Evoland, but for Pong.
 Every point either side scores moves the machine **up one era** -- 0 the 1972 arcade machine,
-1 the 1977 Atari 2600 (the turn to colour), 2 the NES, 3 the Genesis, 4 the Super Nintendo, where
-it stops. It does not matter which side scored, so a match's fourth point lands on era 4 and every
-point after that leaves it there. **All five rungs are built** -- each has its own look, its own
-voice and a change moment -- and the README's *The era ladder* tables them, with a tracked
-reference frame of each in `docs/shots/eras/`. It opens on a **title screen** -- a real `phase` in
+1 the 1977 Atari 2600 (the turn to colour), 2 the NES, 3 the Genesis, 4 the Super Nintendo, then
+the 3D table: 5 the PlayStation, 6 the Nintendo 64, 7 the Dreamcast, 8 the PlayStation 2, 9 the
+Xbox and 10 the 2005 Xbox 360, where it stops. It does not matter which side scored, so a match's
+tenth point lands on era 10 and every point after that leaves it there. **All eleven rungs are
+built** -- each has its own look, its own voice and a change moment -- and the README's *The era
+ladder* tables them, with a tracked reference frame of each in `docs/shots/eras/`. Eras 5 to 10
+are specified in `docs/ERAS.md`, the era bible. It opens on a **title screen** -- a real `phase` in
 `src/game.js`, where `step()` moves nothing at all until `startGame()` is called -- with a
 self-playing demo rally behind it, drawn from the score's own block font. It is plain HTML and plain JavaScript — **no npm, no
 `package.json`, no build step, no framework, no dependencies of any kind** — and that is a
@@ -70,7 +72,7 @@ done. The repo itself binds nothing.
 node --test
 ```
 
-From the repo root, Node 18+. **75 tests, well under a second** (0.15 s measured). It is the headless suite over the pure rules
+From the repo root, Node 18+. **333 tests, about two seconds** (2.3 s measured by item 1157, with all eleven eras built). It is the headless suite over the pure rules
 in `src/game.js` — paddle bounces and their angles, wall bounces, scoring on each side, the serve
 reset, frame-rate independence and the era ladder — plus the era-look checks, which draw on a
 recording canvas and need no browser, and the sound checks (`test/sound.test.js`), which drive the
@@ -95,16 +97,17 @@ timing over the ring, against ordinary play just before it) with the paddle stil
 saving `era-wipe.png` mid-ring -- and, last, it **walks one match up the whole ladder**: a fresh
 era-0 machine, one point let through per rung, a check that each point moved it up exactly one era,
 a screenshot of each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to
-`ladder-era4-snes.png`, cropped to the field) and one more point to prove it stops on era 4.
-On the way up it **films each of the four era changes**: a frame caught mid-ring
-(`change-era0-to-era1.png` to `change-era3-to-era4.png`), a check that the ring's radius reached
+`ladder-era10-xbox360.png`, cropped to the field) and one more point to prove it stops on era 10.
+On the way up it **films each of the ten era changes**: a frame caught mid-ring
+(`change-era0-to-era1.png` to `change-era9-to-era10.png`), a check that the ring's radius reached
 the farthest corner from where the ball went out, and a check that once the ring has gone the live
-canvas matches the new era drawn offscreen more closely than the old one.
+canvas matches the new era drawn offscreen more closely than the old one -- or, when the two eras
+draw the very same frame (a `like: N` stand-in), matches the new era exactly.
 The changes alternate sides (item 1174): a change out of an even era (0 to 1, 2 to 3, ...) starts its ring at the left edge, a real miss past the player, and a change out of an odd era (1 to 2, 3 to 4, ...) starts it at the right edge, the player's own point put just past the computer's paddle -- and a check names the edge each ring came from.
-`--ladder` runs only that walk (about half a minute); `--scoring` runs only the rally and the
-scoring check (about fifteen seconds a run); `--reference` also copies its five era frames
-and four change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
-`index.html?era=N` (N is 0 to 4) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
+`--ladder` runs only that walk (about a minute for all eleven rungs); `--scoring` runs only the
+rally and the scoring check (about fifteen seconds a run); `--reference` also copies its eleven era
+frames and ten change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
+`index.html?era=N` (N is 0 to 10) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
 plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
 it cannot find a browser, and `--port <n>` if 9333 is busy; every launch gets a fresh Chrome profile
@@ -142,8 +145,8 @@ you ever add one of those things, this is the file that has to say so.
 - **Playtest screenshots.** The harness rewrites `docs/shots/playtest/` on every run, so that
   directory is gitignored and a playtest leaves `git status --short` empty — there is nothing to
   check afterwards and nothing to restore. The screenshots that *are* tracked are the reference
-  frames a reader opens: `docs/shots/eras/era0-arcade.png` to `era4-snes.png`, one per rung,
-  `change-era0-to-era1.png` to `change-era3-to-era4.png` beside them, one per era change caught
+  frames a reader opens: `docs/shots/eras/era0-arcade.png` to `era10-xbox360.png`, one per rung,
+  `change-era0-to-era1.png` to `change-era9-to-era10.png` beside them, one per era change caught
   mid-ring, and the older `docs/shots/bootstrap/era-zero.png`. If you deliberately change how an
   era looks or how it arrives,
   re-take them with `node tools/playtest.mjs --ladder --reference` and commit them on purpose, in
@@ -239,6 +242,26 @@ his emulator — never touch either.**
   compares the live canvas with each era drawn offscreen, and the card covers the middle 180 rows
   of both until the serve; a look that draws something important only there would pass unseen.
 
+- **An era card that lands before its neighbours reports false FAILs, and they are not yours.**
+  While eras 6 to 10 were `like: 5` stand-ins, every run of the full playtest on this repo read
+  four or five FAILs of the form *"0 of 336000 pixels differ from era N drawn offscreen, 0 from era
+  N-1"*: two adjacent rungs drew the same frame, so "closer to the new era than the old" could not
+  hold. Four separate cards (1145, 1148, 1150, 1179) each lost time proving that on clean master.
+  Since item 1157 the check asks only an exact match when the two offscreen frames are identical,
+  so a stand-in rung passes; a FAIL there now means the new era really is not what draws.
+- **An era's reference frames are shot by one climb, never one at a time.** Each era card re-took
+  the frames with `--ladder --reference`, which rewrites all twenty-one PNGs, so an era branch cut
+  before its neighbours landed carries a stale picture of their rungs (item 1184 had to re-shoot the
+  six 3D change frames on the merged tree, where three arrivals it had filmed as stand-ins were
+  real by then). Re-take the
+  frames once, on the merged tree, in their own commit -- and if your card only changed one era,
+  commit only that era's two PNGs and restore the rest with `git checkout -- docs/shots/eras`.
+- **A 3D era's ring is slower than play, and that is not a regression.** The arrivals from the
+  PlayStation up measured ring frames at 4.2 to 5.4 ms mean against about 4.2 ms of ordinary play
+  (items 1153, 1154, 1155), all inside a 16.7 ms frame. The playtest's "ring at full frame rate"
+  check compares against play just before it, so on a loaded machine it can miss by a hair with
+  the flourish switched off too (item 1156 measured 22.8 against 22.9 ms). A/B with the flourish
+  off before you chase it.
 - **A pixellab image drawn onto the live canvas breaks the playtest's pixel read, off disk.**
   `tools/playtest.mjs` compares the live canvas with each era drawn offscreen by calling
   `getImageData` in the page, and the page is opened from `file://`, where Chrome counts every
