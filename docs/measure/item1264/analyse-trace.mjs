@@ -61,6 +61,20 @@ if (process.argv.includes('--cut')) {
   console.log(`\ncut ${kept.length} of ${ev.length} events to ${out}`);
 }
 
+// The GPU process's own longest tasks anywhere in the trace, each with what fills it:
+// a long frame with an idle page main thread is found here (a shader compile, say).
+{
+  const gpuKeys = [...names.entries()].filter(([, n]) => n === 'CrGpuMain').map(([k]) => k);
+  const gt = ev.filter((e) => e.ph === 'X' && gpuKeys.includes(`${e.pid}:${e.tid}`) && e.name === 'ThreadControllerImpl::RunTask' && e.dur)
+    .sort((a, b) => b.dur - a.dur).slice(0, 5);
+  console.log('\nlongest GPU main-thread tasks:');
+  for (const t of gt) {
+    const kids = ev.filter((e) => e.ph === 'X' && e.pid === t.pid && e.tid === t.tid && e.ts >= t.ts && e.ts + (e.dur || 0) <= t.ts + t.dur && e !== t && (e.dur || 0) > t.dur * 0.2)
+      .sort((a, b) => b.dur - a.dur).slice(0, 14).map((e) => `${e.name} ${(e.dur / 1000).toFixed(1)}`);
+    console.log(`  ${(t.dur / 1000).toFixed(1)} ms at +${((t.ts - worst.ts) / 1000).toFixed(0)} ms from the longest page task: ${kids.join(' | ')}`);
+  }
+}
+
 // The GPU process during the same window.
 const gpuMain = [...names.entries()].filter(([k, n]) => n === 'CrGpuMain' || (procs.get(Number(k.split(':')[0])) === 'GPU Process' && /Main|Viz/.test(n)));
 console.log('\nGPU process threads during that task:');
