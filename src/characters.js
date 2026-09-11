@@ -101,7 +101,12 @@
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
     8:  { skin: '#dcae8c', body: '#20242c', scale: 3.2, res: 4, round: true }, // PlayStation 2
-    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
+    // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
+    // cyborg, cut from pixellab by assets/pixellab/era9-derive.mjs; the hand on
+    // the shield at the paddle box's top (dz 24), 90 table units tall.
+    9:  { skin: '#d6a684', body: '#1c2a1c', scale: 1.667, res: 4, round: true,
+          sheets: { left: 'era9-armour-left', right: 'era9-armour-right' },
+          frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6 },
     10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
   };
 

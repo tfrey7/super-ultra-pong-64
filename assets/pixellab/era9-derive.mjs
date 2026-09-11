@@ -4,27 +4,35 @@
  * pixellab.ai actually drew (item 1233). Costs no generations: it only reads
  * the raw images tools/pixellab.mjs saved and writes derived files.
  *
- *   node assets/pixellab/era9-derive.mjs            # write the sheets
- *   node assets/pixellab/era9-derive.mjs --blobs    # only list the figures found
+ *   node assets/pixellab/era9-derive.mjs
  *
  * The art bible (docs/ART.md, era 9, ASSETS) asked pixflux for each player as
- * a whole 3 x 6 sheet of 24 x 54 frames. It did not keep the grid: the marine
- * came back as 13 figures in 7 rows of two, on an opaque black ground, and the
- * cyborg as four figures of two different sizes. So the figures are found
- * here instead -- the black ground keyed out by a flood fill from the border,
- * then every 8-connected group of what is left -- and each beat's frame is
- * picked from them by index (PICK below, chosen by looking at the raw sheet),
- * optionally mirrored, and pasted into a fresh sheet on the rig's grid:
- * rows idle, up, down, swing, miss, win; columns 2, 2, 2, 3, 1, 2; feet on
- * the frame's bottom edge, the figure's front (its right, facing the ball)
- * against the frame's right edge where the rig puts the hand.
+ * a whole 3 x 6 sheet of 24 x 54 frames. It did not keep that grid:
  *
- * Output: tex3d-era9-armour-left.png and tex3d-era9-armour-right.png beside
- * this file, which assets/pixellab/tex3d-embed.mjs folds into src/textures3d.js
- * as data: URIs (the 3D eras' images never taint the canvas), and
- * era9-armour-left.png / era9-armour-right.png rewritten to the same pixels,
- * so the rig's file load (src/sprites.js) and the embedded copy are one image.
- * The raw pixflux images are kept as era9-armour-*-raw.png.
+ *   - the marine (era9-armour-left-raw.png, 72 x 324) came back as 13
+ *     figures in 7 rows of two, about 27 x 42 each, on an opaque ground;
+ *   - the cyborg (era9-armour-right-raw.png) as four figures of two different
+ *     sizes, no grid at all -- so it was asked for again from the re-roll
+ *     reserve as ONE row of three 24 x 54 frames (era9-armour-right-row.png),
+ *     which pixflux did keep, though the three poses barely differ.
+ *
+ * So each figure is cut from its cell of the layout pixflux did draw (CELLS),
+ * the ground keyed out (the pixel colour the border is painted in, flood
+ * filled from the edge, so the black outline, a different near-black, stays),
+ * and pasted into a fresh sheet on the rig's grid -- rows idle, up, down,
+ * swing, miss, win; columns 2, 2, 2, 3, 1, 2 -- with its feet on the frame's
+ * bottom edge and its front (facing the ball) against the frame's right edge,
+ * where the rig puts the hand. PICK says which cell plays each frame, chosen
+ * by looking at the raw sheets; `lean` slides a frame's figure toward (+) or
+ * away from (-) the ball by whole pixels, which is how the cyborg's three
+ * near-identical stances are made into a swing and a recoil.
+ *
+ * Output: era9-armour-left.png and era9-armour-right.png, 28 x 54 frames on
+ * 84 x 324 sheets, the names era 9's block in src/characters.js gives (the
+ * rig loads a sheet by name, off disk, through src/sprites.js); and the set
+ * dressing as tex3d-era9-beacon.png (ground keyed) and tex3d-era9-hangar.png,
+ * which assets/pixellab/tex3d-embed.mjs folds into src/textures3d.js as data:
+ * URIs for the era file to draw. Node 18+, no dependencies.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,37 +41,51 @@ import { decodePng, encodePng } from './era2-nes-quantize.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
-export const FRAME = { w: 40, h: 50 };
+export const FRAME = { w: 28, h: 54 };
 export const ROWS = ['idle', 'up', 'down', 'swing', 'miss', 'win'];
 export const COLS = { idle: 2, up: 2, down: 2, swing: 3, miss: 1, win: 2 };
-export const BG_MAX = 26;          // a border-connected pixel this dark on every channel is ground
+export const KEY_TOL = 2;          // a border-connected pixel this close to the border's colour is ground
 
-// Which found figure plays each frame: [index, mirrored]. Indices are the
-// figures in reading order (top to bottom, then left to right) -- `--blobs`
-// prints them.
-export const PICK = {
-  left: {
-    idle: [[0, false], [2, false]],
-    up: [[3, false], [4, false]],
-    down: [[6, false], [8, false]],
-    swing: [[1, false], [7, false], [12, true]],
-    miss: [[5, true]],
-    win: [[10, false], [11, false]]
-  },
-  right: null   // set in main() from what the cyborg sheet holds
+// The layout pixflux drew: column edges and row edges, in raw pixels.
+export const CELLS = {
+  left: { raw: 'era9-armour-left-raw', xs: [0, 38, 72], ys: [0, 55, 100, 146, 189, 232, 276, 324] },
+  right: { raw: 'era9-armour-right-row', xs: [0, 24, 48, 72], ys: [0, 54] }
 };
 
+// Which cell plays each frame: { c: column, r: row, flip, lean }.
+export const PICK = {
+  left: {
+    idle: [{ c: 0, r: 0 }, { c: 0, r: 1 }],
+    up: [{ c: 1, r: 1 }, { c: 0, r: 2 }],
+    down: [{ c: 0, r: 3 }, { c: 1, r: 4 }],
+    swing: [{ c: 1, r: 0 }, { c: 0, r: 6, flip: true }, { c: 1, r: 0 }],
+    miss: [{ c: 1, r: 2, lean: -2 }],
+    win: [{ c: 0, r: 4 }, { c: 1, r: 5 }]
+  },
+  right: {
+    idle: [{ c: 0, r: 0 }, { c: 1, r: 0 }],
+    up: [{ c: 1, r: 0, lean: 1 }, { c: 2, r: 0, lean: 1 }],
+    down: [{ c: 2, r: 0, lean: -1 }, { c: 1, r: 0, lean: -1 }],
+    swing: [{ c: 0, r: 0, lean: -1 }, { c: 2, r: 0, lean: 3 }, { c: 2, r: 0, lean: 1 }],
+    miss: [{ c: 0, r: 0, lean: -3 }],
+    win: [{ c: 2, r: 0 }, { c: 2, r: 0, lean: 1 }]
+  }
+};
+
+/** The ground keyed out: the border's colour, flood filled from the edge. */
 export function keyGround(img) {
   const { width: w, height: h, rgba } = img;
   const out = Buffer.from(rgba);
-  const dark = (i) => rgba[i * 4] <= BG_MAX && rgba[i * 4 + 1] <= BG_MAX && rgba[i * 4 + 2] <= BG_MAX;
+  const g = [rgba[0], rgba[1], rgba[2]];
+  const ground = (i) => Math.abs(rgba[i * 4] - g[0]) <= KEY_TOL && Math.abs(rgba[i * 4 + 1] - g[1]) <= KEY_TOL &&
+    Math.abs(rgba[i * 4 + 2] - g[2]) <= KEY_TOL;
   const seen = new Uint8Array(w * h);
   const stack = [];
-  for (let x = 0; x < w; x++) { stack.push(x, (h - 1) * w + x); }
-  for (let y = 0; y < h; y++) { stack.push(y * w, y * w + w - 1); }
+  for (let x = 0; x < w; x++) stack.push(x, (h - 1) * w + x);
+  for (let y = 0; y < h; y++) stack.push(y * w, y * w + w - 1);
   while (stack.length) {
     const i = stack.pop();
-    if (seen[i] || !dark(i)) continue;
+    if (seen[i] || !ground(i)) continue;
     seen[i] = 1;
     out[i * 4 + 3] = 0;
     const x = i % w, y = (i - x) / w;
@@ -75,123 +97,63 @@ export function keyGround(img) {
   return { width: w, height: h, rgba: out };
 }
 
-export function blobs(img, minPx = 40) {
-  const { width: w, height: h, rgba } = img;
-  const label = new Int32Array(w * h).fill(-1);
-  const found = [];
-  for (let s = 0; s < w * h; s++) {
-    if (label[s] >= 0 || rgba[s * 4 + 3] === 0) continue;
-    const box = { x0: w, y0: h, x1: -1, y1: -1, n: 0, id: found.length };
-    const stack = [s];
-    label[s] = box.id;
-    while (stack.length) {
-      const i = stack.pop();
-      const x = i % w, y = (i - x) / w;
-      box.n++;
-      if (x < box.x0) box.x0 = x; if (x > box.x1) box.x1 = x;
-      if (y < box.y0) box.y0 = y; if (y > box.y1) box.y1 = y;
-      for (let dy = -1; dy <= 1; dy++) {
-        for (let dx = -1; dx <= 1; dx++) {
-          const nx = x + dx, ny = y + dy;
-          if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
-          const j = ny * w + nx;
-          if (label[j] < 0 && rgba[j * 4 + 3] !== 0) { label[j] = box.id; stack.push(j); }
-        }
-      }
-    }
-    found.push(box);
-  }
-  // Small specks join the figure whose box they sit in, else are dropped.
-  const big = found.filter((b) => b.n >= minPx);
-  for (const b of found) {
-    if (b.n >= minPx) continue;
-    const host = big.find((f) => b.x0 >= f.x0 - 2 && b.x1 <= f.x1 + 2 && b.y0 >= f.y0 - 2 && b.y1 <= f.y1 + 2);
-    if (host) {
-      host.x0 = Math.min(host.x0, b.x0); host.x1 = Math.max(host.x1, b.x1);
-      host.y0 = Math.min(host.y0, b.y0); host.y1 = Math.max(host.y1, b.y1);
-      host.members = (host.members || []).concat(b.id);
+/** The opaque bounding box inside one cell, or null. */
+export function cellBox(img, x0, y0, x1, y1) {
+  let bx0 = x1, by0 = y1, bx1 = -1, by1 = -1;
+  for (let y = y0; y < y1; y++) {
+    for (let x = x0; x < x1; x++) {
+      if (img.rgba[(y * img.width + x) * 4 + 3] === 0) continue;
+      if (x < bx0) bx0 = x; if (x > bx1) bx1 = x;
+      if (y < by0) by0 = y; if (y > by1) by1 = y;
     }
   }
-  for (const f of big) f.members = [f.id].concat(f.members || []);
-  // Reading order: a row is figures whose vertical middles are within 12 px.
-  big.sort((a, b) => (a.y0 + a.y1) / 2 - (b.y0 + b.y1) / 2);
-  const rows = [];
-  for (const f of big) {
-    const mid = (f.y0 + f.y1) / 2;
-    const row = rows.find((r) => Math.abs(r.mid - mid) < 12);
-    if (row) row.list.push(f); else rows.push({ mid, list: [f] });
-  }
-  const ordered = [];
-  for (const r of rows) ordered.push(...r.list.sort((a, b) => a.x0 - b.x0));
-  return { label, list: ordered };
+  return bx1 < 0 ? null : { x0: bx0, y0: by0, x1: bx1, y1: by1 };
 }
 
-/** Paste one figure into sheet at frame (col, row): feet on the bottom, its right edge on the frame's right. */
-export function paste(sheet, img, found, fig, col, row, mirror) {
-  const fw = fig.x1 - fig.x0 + 1, fh = fig.y1 - fig.y0 + 1;
-  const k = Math.min(1, FRAME.w / fw, FRAME.h / fh);   // only ever shrunk to fit, never grown
-  const ow = Math.round(fw * k), oh = Math.round(fh * k);
-  const ox = col * FRAME.w + (FRAME.w - ow), oy = row * FRAME.h + (FRAME.h - oh);
-  for (let y = 0; y < oh; y++) {
-    for (let x = 0; x < ow; x++) {
-      let sx = Math.min(fw - 1, Math.floor(x / k));
-      const sy = Math.min(fh - 1, Math.floor(y / k));
-      if (mirror) sx = fw - 1 - sx;
-      const si = (fig.y0 + sy) * img.width + fig.x0 + sx;
-      if (!fig.members.includes(found.label[si])) continue;
-      const di = ((oy + y) * sheet.width + ox + x) * 4;
-      img.rgba.copy(sheet.rgba, di, si * 4, si * 4 + 4);
+/** Paste one cell's figure into frame (col, row): feet on the bottom, its front on the right edge. */
+export function paste(sheet, img, box, col, row, flip, lean) {
+  const fw = box.x1 - box.x0 + 1, fh = box.y1 - box.y0 + 1;
+  const ox = col * FRAME.w + (FRAME.w - fw) + (lean || 0), oy = row * FRAME.h + (FRAME.h - fh);
+  for (let y = 0; y < fh; y++) {
+    for (let x = 0; x < fw; x++) {
+      const dx = ox + x, dy = oy + y;
+      if (dx < col * FRAME.w || dx >= (col + 1) * FRAME.w || dy < row * FRAME.h) continue;
+      const sx = box.x0 + (flip ? fw - 1 - x : x), sy = box.y0 + y;
+      const si = (sy * img.width + sx) * 4;
+      if (img.rgba[si + 3] === 0) continue;
+      img.rgba.copy(sheet.rgba, (dy * sheet.width + dx) * 4, si, si + 4);
     }
   }
 }
 
-export function build(img, found, pick) {
+export function build(img, cells, pick) {
   const cols = Math.max(...ROWS.map((r) => COLS[r]));
   const sheet = { width: FRAME.w * cols, height: FRAME.h * ROWS.length };
   sheet.rgba = Buffer.alloc(sheet.width * sheet.height * 4);
   ROWS.forEach((beat, row) => {
-    (pick[beat] || []).forEach(([index, mirror], col) => {
-      const fig = found.list[index];
-      if (fig) paste(sheet, img, found, fig, col, row, mirror);
+    (pick[beat] || []).forEach((p, col) => {
+      const box = cellBox(img, cells.xs[p.c], cells.ys[p.r], cells.xs[p.c + 1], cells.ys[p.r + 1]);
+      if (box) paste(sheet, img, box, col, row, p.flip, p.lean);
     });
   });
   return sheet;
 }
 
-function rawOf(name) {
-  const raw = path.join(HERE, name + '-raw.png');
-  const plain = path.join(HERE, name + '.png');
-  if (!fs.existsSync(raw)) fs.copyFileSync(plain, raw);
-  return decodePng(fs.readFileSync(raw));
-}
-
-export function main(argv = process.argv.slice(2), log = console.log) {
-  const listOnly = argv.includes('--blobs');
-  const sides = { left: 'era9-armour-left', right: 'era9-armour-right' };
-  for (const side of Object.keys(sides)) {
-    const name = sides[side];
-    const img = keyGround(rawOf(name));
-    const found = blobs(img);
-    log(`${name}: ${found.list.length} figures`);
-    found.list.forEach((f, i) => log(`  ${i}: x ${f.x0}-${f.x1}, y ${f.y0}-${f.y1} (${f.x1 - f.x0 + 1} x ${f.y1 - f.y0 + 1}, ${f.n} px)`));
-    if (listOnly) continue;
-    const pick = PICK[side] || rightPick(found);
-    const sheet = build(img, found, pick);
+export function main(log = console.log) {
+  for (const side of ['left', 'right']) {
+    const cells = CELLS[side];
+    const name = 'era9-armour-' + side;
+    const img = keyGround(decodePng(fs.readFileSync(path.join(HERE, cells.raw + '.png'))));
+    const sheet = build(img, cells, PICK[side]);
     const png = encodePng(sheet.width, sheet.height, sheet.rgba);
-    fs.writeFileSync(path.join(HERE, 'tex3d-' + name + '.png'), png);
     fs.writeFileSync(path.join(HERE, name + '.png'), png);
-    log(`  wrote ${name}.png and tex3d-${name}.png (${sheet.width} x ${sheet.height})`);
+    log(`wrote ${name}.png (${sheet.width} x ${sheet.height}, frames ${FRAME.w} x ${FRAME.h})`);
   }
-}
-
-/** The cyborg: whatever figures came back, spread over the beats. */
-export function rightPick(found) {
-  const n = found.list.length;
-  const at = (i) => [Math.min(n - 1, i), false];
-  return {
-    idle: [at(0), at(1)], up: [at(2), at(3)], down: [at(3), at(2)],
-    swing: [at(0), at(4), at(4)], miss: [at(1)], win: [at(5), at(5)]
-  };
+  // The set dressing: the beacon's ground keyed out, the hangar plate as it came.
+  const beacon = keyGround(decodePng(fs.readFileSync(path.join(HERE, 'era9-beacon.png'))));
+  fs.writeFileSync(path.join(HERE, 'tex3d-era9-beacon.png'), encodePng(beacon.width, beacon.height, beacon.rgba));
+  fs.copyFileSync(path.join(HERE, 'era9-hangar.png'), path.join(HERE, 'tex3d-era9-hangar.png'));
+  log('wrote tex3d-era9-beacon.png (ground keyed) and tex3d-era9-hangar.png');
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] || '').href) main();
