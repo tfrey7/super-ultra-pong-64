@@ -931,6 +931,52 @@
         "shading": "medium shading",
         "detail": "low detail"
       }
+    },
+    {
+      "name": "era5-fighter-right",
+      "file": "era5-fighter-right.png",
+      "prompt": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, blue sleeveless top and grey trousers, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+      "size": {
+        "width": 60,
+        "height": 270
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 1995,
+      "date": "2026-09-11T03:22:34.444Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 4,
+      "seconds": 37,
+      "pixels": {
+        "width": 60,
+        "height": 270
+      },
+      "bytes": 4862,
+      "sha256": "25f5880850fc1d431aa9e23bc51a1713ad2c9ffbefe26c29bdd04cb129918c79",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet of a 1994 PlayStation low-poly 3D martial artist fighter, blue sleeveless top and grey trousers, side view facing right, 3 columns by 6 rows of poses on a grid: row 1 fighting stance idle, row 2 side-step up, row 3 side-step down, row 4 palm strike, row 5 stagger backwards, row 6 victory fist raised; flat shaded polygon faces, blocky box head",
+        "image_size": {
+          "width": 60,
+          "height": 270
+        },
+        "seed": 1995,
+        "outline": "lineless",
+        "shading": "flat shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
     }
   ]
 }
