@@ -224,7 +224,7 @@ async function filmChange(s, clip, from) {
     const m = window.PongRender.eraChangeMoment(g);
     if (!m) return null;
     const o = m.origin, dx = Math.max(o.x, g.width - o.x), dy = Math.max(o.y, g.height - o.y);
-    return { from: m.from, era: m.era, p: m.p, wiping: m.wiping, radius: m.radius,
+    return { from: m.from, era: m.era, p: m.p, wiping: m.wiping, radius: m.radius, width: g.width,
       corner: Math.sqrt(dx * dx + dy * dy), origin: { x: o.x, y: o.y } }; })()`);
   const out = { from, file: null, p: null, end: null, drawn: null };
   const deadline = Date.now() + 3000;
@@ -302,13 +302,23 @@ async function walkLadder(s, baseUrl) {
     const g = await playUntil(s, geo, 500, track);
     const file = await s.shot('ladder-' + ERA_NAMES[rung], clip);
     frames.push({ rung, era: g.era, file });
-    // One point either way moves the machine; letting the ball past is quickest.
+    // One point either way moves the machine, and the ring starts where the ball
+    // went out. Even changes are a real miss past the player (the ring starts on
+    // the left); odd ones are the player's own point, the way a human climbs, so
+    // the ring starts on the right. Beating the computer in a rally is a coin
+    // flip, so the ball is put just past the computer's paddle, heading out --
+    // outside the paddle, so it cannot be bounced back.
+    const outRight = rung % 2 === 1;
     const before = points(g);
-    const after = await playUntil(s, geo, 15000, dodge, (x) => points(x) > before);
+    if (outRight) await s.eval(`(() => { const g = window.__pong, r = g.right;
+      g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0; })()`);
+    const after = await playUntil(s, geo, 15000, outRight ? track : dodge, (x) => points(x) > before);
     moves.push({ from: g.era, to: after.era, scored: points(after) > before,
       score: `${after.score.left}-${after.score.right}` });
     // Below the top, that point started a change: film it while it plays.
-    if (rung < eras.length - 1 && points(after) > before) changes.push(await filmChange(s, clip, g.era));
+    if (rung < eras.length - 1 && points(after) > before) {
+      changes.push(Object.assign(await filmChange(s, clip, g.era), { want: outRight ? 'right' : 'left' }));
+    }
   }
 
   check('each era is on screen when its frame is taken',
@@ -328,11 +338,17 @@ async function walkLadder(s, baseUrl) {
     changes.length === eras.length - 1 && changes.every((c) => c.file),
     changes.map((c) => `era ${c.from} -> ${c.from + 1}: ` +
       (c.file ? `caught at eased progress ${c.p.toFixed(2)}` : 'not caught mid-ring')).join('; '));
+  // Where each ring started: the edge the ball went out of.
+  const sideOf = (c) => (!c.end ? 'unseen' : c.end.origin.x >= c.end.width / 2 ? 'right' : 'left');
+  const fromRight = changes.filter((c) => sideOf(c) === 'right').length;
+  check(`era changes start from both edges: odd changes from the right (the player's point), even from the left`,
+    changes.every((c) => sideOf(c) === c.want) && fromRight >= 2,
+    changes.map((c) => `era ${c.from} -> ${c.from + 1}: from the ${sideOf(c)}`).join('; '));
   for (const c of changes) {
     const e = c.end, d = c.drawn;
     const reached = !!e && e.radius >= e.corner;
     const newDraws = d.era === c.from + 1 && !d.ring && d.asNew < d.asOld;
-    check(`the change to the ${eras[c.from + 1]} ran: the ring reached the far corner and the new era draws afterwards`,
+    check(`the change to the ${eras[c.from + 1]} ran from the ${sideOf(c)} edge: the ring reached the far corner and the new era draws afterwards`,
       !!c.file && reached && newDraws,
       (e ? `ring from ${e.origin.x.toFixed(0)},${e.origin.y.toFixed(0)} ended at radius ` +
         `${e.radius.toFixed(0)}, far corner ${e.corner.toFixed(0)}` : 'the ring was never seen to finish') +

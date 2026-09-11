@@ -100,6 +100,7 @@ On the way up it **films each of the four era changes**: a frame caught mid-ring
 (`change-era0-to-era1.png` to `change-era3-to-era4.png`), a check that the ring's radius reached
 the farthest corner from where the ball went out, and a check that once the ring has gone the live
 canvas matches the new era drawn offscreen more closely than the old one.
+The changes alternate sides (item 1174): a change out of an even era (0 to 1, 2 to 3, ...) starts its ring at the left edge, a real miss past the player, and a change out of an odd era (1 to 2, 3 to 4, ...) starts it at the right edge, the player's own point put just past the computer's paddle -- and a check names the edge each ring came from.
 `--ladder` runs only that walk (about half a minute); `--scoring` runs only the rally and the
 scoring check (about fifteen seconds a run); `--reference` also copies its five era frames
 and four change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
