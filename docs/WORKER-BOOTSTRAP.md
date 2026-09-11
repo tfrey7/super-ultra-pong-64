@@ -88,7 +88,9 @@ title screen with the ball held still, that a click and a keypress each start it
 runs in real time, that the mouse and keys move the paddle, that rallies happen, that a miss
 scores, and that the next serve starts from the centre -- and that the title screen opens no audio,
 the first click switches sound on, the rally is heard, and every era's voice schedules on the real
-Web Audio API (17 checks). Chrome runs `--mute-audio`, so a playtest never beeps through the
+Web Audio API -- and that a forced era change plays its ring at full frame rate (the page's own rAF
+timing over the ring, against ordinary play just before it) with the paddle still following the hand,
+saving `era-wipe.png` mid-ring (19 checks). Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
 plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
 it cannot find a browser, and `--port <n>` if 9333 is busy; each port gets its own Chrome profile,

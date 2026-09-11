@@ -132,14 +132,23 @@ new file, one `<script>` line in `index.html`, and one entry in `Pong.ERAS`.
 **Open the page at any era** with a query: `index.html?era=3`. The playtest
 takes `--era 3` for the same thing.
 
-**The change is a moment.** When a point moves the machine up a rung the field
-flashes, a band of the new machine's colours wipes across it, and a name card
-comes up -- `ERA 2`, then `1985 · NES`, year and machine read from `Pong.ERAS` --
-in that machine's own style: the Atari's paddle colours, the NES's double-framed
-black dialog box, the Genesis's blue window, the Super Nintendo's purple window
-with its four buttons. It is drawn by `src/erachange.js` over the finished
-frame and lives entirely inside the serve pause the point already started
-(`rules.serveDelay`, 0.9 s), so it is gone the frame the ball launches and the
-serve is never held back. A game opened at a later era, or a point at the top of
-the ladder, shows nothing. An era file can restyle its own card by giving its
-look a `card` object with the same fields as `STYLES` in that file.
+**The change is a moment.** When a point moves the machine up a rung, the new
+machine spreads across the field from the spot where the ball went out
+(`state.missAt`): a ring grows from there over 1.5 s, eased, and inside it the
+new era's renderer draws the field while outside it the old era's keeps drawing
+-- the same live state in both, so nothing disappears and the paddles stay in
+the player's hands. Once the ring has passed the centre a name card comes up --
+`ERA 2`, then `1985 · NES`, year and machine read from `Pong.ERAS` -- in that
+machine's own style: the Atari's paddle colours, the NES's double-framed black
+dialog box, the Genesis's blue window, the Super Nintendo's purple window with
+its four buttons. It is all `src/erachange.js`: two offscreen canvases, one per
+era, composited through a circular clip, then the ring's glowing edge. The rules
+stretch the serve pause after an era-change point only (`rules.eraChangePause`,
+1.8 s, against the plain 0.9 s), so the ring always finishes inside it and the
+whole moment is gone the frame the ball launches. The title screen's demo rally
+plays its ring too, dimmed and without a card. A game opened at a later era, or a
+point at the top of the ladder, shows nothing. An era file can restyle its own
+card with a `card` object (the fields of `STYLES` in that file), and give its
+arrival its own look with a `flourish(ctx, p, origin, fromEra, toEra, info)`
+hook, drawn over the ring's edge every frame of the ring that brings it in --
+the header of `src/erachange.js` is the contract.
