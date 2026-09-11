@@ -56,6 +56,22 @@ with the coin, not while the tube warms up.)
   one curved smash, frame by frame, its path traced in red on the last frame.
 - A point scores when the ball leaves either side, and the next serve starts from
   the centre after a short pause. The score is drawn across the top.
+- **A match is eleven points, one per era** (item 1211, `src/match.js`). Every
+  point moves the machine up a rung, so the tenth lands on the Xbox 360, and
+  **MATCH POINT** is lettered under its name plate while the eleventh waits to be
+  served; the slow motion of the game-feel layer plays on it. The eleventh ends
+  the match, and the higher score wins (eleven is odd, so there is no tie). The
+  360 announces it its own way: YOU WIN with an Achievement Unlocked, or YOU LOSE
+  with a message from the computer's gamertag. Then the tape **rewinds**: every
+  machine you climbed through shrinks away inside a closing ring to the one
+  before it, half a second a rung, the soundtrack stepping down with it, from the
+  360 to the arcade -- ending on the 1972 screen with THANKS FOR PLAYING, the
+  final score and the eras visited, and then INSERT COIN again. Pictures:
+  [match point](docs/shots/item1211/matchpoint.png),
+  [a win](docs/shots/item1211/announce-win.png),
+  [a loss](docs/shots/item1211/announce-loss.png),
+  [the rewind midway](docs/shots/item1211/rewind-midway.png) and
+  [the thanks](docs/shots/item1211/thanks.png).
 
 **The sound grows up with the machine.** Paddle hits, wall bounces and points
 each play a note made on the page itself, with no audio files: a bare

@@ -10,7 +10,7 @@
  *   node docs/shots/item-1153/dreamcast-shots.mjs [--port 9353]
  */
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
-import { launchChrome } from '../../../tools/chrome.mjs';
+import { launchChrome, refusePortTaken } from '../../../tools/chrome.mjs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
@@ -23,8 +23,8 @@ const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // A fresh profile folder, deleted when Chrome exits (tools/chrome.mjs, item 1169).
-const chrome = launchChrome(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`,
-  '--mute-audio', '--no-first-run', '--window-size=1000,760', 'about:blank'], { name: 'dreamcast' });
+const chrome = await launchChrome(CHROME, ['--headless=new', `--remote-debugging-port=${PORT}`,
+  '--mute-audio', '--no-first-run', '--window-size=1000,760', 'about:blank'], { name: 'dreamcast' }).catch(refusePortTaken);
 
 let ws;
 try {
