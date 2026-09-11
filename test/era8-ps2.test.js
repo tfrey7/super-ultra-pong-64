@@ -134,7 +134,8 @@ test('cinematic letterbox: 52-pixel black bars over everything, the score a subt
   const bottom = ops.findIndex((o) => o.op === 'fillRect' && o.style === '#000000' && o.rect.join() === '0,548,800,52');
   assert.ok(top >= 0 && bottom >= 0, 'both bars');
   assert.ok(top > ops.findIndex(isBall), 'drawn after the ball');
-  const subtitle = ops.slice(bottom).filter((o) => o.op === 'fillRect' && o.style === '#c9d6e8');
+  // (The name plates' text in the bottom bar is HUD ink too: item 1232.)
+  const subtitle = ops.slice(bottom).filter((o) => o.op === 'fillRect' && o.style === '#c9d6e8' && o.rect[1] < 300);
   assert.ok(subtitle.length > 10, 'the score is drawn in HUD ink after the bars');
   for (const o of subtitle) {
     assert.ok(Math.abs(o.alpha - 0.85) < 1e-9, 'at 0.85 opacity');
