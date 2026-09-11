@@ -303,7 +303,8 @@
       advance(state, dt, intent);
       return state;
     }
-    if (m.hitStop > 0 && state.serveDelay <= 0) {
+    // (The half-millisecond slack keeps float dust from owing a fifth frame.)
+    if (m.hitStop > 5e-4 && state.serveDelay <= 0) {
       // The freeze: ball and paddles hold, and nothing this frame is an event
       // (the rules keep last step's list when they are handed no time, and the
       // voice would play the hit again every frozen frame).
