@@ -553,11 +553,22 @@
     if (COURTS[key]) return COURTS[key];
     var field = fieldTexture(t, tex);
     if (!field) return null;
-    var canvas = root.document.createElement('canvas');
-    canvas.width = cw;
-    canvas.height = ch;
+    // A drifting camera (the PS2's) misses every frame: past the cache's size
+    // the oldest canvas is cleared and reused rather than a new one made.
+    var canvas = null;
+    if (COURT_KEYS.length >= COURT_CACHE) {
+      var old = COURT_KEYS.shift();
+      canvas = COURTS[old];
+      delete COURTS[old];
+    }
+    if (!canvas) canvas = root.document.createElement('canvas');
+    if (canvas.width !== cw) canvas.width = cw;
+    if (canvas.height !== ch) canvas.height = ch;
     var c = canvas.getContext('2d');
     if (!c) return null;
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.globalAlpha = 1;
+    c.clearRect(0, 0, cw, ch);
     c.imageSmoothingEnabled = !!tex.smooth;
     var top = Math.max(0, Math.floor(project(cam, W / 2, 0, 0).y * d));
     var bottom = Math.min(ch, Math.ceil(project(cam, W / 2, H, 0).y * d));
@@ -571,7 +582,6 @@
     }
     COURTS[key] = canvas;
     COURT_KEYS.push(key);
-    if (COURT_KEYS.length > COURT_CACHE) delete COURTS[COURT_KEYS.shift()];
     return canvas;
   }
 

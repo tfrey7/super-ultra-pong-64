@@ -304,19 +304,32 @@
       line: T.fogColour(PAL.toyYellow, 300, FOG),
       rail: railFace(T),
       railTop: T.fogColour(T.shade(PAL.rail, 0.3), -18, FOG),
-      nearLip: PAL.railDark
+      nearLip: PAL.railDark,
+      texture: TEXTURE.court,
+      trim: TEXTURE.trim
     });
 
     // 3. on the table: the fog band swallowing the far end
     T.fogBand(target, cam, FOG);
   }
 
+  // The pixellab tiles (item 1187), laid over the era's own fills through the
+  // shared table: bilinear-filtered (the N64 smoothed every texel), drawn into
+  // the half-resolution world so the blur takes them too, and the court's
+  // grain fades into the fog before the far end, as the cartridge's did.
+  var TEXTURE = {
+    court: { name: 'court-grain', alpha: 0.4, blend: 'soft-light', period: 120, strip: 1, fade: 0.85, smooth: true },
+    trim: { name: 'trim', alpha: 0.35, blend: 'soft-light', period: 30, smooth: true },
+    paddle: { name: 'paddle', alpha: 0.3, blend: 'soft-light', period: 20, smooth: true },
+    ball: { name: 'ball', alpha: 0.35, blend: 'soft-light', period: 12, smooth: true }
+  };
+
   // --------------------------------------------------------------- paddles
   /** A smooth-shaded box with rounded caps, fogged at its depth up to the cap. */
   function paddle(ctx, T, cam, rect, ink) {
     var fogged = T.mix(ink, FOG.colour, Math.min(PADDLE_FOG_CAP, T.fogAmount(rect.y + rect.h, FOG)));
     var faces = T.box(ctx, cam, rect, 0, PADDLE_Z,
-      { ink: fogged, shade: 'gradient', light: { top: 0.3, near: 0, side: -0.3 }, outline: false });
+      { ink: fogged, shade: 'gradient', light: { top: 0.3, near: 0, side: -0.3 }, outline: false, texture: TEXTURE.paddle });
     // Rounded ends: a projected half-ellipse cap on the top face at each end.
     var r = rect.w / 2, cx = rect.x + r;
     var ends = [[rect.y + r, Math.PI], [rect.y + rect.h - r, 0]];
@@ -339,6 +352,7 @@
       radius: BALL_RADIUS,
       shadow: 'rgba(12,56,24,0.55)',
       outline: false,
+      texture: TEXTURE.ball,
       fill: function (sx, sy, sr) {
         // a smooth sphere: the hot spot at the upper-left third, rim to gold
         var g = ctx.createRadialGradient(sx - sr / 3, sy - sr / 3, 0, sx, sy, sr);
