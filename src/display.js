@@ -253,16 +253,22 @@
         var fn = OVERLAYS[r.overlay];
         if (!fn || fn === OVERLAYS.none) continue;
         var rect = fitRect(page.width, page.height, r.aspect);
+        // One row's failure never stops the others from warming.
         x.save();
-        x.setTransform(1, 0, 0, 1, 0, 0);
-        x.imageSmoothingEnabled = !!r.smooth;
-        if (r.smooth) x.imageSmoothingQuality = 'high';
-        x.drawImage(native, 0, 0, native.width, native.height, rect.x, rect.y, rect.w, rect.h);
-        // era -1: no real era, so an overlay that keeps a previous frame (the
-        // 720p panel's smear) never blends this one into a real frame.
-        fn(x, rect, r, { era: -1, time: 0, native: native });
-        x.restore();
-        drew++;
+        try {
+          x.setTransform(1, 0, 0, 1, 0, 0);
+          x.imageSmoothingEnabled = !!r.smooth;
+          if (r.smooth) x.imageSmoothingQuality = 'high';
+          x.drawImage(native, 0, 0, native.width, native.height, rect.x, rect.y, rect.w, rect.h);
+          // era -1: no real era, so an overlay that keeps a previous frame (the
+          // 720p panel's smear) never blends this one into a real frame.
+          fn(x, rect, r, { era: -1, time: 0, native: native });
+          drew++;
+        } catch (rowErr) {
+          // this row stays cold; the rest still warm
+        } finally {
+          x.restore();
+        }
       }
       if (drew) {
         pageCtx.save();
