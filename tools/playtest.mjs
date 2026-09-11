@@ -339,9 +339,20 @@ async function walkLadder(s, baseUrl) {
     // One second of ordinary play at this era, timed while the hand keeps
     // returning the ball, so an era too slow to hold full frame rate is caught
     // on its own and not only when its ring is slower still (item 1192).
+    // The computer's paddle is held on the ball meanwhile: a slow era is exactly
+    // where the computer misses, and a point inside the reading would move the
+    // machine up a rung the walk has not photographed yet. Where a paddle stands
+    // changes nothing about what a frame costs to draw.
     let timed = false;
     const timing = ordinaryPlayTiming(s, rung, 1000).finally(() => { timed = true; });
-    await playUntil(s, geo, 3500, track, () => timed);
+    const until = Date.now() + 3500;
+    while (!timed && Date.now() < until) {
+      const gt = await state(s);
+      await s.mouseTo(geo.left + geo.width / 2, geo.top + (track(gt) / gt.height) * geo.height);
+      await s.eval(`(() => { const g = window.__pong, r = g.right;
+        r.y = Math.max(0, Math.min(g.height - r.h, g.ball.y + 6 - r.h / 2)); return r.y; })()`);
+      await sleep(30);
+    }
     speeds.push({ rung, ...intervalStats(await timing) });
     const g = await playUntil(s, geo, 500, track);
     const file = await s.shot('ladder-' + ERA_NAMES[rung], clip);
