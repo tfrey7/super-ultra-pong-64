@@ -51,7 +51,8 @@ const ERA = arg('era', '');
 // --no-audio takes AudioContext away from the page before it loads, the way a
 // browser with no audio device would, and checks the game still plays silently.
 const NO_AUDIO = process.argv.includes('--no-audio');
-// --ladder runs only the walk up the era ladder (section 8), about 30 seconds.
+// --ladder runs only the walk up the era ladder (section 8), about a minute: a
+// frame and a second of timed ordinary play at every rung, and every era change.
 const LADDER_ONLY = process.argv.includes('--ladder');
 // --scoring runs only the rally and the scoring check (section 6), about ten
 // seconds -- the quick way to ask "can the player still score?" many times.
