@@ -49,16 +49,16 @@
    */
   var PROFILES = [
     { era: 0,  name: 'COMPUTER',     reaction: 0.22, speed: 250, home: 0.45, aim: 58, tick: 0.12, anticipate: 0 },
-    { era: 1,  name: 'CPU',          reaction: 0.30, speed: 290, home: 0.50, aim: 54, tick: 0,    anticipate: 0 },
-    { era: 2,  name: 'PLAYER 2',     reaction: 0.20, speed: 305, home: 0.55, aim: 52, tick: 0,    anticipate: 0 },
-    { era: 3,  name: 'BLAST PROCESSOR', reaction: 0.16, speed: 315, home: 0.60, aim: 50, tick: 0, anticipate: 0 },
-    { era: 4,  name: 'MODE 7',       reaction: 0.15, speed: 300, home: 0.60, aim: 52, tick: 0,    anticipate: 0.35 },
-    { era: 5,  name: 'POLYGON',      reaction: 0.14, speed: 305, home: 0.65, aim: 52, tick: 0,    anticipate: 0.45 },
-    { era: 6,  name: 'RUMBLE PAK',   reaction: 0.13, speed: 310, home: 0.65, aim: 51, tick: 0,    anticipate: 0.55 },
-    { era: 7,  name: 'DREAM CPU',    reaction: 0.12, speed: 315, home: 0.70, aim: 50, tick: 0,    anticipate: 0.65 },
-    { era: 8,  name: 'EMOTION ENGINE', reaction: 0.11, speed: 320, home: 0.70, aim: 49, tick: 0,  anticipate: 0.75 },
-    { era: 9,  name: 'CPU 2001',     reaction: 0.10, speed: 325, home: 0.75, aim: 48, tick: 0,    anticipate: 0.85 },
-    { era: 10, name: 'XENON',        reaction: 0.08, speed: 335, home: 0.80, aim: 46, tick: 0,    anticipate: 1 }
+    { era: 1,  name: 'CPU',          reaction: 0.30, speed: 285, home: 0.50, aim: 58, tick: 0,    anticipate: 0 },
+    { era: 2,  name: 'PLAYER 2',     reaction: 0.20, speed: 297, home: 0.55, aim: 56, tick: 0,    anticipate: 0 },
+    { era: 3,  name: 'BLAST PROCESSOR', reaction: 0.16, speed: 300, home: 0.60, aim: 56, tick: 0, anticipate: 0 },
+    { era: 4,  name: 'MODE 7',       reaction: 0.15, speed: 296, home: 0.60, aim: 55, tick: 0,    anticipate: 0.35 },
+    { era: 5,  name: 'POLYGON',      reaction: 0.14, speed: 301, home: 0.65, aim: 54.5, tick: 0,    anticipate: 0.45 },
+    { era: 6,  name: 'RUMBLE PAK',   reaction: 0.13, speed: 307, home: 0.65, aim: 53.5, tick: 0,    anticipate: 0.55 },
+    { era: 7,  name: 'DREAM CPU',    reaction: 0.12, speed: 310, home: 0.70, aim: 53, tick: 0,    anticipate: 0.65 },
+    { era: 8,  name: 'EMOTION ENGINE', reaction: 0.11, speed: 313, home: 0.70, aim: 53, tick: 0,  anticipate: 0.75 },
+    { era: 9,  name: 'CPU 2001',     reaction: 0.10, speed: 317, home: 0.75, aim: 52, tick: 0,    anticipate: 0.85 },
+    { era: 10, name: 'XENON',        reaction: 0.08, speed: 320, home: 0.80, aim: 52, tick: 0,    anticipate: 1 }
   ];
 
   // Said on a point the computer wins, from the Xbox up. Clean words only, and
