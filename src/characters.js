@@ -94,13 +94,21 @@
   // One block per rung. Era 0 has none: the 1972 machine stays bars and a dot.
   var ERAS = {
     1:  { skin: '#d4a060', body: '#2c3c9c', scale: 2.5 },                    // Atari 2600
-    2:  { skin: '#fcbcb0', body: '#0000bc', scale: 2.5 },                    // NES
+    2:  { sheets: { left: 'era2-sheet-left', right: 'era2-sheet-right' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' }, // NES (item 1225: assets/pixellab/era2-players-sheet.mjs)
     3:  { skin: '#eeaa88', body: '#222266', scale: 2.5, res: 2 },            // Genesis
     4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
-    8:  { skin: '#dcae8c', body: '#20242c', scale: 3.2, res: 4, round: true }, // PlayStation 2
+    // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
+    // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
+    // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
+    // fps 3, not the bible's 8: the rig has one rate for idle, move and win,
+    // and at 8 a two-frame breath reads as a flicker.
+    8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
+          sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
+          frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3 },
     9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
     // Xbox 360 (item 1234, docs/ART.md era 10): two heavy soldiers, pixellab
     // sheets reposed, graded, rimmed and grained offline by
@@ -369,8 +377,9 @@
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
+    // Headless there is no Image to load into, and the loader throws: that is
+    // "not loaded", and the placeholder draws (item 1225, the first real sheet).
     var image;
-    // No Image to load with (node --test): the placeholder, never a throw (item 1234).
     try { image = S.load(cfg.sheet); } catch (e) { return null; }
     if (!S.ready(cfg.sheet)) return null;
     var rects = {};

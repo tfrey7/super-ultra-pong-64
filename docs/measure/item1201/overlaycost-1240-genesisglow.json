@@ -1,0 +1,63 @@
+{
+ "taken": "2026-09-11T03:21:22.756Z",
+ "tweak": "delete PongDisplay.ROWS[3].glow",
+ "rows": [
+  {
+   "setup": "harness",
+   "gpu": false,
+   "overlay": "crt-composite",
+   "era": 2,
+   "native": "256x240",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "ring": {
+    "frames": 87,
+    "total": 1449.9,
+    "mean": 16.67,
+    "p95": 16.8,
+    "max": 16.8
+   }
+  },
+  {
+   "setup": "harness",
+   "gpu": false,
+   "overlay": "crt-composite",
+   "era": 3,
+   "native": "320x224",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "ring": {
+    "frames": 87,
+    "total": 1449.9,
+    "mean": 16.67,
+    "p95": 16.7,
+    "max": 16.8
+   }
+  },
+  {
+   "setup": "harness",
+   "gpu": false,
+   "overlay": "crt-svideo",
+   "era": 4,
+   "native": "256x224",
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "ring": {
+    "frames": 59,
+    "total": 1433.3,
+    "mean": 24.29,
+    "p95": 50,
+    "max": 50
+   }
+  }
+ ]
+}
