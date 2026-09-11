@@ -90,12 +90,17 @@ test('with the art decoded, the court, the paddles and the ball are drawn from t
     assert.ok(new Set(inside.map((c) => c[0])).size >= 4, `${side} paddle is the shaded bar`);
     assert.ok(rec.calls.some(([ink, x, y]) => ink === look.SHADOW && x === p.x + 5 && y === p.y + 5), `${side} paddle casts a shadow`);
   }
-  assert.strictEqual(rec.images.length, byName('genesis-court').length + 1, 'the court and the ball, nothing else');
+  // Item 1226 added the arena's pictures (wall, torches, panel, portraits); nothing else.
+  const own = new Set(Object.values(look.ART));
+  assert.ok(rec.images.every(([img]) => own.has(img.name)), 'only the era\'s own pictures');
+  assert.strictEqual(byName('genesis-ball').length, 1, 'one ball');
 
   // The ball is its picture at the ball's own box, and the trail still follows it.
   const ball = byName('genesis-ball');
   assert.deepStrictEqual(ball.map((c) => c.slice(1)), [[Math.round(g.ball.x), Math.round(g.ball.y), g.ball.size, g.ball.size]]);
-  assert.ok(!rec.calls.some(([ink]) => ink === '#b6b6db'), 'the hand-drawn ball body is not drawn');
+  // (#b6b6db is also the portraits' frame since item 1226, so it is looked for at the ball.)
+  assert.ok(!rec.calls.some(([ink, x, y]) => ink === '#b6b6db' && x === g.ball.x && y === g.ball.y),
+    'the hand-drawn ball body is not drawn');
   assert.strictEqual(rec.calls.filter(([ink]) => ink.startsWith(`rgba(${look.TRAIL_INK},`)).length, look.TRAIL);
 });
 
