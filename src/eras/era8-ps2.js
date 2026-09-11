@@ -394,8 +394,9 @@
    *      colour drains -- a 'saturation' fill of grey, rising to 0.8.
    *   2. the edge, p 0.25 to 0.8: the boot towers. 18 translucent columns of
    *      flare blue stand on the ring's edge, 10 pixels wide and 40 to 140 tall
-   *      (seeded), each rising over 0.15 of p, staggered by its angle so they
-   *      come up one after another round the ring as it carries them outward.
+   *      (seeded), each rising over 0.15 of p, staggered by its angle: they fan
+   *      across the half of the ring that faces the field and come up from the
+   *      middle outward, one after another, as the ring carries them out.
    *      Each throws three sparks as it lights; dust spills outward from the
    *      edge; and just inside the edge a band of grey drains the old colour, so
    *      the picture cross-fades through the ring into the moody palette.
@@ -416,18 +417,25 @@
     ignite: 0.25, edge: 0.8,
     bars: { from: 0, peak: 70, rest: BAR },
     drain: { peak: 0.8, band: 90 },
-    towers: { count: 18, width: 10, hMin: 40, hMax: 140, rise: 0.15, alpha: 0.5, reach: 60 },
+    towers: { count: 18, width: 10, hMin: 40, hMax: 140, rise: 0.15, alpha: 0.5, core: 2, coreAlpha: 0.75, fan: 160, reach: 60 },
     motes: { count: 28, spill: 50, size: 2 },
     sparks: { each: 3, life: 0.08, reach: 34 }
   };
 
+  // The towers fan across the half of the ring that faces the field (the miss
+  // is always at a side wall, so the other half is off the screen): `offset` is
+  // each one's angle from the line toward the field's centre, and `order` its
+  // turn to rise -- the middle first, then outward both ways.
   var TOWERS = (function () {
     var rnd = lcg(8154);
     var out = [];
     var n = ARRIVAL.towers.count;
+    var fan = ARRIVAL.towers.fan * Math.PI / 180;
     for (var i = 0; i < n; i++) {
+      var u = n > 1 ? i / (n - 1) : 0.5;
       out.push({
-        angle: (i / n) * Math.PI * 2 + (rnd() - 0.5) * 0.12,
+        offset: (u - 0.5) * fan + (rnd() - 0.5) * 0.06,
+        order: Math.abs(u - 0.5) * 2,
         height: ARRIVAL.towers.hMin + rnd() * (ARRIVAL.towers.hMax - ARRIVAL.towers.hMin),
         spark: rnd() * Math.PI * 2
       });
@@ -480,14 +488,15 @@
     // Beat 2: the towers on the edge, each rising in its turn; sparks as each lights.
     if (p >= A.ignite && p < A.edge + 0.05 && radius > 1) {
       var span = A.edge - A.ignite - A.towers.rise;
+      var toward = Math.atan2(300 - o.y, 400 - o.x);
       for (var i = 0; i < TOWERS.length; i++) {
         var tw = TOWERS[i];
-        var start = A.ignite + span * (i / TOWERS.length);
+        var start = A.ignite + span * tw.order;
         var k = clamp01((p - start) / A.towers.rise);
         if (k <= 0) continue;
         var fade = clamp01((A.edge + 0.05 - p) / 0.1);
-        var bx = o.x + Math.cos(tw.angle) * radius;
-        var by = o.y + Math.sin(tw.angle) * radius;
+        var bx = o.x + Math.cos(toward + tw.offset) * radius;
+        var by = o.y + Math.sin(toward + tw.offset) * radius;
         var h = Math.min(tw.height * easeOut(k), capHeight(bx, by, o, radius, A.towers.reach));
         if (h > 0.5) plan.towers.push({ x: bx - A.towers.width / 2, y: by - h, w: A.towers.width, h: h, base: by, alpha: A.towers.alpha * fade });
         var sk = (p - start) / A.sparks.life;
@@ -556,6 +565,12 @@
       tg.addColorStop(1, rgba(C.flare, 0));
       ctx.fillStyle = tg;
       ctx.fillRect(tw.x, tw.y, tw.w, tw.h);
+      // Its bright core: flare blue, never white (R1).
+      var cg = ctx.createLinearGradient(0, tw.base, 0, tw.y);
+      cg.addColorStop(0, rgba(C.flare, ARRIVAL.towers.coreAlpha * tw.alpha / ARRIVAL.towers.alpha));
+      cg.addColorStop(1, rgba(C.flare, 0));
+      ctx.fillStyle = cg;
+      ctx.fillRect(tw.x + (tw.w - ARRIVAL.towers.core) / 2, tw.y, ARRIVAL.towers.core, tw.h);
     }
     // The first sparks, where each tower lights.
     ctx.lineWidth = SPARK.width;
