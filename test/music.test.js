@@ -310,9 +310,14 @@ test('the Xbox: the melody on an overdriven saw, drop-tuned power chords spread 
   const arr = M.ARRANGEMENTS[9];
   const lead = partsOf(arr, 'melody', 'full')[0];
   assert.ok(lead.voice.wave === 'sawtooth' && lead.voice.drive >= 0.5, 'a saw through a drive carries the tune');
-  const riff = partsOf(arr, 'chords', 'rhythm')[0];
-  assert.strictEqual(riff.voicing, 'power');
-  assert.ok(riff.octave < 0 && riff.voice.drive > 0 && riff.voice.spread >= 0.8, 'low, distorted, double-tracked wide');
+  const riffs = partsOf(arr, 'chords', 'rhythm');
+  const riff = riffs[0];
+  riffs.forEach((r) => {
+    assert.strictEqual(r.voicing, 'power');
+    assert.ok(r.octave < 0 && r.voice.drive > 0, 'low and distorted');
+  });
+  assert.deepStrictEqual(riffs.map((r) => r.voice.pan).sort(), [-1, 1], 'double-tracked, hard left and hard right');
+  assert.strictEqual(riffs[0].pattern, riffs[1].pattern, 'the two takes play the same riff');
   const score = M.arrange(arr);
   const pi = arr.parts.indexOf(riff);
   const lowest = Math.min(...score.flat().filter((e) => e.part === pi).map((e) => e.midis[0]));

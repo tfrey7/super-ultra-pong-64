@@ -1,0 +1,307 @@
+{
+  "when": "2026-09-11T02:54:42.457Z",
+  "results": [
+    {
+      "name": "era 5: its arrangement books notes after the first click",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 5,
+        "scheduled": 28,
+        "crossfades": 0,
+        "errors": 0,
+        "tempo": 132,
+        "gameEra": 5
+      }
+    },
+    {
+      "name": "era 6: its arrangement books notes after the first click",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 6,
+        "scheduled": 19,
+        "crossfades": 0,
+        "errors": 0,
+        "tempo": 132,
+        "gameEra": 6
+      }
+    },
+    {
+      "name": "era 7: its arrangement books notes after the first click",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 7,
+        "scheduled": 40,
+        "crossfades": 0,
+        "errors": 0,
+        "tempo": 132,
+        "gameEra": 7
+      }
+    },
+    {
+      "name": "era 8: its arrangement books notes after the first click",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 8,
+        "scheduled": 24,
+        "crossfades": 0,
+        "errors": 0,
+        "tempo": 132,
+        "gameEra": 8
+      }
+    },
+    {
+      "name": "era 9: its arrangement books notes after the first click",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 9,
+        "scheduled": 56,
+        "crossfades": 0,
+        "errors": 0,
+        "tempo": 132,
+        "gameEra": 9
+      }
+    },
+    {
+      "name": "era 10: its arrangement books notes after the first click",
+      "ok": true,
+      "detail": {
+        "titleAudio": "none",
+        "available": true,
+        "audio": "running",
+        "era": 10,
+        "scheduled": 30,
+        "crossfades": 0,
+        "errors": 0,
+        "tempo": 132,
+        "gameEra": 10
+      }
+    },
+    {
+      "name": "one session climbs arcade to Xbox 360, every change a cross-fade that keeps the song going",
+      "ok": true,
+      "detail": {
+        "crossfades": 10,
+        "errors": 0,
+        "eras": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "changesAt": [
+          "0->1 @ bar 1 step 13",
+          "1->2 @ bar 2 step 2",
+          "2->3 @ bar 2 step 8",
+          "3->4 @ bar 2 step 13",
+          "4->5 @ bar 3 step 2",
+          "5->6 @ bar 3 step 8",
+          "6->7 @ bar 3 step 13",
+          "7->8 @ bar 4 step 3",
+          "8->9 @ bar 4 step 9",
+          "9->10 @ bar 4 step 14"
+        ]
+      }
+    },
+    {
+      "name": "at the Xbox 360 a 15-hit rally raises the tempo",
+      "ok": true,
+      "detail": {
+        "tempoAtRally0": 132,
+        "tempoAtRally15": 155.8
+      }
+    },
+    {
+      "name": "every era renders real, finite sound with no player errors and no clipping",
+      "ok": true,
+      "detail": [
+        "0 1972 arcade: -43.1 dB, peak 0.021",
+        "1 Atari 2600: -42.6 dB, peak 0.02",
+        "2 NES: -38.1 dB, peak 0.045",
+        "3 Genesis: -24.7 dB, peak 0.119",
+        "4 Super Nintendo: -38.6 dB, peak 0.082",
+        "5 PlayStation: -39.9 dB, peak 0.064",
+        "6 Nintendo 64: -40.3 dB, peak 0.055",
+        "7 Dreamcast: -38.6 dB, peak 0.074",
+        "8 PlayStation 2: -37.8 dB, peak 0.082",
+        "9 Xbox: -32.8 dB, peak 0.128",
+        "10 Xbox 360: -32.1 dB, peak 0.126"
+      ]
+    },
+    {
+      "name": "the eras before the PlayStation are mono; the PlayStation 2 and the Xbox are wide",
+      "ok": true,
+      "detail": [
+        "0: 0",
+        "1: 0",
+        "2: 0",
+        "3: 0",
+        "4: 0",
+        "5: 0.094",
+        "6: 0.123",
+        "7: 0.036",
+        "8: 0.208",
+        "9: 0.102",
+        "10: 0.061"
+      ]
+    },
+    {
+      "name": "the Dreamcast is brighter than the muffled Nintendo 64 and the dark PlayStation 2",
+      "ok": true,
+      "detail": {
+        "n64": 0.064,
+        "dreamcast": 0.089,
+        "ps2": 0.04
+      }
+    },
+    {
+      "name": "no page errors",
+      "ok": true,
+      "detail": []
+    }
+  ],
+  "rendered": [
+    {
+      "era": 0,
+      "name": "1972 arcade",
+      "notes": 8,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -43.1,
+      "peak": 0.021,
+      "width": 0,
+      "brightness": 0.026
+    },
+    {
+      "era": 1,
+      "name": "Atari 2600",
+      "notes": 39,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -42.6,
+      "peak": 0.02,
+      "width": 0,
+      "brightness": 0.241
+    },
+    {
+      "era": 2,
+      "name": "NES",
+      "notes": 137,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -38.1,
+      "peak": 0.045,
+      "width": 0,
+      "brightness": 0.146
+    },
+    {
+      "era": 3,
+      "name": "Genesis",
+      "notes": 115,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -24.7,
+      "peak": 0.119,
+      "width": 0,
+      "brightness": 0.077
+    },
+    {
+      "era": 4,
+      "name": "Super Nintendo",
+      "notes": 45,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -38.6,
+      "peak": 0.082,
+      "width": 0,
+      "brightness": 0.058
+    },
+    {
+      "era": 5,
+      "name": "PlayStation",
+      "notes": 75,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -39.9,
+      "peak": 0.064,
+      "width": 0.094,
+      "brightness": 0.067
+    },
+    {
+      "era": 6,
+      "name": "Nintendo 64",
+      "notes": 44,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -40.3,
+      "peak": 0.055,
+      "width": 0.123,
+      "brightness": 0.064
+    },
+    {
+      "era": 7,
+      "name": "Dreamcast",
+      "notes": 96,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -38.6,
+      "peak": 0.074,
+      "width": 0.036,
+      "brightness": 0.089
+    },
+    {
+      "era": 8,
+      "name": "PlayStation 2",
+      "notes": 54,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -37.8,
+      "peak": 0.082,
+      "width": 0.208,
+      "brightness": 0.04
+    },
+    {
+      "era": 9,
+      "name": "Xbox",
+      "notes": 133,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -32.8,
+      "peak": 0.128,
+      "width": 0.102,
+      "brightness": 0.054
+    },
+    {
+      "era": 10,
+      "name": "Xbox 360",
+      "notes": 74,
+      "errors": 0,
+      "nan": 0,
+      "rmsDb": -32.1,
+      "peak": 0.126,
+      "width": 0.061,
+      "brightness": 0.035
+    }
+  ]
+}
