@@ -96,35 +96,66 @@
   var SHADOW_DY = 18;
   var TRAIL = 0.014;                 // seconds between the ball's afterimages
 
-  // ------------------------------------------------------ the pixel-art sprites
-  // Generated with tools/pixellab.mjs (item 1180); each prompt, seed and size is
-  // in assets/pixellab/manifest.json. The sky is 256x48 -- the Super Nintendo's
-  // 256-pixel line, scaled 3.125x across the 800-wide field -- the paddle a
+  // ------------------------------------------------------------ generated art
+  // The sky, the paddle and the ball are pixel art made with tools/pixellab.mjs
+  // (item 1180; prompts, seeds and bills in assets/pixellab/manifest.json),
+  // fitted to the Super Nintendo OFFLINE by assets/pixellab/era4-snes-embed.mjs
+  // -- 15-bit colour, one-bit sprite transparency -- which also writes the three
+  // strings below. The game never loops over pixels: each is one drawImage.
+  // Embedded as data: URIs, like era 2's (item 1178): a page opened from
+  // file:// counts a file image as another origin and it taints the canvas, so
+  // every getImageData read of the frame throws; a data: image leaves it
+  // readable. The sky is 256x48 -- the console's 256-pixel line, scaled 3.125x
+  // across the 800-wide field, exactly down to the horizon -- the paddle a
   // neutral grey 16x64 capsule dyed each side's ink once, and the ball a 32x32
-  // orb drawn at exactly half size so it stays pixel-sharp. Until an image has
-  // decoded (and under node --test, where there is no PongSprites) the
-  // hand-drawn shape below draws in its place.
-  var SPRITES = { sky: 'snes-sky', paddle: 'snes-paddle', ball: 'snes-ball' };
+  // orb drawn at exactly half size. The Mode 7 floor stays hand-drawn: it
+  // scrolls in perspective every frame. Headless (no Image), or before an image
+  // has decoded, the hand-drawn sky, paddles and ball below are drawn instead.
+  // BEGIN pixellab embeds (written by assets/pixellab/era4-snes-embed.mjs)
+  var ART = {
+    sky: 'data:image/png;base64,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',
+    paddle: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABACAYAAAATffeWAAABjklEQVR42t1XoZKDMBCtrETyC5XI+wUkEouMRMYikZHYk3xCbWXl/cJ9Rm4e3DIp3SFZlutMj5mdaQnv5e1ms8meTv/3ybLM53m+mAhMgPs4eljTND47n30y+Pt288a0kwFcXC6+qqq4EprFGPNEAKvr2sO1BIIZTMAHgi1XwA6D32swXKDxqAJ8FCogMI1FCQY3LkpgCJ5znzICGOXAMMz/w282CaztPZGQ9f2QroAjECmAv2tw17l0BRyBSEHHuLCsgtqFJAWd0yngCOCWyoUliHtXQeYCswqiPODkq2NgiSBFQdt2ujyw2hj8TSK9VMFmIu2tSLLduCLA7CIF6r2ACnz4XlBXZVE9YFdBspnUeaBOZc5/dSqrT2d7WBBfcjKpFRxeDwAW1YO1AnU9mBRIlpGrB7vuiarTGYDwoinbTMN81f26XifDb7yLE/wOhh0L9Qz0LkqADzHr3HSYp44lSQEaCyIIe4apd5IQrJuOKEHYdBXFx9TiJPdLnBLEorfWl2WZDuYaTzH4vZ4f0Tj0DcDoqq4AAAAASUVORK5CYII=',
+    ball: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABQklEQVR42u1WuxHDIAz1GGk9Qkpaj5AVUnoVSpWZxyN4jZSU5DAWBiwwP7vIWXfvyJ0henoSQl13222ZJt8PGcM1Tj+MxllktNNBY+ylFECA62+4rwUBMfZSYSGgHCC+r221fyMRtbZQQh0W87D8qZiYSwId2QqsENNTr3OhEibqJXIIOOYJKFRC55JZ0fhRgtxZRAks0CICO7mPjFIih4Bz1Y6iDpIAkkASCcc5VjgimYB/YyD9arrRQ75zMhWQnoaNAHcVKCVgFGCVKbieAC/Lf+g25NeAl4KsW1BbhKQKUB49sLxuSPeBxFRQjQhyO6FFwLTTIyLEnuJWbJ5h5+3nmYD6Z1kR0M9wRIlg5KDP1swDrhJWZFjZ5ECyAs+1moz03BcfybZ9rO1MaFRA4NznY/2Oyp0yIQtL2svG8tv+2n7zKxX0rBb/TwAAAABJRU5ErkJggg=='
+  };
+  // END pixellab embeds
   var BALL_SPRITE = 16;              // on-screen size of the ball sprite, field units
+  var art = {};                      // key -> its Image, made once
   var tints = {};                    // ink -> the paddle sprite dyed that ink, made once
 
-  function spriteApi() {
-    var S = root.PongSprites;
-    return S && typeof S.draw === 'function' && typeof S.ready === 'function' ? S : null;
+  /** A piece's decoded image, or null (headless, not decoded yet, or none). */
+  function artImage(key) {
+    if (!ART[key] || typeof root.Image !== 'function') return null;
+    var img = art[key];
+    if (!img) {
+      img = art[key] = new root.Image();
+      img.src = ART[key];
+    }
+    return img.complete && img.naturalWidth > 0 ? img : null;
   }
+
+  /** One drawImage, smoothing off, so the art stays as blocky as it was made. */
+  function blit(ctx, img, x, y, w, h) {
+    var smooth = ctx.imageSmoothingEnabled;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img, x, y, w, h);
+    ctx.imageSmoothingEnabled = smooth;
+  }
+  // Start decoding as the page loads, so the art is ready by the first frame.
+  artImage('sky');
+  artImage('paddle');
+  artImage('ball');
 
   /**
    * The paddle sprite dyed one ink, on a canvas of its own: the grey image,
    * multiplied by the ink, cut back to the image's own shape. Two drawImage
    * calls and a fillRect, once per ink; null until the image and a canvas exist.
    */
-  function tintedPaddle(S, ink) {
+  function tintedPaddle(ink) {
     if (tints[ink]) return tints[ink];
+    var img = artImage('paddle');
     var doc = root.document;
-    if (!doc || typeof doc.createElement !== 'function') return null;
-    var img = S.load(SPRITES.paddle);
-    var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
-    if (!(w > 0 && h > 0)) return null;
+    if (!img || !doc || typeof doc.createElement !== 'function') return null;
+    var w = img.naturalWidth, h = img.naturalHeight;
     var c = doc.createElement('canvas');
     c.width = w;
     c.height = h;
@@ -188,8 +219,11 @@
   }
 
   function drawSky(ctx, state) {
-    var S = spriteApi();
-    if (S && S.draw(ctx, SPRITES.sky, 0, 0, state.width, HORIZON)) return;
+    var img = artImage('sky');
+    if (img) {
+      blit(ctx, img, 0, 0, state.width, HORIZON);
+      return;
+    }
     var sky = ctx.createLinearGradient(0, 0, 0, HORIZON);
     for (var i = 0; i < SKY_STOPS.length; i++) sky.addColorStop(SKY_STOPS[i][0], SKY_STOPS[i][1]);
     ctx.fillStyle = sky;
@@ -290,17 +324,10 @@
 
   /** A paddle as a shaded capsule with chrome caps, over its exact rectangle. */
   function drawPaddle(ctx, p, ink) {
-    var S = spriteApi();
-    if (S) {
-      S.load(SPRITES.paddle);
-      var dyed = S.ready(SPRITES.paddle) ? tintedPaddle(S, ink) : null;
-      if (dyed) {
-        ctx.save();
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(dyed, p.x, p.y, p.w, p.h);
-        ctx.restore();
-        return;
-      }
+    var dyed = tintedPaddle(ink);
+    if (dyed) {
+      blit(ctx, dyed, p.x, p.y, p.w, p.h);
+      return;
     }
     var body = ctx.createLinearGradient(p.x, 0, p.x + p.w, 0);
     body.addColorStop(0, shade(ink, -0.55));
@@ -346,9 +373,12 @@
       ctx.globalAlpha = 1;
     }
 
-    var S = spriteApi();
-    var half = BALL_SPRITE / 2;
-    if (S && S.draw(ctx, SPRITES.ball, Math.round(cx - half), Math.round(cy - half), BALL_SPRITE, BALL_SPRITE)) return;
+    var img = artImage('ball');
+    if (img) {
+      var half = BALL_SPRITE / 2;
+      blit(ctx, img, Math.round(cx - half), Math.round(cy - half), BALL_SPRITE, BALL_SPRITE);
+      return;
+    }
 
     var orb = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r);
     orb.addColorStop(0, '#ffffff');

@@ -476,6 +476,139 @@
         "detail": "medium detail",
         "no_background": true
       }
+    },
+    {
+      "name": "era4-sky",
+      "file": "era4-sky.png",
+      "prompt": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",
+      "size": {
+        "width": 256,
+        "height": 48
+      },
+      "style": {
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "highly detailed"
+      },
+      "seed": 134143913,
+      "date": "2026-09-11T01:16:21.270Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 256,
+        "height": 48
+      },
+      "bytes": 1606,
+      "sha256": "1bf5ead67917776eb2af2662aeab32491f88027b52e0c3740843e6e03167d523",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo game background, dusk sky over a jagged purple mountain range, deep night blue at the top fading through violet and magenta to warm orange at the horizon, small white stars, pixel art",
+        "image_size": {
+          "width": 256,
+          "height": 48
+        },
+        "seed": 134143913,
+        "outline": "lineless",
+        "shading": "medium shading",
+        "detail": "highly detailed"
+      },
+      "derivedFrom": "snes-sky.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not; 29 colours",
+      "card": "item 1180",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
+      "name": "era4-paddle",
+      "file": "era4-paddle.png",
+      "prompt": "a vertical pill-shaped metal pong paddle, light grey shaded body with shiny chrome end caps, 16-bit Super Nintendo sprite, pixel art",
+      "size": {
+        "width": 16,
+        "height": 64
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 575168117,
+      "date": "2026-09-11T01:16:44.798Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 16,
+        "height": 64
+      },
+      "bytes": 455,
+      "sha256": "d5d1d0fca09c873850acdf49ea9afbd11c1959afcb7d18beee5939e26568a83b",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a vertical pill-shaped metal pong paddle, light grey shaded body with shiny chrome end caps, 16-bit Super Nintendo sprite, pixel art",
+        "image_size": {
+          "width": 16,
+          "height": 64
+        },
+        "seed": 575168117,
+        "outline": "single color black outline",
+        "shading": "medium shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "derivedFrom": "snes-paddle.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not; 23 colours",
+      "card": "item 1180",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
+    },
+    {
+      "name": "era4-ball",
+      "file": "era4-ball.png",
+      "prompt": "a glowing round ball, white-hot centre, bright yellow then orange rim, shiny highlight, 16-bit Super Nintendo sprite, pixel art",
+      "size": {
+        "width": 32,
+        "height": 32
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "seed": 1400847945,
+      "date": "2026-09-11T01:17:00.507Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 32,
+        "height": 32
+      },
+      "bytes": 379,
+      "sha256": "80f210f911a9cfe58126cc3cca61a23e88946505076a7028262079e3fb26e92e",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "a glowing round ball, white-hot centre, bright yellow then orange rim, shiny highlight, 16-bit Super Nintendo sprite, pixel art",
+        "image_size": {
+          "width": 32,
+          "height": 32
+        },
+        "seed": 1400847945,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "medium detail",
+        "no_background": true
+      },
+      "derivedFrom": "snes-ball.png",
+      "derivedBy": "node assets/pixellab/era4-snes-embed.mjs",
+      "how": "every colour snapped to the Super Nintendo's 15-bit colour (five bits a channel), alpha cut at half so a pixel is drawn or not; 13 colours",
+      "card": "item 1180",
+      "verdict": "drawn by era 4 (src/eras/era4-snes.js, embedded there as a data: URI)"
     }
   ]
 }
