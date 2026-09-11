@@ -58,6 +58,9 @@
     ballMaxSpeed: 720,
     maxBounceAngle: Math.PI / 3,  // 60 degrees off the horizontal
     serveDelay: 0.9,        // seconds the ball waits at the centre
+    eraChangePause: 1.8,    // ...stretched to this after a point that moved the
+                            // machine up an era, so the era change (a 1.5 s
+                            // ring wipe, src/erachange.js) plays inside it
     paletteSize: 12,        // how many paddle colours the renderer offers.
                             // The rules pick an INDEX; the hex lives in
                             // src/render.js, which is the only place that
@@ -129,6 +132,11 @@
       era: startEra,
       eraChangedAt: 0,
       startEra: startEra,
+      // Where the ball left the field on the last point: { x, y } in field
+      // units, x being the edge it crossed (0 or width) and y the height of the
+      // ball's centre as it went. Null until a point is scored. The era change
+      // spreads out from here.
+      missAt: null,
       // Where a fresh machine sits. In 'title' the field exists but NOTHING
       // moves: the ball holds still and no point can be scored until
       // startGame() is called. 'playing' is the game proper.
@@ -204,6 +212,7 @@
     state.paddleColour = { left: 0, right: 0 };
     state.era = clampEra(state.startEra || 0);
     state.eraChangedAt = 0;
+    state.missAt = null;
     serve(state, 1);
     if (state.era >= 1) flipToColour(state);
     return true;
@@ -355,22 +364,30 @@
     else if (b.vx > 0 && overlaps(b, state.right)) bounceOffPaddle(state, state.right, -1);
 
     if (b.x + b.size < 0) {
-      state.score.right += 1;
-      state.lastEvent = 'score';
-      advanceEra(state);
-      emit(state, 'score', 'right');
-      serve(state, 1);
+      pointScored(state, 'right', 0, 1);
       return true;
     }
     if (b.x > state.width) {
-      state.score.left += 1;
-      state.lastEvent = 'score';
-      advanceEra(state);
-      emit(state, 'score', 'left');
-      serve(state, -1);
+      pointScored(state, 'left', state.width, -1);
       return true;
     }
     return false;
+  }
+
+  /**
+   * A point: the score, where the ball went out, the era ladder, the event, and
+   * the next serve. A point that moved the machine up an era waits the longer
+   * eraChangePause instead of the plain serveDelay, so the era change has room.
+   */
+  function pointScored(state, side, edgeX, direction) {
+    var b = state.ball;
+    state.score[side] += 1;
+    state.lastEvent = 'score';
+    state.missAt = { x: edgeX, y: clamp(b.y + b.size / 2, 0, state.height) };
+    var moved = advanceEra(state);
+    emit(state, 'score', side);
+    serve(state, direction);
+    if (moved) state.serveDelay = Math.max(state.serveDelay, state.rules.eraChangePause || 0);
   }
 
   /**
