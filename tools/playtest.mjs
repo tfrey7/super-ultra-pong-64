@@ -225,7 +225,9 @@ async function filmChange(s, clip, from) {
     seen = true;
     if (!out.file && m.wiping && m.p >= 0.4) {
       out.p = m.p;
+      const t0 = Date.now();
       out.file = await s.shot(`change-era${from}-to-era${from + 1}`, clip);
+      out.shotMs = Date.now() - t0;
     } else if (!m.wiping) { out.end = m; break; }
     else await sleep(8);
   }
@@ -339,7 +341,7 @@ async function walkLadder(s, baseUrl) {
   check(`every era change on the climb is filmed: ${eras.length - 1} of them`,
     changes.length === eras.length - 1 && changes.every((c) => c.file),
     changes.map((c) => `era ${c.from} -> ${c.from + 1}: ` +
-      (c.file ? `caught at eased progress ${c.p.toFixed(2)}` : 'not caught mid-ring')).join('; '));
+      (c.file ? `caught at eased progress ${c.p.toFixed(2)} (shot took ${c.shotMs} ms)` : 'not caught mid-ring')).join('; '));
   // Where each ring started: the edge the ball went out of.
   const sideOf = (c) => (!c.end ? 'unseen' : c.end.origin.x >= c.end.width / 2 ? 'right' : 'left');
   const fromRight = changes.filter((c) => sideOf(c) === 'right').length;
