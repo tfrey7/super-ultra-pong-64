@@ -97,7 +97,17 @@
     2:  { skin: '#fcbcb0', body: '#0000bc', scale: 2.5 },                    // NES
     3:  { skin: '#eeaa88', body: '#222266', scale: 2.5, res: 2 },            // Genesis
     4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
-    5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
+    // PlayStation (item 1228): a STAND-IN only. Tim ruled flat sprites out of
+    // the 3D eras; the real players are polygon models from item 1248's
+    // renderer, and era 5's model card swaps these two sheets out. They are
+    // pixflux's two raw fighter sheets packed into the rig's 3 x 6 order by
+    // assets/pixellab/era5-fighters-cut.mjs: the red-gi fighter on the left,
+    // the blue-top fighter on the right, 23-pixel figures in a 20 x 30 frame,
+    // drawn about 83 table units tall with the hand on the paddle box's top.
+    5:  { skin: '#c8906a', body: '#1a1a1f', res: 2, round: true,
+          sheets: { left: 'era5-left', right: 'era5-right' },
+          frame: { w: 20, h: 30 }, hand: { x: 19, y: 18 }, scale: 3.6,
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8 },
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
     // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by

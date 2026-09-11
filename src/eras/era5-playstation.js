@@ -267,12 +267,241 @@
     if (sp.field) c.setTransform(sp.field, 0, 0, sp.field, 0, 0);
   }
 
+  // ------------------------------------------------------------ the arena (item 1228)
+  /*
+   * docs/ART.md, era 5: a harbour rooftop at night, a Toshinden arena with a
+   * Ridge Racer city behind it. Behind the far wall, 10 flat-shaded boxes (the
+   * skyline) with 24 windows in accent yellow that switch one at a time every
+   * 0.7 s, and 2 searchlight beams in accent blue sweeping +-25 degrees every
+   * 5 s from the roofline. At match point both beams swing onto the table's
+   * centre line and stop. All drawn in code, into the 320 x 240 buffer, so the
+   * city is as chunky, snapped and wobbling as the table.
+   */
+  var SKYLINE = { count: 10, from: -260, to: 1060, wMin: 40, wMax: 90, hMin: 60, hMax: 200,
+                  yNear: -60, yFar: -120, depth: 30, windows: 24, winW: 8, winH: 10, winAlpha: 0.5, switchS: 0.7 };
+  var SEARCH = { from: [3, 6], width: 40, length: 320, swing: 25, period: 5, alpha: 0.18,
+                 targets: [[400, 170], [400, 430]] };
+
+  // Seeded, so the city is the same every frame and every run.
+  var BOXES = (function () {
+    var s = 1994 >>> 0;
+    function rnd() { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }
+    var slot = (SKYLINE.to - SKYLINE.from) / SKYLINE.count, out = [];
+    for (var i = 0; i < SKYLINE.count; i++) {
+      var w = SKYLINE.wMin + rnd() * (SKYLINE.wMax - SKYLINE.wMin);
+      out.push({
+        x: Math.round(SKYLINE.from + i * slot + rnd() * (slot - w)),
+        w: Math.round(w),
+        h: Math.round(SKYLINE.hMin + rnd() * (SKYLINE.hMax - SKYLINE.hMin)),
+        y: Math.round(SKYLINE.yNear + rnd() * (SKYLINE.yFar - SKYLINE.yNear))
+      });
+    }
+    return out;
+  })();
+
+  // The 24 windows: box i % 10, stacked up its front face.
+  var WINDOWS = (function () {
+    var out = [];
+    for (var i = 0; i < SKYLINE.windows; i++) {
+      var b = BOXES[i % SKYLINE.count], tier = Math.floor(i / SKYLINE.count);
+      var room = Math.max(1, b.w - 2 * SKYLINE.winW);
+      out.push({ box: i % SKYLINE.count, x: b.x + SKYLINE.winW / 2 + ((i * 23) % room),
+                 z: b.h * (0.25 + 0.25 * tier), base: (i * 5) % 3 !== 0 });
+    }
+    return out;
+  })();
+
+  /** Whether window i is lit at t: each flips once every 24 switches, staggered so ONE flips each 0.7 s. */
+  function windowLit(i, t) {
+    var step = Math.floor(Math.max(0, t || 0) / SKYLINE.switchS);
+    var flips = Math.floor((step + (i * 7) % SKYLINE.windows) / SKYLINE.windows);
+    return WINDOWS[i].base !== (flips % 2 === 1);
+  }
+
+  /** The sweep of beam i at t, in degrees from straight up. */
+  function beamAngle(i, t) {
+    return SEARCH.swing * Math.sin(2 * Math.PI * (t || 0) / SEARCH.period + i * Math.PI);
+  }
+
+  /** Where beam i starts: the middle of its box's roofline, on screen. */
+  function beamBase(T, cam, i) {
+    var b = BOXES[SEARCH.from[i]];
+    return T.project(cam, b.x + b.w / 2, b.y - SKYLINE.depth / 2, b.h);
+  }
+
+  /** The beam's triangle: from its base, `length` along the angle, `width` across at the far end. */
+  function beamTriangle(base, deg, length, width) {
+    var a = (deg - 90) * Math.PI / 180, ex = base.x + Math.cos(a) * length, ey = base.y + Math.sin(a) * length;
+    var nx = -Math.sin(a) * width / 2, ny = Math.cos(a) * width / 2;
+    return [base, { x: ex + nx, y: ey + ny }, { x: ex - nx, y: ey - ny }];
+  }
+
+  /** A beam locked on the table's centre line at match point. */
+  function lockedBeam(T, cam, i) {
+    var base = beamBase(T, cam, i), tg = SEARCH.targets[i];
+    var end = T.project(cam, tg[0], tg[1], 0);
+    var dx = end.x - base.x, dy = end.y - base.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var deg = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+    return beamTriangle(base, deg, len, SEARCH.width * end.scale);
+  }
+
+  function fillPoly(c, pts, style, alpha) {
+    trace(c, pts);
+    c.globalAlpha = alpha;
+    c.fillStyle = style;
+    c.fill();
+    c.globalAlpha = 1;
+  }
+
+  function beams(c, T, cam, t, locked) {
+    for (var i = 0; i < SEARCH.from.length; i++) {
+      var tri = locked ? lockedBeam(T, cam, i) : beamTriangle(beamBase(T, cam, i), beamAngle(i, t), SEARCH.length, SEARCH.width);
+      fillPoly(c, tri, PAL.accents[3], SEARCH.alpha);
+    }
+  }
+
+  /** The skyline, far boxes first: the side facing the centre, the front, the roof, then the windows. */
+  function skyline(c, T, cam, t) {
+    var order = BOXES.map(function (b, i) { return i; }).sort(function (a, b) { return BOXES[a].y - BOXES[b].y; });
+    for (var n = 0; n < order.length; n++) {
+      var b = BOXES[order[n]], y0 = b.y, y1 = b.y - SKYLINE.depth;
+      var sx = b.x + b.w / 2 < 400 ? b.x + b.w : b.x;
+      T.path(c, cam, [[sx, y0, 0], [sx, y1, 0], [sx, y1, b.h], [sx, y0, b.h]]);
+      c.fillStyle = T.shade(PAL.texDark, -0.4);
+      c.fill();
+      T.path(c, cam, [[b.x, y0, 0], [b.x + b.w, y0, 0], [b.x + b.w, y0, b.h], [b.x, y0, b.h]]);
+      c.fillStyle = PAL.texDark;
+      c.fill();
+      T.path(c, cam, [[b.x, y0, b.h], [b.x + b.w, y0, b.h], [b.x + b.w, y1, b.h], [b.x, y1, b.h]]);
+      c.fillStyle = PAL.texLight;
+      c.fill();
+    }
+    c.globalAlpha = SKYLINE.winAlpha;
+    c.fillStyle = PAL.accents[1];
+    for (var i = 0; i < WINDOWS.length; i++) {
+      if (!windowLit(i, t)) continue;
+      var w = WINDOWS[i], by = BOXES[w.box].y;
+      T.path(c, cam, [[w.x, by, w.z], [w.x + SKYLINE.winW, by, w.z], [w.x + SKYLINE.winW, by, w.z + SKYLINE.winH], [w.x, by, w.z + SKYLINE.winH]]);
+      c.fill();
+    }
+    c.globalAlpha = 1;
+  }
+
+  function isMatchPoint(state) {
+    var G = root.Pong;
+    try { return !!(G && typeof G.isMatchPoint === 'function' && G.isMatchPoint(state)); } catch (e) { return false; }
+  }
+
+  // ------------------------------------------------------------ the fight HUD (item 1228)
+  /*
+   * Tekken's long health bars, into the buffer with the score: 110 x 4 buffer
+   * pixels from the score outward, accent yellow on the rail shadow, each
+   * draining one tenth for every point the other side has taken, with P1 and
+   * CPU under them. A point drains the conceding bar with a red chunk that
+   * shrinks over 0.4 s, and POINT flashes in the middle for 0.8 s; at match
+   * point FINAL ROUND is held there. Everything sits above the far edge (R8).
+   */
+  var BARS = { w: 110, h: 4, top: 4, inner: 14, frame: '#1a1a1f', back: '#4a4e59', per: 0.1, chunkS: 0.4 };
+  var LABELS = { cell: 2, gap: 2, top: 11 };
+  var CALL = { cell: 2, gap: 2, top: 12, lineTwo: 21, pointS: 0.8 };
+
+  /** How full each player's bar is: 1 less a tenth per point the OTHER side has, never below 0. */
+  function barFractions(state) {
+    return {
+      left: Math.max(0, 1 - BARS.per * (state.score.right || 0)),
+      right: Math.max(0, 1 - BARS.per * (state.score.left || 0))
+    };
+  }
+
+  // Private memory (bible rule 1.4), per game by its score object: the last score
+  // total seen, when it last went up and which side conceded it.
+  var points = typeof WeakMap === 'function' ? new WeakMap() : null;
+
+  function concededBy(state) {
+    return state.missAt ? (state.missAt.x < (state.width || 800) / 2 ? 'left' : 'right') : null;
+  }
+
+  /** { at, side } of the latest point this game: `at` -Infinity when none has been seen. */
+  function pointMoment(state) {
+    var total = (state.score.left || 0) + (state.score.right || 0), t = state.time || 0;
+    var key = state.score, mem = points && key && points.get(key);
+    if (!mem || total < mem.total || t < mem.t) {
+      // First sight of this game: the point that just brought the machine here counts.
+      var fresh = total > 0 && state.eraChangedAt > 0 && t - state.eraChangedAt < CALL.pointS;
+      mem = { total: total, t: t, at: fresh ? state.eraChangedAt : -Infinity, side: fresh ? concededBy(state) : null };
+    } else if (total > mem.total) {
+      mem = { total: total, t: t, at: t, side: concededBy(state) };
+    } else {
+      mem = { total: mem.total, t: t, at: mem.at, side: mem.side };
+    }
+    if (points && key && typeof key === 'object') points.set(key, mem);
+    return mem;
+  }
+
+  /** What the middle of the HUD calls at this moment: POINT, FINAL ROUND, or nothing. */
+  function hudCall(state, moment) {
+    var age = (state.time || 0) - moment.at;
+    if (age >= 0 && age < CALL.pointS) return { lines: ['POINT'], ink: PAL.accents[1], shadow: PAL.accents[0] };
+    if (isMatchPoint(state)) return { lines: ['FINAL', 'ROUND'], ink: PAL.accents[1], shadow: PAL.accents[0] };
+    return null;
+  }
+
+  /** The red damage chunk on the conceding bar: its width as a fraction of the bar, 0 once shrunk. */
+  function chunkOf(state, moment, side) {
+    var age = (state.time || 0) - moment.at;
+    if (moment.side !== side || !(age >= 0 && age < BARS.chunkS)) return 0;
+    return BARS.per * (1 - age / BARS.chunkS);
+  }
+
+  function hud(c, state, sp, P) {
+    if (sp.field) c.setTransform(1, 0, 0, 1, 0, 0);
+    var k = sp.px, full = barFractions(state), moment = pointMoment(state);
+    for (var s = 0; s < 2; s++) {
+      var side = s ? 'right' : 'left', dir = s ? -1 : 1;
+      var outer = s ? BUFFER.w / 2 + BARS.inner + BARS.w : BUFFER.w / 2 - BARS.inner - BARS.w;
+      var x0 = s ? outer - BARS.w : outer;
+      c.fillStyle = BARS.frame;
+      c.fillRect((x0 - 1) * k, (BARS.top - 1) * k, (BARS.w + 2) * k, (BARS.h + 2) * k);
+      c.fillStyle = BARS.back;
+      c.fillRect(x0 * k, BARS.top * k, BARS.w * k, BARS.h * k);
+      var fw = Math.round(BARS.w * full[side]);   // whole buffer pixels: the bar steps, it never slides
+      c.fillStyle = PAL.accents[1];
+      c.fillRect((s ? outer - fw : outer) * k, BARS.top * k, fw * k, BARS.h * k);
+      var cw = Math.round(BARS.w * chunkOf(state, moment, side));
+      if (cw > 0) {
+        c.fillStyle = PAL.accents[0];
+        c.fillRect((s ? outer - fw - cw : outer + fw) * k, BARS.top * k, cw * k, BARS.h * k);
+      }
+      var label = s ? 'CPU' : 'P1', lx = outer + dir * 11;
+      c.fillStyle = PAL.hudShadow;
+      P.drawText(c, label, (lx + 1) * k, (LABELS.top + 1) * k, LABELS.cell * k, LABELS.gap * k);
+      c.fillStyle = PAL.hud;
+      P.drawText(c, label, lx * k, LABELS.top * k, LABELS.cell * k, LABELS.gap * k);
+    }
+    var call = hudCall(state, moment);
+    if (call) {
+      for (var l = 0; l < call.lines.length; l++) {
+        var top = (call.lines.length > 1 ? (l ? CALL.lineTwo : CALL.top - 4) : CALL.top) * k;
+        c.fillStyle = call.shadow;
+        P.drawText(c, call.lines[l], BUFFER.w / 2 * k + k, top + k, CALL.cell * k, CALL.gap * k);
+        c.fillStyle = call.ink;
+        P.drawText(c, call.lines[l], BUFFER.w / 2 * k, top, CALL.cell * k, CALL.gap * k);
+      }
+    }
+    if (sp.field) c.setTransform(sp.field, 0, 0, sp.field, 0, 0);
+  }
+
   /** Steps 1 to 4 and the HUD, into whichever context is the low-resolution picture. */
   function scene(c, state, cam, T, P, sp) {
     // 1. backdrop, in buffer pixels
     if (sp.field) c.setTransform(1, 0, 0, 1, 0, 0);
     backdrop(c, T, sp);
     if (sp.field) c.setTransform(sp.field, 0, 0, sp.field, 0, 0);
+
+    // 1b. the city behind the far wall: the searchlights, then the skyline over them
+    var t = state.time || 0, finalRound = isMatchPoint(state);
+    if (!finalRound) beams(c, T, cam, t, false);
+    skyline(c, T, cam, t);
 
     // 2. the table. Void under the footprint, so a seam between two snapped
     // triangles shows a hairline of void rather than being papered over.
@@ -289,6 +518,9 @@
       texture: TEXTURE.court,
       trim: TEXTURE.trim
     });
+
+    // 2b. match point: both searchlights locked on the centre line, on the table, under the paddles (R4)
+    if (finalRound) beams(c, T, cam, t, true);
 
     // 3. the contact shadow at the ball's true footprint (R5); hidden with the ball
     if (state.serveDelay <= 0) {
@@ -311,6 +543,7 @@
 
     // 8. the score goes INTO the buffer on purpose, so it is as chunky as the rest (R8: above the far edge)
     score(c, state, sp, P);
+    hud(c, state, sp, P);
   }
 
   /**
@@ -625,6 +858,12 @@
     },
     draw: draw,
     flourish: arrival,
+    // The arena and the fight HUD's pure parts, for the tests (item 1228).
+    arena: {
+      SKYLINE: SKYLINE, SEARCH: SEARCH, BOXES: BOXES, WINDOWS: WINDOWS, BARS: BARS, LABELS: LABELS, CALL: CALL,
+      windowLit: windowLit, beamAngle: beamAngle, beamBase: beamBase, beamTriangle: beamTriangle,
+      lockedBeam: lockedBeam, barFractions: barFractions, pointMoment: pointMoment, hudCall: hudCall, chunkOf: chunkOf
+    },
     // The arrival's pure parts, for the tests (item 1151).
     arrival: {
       ARRIVAL: ARRIVAL, shardsFor: shardsFor, shardPose: shardPose,
