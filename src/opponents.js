@@ -65,7 +65,7 @@
   // only letters the block font can spell (A-Z, digits, space, colon, full stop).
   var TAUNTS = ['TOO SLOW', 'NICE TRY', 'GG', 'MY POINT', 'SO CLOSE', 'NOT TODAY', 'OWNED', 'BOOM'];
   var TAUNT_FROM_ERA = 9;
-  var TAUNT_SECONDS = 2.5;
+  var TAUNT_SECONDS = 3.5;   // outlasts the Xbox arrival, which brings its gamertags in
 
   function profileFor(era) {
     var n = Math.floor(Number(era));
@@ -204,13 +204,13 @@
     { font: 'block', at: [510, 124], size: 10, ink: 'paddle' },                                  // Atari: in its colour
     { font: 'block', at: [510, 124], size: 10, ink: '#fcfcfc', shadow: '#000000' },              // NES: white on a hard shadow
     { font: 'block', at: [510, 124], size: 10, ink: '#ffffff', shadow: '#0038a8', skew: -0.25 }, // Genesis: italic, blue drop
-    { font: 'block', at: [510, 124], size: 10, ink: '#f8f8f8', outline: '#302070' },             // SNES: outlined
-    { font: 'hd', at: [510, 118], size: 15, ink: '#e8e8f0', weight: 700, family: 'Arial, sans-serif' },
-    { font: 'hd', at: [510, 118], size: 15, ink: '#ffd800', weight: 700, family: 'Arial Black, Arial, sans-serif', shadow: '#c00018' },
-    { font: 'hd', at: [510, 118], size: 15, ink: '#ff7a1a', weight: 700, family: 'Verdana, sans-serif' },
-    { font: 'hd', at: [510, 118], size: 15, ink: '#9ec9ff', weight: 400, family: 'Arial, sans-serif', glow: '#2a6cff' },
-    { font: 'hd', at: [600, 70], size: 14, ink: '#b8ff3c', weight: 700, family: 'Arial, sans-serif', glow: '#5cff2a' },
-    { font: 'hd', at: [600, 70], size: 16, ink: '#ffffff', weight: 600, family: 'Segoe UI, Arial, sans-serif', glow: '#7ad73c' }
+    { font: 'block', at: [510, 119], size: 10, ink: '#f8f8f8', outline: '#302070' },             // SNES: outlined, inside the score panel
+    { font: 'hd', at: [510, 72], size: 14, ink: '#e8e8f0', weight: 700, family: 'Arial, sans-serif' },                                // PlayStation: plain, under the digits
+    { font: 'hd', at: [610, 50], size: 15, ink: '#ffd800', weight: 700, family: 'Arial Black, Arial, sans-serif', shadow: '#c00018' }, // N64: beside the score, red drop
+    { font: 'hd', at: [615, 34], size: 15, ink: '#ff7a1a', weight: 700, family: 'Verdana, sans-serif', shadow: '#1a1a1a' },           // Dreamcast: beside the placard, cel outline
+    { font: 'hd', at: [565, 28], size: 15, ink: '#9ec9ff', weight: 400, family: 'Arial, sans-serif', glow: '#2a6cff' },              // PS2: thin and blue, beside the digits
+    { font: 'hd', at: [528, 70], size: 14, ink: '#b8ff3c', weight: 700, family: 'Arial, sans-serif', glow: '#5cff2a' },              // Xbox: under the digit, green glow
+    { font: 'hd', at: [667, 106], size: 15, ink: '#ffffff', weight: 600, family: 'Segoe UI, Arial, sans-serif', glow: '#7ad73c' }     // Xbox 360: under its blade
   ];
 
   function letteringFor(era) {
