@@ -35,10 +35,11 @@
  * truth of which era draws where; this only paints over it, and the state it is
  * handed is never written.
  *
- * The sting: a soft TV warble in the Atari voice (a square hum sliding up with
- * a wobble, then two coarse TIA steps), added to era 1's row of
- * PongSound.VOICES as `sting` and played once per change through the page's own
- * player -- never behind the title, where the demo rally is silent.
+ * The sound that goes with it, a soft TV warble, is not played from here. It is
+ * the Atari voice's `boot` list in src/sound.js: the player sounds it in place
+ * of the point's note on the change that brings era 1 in -- once, however many
+ * times this hook is drawn, and never behind the title, whose demo rally the
+ * player is never handed. This hook draws, and nothing else.
  */
 (function (root) {
   'use strict';
@@ -71,17 +72,6 @@
   var BAR = 34;            // half the height of the frame bar at the roll's seam
   var FLASH_S = 0.28;      // how long the power-on line lasts
   var BLEED_INKS = ['#d8a038', '#d0589c', '#4890d8', '#68bc40', '#c85c14', '#a858c8'];
-
-  // The warble: a square hum sliding up an octave with a slow wobble, like a
-  // set not yet on its channel, then two coarse TIA steps as the picture locks.
-  // Soft -- a third of the loudness of a paddle hit.
-  var STING = [
-    { wave: 'square', freq: 110, slideTo: 220, at: 0.00, dur: 0.46, gain: 0.07,
-      fm: { ratio: 0.06, index: 0.09 } },
-    { wave: 'square', freq: 294, at: 0.40, dur: 0.10, gain: 0.07 },
-    { wave: 'square', freq: 440, slideTo: 392, at: 0.52, dur: 0.34, gain: 0.06,
-      fm: { ratio: 0.016, index: 0.025 } }
-  ];
 
   function phosphor(a) {
     return 'rgba(' + PHOSPHOR.join(',') + ',' + Math.max(0, Math.min(1, a)).toFixed(3) + ')';
@@ -262,31 +252,6 @@
     ctx.restore();
   }
 
-  // The sting plays once per change: remembered by which game and when.
-  var stung = { state: null, at: null };
-
-  function soundModule() {
-    if (root.PongSound) return root.PongSound;
-    return typeof module === 'object' && typeof require === 'function' ? require('../sound.js') : null;
-  }
-
-  /** Era 1's row of voices gains its sting; then the page's player plays it once. */
-  function playSting(state) {
-    var at = state.eraChangedAt;
-    if (stung.state === state && stung.at === at) return false;
-    stung.state = state;
-    stung.at = at;
-    var player = root.__pongSound;
-    if (!player || typeof player.play !== 'function') return false;
-    try {
-      var S = soundModule();
-      if (S && S.VOICES && S.VOICES[1] && !S.VOICES[1].sting) S.VOICES[1].sting = STING;
-      return !!player.play({ type: 'sting', era: 1 });
-    } catch (e) {
-      return false;
-    }
-  }
-
   /** The flourish hook: see the header of src/erachange.js for the contract. */
   function tvComesAlive(ctx, p, origin, fromEra, toEra, info) {
     // Only the arrival of THIS era: the Super Nintendo borrows era 1's look
@@ -302,7 +267,6 @@
       if (r > 1) scanBand(ctx, o, r, info.t, w, h, info.dim);
       return;
     }
-    playSting(info.state);
     // The eased ring is barely a point for its first frames -- exactly when the
     // power-on line belongs -- so only the ring's own layers wait for it to open.
     if (r > 1) {
@@ -324,7 +288,6 @@
       var i = (state.paddleColour && state.paddleColour[side]) || 0;
       return PALETTE[i % PALETTE.length];
     },
-    flourish: tvComesAlive,
-    sting: STING
+    flourish: tvComesAlive
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
