@@ -220,6 +220,14 @@ test('era 0 and the dimmed attract frame draw no players', () => {
 });
 
 test('every era from 1 up draws both players, the right one mirrored, and writes no state', () => {
+  // An era card's sheet is not decoded yet here (there is no Image under
+  // node), so an era with art draws its placeholder -- as a page does until
+  // the PNG has loaded (item 1232, the first era block to name sheets).
+  const fake = fakeSprites();
+  try { everyEraDrawsBoth(); } finally { fake.restore(); }
+});
+
+function everyEraDrawsBoth() {
   for (let e = 1; e <= 10; e++) {
     const g = playing(e);
     g.events = [{ type: 'paddle', side: 'left', era: e, time: g.time }];
@@ -231,7 +239,7 @@ test('every era from 1 up draws both players, the right one mirrored, and writes
     assert.strictEqual(mirrors.length, 1, 'era ' + e + ': one mirrored player');
     assert.ok(ctx.calls.some(([k]) => k === 'fillRect'), 'era ' + e + ' drew its placeholder');
   }
-});
+}
 
 test('through the renderer: PongRender.draw draws the era, then the players over it', () => {
   const g = playing(2);
@@ -369,8 +377,8 @@ test('a block with only `sheet` still serves both sides, as before sheets existe
     assert.strictEqual(C.configFor(2, 'right').sheet, 'test-rival');
     // And no sheet anywhere is the placeholder on both sides, exactly as now.
     for (let e = 1; e <= 10; e++) {
-      // Era 2 is this test's own block; an era card that brought its art wears it (item 1227).
-      if (e === 2 || C.ERAS[e].sheet || C.ERAS[e].sheets) continue;
+      if (e === 2) continue;
+      if (C.ERAS[e].sheet || C.ERAS[e].sheets) continue;   // an era card's own art (item 1232 on)
       assert.strictEqual(C.configFor(e, 'left').sheet, null, 'era ' + e + ' left is the placeholder');
       assert.deepStrictEqual(C.configFor(e, 'right'), Object.assign(C.configFor(e, 'left'), { side: 'right' }),
         'era ' + e + ': the two sides are the same config');

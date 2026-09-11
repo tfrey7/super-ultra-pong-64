@@ -1,0 +1,393 @@
+{
+ "taken": "2026-09-11T03:21:20.061Z",
+ "label": "ab-branch-audio",
+ "gpu": false,
+ "fresh": [
+  {
+   "era": 0,
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 39.8,
+   "taskMsPerSec": 216,
+   "heapMB": 2.4,
+   "nodes": 238,
+   "jsListeners": 20,
+   "counts": {
+    "raf": 293,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 67,
+    "audioNodes": 19,
+    "sourcesLive": 5,
+    "sourcesStarted": 7
+   },
+   "music": {
+    "era": 0,
+    "scheduled": 5,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 17,
+   "audioLoadPct": [
+    0.1,
+    0.6
+   ]
+  },
+  {
+   "era": 1,
+   "frames": 60,
+   "total": 1000,
+   "mean": 16.67,
+   "p95": 16.8,
+   "max": 16.8,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 46.8,
+   "taskMsPerSec": 495.4,
+   "heapMB": 2.2,
+   "nodes": 219,
+   "jsListeners": 24,
+   "counts": {
+    "raf": 296,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 83,
+    "audioNodes": 42,
+    "sourcesLive": 4,
+    "sourcesStarted": 16
+   },
+   "music": {
+    "era": 1,
+    "scheduled": 17,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 34,
+   "audioLoadPct": [
+    0.1,
+    1
+   ]
+  },
+  {
+   "era": 2,
+   "frames": 61,
+   "total": 1016.6,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 77.2,
+   "taskMsPerSec": 466.9,
+   "heapMB": 2.4,
+   "nodes": 218,
+   "jsListeners": 62,
+   "counts": {
+    "raf": 303,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 82,
+    "audioNodes": 154,
+    "sourcesLive": 13,
+    "sourcesStarted": 60
+   },
+   "music": {
+    "era": 2,
+    "scheduled": 71,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 95,
+   "audioLoadPct": [
+    0.1,
+    1.2
+   ]
+  },
+  {
+   "era": 3,
+   "frames": 55,
+   "total": 1016.6,
+   "mean": 18.48,
+   "p95": 33.4,
+   "max": 33.4,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 136.5,
+   "taskMsPerSec": 994.7,
+   "heapMB": 5,
+   "nodes": 464,
+   "jsListeners": 125,
+   "counts": {
+    "raf": 273,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 82,
+    "audioNodes": 212,
+    "sourcesLive": 17,
+    "sourcesStarted": 76
+   },
+   "music": {
+    "era": 3,
+    "scheduled": 60,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 190,
+   "audioLoadPct": [
+    0.1,
+    2.4
+   ]
+  },
+  {
+   "era": 4,
+   "frames": 61,
+   "total": 1016.5,
+   "mean": 16.66,
+   "p95": 16.7,
+   "max": 16.8,
+   "rafPerFrame": 3.05,
+   "scriptMsPerSec": 390.6,
+   "taskMsPerSec": 802,
+   "heapMB": 3.8,
+   "nodes": 462,
+   "jsListeners": 116,
+   "counts": {
+    "raf": 313,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 80,
+    "audioNodes": 195,
+    "sourcesLive": 35,
+    "sourcesStarted": 70
+   },
+   "music": {
+    "era": 4,
+    "scheduled": 24,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 301,
+   "audioLoadPct": [
+    0.5,
+    4.2
+   ]
+  },
+  {
+   "era": 5,
+   "frames": 30,
+   "total": 1016.7,
+   "mean": 33.89,
+   "p95": 33.5,
+   "max": 50,
+   "rafPerFrame": 3.1,
+   "scriptMsPerSec": 244.5,
+   "taskMsPerSec": 995.5,
+   "heapMB": 4.6,
+   "nodes": 466,
+   "jsListeners": 157,
+   "counts": {
+    "raf": 160,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 87,
+    "audioNodes": 300,
+    "sourcesLive": 43,
+    "sourcesStarted": 93
+   },
+   "music": {
+    "era": 5,
+    "scheduled": 47,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 504,
+   "audioLoadPct": [
+    4.7,
+    12.1
+   ]
+  },
+  {
+   "era": 6,
+   "frames": 22,
+   "total": 1016.6,
+   "mean": 46.21,
+   "p95": 50.1,
+   "max": 66.7,
+   "rafPerFrame": 3.14,
+   "scriptMsPerSec": 429,
+   "taskMsPerSec": 996.1,
+   "heapMB": 4.6,
+   "nodes": 466,
+   "jsListeners": 208,
+   "counts": {
+    "raf": 122,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 79,
+    "audioNodes": 330,
+    "sourcesLive": 75,
+    "sourcesStarted": 118
+   },
+   "music": {
+    "era": 6,
+    "scheduled": 33,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 775,
+   "audioLoadPct": [
+    3.2,
+    11.8
+   ]
+  },
+  {
+   "era": 7,
+   "frames": 28,
+   "total": 1049.9,
+   "mean": 37.5,
+   "p95": 50.1,
+   "max": 50.1,
+   "rafPerFrame": 3.11,
+   "scriptMsPerSec": 323.4,
+   "taskMsPerSec": 994.9,
+   "heapMB": 5.1,
+   "nodes": 458,
+   "jsListeners": 227,
+   "counts": {
+    "raf": 148,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 79,
+    "audioNodes": 313,
+    "sourcesLive": 23,
+    "sourcesStarted": 104
+   },
+   "music": {
+    "era": 7,
+    "scheduled": 65,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 956,
+   "audioLoadPct": [
+    0.3,
+    8.4
+   ]
+  },
+  {
+   "era": 8,
+   "frames": 20,
+   "total": 1016.6,
+   "mean": 50.83,
+   "p95": 83.3,
+   "max": 83.3,
+   "rafPerFrame": 3.15,
+   "scriptMsPerSec": 476,
+   "taskMsPerSec": 997.3,
+   "heapMB": 4,
+   "nodes": 464,
+   "jsListeners": 179,
+   "counts": {
+    "raf": 112,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 85,
+    "audioNodes": 281,
+    "sourcesLive": 51,
+    "sourcesStarted": 97
+   },
+   "music": {
+    "era": 8,
+    "scheduled": 41,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 1209,
+   "audioLoadPct": [
+    3.1,
+    9
+   ]
+  },
+  {
+   "era": 9,
+   "frames": 21,
+   "total": 1000,
+   "mean": 47.62,
+   "p95": 50,
+   "max": 66.7,
+   "rafPerFrame": 3.14,
+   "scriptMsPerSec": 449.5,
+   "taskMsPerSec": 990.3,
+   "heapMB": 4.1,
+   "nodes": 464,
+   "jsListeners": 318,
+   "counts": {
+    "raf": 117,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 79,
+    "audioNodes": 843,
+    "sourcesLive": 34,
+    "sourcesStarted": 205
+   },
+   "music": {
+    "era": 9,
+    "scheduled": 107,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 1927,
+   "audioLoadPct": [
+    2.9,
+    23.7
+   ]
+  },
+  {
+   "era": 10,
+   "frames": 8,
+   "total": 1083.4,
+   "mean": 135.42,
+   "p95": 150,
+   "max": 150,
+   "rafPerFrame": 3.38,
+   "scriptMsPerSec": 810,
+   "taskMsPerSec": 987.4,
+   "heapMB": 4.6,
+   "nodes": 458,
+   "jsListeners": 325,
+   "counts": {
+    "raf": 72,
+    "intervals": 1,
+    "timeouts": 0,
+    "listeners": 11,
+    "canvases": 79,
+    "audioNodes": 523,
+    "sourcesLive": 48,
+    "sourcesStarted": 145
+   },
+   "music": {
+    "era": 10,
+    "scheduled": 131,
+    "crossfades": 0,
+    "errors": 0
+   },
+   "audioLive": 2517,
+   "audioLoadPct": [
+    3.2,
+    11
+   ]
+  }
+ ],
+ "climb": []
+}

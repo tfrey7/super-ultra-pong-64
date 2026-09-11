@@ -82,3 +82,63 @@ Look file: [src/eras/era8-ps2.js](../../src/eras/era8-ps2.js). Chapter 9 of [doc
    `src/match.js`, and `advanceEra`'s call.
 5. Place any light where the camera can see it. Project it first; the bible's number could not be
    seen.
+
+## LESSONS
+
+What item 1232 learned making this era look like a AAA game of 2000 that happens to be Pong (the
+art bible's era 8 page, [docs/ART.md](../ART.md)).
+
+**What sold the flagship look here**
+
+- **People at the table.** Two operatives stand at the table's ends, one in midnight navy with an
+  amber visor and one in slate with a blue visor. They are drawn as upright figures at the paddle's
+  spot on the table, and they shrink toward the far rail. Nothing else turned the frame from a
+  table game into a scene so quickly.
+- **A place, not a backdrop.** The night skyline fills the band between the top bar and the far
+  rail, and the wedges beside the table. Behind it a searchlight sweeps, and rain falls over
+  everything. The frame shows only about forty pixels of sky, and that was enough.
+- **Mirrors.** The glossy slab reflects the players as it reflects the paddles, at the same 0.18.
+  That one draw is most of the "PS2 shine".
+- **Film interface.** The score stays a subtitle, and codec name plates sit in the bottom bar.
+  A point is typed across the top bar a letter at a time, and match point is set in amber. The
+  letterbox is the HUD's frame, so the playfield carries nothing.
+
+**What did not work**
+
+- **pixflux does not draw sprite sheets.** Asked for "3 columns by 6 rows of equal cells" at
+  72 x 324, it drew a 2 x 4 grid of eight figures for one player and a single column of three for
+  the other, at two different heights. [era8-sheets.mjs](../../assets/pixellab/era8-sheets.mjs)
+  finds each figure by its alpha, scales every figure to 80 pixels and stands them on one baseline.
+  It derives the missing beats: a lean for move, a mirrored figure turning to watch the ball for a
+  miss, and a pixel's bob for idle. That script costs 0 generations. **Ask pixflux for figures,
+  never for a grid, and cut the grid yourself.**
+- **Parallel generations race on the manifest.** Three `tools/pixellab.mjs gen` runs at once each
+  rewrote `manifest.json`, and only the last entry survived. Two entries had to be rebuilt from
+  their prompts, seeds and bills. Generate one at a time, or merge the entries afterwards.
+- **The bible's skyline was placed in world space where the camera cannot see it.** It gave towers
+  120 to 300 units tall at world y -100 to -200. Through this camera they land 160 to 500 pixels
+  above the canvas. The flare's light failed the same way before. The plate is laid in screen
+  space instead, sliding at half the camera's drift. **Project any set dressing before you
+  specify it.**
+- **The bible's rain colour was invisible.** Slate at 0.25 on a slate slab cannot be seen, so the
+  rain is HUD ink at 0.18.
+- **The players are drawn after the era, so over the letterbox.** The rig
+  (`src/characters.js`) draws them after the era's frame. The era wraps the renderer's draw once
+  more, outermost, and lays its bars again over them. Without that, a far player's head pokes
+  into the black bar.
+- **One animation rate for every beat.** The rig cycles idle, move and win at one `fps`. The
+  bible's 8 turned a two-frame breath into a flicker, so the era runs at 3.
+
+**What a one-era game would copy**
+
+1. The operative sheets: `assets/pixellab/era8-sheet-left.png` and `era8-sheet-right.png`, six
+   rows (idle, up, down, swing, miss, win) of 40 x 84 frames, the hand at (32, 47), drawn 1.125
+   table units a pixel.
+2. The recipe for making more: generate single figures, then run `era8-sheets.mjs` to cut, scale,
+   baseline, grade (12% toward navy) and cap every colour at luma 0.8. The visor stays the
+   brightest thing on a figure, and the ball the brightest on screen.
+3. The arena layers, in painter's order: sky gradient and amber haze, then the searchlight, the
+   skyline plate, the slab, the reflections (paddles and players), dust, paddles, trail, halo and
+   sparks, the flare, the rain, the ball, and the letterbox with its subtitle and plates.
+4. The typed line: a subtitle that reveals one letter every 0.03 s and holds a second is the
+   cheapest "cutscene" there is.

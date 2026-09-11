@@ -792,6 +792,7 @@
       era: null,                // the era whose arrangement is playing
       scheduled: 0,             // notes booked on the audio clock
       crossfades: 0,
+      released: 0,              // faded arrangements let go of, every node unplugged (item 1238)
       ducks: 0,
       errors: 0,
       lastSwitch: null,         // { from, to, bar, step } of the latest era change
@@ -905,7 +906,7 @@
       bus.connect(duck);
       music.lastSwitch = { from: current ? current.era : null, to: era,
                            bar: Math.floor(pos / theme.steps), step: pos % theme.steps };
-      current = { era: era, arr: arr, bus: bus, fxIn: bus, drones: [], score: null };
+      current = { era: era, arr: arr, bus: bus, fxIn: bus, drones: [], fx: [], score: null };
       music.era = era;
       if (arr) {
         current.score = scoreOf(arr);
@@ -928,15 +929,31 @@
       return arr._score;
     }
 
+    /**
+     * A faded arrangement is let go of whole (item 1238): its drones stopped,
+     * and every node of its effects chain unplugged -- not only the bus. An echo
+     * is a delay feeding itself through a gain, and a reverb holds seconds of
+     * impulse; left wired to each other after the bus came off, each change up
+     * the ladder added one more set the page never let go of.
+     */
     function retireFaded() {
       var t = ctx.currentTime;
       for (var i = fading.length - 1; i >= 0; i--) {
         if (t >= fading[i].until) {
-          stopDrones(fading[i]);
-          try { fading[i].bus.disconnect(); } catch (e) { /* already gone */ }
+          release(fading[i]);
           fading.splice(i, 1);
         }
       }
+    }
+
+    function release(track) {
+      stopDrones(track);
+      var nodes = [track.bus].concat(track.fx || []);
+      for (var i = 0; i < nodes.length; i++) {
+        try { nodes[i].disconnect(); } catch (e) { /* already gone */ }
+      }
+      track.fx = [];
+      music.released += 1;
     }
 
     /** Book every step inside the lookahead window, for every arrangement still sounding. */
@@ -1148,10 +1165,13 @@
      * over the whole mix, then an echo and/or a reverb fed from after them.
      */
     function effectsChain(fx, bus, track) {
-      var input = ctx.createGain();
+      // Every node made here is kept on the track, so retiring it unplugs them all.
+      var made = track ? track.fx : [];
+      function keep(n) { made.push(n); return n; }
+      var input = keep(ctx.createGain());
       var node = input;
       if (fx.grit) {
-        var shaper = ctx.createWaveShaper();
+        var shaper = keep(ctx.createWaveShaper());
         var n = 1024, curve = new Float32Array(n), k = fx.grit * 20;
         for (var i = 0; i < n; i++) { var x = i * 2 / n - 1; curve[i] = (1 + k) * x / (1 + k * Math.abs(x)); }
         shaper.curve = curve;
@@ -1160,7 +1180,7 @@
       }
       if (fx.crush) {
         // Fewer amplitude steps: the grainy edge of compressed samples.
-        var crusher = ctx.createWaveShaper();
+        var crusher = keep(ctx.createWaveShaper());
         var cn = 2048, cc = new Float32Array(cn), lv = Math.pow(2, fx.crush) / 2;
         for (var ci = 0; ci < cn; ci++) cc[ci] = Math.round((ci * 2 / cn - 1) * lv) / lv;
         crusher.curve = cc;
@@ -1168,7 +1188,7 @@
         node = crusher;
       }
       if (fx.lowpass) {
-        var lp = ctx.createBiquadFilter();
+        var lp = keep(ctx.createBiquadFilter());
         lp.type = 'lowpass';
         lp.frequency.value = fx.lowpass;
         lp.Q.value = 0.5;
@@ -1177,14 +1197,14 @@
       }
       if (fx.sweep) {
         // A resonant low-pass whose cutoff rises and falls once every `bars` bars.
-        var sw = ctx.createBiquadFilter();
+        var sw = keep(ctx.createBiquadFilter());
         sw.type = 'lowpass';
         sw.frequency.value = fx.sweep.freq;
         sw.Q.value = fx.sweep.q || 6;
-        var lfo = ctx.createOscillator();
+        var lfo = keep(ctx.createOscillator());
         lfo.type = 'sine';
         lfo.frequency.value = 1 / ((fx.sweep.bars || 4) * 4 * 60 / theme.bpm);
-        var dep = ctx.createGain();
+        var dep = keep(ctx.createGain());
         dep.gain.value = Math.min(fx.sweep.depth, fx.sweep.freq - 40);
         lfo.connect(dep);
         dep.connect(sw.frequency);
@@ -1195,11 +1215,11 @@
       }
       node.connect(bus);   // the dry path
       if (fx.echo) {
-        var delay = ctx.createDelay(1.0);
+        var delay = keep(ctx.createDelay(1.0));
         delay.delayTime.value = fx.echo.time;
-        var fb = ctx.createGain();
+        var fb = keep(ctx.createGain());
         fb.gain.value = fx.echo.feedback;
-        var ew = ctx.createGain();
+        var ew = keep(ctx.createGain());
         ew.gain.value = fx.echo.mix;
         node.connect(delay);
         delay.connect(fb);
@@ -1208,25 +1228,38 @@
         ew.connect(bus);
       }
       if (fx.reverb) {
-        var conv = ctx.createConvolver();
-        var sr = ctx.sampleRate, len = Math.floor(sr * fx.reverb.seconds);
-        var ir = ctx.createBuffer(2, len, sr);
-        var seed = 7;
-        for (var ch = 0; ch < 2; ch++) {
-          var d = ir.getChannelData(ch);
-          for (var j = 0; j < len; j++) {
-            seed = (seed * 16807) % 2147483647;
-            d[j] = (seed / 1073741823.5 - 1) * Math.pow(1 - j / len, fx.reverb.decay);
-          }
-        }
-        conv.buffer = ir;
-        var wet = ctx.createGain();
+        var conv = keep(ctx.createConvolver());
+        conv.buffer = impulseFor(fx.reverb);
+        var wet = keep(ctx.createGain());
         wet.gain.value = fx.reverb.mix;
         node.connect(conv);
         conv.connect(wet);
         wet.connect(bus);
       }
       return input;
+    }
+
+    /**
+     * A reverb's impulse: seconds of decaying noise, built ONCE per reverb and
+     * shared by every change into that arrangement (item 1238). Built on every
+     * change it cost the page up to four seconds of stereo noise, computed in
+     * the very frame the ring starts.
+     */
+    var impulses = [];
+    function impulseFor(spec) {
+      for (var i = 0; i < impulses.length; i++) if (impulses[i].spec === spec) return impulses[i].buffer;
+      var sr = ctx.sampleRate, len = Math.floor(sr * spec.seconds);
+      var ir = ctx.createBuffer(2, len, sr);
+      var seed = 7;
+      for (var ch = 0; ch < 2; ch++) {
+        var d = ir.getChannelData(ch);
+        for (var j = 0; j < len; j++) {
+          seed = (seed * 16807) % 2147483647;
+          d[j] = (seed / 1073741823.5 - 1) * Math.pow(1 - j / len, spec.decay);
+        }
+      }
+      impulses.push({ spec: spec, buffer: ir });
+      return ir;
     }
 
     function startDrones(track) {
@@ -1239,9 +1272,11 @@
         o.frequency.value = d.freq;
         var g = ctx.createGain();
         g.gain.value = d.gain;
+        track.fx.push(o, g);
         var head = o;
         if (d.filter) {
           var flt = ctx.createBiquadFilter();
+          track.fx.push(flt);
           flt.type = d.filter.type;
           flt.frequency.value = d.filter.freq;
           flt.Q.value = d.filter.q || 0.7;
@@ -1256,6 +1291,7 @@
           lfo.frequency.value = d.wobble.rate;
           var depth = ctx.createGain();
           depth.gain.value = d.gain * d.wobble.depth;
+          track.fx.push(lfo, depth);
           lfo.connect(depth);
           depth.connect(g.gain);
           lfo.start(t);
