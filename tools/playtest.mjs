@@ -56,13 +56,15 @@ const LADDER_ONLY = process.argv.includes('--ladder');
 // --scoring runs only the rally and the scoring check (section 6), about ten
 // seconds -- the quick way to ask "can the player still score?" many times.
 const SCORING_ONLY = process.argv.includes('--scoring');
-// --reference also copies the five era frames the walk takes into the TRACKED
-// docs/shots/eras/, the reference pictures a reader opens. Off by default,
+// --reference also copies the five era frames the walk takes, and the four
+// frames it catches mid-change (change-era0-to-era1.png to change-era3-to-era4.png),
+// into the TRACKED docs/shots/eras/, the reference pictures a reader opens. Off by default,
 // because every walk's frames differ and a plain playtest must leave git clean.
 const REFERENCE = process.argv.includes('--reference');
 const ERA_SHOTS = path.join(ROOT, 'docs', 'shots', 'eras');
 // One name per rung, the same as that era's file in src/eras/.
-const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes'];
+const ERA_NAMES = ['era0-arcade', 'era1-atari2600', 'era2-nes', 'era3-genesis', 'era4-snes',
+  'era5-playstation', 'era6-n64', 'era7-dreamcast', 'era8-ps2', 'era9-xbox', 'era10-xbox360'];
 const CHROME = arg('chrome', CHROMES.find((p) => existsSync(p)));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -209,6 +211,58 @@ async function playToScore(s, midX, toClientY) {
 }
 
 /**
+ * Film the era change a point has just started, and check that it ran. Three
+ * readings of the page's own ring (PongRender.eraChangeMoment): a frame taken
+ * with the ring about half way; the ring's radius once the wipe has finished,
+ * against the distance from where the ball went out to the farthest corner;
+ * and, a frame later, the live canvas compared pixel by pixel with each of the
+ * two eras drawn offscreen from the same state -- the new era has to be the one
+ * on screen. The name card's band across the middle is left out of that count,
+ * because the card sits over both until the serve.
+ */
+async function filmChange(s, clip, from) {
+  const moment = () => s.eval(`(() => { const g = window.__pong;
+    const m = window.PongRender.eraChangeMoment(g);
+    if (!m) return null;
+    const o = m.origin, dx = Math.max(o.x, g.width - o.x), dy = Math.max(o.y, g.height - o.y);
+    return { from: m.from, era: m.era, p: m.p, wiping: m.wiping, radius: m.radius,
+      corner: Math.sqrt(dx * dx + dy * dy), origin: { x: o.x, y: o.y } }; })()`);
+  const out = { from, file: null, p: null, end: null, drawn: null };
+  const deadline = Date.now() + 3000;
+  let seen = false;
+  while (Date.now() < deadline) {
+    const m = await moment();
+    if (!m) { if (seen) break; await sleep(8); continue; }
+    seen = true;
+    if (!out.file && m.wiping && m.p >= 0.4) {
+      out.p = m.p;
+      out.file = await s.shot(`change-era${from}-to-era${from + 1}`, clip);
+    } else if (!m.wiping) { out.end = m; break; }
+    else await sleep(8);
+  }
+  out.drawn = await s.eval(`new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => {
+    const g = window.__pong, R = window.PongRender, live = document.getElementById('field');
+    const w = live.width, h = live.height;
+    const pix = (c) => c.getContext('2d').getImageData(0, 0, w, h).data;
+    const render = (era) => { const c = document.createElement('canvas'); c.width = w; c.height = h;
+      R.draw(c.getContext('2d'), era === g.era ? g : Object.assign({}, g, { era: era })); return pix(c); };
+    const L = pix(live), N = render(${from + 1}), O = render(${from});
+    let asNew = 0, asOld = 0, counted = 0;
+    for (let y = 0; y < h; y++) {
+      if (y >= h / 2 - 90 && y < h / 2 + 90) continue;
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4; counted++;
+        if (L[i] !== N[i] || L[i + 1] !== N[i + 1] || L[i + 2] !== N[i + 2]) asNew++;
+        if (L[i] !== O[i] || L[i + 1] !== O[i + 1] || L[i + 2] !== O[i + 2]) asOld++;
+      }
+    }
+    const m = R.eraChangeMoment(g);
+    done({ era: g.era, ring: !!(m && m.wiping), asNew: asNew, asOld: asOld, counted: counted });
+  })))`);
+  return out;
+}
+
+/**
  * 8. Drive one match up the whole ladder the way a player meets it: a fresh
  * machine on era 0, then one point per rung. Each era is photographed, cropped
  * to the field, once its change moment has cleared and the ball is in play; a
@@ -241,6 +295,7 @@ async function walkLadder(s, baseUrl) {
 
   const frames = [];
   const moves = [];
+  const changes = [];
   for (let rung = 0; rung < eras.length; rung++) {
     // Wait out the serve pause -- the era change lives inside it -- then let
     // the ball get clear of the centre before the picture.
@@ -253,6 +308,8 @@ async function walkLadder(s, baseUrl) {
     const after = await playUntil(s, geo, 15000, dodge, (x) => points(x) > before);
     moves.push({ from: g.era, to: after.era, scored: points(after) > before,
       score: `${after.score.left}-${after.score.right}` });
+    // Below the top, that point started a change: film it while it plays.
+    if (rung < eras.length - 1 && points(after) > before) changes.push(await filmChange(s, clip, g.era));
   }
 
   check('each era is on screen when its frame is taken',
@@ -268,17 +325,34 @@ async function walkLadder(s, baseUrl) {
   check(`and the ladder stops at the top: another point leaves it on the ${eras[eras.length - 1]}`,
     top.scored && top.from === eras.length - 1 && top.to === eras.length - 1, said(top));
 
+  check(`every era change on the climb is filmed: ${eras.length - 1} of them`,
+    changes.length === eras.length - 1 && changes.every((c) => c.file),
+    changes.map((c) => `era ${c.from} -> ${c.from + 1}: ` +
+      (c.file ? `caught at eased progress ${c.p.toFixed(2)}` : 'not caught mid-ring')).join('; '));
+  for (const c of changes) {
+    const e = c.end, d = c.drawn;
+    const reached = !!e && e.radius >= e.corner;
+    const newDraws = d.era === c.from + 1 && !d.ring && d.asNew < d.asOld;
+    check(`the change to the ${eras[c.from + 1]} ran: the ring reached the far corner and the new era draws afterwards`,
+      !!c.file && reached && newDraws,
+      (e ? `ring from ${e.origin.x.toFixed(0)},${e.origin.y.toFixed(0)} ended at radius ` +
+        `${e.radius.toFixed(0)}, far corner ${e.corner.toFixed(0)}` : 'the ring was never seen to finish') +
+      `; afterwards on era ${d.era}, ${d.asNew} of ${d.counted} pixels differ from era ${c.from + 1} ` +
+      `drawn offscreen, ${d.asOld} from era ${c.from}`);
+  }
+
   if (REFERENCE) {
     mkdirSync(ERA_SHOTS, { recursive: true });
     for (const f of frames) copyFileSync(f.file, path.join(ERA_SHOTS, ERA_NAMES[f.rung] + '.png'));
+    for (const c of changes) if (c.file) copyFileSync(c.file, path.join(ERA_SHOTS, path.basename(c.file)));
   }
-  return frames.map((f) => f.file);
+  return [...frames.map((f) => f.file), ...changes.filter((c) => c.file).map((c) => c.file)];
 }
 
 function summarise(shots) {
   console.log('\nscreenshots:');
   for (const f of shots) console.log('  ' + f);
-  if (REFERENCE) console.log(`the five era frames were also copied to ${ERA_SHOTS} (tracked)`);
+  if (REFERENCE) console.log(`the five era frames and the four mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
   process.exitCode = failed.length ? 1 : 0;
@@ -435,7 +509,7 @@ async function main() {
         (qr.last ? `, last: ${qr.last.type} on era ${qr.last.era} (${qr.last.waves.join('+')}` +
           `${qr.last.echo ? ' + echo' : ''})` : ''));
     const voices = await s.eval(`(() => { const p = window.__pongSound; const out = [];
-      for (let era = 0; era <= 4; era++) {
+      for (let era = 0; era <= window.Pong.TOP_ERA; era++) {
         const ok = p.play({ type: 'paddle', era: era });
         out.push({ era: era, ok: ok, last: ok ? p.last : null });
       }

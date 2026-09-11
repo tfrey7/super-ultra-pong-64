@@ -1,5 +1,7 @@
 # Super Ultra Pong 64: Remastered
 
+**Play it live:** https://tfrey7.github.io/super-ultra-pong-64/
+
 A Pong that **evolves while you play it**. You start at the 1972 arcade machine —
 black screen, two white bars, a square ball, a dashed line down the middle — and
 as the session goes on the game grows up through the eras around it: colour,
@@ -195,3 +197,16 @@ card with a `card` object (the fields of `STYLES` in that file), and give its
 arrival its own look with a `flourish(ctx, p, origin, fromEra, toEra, info)`
 hook, drawn over the ring's edge every frame of the ring that brings it in --
 the header of `src/erachange.js` is the contract.
+
+### Each era change, step by step
+
+Every rung arrives with its own flourish riding the ring. The playtest's ladder
+walk films each one mid-ring and checks it ran (the ring reached the far corner,
+and the new era is what draws once it has gone):
+
+| Change | What the player sees | Mid-change frame |
+| --- | --- | --- |
+| Arcade to Atari 2600 | a CRT scanline sweep rides the ring's edge and bleeds the colour in, with a power-on line and a sting | [`change-era0-to-era1.png`](docs/shots/eras/change-era0-to-era1.png) |
+| Atari 2600 to NES | the picture blinks once and turns over in tiles ahead of the ring like a cartridge reset, to the NES power-on chime | [`change-era1-to-era2.png`](docs/shots/eras/change-era1-to-era2.png) |
+| NES to Genesis | the old picture cracks on the ring's edge into shards that spin and fly off, to a bassy FM sting | [`change-era2-to-era3.png`](docs/shots/eras/change-era2-to-era3.png) |
+| Genesis to Super Nintendo | the field tilts back into a Mode 7 plane and sweeps flat under the new era, its name card spinning in, to an orchestral hit | [`change-era3-to-era4.png`](docs/shots/eras/change-era3-to-era4.png) |
