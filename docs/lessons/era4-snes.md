@@ -151,3 +151,22 @@ Super Mario World's sprites) that happens to be Pong. Picture:
   calls with no pixel loop.
 - The rule that kept it readable: everything behind play is lit for dusk (a 50% navy wash over the
   balloons), and only the ball, the paddles and the HUD edge are near white.
+
+### Realism rung 4: the table in perspective (item 1267)
+
+- **LESSON: tilt the widths and leave the heights alone.** The table is tipped back in play: every
+  field point is drawn at x' = 400 + (x - 400) * s(y), with s running in perspective from 0.9 at
+  the far edge (y 0) to 1 at the near edge. Heights stay exactly where the rules put them. So the
+  pointer still reaches the same field y, and every layer that draws in field units (the feel
+  layer, the ring, the rig's players) still lands on the right row. Squashing the heights as
+  well, which is truer Mode 7, would have drawn each bat and the ball well away from the rows
+  where their players and sparks are drawn (I reasoned this out, I did not build it). The table is
+  a few filled paths a frame, and the strip-drawn tilt stays in the arrival flourish.
+- **What 1267 could not do in its own file:** the pilots are drawn by the rig
+  (`src/characters.js`) after the era's frame, in flat field units. So they still stand at the
+  paddle's flat outer face, while their bat is drawn up to 37 units nearer the net at the top wall,
+  and their pads and legs still show. For now each handle reaches out to the flat outer face, so
+  the glove holds it at every height. Card 1282 anchors the pilots at `look.project(...)` and crops
+  them to the waist up.
+- The bats are rung 3's (earned-ink rubber, wood line, black rubber, handle), drawn as filled quads
+  through the tilt. The dyed capsule sprite (`tintedPaddle`) is no longer drawn in play.

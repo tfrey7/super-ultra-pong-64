@@ -184,3 +184,19 @@ North America), with the heft of *Super Mario Bros.* in the sprites.
    come from events the rules already emit, so the art never touches play.
 4. **The order:** court, border, net, crowd, umpire, band, paddles, ball shadow, ball, seam, then
    the players over the frame. The ball is the last thing but its own seam.
+
+### Realism rung 2: the tennis court becomes a table (item 1267)
+
+- **LESSON: turn the paint you have into the next thing, rather than painting over it.** Item
+  1259's tennis court already had most of a table tennis table in it: a white border (the table's
+  edge lines), a dotted net between two posts, and a centre service line (the table's centre
+  line). Rung 2 kept all three, ran the centre line from end to end, moved the border's ends in to
+  the paddles' outer faces (x 32 and 768) with a dark wooden floor past them, and painted out only
+  the baselines, service lines, singles sidelines, centre marks and the ball's seam. The teal tiled
+  floor stayed as the table top. That is five small edits, and the landed crowd, umpire, band and
+  tile flip were never touched.
+- The bat's handle is 3 NES pixels of `$18` ochre off the paddle's outer face. The rig's figure is
+  drawn over it, so most of the handle sits under the fist: that is what "held" looks like at this
+  size, and the handle shows only where the sprite is transparent.
+- The order is now: court, floor past the ends, centre line, border, net, crowd, umpire, band,
+  handles, paddles, ball shadow, ball, then the players. The ball is the last thing the era draws.
