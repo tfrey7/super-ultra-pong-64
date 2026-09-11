@@ -370,13 +370,6 @@ async function main() {
   const chrome = spawn(CHROME, [
     // --mute-audio: the audio graph still runs and is still checked, but a
     // playtest never beeps through the speakers of the machine it runs on.
-    // --allow-file-access-from-files: the page is opened off disk, where Chrome
-    // counts every image as another origin, so one drawImage of a pixellab
-    // sprite taints the canvas and the ladder walk's getImageData throws. With
-    // it, the page's own files share its origin and the canvas stays readable
-    // (item 1180). A player opening index.html needs none of this: the game
-    // itself never reads its canvas back.
-    '--allow-file-access-from-files',
     '--headless=new', '--disable-gpu', '--hide-scrollbars', '--mute-audio',
     '--window-size=1000,760', '--remote-debugging-port=' + PORT,
     '--user-data-dir=' + profile, '--no-first-run', '--no-default-browser-check',
