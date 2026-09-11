@@ -478,8 +478,8 @@ async function walkLadder(s, baseUrl) {
     const file = await s.shot('ladder-' + ERA_NAMES[rung], clip);
     frames.push({ rung, era: g.era, file });
     // One point either way moves the machine, and the ring starts where the ball
-    // went out. Even changes are a real miss past the player (the ring starts on
-    // the left); odd ones are the player's own point, the way a human climbs, so
+    // went out. Even changes are the computer's point, past the player (the ring
+    // starts on the left); odd ones are the player's own point, the way a human climbs, so
     // the ring starts on the right. Beating the computer in a rally is a coin
     // flip, so the ball is put just past the computer's paddle, heading out --
     // outside the paddle, so it cannot be bounced back. The computer's point is
