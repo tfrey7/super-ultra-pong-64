@@ -102,6 +102,8 @@
     // Dreamcast (item 1231): two Jet Set Radio-manner skaters, cut from pixflux by
     // assets/pixellab/era7-skater-cut.py; each figure about 68 px tall, so 1.3 table
     // units a pixel stands it about 90 tall, the hand on the paddle box's top (dz 24).
+    // A STAND-IN: Tim ruled flat sprites out of the 3D eras (23:47 EDT 2026-09-10);
+    // this era's polygon-model card (item 1248's renderer) swaps these sheets out.
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 1.3, res: 3, round: true,
           sheets: { left: 'era7-skater-left-sheet', right: 'era7-skater-right-sheet' },
           frame: { w: 44, h: 84 }, hand: { x: 44, y: 66 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 10 },
