@@ -3991,8 +3991,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 465,
-      "sha256": "4f01026ae2c7ea3209fc3bfdf31ef6c6573effc6a6e705e2d74717abb7ba3c19",
+      "bytes": 447,
+      "sha256": "95455b4f2e48d5aea4e2b490f73859b93b5f125f1f41b403bd2d229ef7b3deb4",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4024,8 +4024,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 465,
-      "sha256": "46ff0b916359b5b0ea46b94a785f350c11a381ec2f94eef55ffd39f4aaa5201e",
+      "bytes": 447,
+      "sha256": "7d77f55e86401fdbd26d97a28707061ca7ded565ce8885e529f70cd0325451b4",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4057,8 +4057,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 466,
-      "sha256": "1d3b705565d523f5cf7ed645b27e7ad372194ecbd5ae39f8ce6113377329f59f",
+      "bytes": 448,
+      "sha256": "24ff7ab6902520074348e716773fc05b3ec6737ab270c5b1f3ade0cc6f12c718",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4090,8 +4090,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 465,
-      "sha256": "9ebfadb0d94802e3531386056365152206b2e4f52472e1d7b2222edf01c0a17c",
+      "bytes": 447,
+      "sha256": "f1dd33bc7311db6a323db30efee6851dd3125e8e3dfb56b2f594f41dd3a49f12",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4123,8 +4123,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 465,
-      "sha256": "298949f500f450b84f3c5e66d5310ecef6cc456c992ff6312911743d04eeef15",
+      "bytes": 447,
+      "sha256": "549e36cc6bb235d8bcc2142479b835955aefe4b673169112bb2cced7c4c037ff",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4156,8 +4156,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 465,
-      "sha256": "3ff332252d70eaa14fd43180856ae274d762983b618c79e41e4946ba2bec3611",
+      "bytes": 447,
+      "sha256": "35fe72de898ad26cab2f74ae67a0cd3fb609b25f42abe2bf661f9fe6c0f79204",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4189,8 +4189,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 464,
-      "sha256": "4d926a021d4f667662f122f2b0164b8c5f1b1bbb72cc462cc733f60ad6179362",
+      "bytes": 447,
+      "sha256": "1a405fba1f3fabb67ad4bb66b78a7bbceef59cd9aa0f8857478b54d1674155b3",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4222,8 +4222,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 465,
-      "sha256": "44aba1834aa1ee12a92626229e62a2efc158d74fe4a686caa31f71c44fa317f3",
+      "bytes": 447,
+      "sha256": "7195d5d39f5e2c68f9f540d8aeb1ce5816d64a23904b635e3e5a178d3d7c47d3",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4255,8 +4255,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 465,
-      "sha256": "8900f87a5d1208f12f8e097eaee0e12720bde59ea7eaf5bb97982170df60d7e5",
+      "bytes": 447,
+      "sha256": "e762507546318936e9e929c96d02fb40770c186ce1bf222d4cb8fa21757b7bb9",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4288,8 +4288,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 463,
-      "sha256": "9aa3dfda1d6979de9404be12f5157ae6df93e7691b4d8fe41bfc738c1bc37427",
+      "bytes": 445,
+      "sha256": "5880cec48a941864dc36daf4b837301eff43ad87b1690f4d3ddf41f026c729e5",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4321,8 +4321,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 465,
-      "sha256": "9128118f7a275d7180381e5c321217d4721516fa37a5b4a2b61ebd7cb925fb85",
+      "bytes": 447,
+      "sha256": "12f998366b4dcc6d6d38422ce6e533ab6e34b92c110d952dbe346c6e8aad7412",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4354,8 +4354,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 465,
-      "sha256": "70f659ce667e5349705e3f0ef0371d7345aeb2596be0de0e1b1760f8bb67ac45",
+      "bytes": 448,
+      "sha256": "51734c9dd3a5ad5d1325f6d400beb860aad3c613f2888f62affbf05a8679904e",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's player, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4387,8 +4387,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 438,
-      "sha256": "0e4badf816f90a5976a575579ba4a850029e5196c40efe03e6f24d47be7d1fc1",
+      "bytes": 422,
+      "sha256": "2e3edbb80c6915152e5b4970583cf3cae50ef7072ee39bd97028b96616e25166",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c85c14, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4420,8 +4420,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 438,
-      "sha256": "3a0203da49839ef577859e7705dbf136ff47a05eb02788c34f42645010960c35",
+      "bytes": 422,
+      "sha256": "e14737a66a7198dc772810473d58142d24df1546ff3a0a3a00e0957262e9197e",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d8a038, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4453,8 +4453,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 439,
-      "sha256": "735df9842542bc17c374562de162250fb9e3741aacfb38827bbc1f5d74279f20",
+      "bytes": 423,
+      "sha256": "444281fb048b5c93aa97b9d2e2ff06d072d1ab0b950b004d5a33ee2a80f6efc8",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #c8cc30, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4486,8 +4486,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 438,
-      "sha256": "60db506123ed811d4d66c888addf74e548ac1bd3f21dee9c086801a546373a96",
+      "bytes": 422,
+      "sha256": "021c24402db7a96b72842476340abca362a5caca270944ae99e8c41efd3cae2b",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #68bc40, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4519,8 +4519,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 438,
-      "sha256": "24f821f8bc4c577d0fd1020d31eea597a1271e69e9a61a2e641ff0bcf1d89377",
+      "bytes": 422,
+      "sha256": "54c3c6a1072877456567cd06418ad6925bd475e56e01be3dc81675ec5fa13784",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #40b898, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4552,8 +4552,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 438,
-      "sha256": "cffd19fcea98aded0f3c7c9c3d71c5af9671b7520f06f7d952ccce1dfec0d004",
+      "bytes": 422,
+      "sha256": "fc28f637019bf30683ce330847946562b8a2813965905a296bbad4c12364288e",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #4890d8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4585,8 +4585,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 437,
-      "sha256": "116a292ee8e649f94037fef229f2e81ab16ddf5f02afe85962c5e556265f6957",
+      "bytes": 422,
+      "sha256": "3d020cfa3bbdd62aa98bd77c638c1094d595b73c73ace851b51f06fa47ac81a7",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #7068d4, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4618,8 +4618,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 438,
-      "sha256": "39fa267fcfcffa1dd011e9b42492c3481ffa13b8ec348effe4a2499a7effaf75",
+      "bytes": 422,
+      "sha256": "c4006d5a19a65873ac3ee103c11e654332916e7cd1d69cdf4d13e1496981468c",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #a858c8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4651,8 +4651,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 438,
-      "sha256": "d70695b427f1c8956fa56a34e16587955ef66c2a7b1b1162d82c14e6c91489ee",
+      "bytes": 422,
+      "sha256": "e28d20eacf24be0a0854962c720a947bd0b68a37b1591964f3df8f6dd7a47098",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d0589c, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4684,8 +4684,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 436,
-      "sha256": "f1bae6ee07716d06393a55c181998d79d3ceb61623942766a6393b84fb5eb8e7",
+      "bytes": 420,
+      "sha256": "d910825146a77d19c08f712733dcc14c33edd1aef92179585bef2e16c39c7166",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #cc4444, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4717,8 +4717,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 438,
-      "sha256": "d6d866b6295b620d70ec657300d62d61ea80630dd3c0ec215704edbb1d0bb806",
+      "bytes": 422,
+      "sha256": "a1f36bd979f937a0191edf55d61c9bd1aa8f3914d9a311e9f90c5862518605e0",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #d88860, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
@@ -4750,8 +4750,8 @@
         "width": 18,
         "height": 168
       },
-      "bytes": 438,
-      "sha256": "1aeff6b9d2346055642fec324bb51b87cb151b655b129acdfd7a770a8faef196",
+      "bytes": 423,
+      "sha256": "953c127157f83be49ec12948ad25466f9ad5787db5f01ba83db8dbc5822361da",
       "endpoint": "none",
       "request": {
         "description": "drawn as a text grid, no generation: era 1's computer, a one-colour 2600 sprite in #8cc8e8, 3 x 6 frames of 6 x 28 (idle, up, down, swing, miss, win)",
