@@ -84,7 +84,9 @@
   // ripples; the ash drifts down and gusts sideways for half a second on a
   // point; the sun's bloom breathes. The ruin and banner go through the
   // depth-of-field buffer with the rest of the scenery, so they are soft.
-  var RUIN = { w: 800, h: 120, sunX: 490, alpha: 0.92, columns: 6 };   // drawn once, twice as wide: one sun, under the HDR sun
+  // w 914 and sunX 560 (were 800 and 490): the same plate a seventh wider, so it starts at
+  // the picture's left edge with its sun still under the HDR sun (the ladder camera, item 1266).
+  var RUIN = { w: 914, h: 120, sunX: 560, alpha: 0.92, columns: 6 };   // drawn once, twice as wide: one sun, under the HDR sun
   var BANNER = { x: 85, top: 22, w: 40, h: 60, slices: 6, ripple: 4, hz: 0.8 };
   var ASH = { n: 40, alpha: 0.3, min: 8, max: 20, gust: 60, gustS: 0.5 };
   var BREATHE = { amount: 0.05, period: 6 };

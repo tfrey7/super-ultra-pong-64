@@ -102,7 +102,9 @@
     ],
     tower: { x: 700, y: -80, w: 40, legs: 40, top: 100, leg: 4, tank: PALETTE.orange, band: PALETTE.yellow },
     windows: { count: 12, size: 7, min: 0.5, max: 2 },
-    blimp: { w: 80, h: 24, speed: 12, y: 9, flash: 1, body: PALETTE.blue, panel: PALETTE.yellow }
+    // y 80: under the score's band (its cans end at 68) and over the skyline, in
+    // the sky the ladder camera (item 1266) opened up; at y 9 it flew behind the score.
+    blimp: { w: 80, h: 24, speed: 12, y: 80, flash: 1, body: PALETTE.blue, panel: PALETTE.yellow }
   };
 
   // Twelve window lights on the skyline, each on its own seeded period.
