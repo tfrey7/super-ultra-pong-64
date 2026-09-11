@@ -14,6 +14,9 @@
  *   node docs/measure/item-1203/trace.mjs --label cold [--runs 3] [--port 9391]
  *        [--no-audio]   take AudioContext away before the page loads
  *        [--control]    same schedule, no point forced
+ *        [--skia]       add Skia's and ANGLE's categories (names every GPU program built)
+ *        [--from-load]  trace from before the page loads (the warm-up's GPU work too)
+ *        [--timing]     no trace: time the ring's frames only, over-3x-median rule
  *
  * Writes, beside this file: <label>.json (every leg's breakdown), and
  * <label>-leg<N>.trace.json.gz -- the trace cut to 150 ms either side of the long
@@ -33,6 +36,12 @@ const LABEL = arg('--label', 'run');
 const RUNS = Number(arg('--runs', 3));
 const NO_AUDIO = process.argv.includes('--no-audio');
 const CONTROL = process.argv.includes('--control');
+// --from-load: trace from before the page loads, so the warm-up's own GPU work is in it too.
+const FROM_LOAD = process.argv.includes('--from-load');
+// --timing: no trace at all (tracing slows every frame); the ring's frames by the
+// page's own rAF clock, long = over 3x the median frame across the ring, the
+// same rule as item 1164's firstring.mjs.
+const TIMING = process.argv.includes('--timing');
 let port = Number(arg('--port', 9391));
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
@@ -92,13 +101,15 @@ async function leg(n) {
     await send('Runtime.enable');
     if (NO_AUDIO) await send('Page.addScriptToEvaluateOnNewDocument', { source: 'delete window.AudioContext; delete window.webkitAudioContext;' });
     const url = pathToFileURL(path.join(ROOT, 'index.html')).href + '?era=3';
+    const traceConfig = { recordMode: 'recordAsMuchAsPossible', includedCategories: CATEGORIES };
+    if (FROM_LOAD && !TIMING) await send('Tracing.start', { transferMode: 'ReportEvents', traceConfig });
     await send('Page.navigate', { url });
     await sleep(900);
     await send('Input.dispatchKeyEvent', { type: 'keyDown', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
     await send('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Space', key: ' ', windowsVirtualKeyCode: 32 });
     await sleep(1500);
 
-    await send('Tracing.start', { transferMode: 'ReportEvents', traceConfig: { recordMode: 'recordAsMuchAsPossible', includedCategories: CATEGORIES } });
+    if (!FROM_LOAD && !TIMING) await send('Tracing.start', { transferMode: 'ReportEvents', traceConfig });
     // Mark every rAF tick, the ring's first frame and every sound the player makes.
     await evalJs(`(() => { const s = window.__pongSound;
       if (s && !s.__marked) { const h = s.handle; s.handle = function (st) { const n = h.apply(this, arguments); if (n) performance.mark('sound ' + n); return n; }; s.__marked = 1; }
@@ -115,6 +126,7 @@ async function leg(n) {
     await sleep(1700);
     const page = await evalJs(`({ era: window.__pong.era, audio: window.__pongSound ? window.__pongSound.audioState() : 'no player',
       boots: window.__pongSound ? window.__pongSound.boots : 0, played: window.__pongSound ? window.__pongSound.played : 0 })`);
+    if (TIMING) return { n, port: PORT, page, ...ringTiming(await evalJs('window.__ticks')) };
     const done = new Promise((r) => { traceDone = r; });
     await send('Tracing.end');
     await done;
@@ -123,6 +135,20 @@ async function leg(n) {
     try { ws && ws.close(); } catch { /* gone */ }
     await chrome.close();
   }
+}
+
+/** Every frame interval touching the ring (the one INTO its first frame counts). */
+function ringTiming(ticks) {
+  const ring = [];
+  for (let k = 1; k < ticks.length; k++) {
+    if (ticks[k][1] || ticks[k - 1][1]) ring.push({ ms: ticks[k][0] - ticks[k - 1][0], raw: ticks[k][2] });
+  }
+  const s = ring.map((f) => f.ms).sort((a, b) => a - b);
+  const median = s[Math.floor(s.length / 2)] || 0;
+  const r1 = (v) => +v.toFixed(1);
+  return { ringFrames: ring.length, medianFrameMs: r1(median), maxFrameMs: r1(s[s.length - 1] || 0),
+    longFrames: ring.filter((f) => f.ms > 3 * median).map((f) => ({ ms: r1(f.ms), raw: f.raw === null ? null : +f.raw.toFixed(3) })),
+    frames: ring.map((f) => r1(f.ms)) };
 }
 
 /** Find the longest rAF gap in trace time and sum every thread's work inside it. */
@@ -182,7 +208,16 @@ function analyse(events, n) {
   writeFileSync(path.join(HERE, file), gzipSync(JSON.stringify({ traceEvents: cut })));
 
   const rel = (ts) => (ts === null || ts === undefined ? null : +((ts - win.from) / 1000).toFixed(1));
+  // Every GPU program Skia had to build (a cache miss) anywhere in the trace, with
+  // what its shaders take in -- so programs built at load can be told from ones
+  // built at the point. Needs --skia.
+  const programBuilds = events.filter((e) => e.ph === 'X' && e.name === 'shader_compile')
+    .map((e) => ({ atMs: rel(e.ts), ms: +((e.dur || 0) / 1000).toFixed(1) }));
+  const shaders = events.filter((e) => e.ph === 'X' && e.name === 'ShaderTranslateTaskD3D::run' && e.args && e.args.source)
+    .map((e) => ({ atMs: rel(e.ts), takes: (e.args.source.match(/^(?:uniform|in|attribute) [^;]*;/gm) || [])
+      .map((l) => l.replace(/;$/, '').split(/\s+/).pop()).join(' ') }));
   return {
+    programBuilds, shaders,
     traceFile: file, eventsTotal: events.length, eventsCut: cut.length,
     medianFrameMs: +median.toFixed(2), longFrames: long.map((g) => +g.ms.toFixed(1)),
     window: { ms: +win.ms.toFixed(1), pointAtMs: rel(pointAt), ringFirstFrameAtMs: rel(ringAt), soundsAtMs: sounds.map(rel) },
@@ -194,10 +229,15 @@ const results = [];
 for (let r = 0; r < RUNS; r++) {
   const res = await leg(r + 1);
   results.push(res);
+  if (TIMING) {
+    console.log(`leg ${res.n}: ring ${res.ringFrames} frames, median ${res.medianFrameMs} ms, max ${res.maxFrameMs} ms, ` +
+      `over 3x median: ${res.longFrames.length ? res.longFrames.map((f) => `${f.ms} ms at raw ${f.raw}`).join(', ') : 'none'}`);
+    continue;
+  }
   console.log(`leg ${res.n}: long frames ${JSON.stringify(res.longFrames)} (median ${res.medianFrameMs} ms); window ${res.window.ms} ms, ` +
     `point at ${res.window.pointAtMs}, ring at ${res.window.ringFirstFrameAtMs}, sounds at ${JSON.stringify(res.window.soundsAtMs)}; page ${JSON.stringify(res.page)}`);
   for (const t of res.threads.slice(0, 8)) console.log(`   ${t.busyMs.toFixed(1).padStart(6)} ms  ${t.thread}  <- ${t.heaviestNames.slice(0, 5).map((x) => `${x.name} ${x.ms}`).join(', ')}`);
 }
-const out = { label: LABEL, noAudio: NO_AUDIO, control: CONTROL, root: ROOT, chrome: CHROME, when: new Date().toISOString(), categories: CATEGORIES, results };
+const out = { label: LABEL, noAudio: NO_AUDIO, control: CONTROL, timing: TIMING, fromLoad: FROM_LOAD, root: ROOT, chrome: CHROME, when: new Date().toISOString(), categories: CATEGORIES, results };
 writeFileSync(path.join(HERE, `${LABEL}.json`), JSON.stringify(out, null, 1) + '\n');
 console.log('wrote', path.join(HERE, `${LABEL}.json`));

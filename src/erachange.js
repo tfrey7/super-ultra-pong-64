@@ -311,11 +311,18 @@
     var origin = { x: -8, y: state.height / 4 };
     var reach = ringReach(origin, state.width, state.height);
     var fracs = [0.04, 0.3, 0.6, 1];
+    // The real looks, never the dimmed ones (item 1203). The page's first framed
+    // draw is the attract rally behind the title, whose opts carry the dimming
+    // ink -- and every era look handed that ink falls back to the plain dimmed
+    // frame. Warmed with it, not one era's own gradients, rounded paddles or
+    // shaded ball ever reached the GPU, so the first real ring still built about
+    // ten GPU programs in its first frame (~100 ms, docs/measure/item-1203/).
+    var real = null;
     ctx.save();
     try {
       for (var k = 1; k <= top; k++) {
         for (var f = 0; f < fracs.length; f++) {
-          composite(ctx, state, opts,
+          composite(ctx, state, real,
             { from: k - 1, era: k, origin: origin, radius: fracs[f] * reach }, cardStyle(k));
         }
       }

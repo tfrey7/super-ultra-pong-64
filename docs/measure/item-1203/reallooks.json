@@ -1,0 +1,3946 @@
+{
+ "label": "reallooks",
+ "noAudio": false,
+ "control": false,
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1203",
+ "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+ "when": "2026-09-11T02:23:32.406Z",
+ "categories": [
+  "devtools.timeline",
+  "disabled-by-default-devtools.timeline",
+  "disabled-by-default-devtools.timeline.frame",
+  "toplevel",
+  "blink",
+  "blink.user_timing",
+  "cc",
+  "gpu",
+  "viz",
+  "audio",
+  "media",
+  "v8",
+  "loading",
+  "disabled-by-default-gpu.service",
+  "disabled-by-default-audio",
+  "disabled-by-default-cc.debug.scheduler.frames",
+  "benchmark",
+  "renderer.scheduler",
+  "mojom",
+  "ipc",
+  "skia",
+  "disabled-by-default-skia",
+  "disabled-by-default-skia.gpu",
+  "disabled-by-default-skia.shaders",
+  "gpu.angle",
+  "disabled-by-default-gpu.angle"
+ ],
+ "results": [
+  {
+   "n": 1,
+   "port": 9451,
+   "page": {
+    "era": 4,
+    "audio": "running",
+    "boots": 0,
+    "played": 2
+   },
+   "programBuilds": [
+    {
+     "atMs": -3150.7,
+     "ms": 5.6
+    },
+    {
+     "atMs": -3144.6,
+     "ms": 8.6
+    },
+    {
+     "atMs": -3135.2,
+     "ms": 3.7
+    },
+    {
+     "atMs": -3127.2,
+     "ms": 3.1
+    },
+    {
+     "atMs": -3122.2,
+     "ms": 4
+    },
+    {
+     "atMs": -3118.1,
+     "ms": 5.4
+    },
+    {
+     "atMs": -3088.6,
+     "ms": 20.3
+    },
+    {
+     "atMs": -3068,
+     "ms": 19.1
+    },
+    {
+     "atMs": -3048.7,
+     "ms": 10.3
+    },
+    {
+     "atMs": -3038.3,
+     "ms": 4.5
+    },
+    {
+     "atMs": -3030.8,
+     "ms": 41.1
+    },
+    {
+     "atMs": -2989.6,
+     "ms": 5.6
+    },
+    {
+     "atMs": -2953.5,
+     "ms": 3.1
+    },
+    {
+     "atMs": -2950.2,
+     "ms": 20
+    },
+    {
+     "atMs": -2929.8,
+     "ms": 16.6
+    },
+    {
+     "atMs": -2913.1,
+     "ms": 3.7
+    },
+    {
+     "atMs": -2909.2,
+     "ms": 17
+    },
+    {
+     "atMs": -2892,
+     "ms": 16.2
+    },
+    {
+     "atMs": -2875.7,
+     "ms": 9.1
+    },
+    {
+     "atMs": -2866.4,
+     "ms": 3.3
+    },
+    {
+     "atMs": -2863,
+     "ms": 8.6
+    },
+    {
+     "atMs": -2854,
+     "ms": 8.1
+    },
+    {
+     "atMs": -2821.4,
+     "ms": 18.8
+    },
+    {
+     "atMs": -2802.3,
+     "ms": 16.2
+    },
+    {
+     "atMs": -2785.9,
+     "ms": 4.4
+    },
+    {
+     "atMs": -2781.3,
+     "ms": 7.2
+    },
+    {
+     "atMs": -2773.8,
+     "ms": 6.1
+    },
+    {
+     "atMs": -2750.6,
+     "ms": 16.2
+    },
+    {
+     "atMs": -2734.3,
+     "ms": 16.6
+    },
+    {
+     "atMs": -2717.5,
+     "ms": 17.3
+    },
+    {
+     "atMs": -2699.2,
+     "ms": 32.5
+    },
+    {
+     "atMs": -2666.5,
+     "ms": 10.2
+    },
+    {
+     "atMs": -2653.1,
+     "ms": 9.1
+    },
+    {
+     "atMs": -2601.3,
+     "ms": 21.7
+    },
+    {
+     "atMs": -2579.4,
+     "ms": 7.8
+    },
+    {
+     "atMs": -2562.2,
+     "ms": 4
+    },
+    {
+     "atMs": -2553.2,
+     "ms": 17.6
+    },
+    {
+     "atMs": -2535.5,
+     "ms": 15.8
+    },
+    {
+     "atMs": -2519.4,
+     "ms": 18.1
+    },
+    {
+     "atMs": -2501,
+     "ms": 5.9
+    },
+    {
+     "atMs": -2494.5,
+     "ms": 4.9
+    },
+    {
+     "atMs": -2489.4,
+     "ms": 7.6
+    },
+    {
+     "atMs": -2481.5,
+     "ms": 7.8
+    },
+    {
+     "atMs": -2459.9,
+     "ms": 16.3
+    },
+    {
+     "atMs": -2441.5,
+     "ms": 10.6
+    },
+    {
+     "atMs": -2429.9,
+     "ms": 5.9
+    },
+    {
+     "atMs": -2402.4,
+     "ms": 15.2
+    },
+    {
+     "atMs": -2386.7,
+     "ms": 25.4
+    },
+    {
+     "atMs": -2361.1,
+     "ms": 21.8
+    },
+    {
+     "atMs": -2339.3,
+     "ms": 17.9
+    },
+    {
+     "atMs": -2321.1,
+     "ms": 24.3
+    },
+    {
+     "atMs": -2296.5,
+     "ms": 3.5
+    },
+    {
+     "atMs": -2266.2,
+     "ms": 4.3
+    },
+    {
+     "atMs": -1176.1,
+     "ms": 9.1
+    },
+    {
+     "atMs": -134.5,
+     "ms": 6.7
+    },
+    {
+     "atMs": -78.5,
+     "ms": 16.9
+    }
+   ],
+   "shaders": [
+    {
+     "atMs": -3150.4,
+     "takes": "u_skRTFlip uinnerRect_S1 uradiusPlusHalf_S1 uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -3150,
+     "takes": "sk_RTAdjust position localCoord"
+    },
+    {
+     "atMs": -3144,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[1] uscale_S1_c0_c0_c0[4] ubias_S1_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -3143.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 position color localCoord"
+    },
+    {
+     "atMs": -3134.8,
+     "takes": "u_skRTFlip ucircle_S1_c0 uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -3134.5,
+     "takes": "sk_RTAdjust position localCoord"
+    },
+    {
+     "atMs": -3127,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -3126.7,
+     "takes": "sk_RTAdjust position coverage localCoord"
+    },
+    {
+     "atMs": -3122,
+     "takes": "u_skRTFlip uinnerRect_S1 uradiusPlusHalf_S1"
+    },
+    {
+     "atMs": -3121.7,
+     "takes": "sk_RTAdjust position color"
+    },
+    {
+     "atMs": -3117.7,
+     "takes": "uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c1 uleftBorderColor_S1_c0 urightBorderColor_S1_c0 uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -3117.1,
+     "takes": "sk_RTAdjust uAtlasSizeInv_S0 ulocalMatrix_S0 umatrix_S1_c0_c1 inPosition inColor inTextureCoords"
+    },
+    {
+     "atMs": -3088.3,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -3087.7,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -3067.6,
+     "takes": "u_skRTFlip umatrix_S1_c0 umatrix_S2_c0 ucoverageInvert_S2 uTextureSampler_0_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -3067,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -3048.1,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -3047.2,
+     "takes": "sk_RTAdjust uatlas_adjust_S0 umatrix_S1_c0_c0_c1 fillBounds affineMatrix translate color locations"
+    },
+    {
+     "atMs": -3038.1,
+     "takes": ""
+    },
+    {
+     "atMs": -3037.4,
+     "takes": "sk_RTAdjust inPosition inColor inEllipseOffset inEllipseRadii"
+    },
+    {
+     "atMs": -3030.4,
+     "takes": "umatrix_S1_c0 umatrix_S2_c0_c0 uTextureSampler_0_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -3029.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0 umatrix_S2_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2989.1,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 umatrix_S2 uTextureSampler_0_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2988.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 umatrix_S2 position color localCoord"
+    },
+    {
+     "atMs": -2953.3,
+     "takes": "ucolor_S0"
+    },
+    {
+     "atMs": -2953,
+     "takes": "sk_RTAdjust uaffineMatrix_S0 utranslate_S0 inputPoint"
+    },
+    {
+     "atMs": -2950,
+     "takes": "ucolor_S0"
+    },
+    {
+     "atMs": -2949.5,
+     "takes": "sk_RTAdjust uaffineMatrix_S0 utranslate_S0 resolveLevel_and_idx p01 p23"
+    },
+    {
+     "atMs": -2929.3,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[1] uscale_S1_c0_c0_c0[4] ubias_S1_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2928.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2912.9,
+     "takes": "umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2912.5,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -2908.6,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0_c0[2] ubias_S1_c0_c0_c0_c0[2] uthreshold_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2907.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2891.5,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0_c0[2] ubias_S1_c0_c0_c0_c0[2] uthreshold_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2890.7,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2875.2,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[1] uscale_S1_c0_c0_c0[4] ubias_S1_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2874,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2866.2,
+     "takes": ""
+    },
+    {
+     "atMs": -2865.8,
+     "takes": "sk_RTAdjust inPosition inColor inCoverage"
+    },
+    {
+     "atMs": -2862.5,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2861.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2853.2,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2852.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2821.1,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2820.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2802,
+     "takes": "u_skRTFlip umatrix_S1_c0 uedgeArray_S2[3] uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2800.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2785.6,
+     "takes": "u_skRTFlip umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2785.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2780.9,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0 uend_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2780.3,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2773.5,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2772.9,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2750.1,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0 uend_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2749.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2733.8,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2732.9,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2717.1,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uedgeArray_S2[3] uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2716.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2698.7,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2698,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2666,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0_c0[1] uscale_S1_c0_c0_c0_c0[4] ubias_S1_c0_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2665.3,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2652.6,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0 uend_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2652.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2600.6,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2599.7,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2578.9,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2578.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2562,
+     "takes": "u_skRTFlip"
+    },
+    {
+     "atMs": -2561.6,
+     "takes": "sk_RTAdjust inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2552.8,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uedgeArray_S2[4] uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2552,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2535.3,
+     "takes": "u_skRTFlip uedgeArray_S1[4]"
+    },
+    {
+     "atMs": -2534.6,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -2518.9,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 umatrix_S2_c0_c0 uedgeArray_S2_c1_c0[4] uedgeArray_S2_c1[4] uTextureSampler_0_S1 uTextureSampler_1_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2518.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 umatrix_S2_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2500.8,
+     "takes": "u_skRTFlip uedgeArray_S1[4]"
+    },
+    {
+     "atMs": -2500.2,
+     "takes": "sk_RTAdjust inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2494.3,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2493.8,
+     "takes": "sk_RTAdjust uatlas_adjust_S0 fillBounds color locations"
+    },
+    {
+     "atMs": -2489,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2488.4,
+     "takes": "sk_RTAdjust umatrix_S1 position localCoord"
+    },
+    {
+     "atMs": -2480.9,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2480.4,
+     "takes": "sk_RTAdjust umatrix_S1 position localCoord"
+    },
+    {
+     "atMs": -2459.5,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2458.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2441.2,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2440.4,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2429.4,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0_c0[2] ubias_S1_c0_c0_c0_c0[2] uthreshold_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2428.8,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -2402.1,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2401.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2386.3,
+     "takes": "u_skRTFlip uDstTextureCoords_S0 ublend_S1 uDstTextureSampler_S0"
+    },
+    {
+     "atMs": -2384.8,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -2360.8,
+     "takes": "u_skRTFlip uDstTextureCoords_S0 uDstTextureSampler_S0"
+    },
+    {
+     "atMs": -2359.9,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -2338.8,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2337.6,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2320.6,
+     "takes": "u_skRTFlip uDstTextureCoords_S0 umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 ublend_S2 uDstTextureSampler_S0 uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2318.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2296.2,
+     "takes": "uColor_S0"
+    },
+    {
+     "atMs": -2295.7,
+     "takes": "sk_RTAdjust inPosition inCoverage"
+    },
+    {
+     "atMs": -2266,
+     "takes": "ucolor_S1_c0 umatrix_S1_c1_c0 ublend_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2265.6,
+     "takes": "sk_RTAdjust umatrix_S1_c1_c0 position color localCoord"
+    },
+    {
+     "atMs": -1175.7,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -1174.9,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -134,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -133.4,
+     "takes": "sk_RTAdjust uatlas_adjust_S0 umatrix_S1_c0_c0_c1 fillBounds affineMatrix translate color locations"
+    },
+    {
+     "atMs": -78.2,
+     "takes": "u_skRTFlip umatrix_S1_c0 urectUniform_S2_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -77.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    }
+   ],
+   "traceFile": "reallooks-leg1.trace.json.gz",
+   "eventsTotal": 2596433,
+   "eventsCut": 153029,
+   "medianFrameMs": 5.52,
+   "longFrames": [
+    24.6,
+    24.8,
+    23.3,
+    20,
+    21,
+    20.7,
+    16.6
+   ],
+   "window": {
+    "ms": 24.8,
+    "pointAtMs": -254.5,
+    "ringFirstFrameAtMs": -246.8,
+    "soundsAtMs": [
+     -278.3,
+     -248.7
+    ]
+   },
+   "threads": [
+    {
+     "thread": "Browser / ThreadPoolBackgroundWorker",
+     "busyMs": 24.83,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 24.83,
+       "atMs": -1002.2
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 24.83
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / CrGpuMain",
+     "busyMs": 24.81,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 15.44,
+       "atMs": -1.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 5.97,
+       "atMs": 15.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 2.11,
+       "atMs": 22.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 1.25,
+       "atMs": 21.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.02,
+       "atMs": 22.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 15.4
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 24.81
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 24.7
+      },
+      {
+       "name": "Scheduler::RunTask",
+       "ms": 24.67
+      },
+      {
+       "name": "GpuChannel::ExecuteDeferredRequest",
+       "ms": 23.39
+      },
+      {
+       "name": "GPUTask",
+       "ms": 23.38
+      },
+      {
+       "name": "RendererMainThread",
+       "ms": 23.31
+      },
+      {
+       "name": "CommandBuffer::Flush",
+       "ms": 23.31
+      },
+      {
+       "name": "CommandBufferStub::OnAsyncFlush",
+       "ms": 23.3
+      },
+      {
+       "name": "CommandBufferService:PutChanged",
+       "ms": 23.29
+      },
+      {
+       "name": "RasterDecoderImpl::DoRasterCHROMIUM",
+       "ms": 15.47
+      },
+      {
+       "name": "RasterDecoderImpl::DoRasterCHROMIUM::Deserializing",
+       "ms": 15.46
+      },
+      {
+       "name": "void __cdecl SkCanvas::drawRect(const SkRect &, const SkPaint &)",
+       "ms": 12.13
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / GpuVSyncThread",
+     "busyMs": 24.81,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 4.22,
+       "atMs": 16.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.18,
+       "atMs": 7.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.15,
+       "atMs": 3.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.13,
+       "atMs": 12.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.13,
+       "atMs": 20.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 3.74,
+       "atMs": -0.2
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 24.81
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 24.78
+      },
+      {
+       "name": "WinVSyncProvider::GetVSyncIntervalIfAvailable",
+       "ms": 0.18
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / CrRendererMain",
+     "busyMs": 2.4,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 1.95,
+       "atMs": 22.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.41,
+       "atMs": -2.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.4
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 2.4
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 2.35
+      },
+      {
+       "name": "ProxyMain::BeginMainFrame",
+       "ms": 2.32
+      },
+      {
+       "name": "WebFrameWidgetImpl::BeginMainFrame",
+       "ms": 1.97
+      },
+      {
+       "name": "Blink.Animate.UpdateTime",
+       "ms": 1.96
+      },
+      {
+       "name": "PageAnimator::serviceScriptedAnimations",
+       "ms": 1.95
+      },
+      {
+       "name": "FrameRequestCallbackCollection::ExecuteFrameCallbacks",
+       "ms": 1.94
+      },
+      {
+       "name": "FireAnimationFrame",
+       "ms": 1.93
+      },
+      {
+       "name": "AsyncTask Run",
+       "ms": 1.93
+      },
+      {
+       "name": "v8.callFunction",
+       "ms": 1.9
+      },
+      {
+       "name": "FunctionCall",
+       "ms": 1.88
+      },
+      {
+       "name": "Commit",
+       "ms": 0.21
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / Compositor",
+     "busyMs": 0.61,
+     "topLevel": [
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.12,
+       "atMs": 22.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.12,
+       "atMs": 22.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.1,
+       "atMs": 0.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.1,
+       "atMs": 4.5
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.07,
+       "atMs": 24.6
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.03,
+       "atMs": 22.8
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 0.38
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.34
+      },
+      {
+       "name": "Graphics.Pipeline",
+       "ms": 0.29
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.23
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.2
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.17
+      },
+      {
+       "name": "ExternalBeginFrameSource::OnBeginFrame",
+       "ms": 0.12
+      },
+      {
+       "name": "ProxyImpl::ScheduledActionDraw",
+       "ms": 0.11
+      },
+      {
+       "name": "MainFrame.Draw",
+       "ms": 0.11
+      },
+      {
+       "name": "Scheduler::BeginFrame",
+       "ms": 0.1
+      },
+      {
+       "name": "viz::BeginFrameArgs",
+       "ms": 0.09
+      },
+      {
+       "name": "ProxyImpl::ReadyToCommit",
+       "ms": 0.09
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / VizCompositorThread",
+     "busyMs": 0.6,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 0.29,
+       "atMs": 22.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.11,
+       "atMs": 22.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.06,
+       "atMs": 24.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.04,
+       "atMs": 23
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.03,
+       "atMs": 4.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.02,
+       "atMs": 15.5
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 0.6
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.55
+      },
+      {
+       "name": "Graphics.Pipeline",
+       "ms": 0.51
+      },
+      {
+       "name": "DisplayScheduler::OnBeginFrameDeadline",
+       "ms": 0.29
+      },
+      {
+       "name": "DisplayScheduler::DrawAndSwap",
+       "ms": 0.28
+      },
+      {
+       "name": "Display::DrawAndSwap",
+       "ms": 0.28
+      },
+      {
+       "name": "DirectRenderer::DrawFrame",
+       "ms": 0.12
+      },
+      {
+       "name": "ExternalBeginFrameSource::OnBeginFrame",
+       "ms": 0.12
+      },
+      {
+       "name": "DirectRenderer::DrawRenderPass",
+       "ms": 0.1
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.06
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.04
+      },
+      {
+       "name": "void __cdecl SkCanvas::experimental_DrawEdgeAAImageSet(const ImageSetEntry *, int, const SkPoint *, const SkMatrix *, const SkSamplingOptions &, const SkPaint *, SrcRectConstraint)",
+       "ms": 0.03
+      }
+     ]
+    }
+   ],
+   "otherEvents": [
+    "212x I disabled-by-default-skia.gpu SurfaceDrawContext::addDrawOp",
+    "50x I blink Canvas2DResourceProvider::Snapshot",
+    "13x I disabled-by-default-skia.gpu FillRRectOp",
+    "13x f viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "13x s viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "7x b cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "7x b cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "7x e cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "7x e cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "6x I gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "6x I disabled-by-default-devtools.timeline.frame BeginFrame",
+    "6x I toplevel ThreadControllerImpl::RunTask",
+    "5x I disabled-by-default-devtools.timeline.frame DroppedFrame",
+    "4x f gpu,toplevel.flow Scheduler::RunTask",
+    "4x f gpu,toplevel.flow Scheduler::ScheduleTask",
+    "4x s gpu,toplevel.flow Scheduler::RunTask",
+    "3x I disabled-by-default-skia.gpu virtual void __cdecl GrGLTexture::onRelease(void)",
+    "3x I cc auto cc::SchedulerStateMachine::ShouldThrottleSendBeginMainFrame()::(lambda)::operator()(uint32_t) const",
+    "3x s gpu,toplevel.flow Scheduler::ScheduleTask",
+    "3x n cc ScheduledTasksState",
+    "3x e cc,benchmark JankV3",
+    "3x e cc,benchmark Frame ",
+    "3x b cc,benchmark Frame   ",
+    "2x I blink.user_timing tick",
+    "2x I devtools.timeline RequestAnimationFrame",
+    "2x I disabled-by-default-devtools.timeline UpdateCounters",
+    "2x I blink CanvasRenderingContext2D::FinalizeFrame",
+    "2x I toplevel BlinkScheduler_PerformMicrotaskCheckpoint",
+    "2x I cc auto cc::(anonymous namespace)::InsertNodeForTask(TaskGraph *, TileTask *, uint16_t, uint16_t, size_t, bool)::(lambda)::operator()()::(lambda)::operator()(uint32_t) const",
+    "2x I gpu,toplevel.flow Scheduler::FinishTask",
+    "2x I gpu DCompPresenter::CheckPendingFrames",
+    "2x I viz DisplayDamageTracker::HasPendingSurfaces",
+    "2x I viz All active surfaces ready",
+    "2x s gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "2x f gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "2x f gpu,toplevel.flow CommandBuffer::Flush",
+    "2x f gpu,toplevel.flow GpuChannel::Flush",
+    "2x s gpu,toplevel.flow CommandBuffer::Flush",
+    "2x s disabled-by-default-cc.debug.scheduler.frames viz::BeginFrameArgs",
+    "2x f disabled-by-default-cc.debug.scheduler.frames viz::BeginFrameArgs"
+   ]
+  },
+  {
+   "n": 2,
+   "port": 9452,
+   "page": {
+    "era": 4,
+    "audio": "running",
+    "boots": 0,
+    "played": 2
+   },
+   "programBuilds": [
+    {
+     "atMs": -3067.2,
+     "ms": 5.6
+    },
+    {
+     "atMs": -3058.8,
+     "ms": 4.4
+    },
+    {
+     "atMs": -3039.9,
+     "ms": 3.5
+    },
+    {
+     "atMs": -3036.1,
+     "ms": 14.4
+    },
+    {
+     "atMs": -3021.4,
+     "ms": 5.4
+    },
+    {
+     "atMs": -3015.8,
+     "ms": 3.6
+    },
+    {
+     "atMs": -3011.8,
+     "ms": 4.2
+    },
+    {
+     "atMs": -3007.3,
+     "ms": 5.3
+    },
+    {
+     "atMs": -3000.4,
+     "ms": 4.3
+    },
+    {
+     "atMs": -2993.2,
+     "ms": 3.5
+    },
+    {
+     "atMs": -2978.8,
+     "ms": 16.6
+    },
+    {
+     "atMs": -2961.9,
+     "ms": 19.2
+    },
+    {
+     "atMs": -2942.5,
+     "ms": 7.9
+    },
+    {
+     "atMs": -2934.4,
+     "ms": 5.7
+    },
+    {
+     "atMs": -2927.2,
+     "ms": 5.2
+    },
+    {
+     "atMs": -2916.5,
+     "ms": 12.6
+    },
+    {
+     "atMs": -2902.3,
+     "ms": 17.7
+    },
+    {
+     "atMs": -2884.5,
+     "ms": 5.7
+    },
+    {
+     "atMs": -2846.9,
+     "ms": 4.4
+    },
+    {
+     "atMs": -2842.3,
+     "ms": 18.3
+    },
+    {
+     "atMs": -2823.6,
+     "ms": 16.4
+    },
+    {
+     "atMs": -2807.1,
+     "ms": 3.8
+    },
+    {
+     "atMs": -2803.1,
+     "ms": 16.8
+    },
+    {
+     "atMs": -2786.2,
+     "ms": 16.4
+    },
+    {
+     "atMs": -2769.7,
+     "ms": 8.9
+    },
+    {
+     "atMs": -2760.6,
+     "ms": 3.4
+    },
+    {
+     "atMs": -2757,
+     "ms": 8.5
+    },
+    {
+     "atMs": -2748.3,
+     "ms": 7.9
+    },
+    {
+     "atMs": -2696.5,
+     "ms": 15.5
+    },
+    {
+     "atMs": -2680.8,
+     "ms": 23.2
+    },
+    {
+     "atMs": -2657.3,
+     "ms": 5.2
+    },
+    {
+     "atMs": -2651.9,
+     "ms": 7.3
+    },
+    {
+     "atMs": -2644.2,
+     "ms": 5.9
+    },
+    {
+     "atMs": -2623.2,
+     "ms": 16.2
+    },
+    {
+     "atMs": -2606.6,
+     "ms": 21.2
+    },
+    {
+     "atMs": -2585.2,
+     "ms": 18
+    },
+    {
+     "atMs": -2566.4,
+     "ms": 8.6
+    },
+    {
+     "atMs": -2557.7,
+     "ms": 10.1
+    },
+    {
+     "atMs": -2545.2,
+     "ms": 8.2
+    },
+    {
+     "atMs": -2495.6,
+     "ms": 16.9
+    },
+    {
+     "atMs": -2478.4,
+     "ms": 8.2
+    },
+    {
+     "atMs": -2460.2,
+     "ms": 5.5
+    },
+    {
+     "atMs": -2450.1,
+     "ms": 18.1
+    },
+    {
+     "atMs": -2431.9,
+     "ms": 14.4
+    },
+    {
+     "atMs": -2417.2,
+     "ms": 30.1
+    },
+    {
+     "atMs": -2386.8,
+     "ms": 6.4
+    },
+    {
+     "atMs": -2379.8,
+     "ms": 5.5
+    },
+    {
+     "atMs": -2374.1,
+     "ms": 8.9
+    },
+    {
+     "atMs": -2364.8,
+     "ms": 8
+    },
+    {
+     "atMs": -2342.4,
+     "ms": 17.1
+    },
+    {
+     "atMs": -2322.8,
+     "ms": 6.4
+    },
+    {
+     "atMs": -2315.8,
+     "ms": 6.4
+    },
+    {
+     "atMs": -2286.3,
+     "ms": 25.9
+    },
+    {
+     "atMs": -2259.4,
+     "ms": 17.2
+    },
+    {
+     "atMs": -2241.8,
+     "ms": 16.6
+    },
+    {
+     "atMs": -2225,
+     "ms": 19.3
+    },
+    {
+     "atMs": -2205.4,
+     "ms": 17.4
+    },
+    {
+     "atMs": -2187.7,
+     "ms": 3.3
+    },
+    {
+     "atMs": -2155.6,
+     "ms": 4.9
+    },
+    {
+     "atMs": -2149.8,
+     "ms": 3.9
+    },
+    {
+     "atMs": -2125.4,
+     "ms": 18.7
+    },
+    {
+     "atMs": -2105.7,
+     "ms": 8.7
+    },
+    {
+     "atMs": -2096.5,
+     "ms": 8.9
+    },
+    {
+     "atMs": -2068,
+     "ms": 5.8
+    },
+    {
+     "atMs": -2061.4,
+     "ms": 10
+    },
+    {
+     "atMs": -2050.4,
+     "ms": 5.2
+    },
+    {
+     "atMs": -2027,
+     "ms": 4.2
+    },
+    {
+     "atMs": -966.5,
+     "ms": 8.7
+    },
+    {
+     "atMs": -56.6,
+     "ms": 6.7
+    },
+    {
+     "atMs": 2.9,
+     "ms": 17.1
+    }
+   ],
+   "shaders": [
+    {
+     "atMs": -3072.9,
+     "takes": ""
+    },
+    {
+     "atMs": -3072.4,
+     "takes": "sk_RTAdjust inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -3066.9,
+     "takes": "u_skRTFlip umatrix_S1_c0 ucircle_S2_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -3065.4,
+     "takes": "sk_RTAdjust umatrix_S1_c0 position color localCoord"
+    },
+    {
+     "atMs": -3058.6,
+     "takes": ""
+    },
+    {
+     "atMs": -3058.2,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -3039.5,
+     "takes": ""
+    },
+    {
+     "atMs": -3039.3,
+     "takes": "sk_RTAdjust position color"
+    },
+    {
+     "atMs": -3035.8,
+     "takes": ""
+    },
+    {
+     "atMs": -3035.1,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -3021,
+     "takes": "u_skRTFlip umatrix_S1_c0 ucoverageInvert_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -3020.4,
+     "takes": "sk_RTAdjust position color"
+    },
+    {
+     "atMs": -3015.6,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -3015.1,
+     "takes": "sk_RTAdjust uAtlasSizeInv_S0 inPosition inColor inTextureCoords"
+    },
+    {
+     "atMs": -3011.6,
+     "takes": "u_skRTFlip"
+    },
+    {
+     "atMs": -3011.2,
+     "takes": "sk_RTAdjust inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -3007,
+     "takes": ""
+    },
+    {
+     "atMs": -3006.6,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -3000.2,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2999.8,
+     "takes": "sk_RTAdjust uAtlasSizeInv_S0 inPosition inColor inTextureCoords"
+    },
+    {
+     "atMs": -2993,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2992.7,
+     "takes": "sk_RTAdjust position color localCoord"
+    },
+    {
+     "atMs": -2978.5,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2977.9,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2961.4,
+     "takes": "u_skRTFlip umatrix_S1_c0 umatrix_S2_c0 ucoverageInvert_S2 uTextureSampler_0_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2960.7,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2941.8,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2941.1,
+     "takes": "sk_RTAdjust uatlas_adjust_S0 umatrix_S1_c0_c0_c1 fillBounds affineMatrix translate color locations"
+    },
+    {
+     "atMs": -2934.1,
+     "takes": ""
+    },
+    {
+     "atMs": -2933.5,
+     "takes": "sk_RTAdjust inPosition inColor inEllipseOffset inEllipseRadii"
+    },
+    {
+     "atMs": -2926.8,
+     "takes": "uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c1 uleftBorderColor_S1_c0 urightBorderColor_S1_c0 uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2926.3,
+     "takes": "sk_RTAdjust uAtlasSizeInv_S0 ulocalMatrix_S0 umatrix_S1_c0_c1 inPosition inColor inTextureCoords"
+    },
+    {
+     "atMs": -2916.3,
+     "takes": "u_skRTFlip uinnerRect_S1 uradiusPlusHalf_S1"
+    },
+    {
+     "atMs": -2915.8,
+     "takes": "sk_RTAdjust position color"
+    },
+    {
+     "atMs": -2902,
+     "takes": "umatrix_S1_c0 umatrix_S2_c0_c0 uTextureSampler_0_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2901.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0 umatrix_S2_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2884,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 umatrix_S2 uTextureSampler_0_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2883.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 umatrix_S2 position color localCoord"
+    },
+    {
+     "atMs": -2846.6,
+     "takes": "ucolor_S0"
+    },
+    {
+     "atMs": -2846.3,
+     "takes": "sk_RTAdjust uaffineMatrix_S0 utranslate_S0 inputPoint"
+    },
+    {
+     "atMs": -2842.2,
+     "takes": "ucolor_S0"
+    },
+    {
+     "atMs": -2841.8,
+     "takes": "sk_RTAdjust uaffineMatrix_S0 utranslate_S0 resolveLevel_and_idx p01 p23"
+    },
+    {
+     "atMs": -2823.1,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[1] uscale_S1_c0_c0_c0[4] ubias_S1_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2822.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2806.9,
+     "takes": "umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2806.5,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -2802.5,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0_c0[2] ubias_S1_c0_c0_c0_c0[2] uthreshold_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2801.6,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2785.6,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0_c0[2] ubias_S1_c0_c0_c0_c0[2] uthreshold_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2784.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2769,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[1] uscale_S1_c0_c0_c0[4] ubias_S1_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2768.2,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2760.4,
+     "takes": ""
+    },
+    {
+     "atMs": -2759.9,
+     "takes": "sk_RTAdjust inPosition inColor inCoverage"
+    },
+    {
+     "atMs": -2756.2,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2755.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2747.8,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2747.2,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2696.2,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2695.7,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2680.4,
+     "takes": "u_skRTFlip umatrix_S1_c0 uedgeArray_S2[3] uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2679.6,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2657,
+     "takes": "u_skRTFlip umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2656.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2651.4,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0 uend_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2650.8,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2643.9,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2643.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2622.7,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0 uend_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2622,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2606.1,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2605.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2584.8,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uedgeArray_S2[3] uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2584,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2565.9,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2565.2,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2557.2,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0_c0[1] uscale_S1_c0_c0_c0_c0[4] ubias_S1_c0_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2556.4,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2544.7,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0 uend_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2544.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2495.1,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2493.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2477.6,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2476.9,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2460,
+     "takes": "u_skRTFlip"
+    },
+    {
+     "atMs": -2459.5,
+     "takes": "sk_RTAdjust inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2449.7,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uedgeArray_S2[4] uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2449,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2431.7,
+     "takes": "u_skRTFlip uedgeArray_S1[4]"
+    },
+    {
+     "atMs": -2431,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -2416.7,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 umatrix_S2_c0_c0 uedgeArray_S2_c1_c0[4] uedgeArray_S2_c1[4] uTextureSampler_0_S1 uTextureSampler_1_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2415.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 umatrix_S2_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2386.5,
+     "takes": "u_skRTFlip uedgeArray_S1[4]"
+    },
+    {
+     "atMs": -2385.8,
+     "takes": "sk_RTAdjust inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2379.6,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2379.1,
+     "takes": "sk_RTAdjust uatlas_adjust_S0 fillBounds color locations"
+    },
+    {
+     "atMs": -2373.7,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2373.2,
+     "takes": "sk_RTAdjust umatrix_S1 position localCoord"
+    },
+    {
+     "atMs": -2364.4,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2363.7,
+     "takes": "sk_RTAdjust umatrix_S1 position localCoord"
+    },
+    {
+     "atMs": -2341.9,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2340.6,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2322.4,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2321.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2315.2,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0_c0[2] ubias_S1_c0_c0_c0_c0[2] uthreshold_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2314.6,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -2286,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2285.2,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2258.8,
+     "takes": "u_skRTFlip uDstTextureCoords_S0 ublend_S1 uDstTextureSampler_S0"
+    },
+    {
+     "atMs": -2257.6,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -2241.3,
+     "takes": "u_skRTFlip uDstTextureCoords_S0 uDstTextureSampler_S0"
+    },
+    {
+     "atMs": -2240.1,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -2224.5,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2223.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2204.9,
+     "takes": "u_skRTFlip uDstTextureCoords_S0 umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 ublend_S2 uDstTextureSampler_S0 uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2203.6,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2187.5,
+     "takes": "uColor_S0"
+    },
+    {
+     "atMs": -2187,
+     "takes": "sk_RTAdjust inPosition inCoverage"
+    },
+    {
+     "atMs": -2155.2,
+     "takes": "ucolor_S1_c0 umatrix_S1_c1_c0 ublend_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2154.7,
+     "takes": "sk_RTAdjust umatrix_S1_c1_c0 position color localCoord"
+    },
+    {
+     "atMs": -2149.5,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2149.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0 position color localCoord"
+    },
+    {
+     "atMs": -2124.5,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[2] uscale_S1_c0_c0_c0[8] ubias_S1_c0_c0_c0[8] ubias_S1_c0_c0_c1_c0 uscale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2123.5,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -2105.3,
+     "takes": "umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2104.5,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -2095.9,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2095.2,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -2067.7,
+     "takes": "u_skRTFlip uinnerRect_S1 uradiusPlusHalf_S1 uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2067,
+     "takes": "sk_RTAdjust position localCoord"
+    },
+    {
+     "atMs": -2060.9,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[1] uscale_S1_c0_c0_c0[4] ubias_S1_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2060.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 position color localCoord"
+    },
+    {
+     "atMs": -2050,
+     "takes": "u_skRTFlip ucircle_S1_c0 uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2048.9,
+     "takes": "sk_RTAdjust position localCoord"
+    },
+    {
+     "atMs": -2026.7,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2026.2,
+     "takes": "sk_RTAdjust position coverage localCoord"
+    },
+    {
+     "atMs": -966,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -965.4,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -56.1,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -55.6,
+     "takes": "sk_RTAdjust uatlas_adjust_S0 umatrix_S1_c0_c0_c1 fillBounds affineMatrix translate color locations"
+    },
+    {
+     "atMs": 3.3,
+     "takes": "u_skRTFlip umatrix_S1_c0 urectUniform_S2_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": 4.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    }
+   ],
+   "traceFile": "reallooks-leg2.trace.json.gz",
+   "eventsTotal": 2575013,
+   "eventsCut": 222715,
+   "medianFrameMs": 5.29,
+   "longFrames": [
+    23.7
+   ],
+   "window": {
+    "ms": 23.7,
+    "pointAtMs": -178.1,
+    "ringFirstFrameAtMs": -167.8,
+    "soundsAtMs": [
+     -257.9,
+     -169.8
+    ]
+   },
+   "threads": [
+    {
+     "thread": "Browser / ThreadPoolBackgroundWorker",
+     "busyMs": 23.73,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 23.73,
+       "atMs": -883.4
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 23.73
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / CrGpuMain",
+     "busyMs": 23.73,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 20.82,
+       "atMs": -1.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 2.64,
+       "atMs": 21.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.23,
+       "atMs": 20.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 20.8
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 21.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0,
+       "atMs": 20.8
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 23.73
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 23.72
+      },
+      {
+       "name": "Scheduler::RunTask",
+       "ms": 23.7
+      },
+      {
+       "name": "GpuChannel::ExecuteDeferredRequest",
+       "ms": 23.45
+      },
+      {
+       "name": "GPUTask",
+       "ms": 23.45
+      },
+      {
+       "name": "RendererMainThread",
+       "ms": 23.44
+      },
+      {
+       "name": "CommandBuffer::Flush",
+       "ms": 23.44
+      },
+      {
+       "name": "CommandBufferStub::OnAsyncFlush",
+       "ms": 23.43
+      },
+      {
+       "name": "CommandBufferService:PutChanged",
+       "ms": 23.43
+      },
+      {
+       "name": "GrDirectContextPriv::flushSurfaces",
+       "ms": 18.8
+      },
+      {
+       "name": "GrDrawingManager::flush",
+       "ms": 18.79
+      },
+      {
+       "name": "RasterDecoderImpl::DoEndRasterCHROMIUM",
+       "ms": 18.77
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / GpuVSyncThread",
+     "busyMs": 23.72,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 4.18,
+       "atMs": 3.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.17,
+       "atMs": 11.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.17,
+       "atMs": 15.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.16,
+       "atMs": 7.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 3.85,
+       "atMs": 19.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 3.19,
+       "atMs": -1
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 23.72
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 23.7
+      },
+      {
+       "name": "WinVSyncProvider::GetVSyncIntervalIfAvailable",
+       "ms": 0.15
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 14.96,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 14.96,
+       "atMs": 4.9
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 14.96
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 14.95
+      },
+      {
+       "name": "GetVertexExecutableTask::run",
+       "ms": 14.94
+      },
+      {
+       "name": "D3DCompile",
+       "ms": 14.68
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 4.32,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 4.32,
+       "atMs": 4.9
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 4.32
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 4.32
+      },
+      {
+       "name": "GetPixelExecutableTask::run",
+       "ms": 4.31
+      },
+      {
+       "name": "D3DCompile",
+       "ms": 4.21
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / CrRendererMain",
+     "busyMs": 2.69,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 2.37,
+       "atMs": 21.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.25,
+       "atMs": -1.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.03,
+       "atMs": 2.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.3
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 2.69
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 2.64
+      },
+      {
+       "name": "ProxyMain::BeginMainFrame",
+       "ms": 2.6
+      },
+      {
+       "name": "WebFrameWidgetImpl::BeginMainFrame",
+       "ms": 2.38
+      },
+      {
+       "name": "Blink.Animate.UpdateTime",
+       "ms": 2.37
+      },
+      {
+       "name": "PageAnimator::serviceScriptedAnimations",
+       "ms": 2.36
+      },
+      {
+       "name": "FrameRequestCallbackCollection::ExecuteFrameCallbacks",
+       "ms": 2.35
+      },
+      {
+       "name": "FireAnimationFrame",
+       "ms": 2.34
+      },
+      {
+       "name": "AsyncTask Run",
+       "ms": 2.34
+      },
+      {
+       "name": "v8.callFunction",
+       "ms": 2.31
+      },
+      {
+       "name": "FunctionCall",
+       "ms": 2.3
+      },
+      {
+       "name": "RasterImplementation::RasterCHROMIUM",
+       "ms": 0.15
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 1.28,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.66,
+       "atMs": 4.1
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.54,
+       "atMs": 3.3
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.09,
+       "atMs": 4.8
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0,
+       "atMs": 4.9
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 1.28
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 1.27
+      },
+      {
+       "name": "ShaderTranslateTaskD3D::run",
+       "ms": 1.14
+      },
+      {
+       "name": "LinkTaskD3D::link",
+       "ms": 0.03
+      }
+     ]
+    },
+    {
+     "thread": "Browser / CacheThread_BlockFile",
+     "busyMs": 1.18,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 1.11,
+       "atMs": 20.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.04,
+       "atMs": 20.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.02,
+       "atMs": 20.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 20.2
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 1.18
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 1.17
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / Compositor",
+     "busyMs": 0.66,
+     "topLevel": [
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.17,
+       "atMs": 21.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.15,
+       "atMs": 21.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.12,
+       "atMs": 2.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.08,
+       "atMs": 0.2
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.04,
+       "atMs": 21.3
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.02,
+       "atMs": 21.5
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 0.42
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.39
+      },
+      {
+       "name": "Graphics.Pipeline",
+       "ms": 0.37
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.24
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.2
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.17
+      },
+      {
+       "name": "ProxyImpl::ScheduledActionDraw",
+       "ms": 0.14
+      },
+      {
+       "name": "MainFrame.Draw",
+       "ms": 0.14
+      },
+      {
+       "name": "ExternalBeginFrameSource::OnBeginFrame",
+       "ms": 0.12
+      },
+      {
+       "name": "Scheduler::BeginFrame",
+       "ms": 0.11
+      },
+      {
+       "name": "viz::BeginFrameArgs",
+       "ms": 0.1
+      },
+      {
+       "name": "Scheduler::BeginImplFrame",
+       "ms": 0.1
+      }
+     ]
+    }
+   ],
+   "otherEvents": [
+    "141x I disabled-by-default-skia.gpu SurfaceDrawContext::addDrawOp",
+    "52x I blink Canvas2DResourceProvider::Snapshot",
+    "12x f viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "11x s viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "7x I gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "7x e cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "6x b cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "6x b cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "5x I disabled-by-default-devtools.timeline.frame BeginFrame",
+    "5x e cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "4x I toplevel BlinkScheduler_PerformMicrotaskCheckpoint",
+    "4x I disabled-by-default-devtools.timeline.frame DroppedFrame",
+    "4x I gpu DCompPresenter::CheckPendingFrames",
+    "3x I toplevel ThreadControllerImpl::RunTask",
+    "3x I disabled-by-default-skia.gpu virtual void __cdecl GrGLTexture::onRelease(void)",
+    "3x I disabled-by-default-skia.gpu virtual void __cdecl (anonymous namespace)::FillRectOpImpl::onPrepareDraws(GrMeshDrawTarget *)",
+    "3x I blink CanvasResourceSharedImage::Bitmap",
+    "3x f gpu,toplevel.flow Scheduler::ScheduleTask",
+    "3x f gpu,toplevel.flow Scheduler::RunTask",
+    "3x s gpu,toplevel.flow Scheduler::RunTask",
+    "3x s gpu,toplevel.flow Scheduler::ScheduleTask",
+    "3x n cc ScheduledTasksState",
+    "2x I blink.user_timing tick",
+    "2x I devtools.timeline RequestAnimationFrame",
+    "2x I disabled-by-default-devtools.timeline UpdateCounters",
+    "2x I disabled-by-default-skia.gpu FillRRectOp",
+    "2x I cc auto cc::(anonymous namespace)::InsertNodeForTask(TaskGraph *, TileTask *, uint16_t, uint16_t, size_t, bool)::(lambda)::operator()()::(lambda)::operator()(uint32_t) const",
+    "2x I viz DisplayDamageTracker::HasPendingSurfaces",
+    "2x I viz All active surfaces ready",
+    "2x I cc auto cc::SchedulerStateMachine::ShouldThrottleSendBeginMainFrame()::(lambda)::operator()(uint32_t) const",
+    "2x s gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "2x f gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "2x f blink AsyncTask Scheduled",
+    "2x s blink AsyncTask Scheduled",
+    "2x C gpu CommandBufferService::Paused",
+    "2x b cc,benchmark,disabled-by-default-devtools.timeline.frame EndActivateToSubmitCompositorFrame",
+    "2x e disabled-by-default-cc.debug.scheduler.frames Scheduler@cc\\scheduler\\scheduler.cc:65",
+    "2x e disabled-by-default-cc.debug.scheduler.frames LayerTreeHostImpl@cc\\trees\\layer_tree_host_impl.cc:596",
+    "2x e cc,benchmark,disabled-by-default-devtools.timeline.frame StartDrawToSwapStart",
+    "2x b cc,benchmark,disabled-by-default-devtools.timeline.frame Swap"
+   ]
+  },
+  {
+   "n": 3,
+   "port": 9453,
+   "page": {
+    "era": 4,
+    "audio": "running",
+    "boots": 0,
+    "played": 2
+   },
+   "programBuilds": [
+    {
+     "atMs": -3068.4,
+     "ms": 4.3
+    },
+    {
+     "atMs": -3061.5,
+     "ms": 4.5
+    },
+    {
+     "atMs": -3053.3,
+     "ms": 3.2
+    },
+    {
+     "atMs": -3049.9,
+     "ms": 15.5
+    },
+    {
+     "atMs": -3034,
+     "ms": 3.6
+    },
+    {
+     "atMs": -3030.3,
+     "ms": 3.5
+    },
+    {
+     "atMs": -3026.4,
+     "ms": 4.3
+    },
+    {
+     "atMs": -3021.8,
+     "ms": 3.4
+    },
+    {
+     "atMs": -3017,
+     "ms": 4.1
+    },
+    {
+     "atMs": -3010.3,
+     "ms": 3.5
+    },
+    {
+     "atMs": -2996.5,
+     "ms": 18.2
+    },
+    {
+     "atMs": -2978,
+     "ms": 18.6
+    },
+    {
+     "atMs": -2959.3,
+     "ms": 10.2
+    },
+    {
+     "atMs": -2948.9,
+     "ms": 5.1
+    },
+    {
+     "atMs": -2941.9,
+     "ms": 5.4
+    },
+    {
+     "atMs": -2929.9,
+     "ms": 18.3
+    },
+    {
+     "atMs": -2911.5,
+     "ms": 6.3
+    },
+    {
+     "atMs": -2903.8,
+     "ms": 3.7
+    },
+    {
+     "atMs": -2860.2,
+     "ms": 3.7
+    },
+    {
+     "atMs": -2856.4,
+     "ms": 20.4
+    },
+    {
+     "atMs": -2835.7,
+     "ms": 16.1
+    },
+    {
+     "atMs": -2819.4,
+     "ms": 3.5
+    },
+    {
+     "atMs": -2815.7,
+     "ms": 18.6
+    },
+    {
+     "atMs": -2797,
+     "ms": 17.4
+    },
+    {
+     "atMs": -2779.5,
+     "ms": 8.7
+    },
+    {
+     "atMs": -2770.7,
+     "ms": 3.2
+    },
+    {
+     "atMs": -2767.4,
+     "ms": 8.2
+    },
+    {
+     "atMs": -2759,
+     "ms": 7.6
+    },
+    {
+     "atMs": -2725.6,
+     "ms": 16.1
+    },
+    {
+     "atMs": -2708.9,
+     "ms": 16.7
+    },
+    {
+     "atMs": -2692,
+     "ms": 4.7
+    },
+    {
+     "atMs": -2687.2,
+     "ms": 7.3
+    },
+    {
+     "atMs": -2679.4,
+     "ms": 6.1
+    },
+    {
+     "atMs": -2656.1,
+     "ms": 16.2
+    },
+    {
+     "atMs": -2639.7,
+     "ms": 16
+    },
+    {
+     "atMs": -2623.5,
+     "ms": 16.3
+    },
+    {
+     "atMs": -2606.5,
+     "ms": 7.9
+    },
+    {
+     "atMs": -2598.5,
+     "ms": 10.4
+    },
+    {
+     "atMs": -2585.9,
+     "ms": 7.5
+    },
+    {
+     "atMs": -2537.5,
+     "ms": 18.1
+    },
+    {
+     "atMs": -2519.2,
+     "ms": 7.8
+    },
+    {
+     "atMs": -2500.8,
+     "ms": 3.9
+    },
+    {
+     "atMs": -2492.7,
+     "ms": 16.3
+    },
+    {
+     "atMs": -2476.1,
+     "ms": 16.4
+    },
+    {
+     "atMs": -2459.2,
+     "ms": 16.8
+    },
+    {
+     "atMs": -2442.1,
+     "ms": 6.2
+    },
+    {
+     "atMs": -2435.3,
+     "ms": 5
+    },
+    {
+     "atMs": -2430.2,
+     "ms": 7.8
+    },
+    {
+     "atMs": -2422.1,
+     "ms": 7.6
+    },
+    {
+     "atMs": -2399.9,
+     "ms": 18.1
+    },
+    {
+     "atMs": -2379.9,
+     "ms": 6.3
+    },
+    {
+     "atMs": -2372.9,
+     "ms": 6.1
+    },
+    {
+     "atMs": -2345.1,
+     "ms": 15.8
+    },
+    {
+     "atMs": -2328.8,
+     "ms": 16.1
+    },
+    {
+     "atMs": -2312.5,
+     "ms": 14.2
+    },
+    {
+     "atMs": -2298.2,
+     "ms": 16.3
+    },
+    {
+     "atMs": -2281.6,
+     "ms": 17.2
+    },
+    {
+     "atMs": -2264.2,
+     "ms": 3
+    },
+    {
+     "atMs": -2235.1,
+     "ms": 3.4
+    },
+    {
+     "atMs": -2229.9,
+     "ms": 3.5
+    },
+    {
+     "atMs": -2212,
+     "ms": 14.1
+    },
+    {
+     "atMs": -2197.3,
+     "ms": 6.9
+    },
+    {
+     "atMs": -2190.2,
+     "ms": 7.5
+    },
+    {
+     "atMs": -2162,
+     "ms": 3.6
+    },
+    {
+     "atMs": -2158,
+     "ms": 5.8
+    },
+    {
+     "atMs": -2151.7,
+     "ms": 4.2
+    },
+    {
+     "atMs": -2140.6,
+     "ms": 3
+    },
+    {
+     "atMs": -983.3,
+     "ms": 10
+    },
+    {
+     "atMs": -52.4,
+     "ms": 9.3
+    },
+    {
+     "atMs": 1.8,
+     "ms": 18
+    }
+   ],
+   "shaders": [
+    {
+     "atMs": -3074.5,
+     "takes": "sk_RTAdjust inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -3068.1,
+     "takes": "u_skRTFlip umatrix_S1_c0 ucircle_S2_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -3067.4,
+     "takes": "sk_RTAdjust umatrix_S1_c0 position color localCoord"
+    },
+    {
+     "atMs": -3061.2,
+     "takes": ""
+    },
+    {
+     "atMs": -3060.8,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -3053.1,
+     "takes": ""
+    },
+    {
+     "atMs": -3052.9,
+     "takes": "sk_RTAdjust position color"
+    },
+    {
+     "atMs": -3049.7,
+     "takes": ""
+    },
+    {
+     "atMs": -3049,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -3033.8,
+     "takes": "u_skRTFlip umatrix_S1_c0 ucoverageInvert_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -3033.4,
+     "takes": "sk_RTAdjust position color"
+    },
+    {
+     "atMs": -3030,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -3029.7,
+     "takes": "sk_RTAdjust uAtlasSizeInv_S0 inPosition inColor inTextureCoords"
+    },
+    {
+     "atMs": -3026.1,
+     "takes": "u_skRTFlip"
+    },
+    {
+     "atMs": -3025.5,
+     "takes": "sk_RTAdjust inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -3021.6,
+     "takes": ""
+    },
+    {
+     "atMs": -3021.3,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -3016.8,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -3016.4,
+     "takes": "sk_RTAdjust uAtlasSizeInv_S0 inPosition inColor inTextureCoords"
+    },
+    {
+     "atMs": -3010.1,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -3009.8,
+     "takes": "sk_RTAdjust position color localCoord"
+    },
+    {
+     "atMs": -2996.1,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2995.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2977.6,
+     "takes": "u_skRTFlip umatrix_S1_c0 umatrix_S2_c0 ucoverageInvert_S2 uTextureSampler_0_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2976.7,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2958.7,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2957.9,
+     "takes": "sk_RTAdjust uatlas_adjust_S0 umatrix_S1_c0_c0_c1 fillBounds affineMatrix translate color locations"
+    },
+    {
+     "atMs": -2948.7,
+     "takes": ""
+    },
+    {
+     "atMs": -2948.3,
+     "takes": "sk_RTAdjust inPosition inColor inEllipseOffset inEllipseRadii"
+    },
+    {
+     "atMs": -2941.5,
+     "takes": "uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c1 uleftBorderColor_S1_c0 urightBorderColor_S1_c0 uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2940.9,
+     "takes": "sk_RTAdjust uAtlasSizeInv_S0 ulocalMatrix_S0 umatrix_S1_c0_c1 inPosition inColor inTextureCoords"
+    },
+    {
+     "atMs": -2929.6,
+     "takes": "umatrix_S1_c0 umatrix_S2_c0_c0 uTextureSampler_0_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2929,
+     "takes": "sk_RTAdjust umatrix_S1_c0 umatrix_S2_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2911,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 umatrix_S2 uTextureSampler_0_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2910.4,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 umatrix_S2 position color localCoord"
+    },
+    {
+     "atMs": -2903.6,
+     "takes": "u_skRTFlip uinnerRect_S1 uradiusPlusHalf_S1"
+    },
+    {
+     "atMs": -2903.2,
+     "takes": "sk_RTAdjust position color"
+    },
+    {
+     "atMs": -2860,
+     "takes": "ucolor_S0"
+    },
+    {
+     "atMs": -2859.8,
+     "takes": "sk_RTAdjust uaffineMatrix_S0 utranslate_S0 inputPoint"
+    },
+    {
+     "atMs": -2856.3,
+     "takes": "ucolor_S0"
+    },
+    {
+     "atMs": -2855.8,
+     "takes": "sk_RTAdjust uaffineMatrix_S0 utranslate_S0 resolveLevel_and_idx p01 p23"
+    },
+    {
+     "atMs": -2835.1,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[1] uscale_S1_c0_c0_c0[4] ubias_S1_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2834.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2819.2,
+     "takes": "umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2818.9,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -2815.2,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0_c0[2] ubias_S1_c0_c0_c0_c0[2] uthreshold_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2814.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2796.5,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0_c0[2] ubias_S1_c0_c0_c0_c0[2] uthreshold_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2795.7,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2779,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[1] uscale_S1_c0_c0_c0[4] ubias_S1_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2778,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2770.6,
+     "takes": ""
+    },
+    {
+     "atMs": -2770.3,
+     "takes": "sk_RTAdjust inPosition inColor inCoverage"
+    },
+    {
+     "atMs": -2766.8,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2766.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2758.4,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2757.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2725.2,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2724.5,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2708.3,
+     "takes": "u_skRTFlip umatrix_S1_c0 uedgeArray_S2[3] uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2707.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2691.7,
+     "takes": "u_skRTFlip umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2691.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2686.7,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0 uend_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2686.1,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2679,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2678.4,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2655.6,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0 uend_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2654.9,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2639.2,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2638.4,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2623.1,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uedgeArray_S2[3] uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2622,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2605.9,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2605.2,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2598,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0_c0[1] uscale_S1_c0_c0_c0_c0[4] ubias_S1_c0_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2597.1,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2585.4,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0 uend_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2584.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2537,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2536.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2518.7,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2518,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2500.6,
+     "takes": "u_skRTFlip"
+    },
+    {
+     "atMs": -2500.2,
+     "takes": "sk_RTAdjust inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2492.3,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uedgeArray_S2[4] uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2491.4,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2475.8,
+     "takes": "u_skRTFlip uedgeArray_S1[4]"
+    },
+    {
+     "atMs": -2474.8,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -2458.7,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 umatrix_S2_c0_c0 uedgeArray_S2_c1_c0[4] uedgeArray_S2_c1[4] uTextureSampler_0_S1 uTextureSampler_1_S1 uTextureSampler_0_S2"
+    },
+    {
+     "atMs": -2457.8,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 umatrix_S2_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2441.9,
+     "takes": "u_skRTFlip uedgeArray_S1[4]"
+    },
+    {
+     "atMs": -2441.3,
+     "takes": "sk_RTAdjust inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2435.1,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2434.8,
+     "takes": "sk_RTAdjust uatlas_adjust_S0 fillBounds color locations"
+    },
+    {
+     "atMs": -2429.8,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2429.1,
+     "takes": "sk_RTAdjust umatrix_S1 position localCoord"
+    },
+    {
+     "atMs": -2421.7,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2421.2,
+     "takes": "sk_RTAdjust umatrix_S1 position localCoord"
+    },
+    {
+     "atMs": -2399.5,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0[2] ubias_S1_c0_c0_c0[2] uthreshold_S1_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2398.7,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2379.5,
+     "takes": "u_skRTFlip umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2379,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 inPosition inColor inQuadEdge"
+    },
+    {
+     "atMs": -2372.4,
+     "takes": "u_skRTFlip uscale_S1_c0_c0_c0_c0[2] ubias_S1_c0_c0_c0_c0[2] uthreshold_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2371.8,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -2344.8,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2344.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2328.4,
+     "takes": "u_skRTFlip uDstTextureCoords_S0 ublend_S1 uDstTextureSampler_S0"
+    },
+    {
+     "atMs": -2327.5,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -2312.3,
+     "takes": "u_skRTFlip uDstTextureCoords_S0 uDstTextureSampler_S0"
+    },
+    {
+     "atMs": -2311.6,
+     "takes": "sk_RTAdjust radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate color"
+    },
+    {
+     "atMs": -2297.6,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 ur0_S1_c0_c0_c1_c0 ulengthScale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2296.9,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2281.2,
+     "takes": "u_skRTFlip uDstTextureCoords_S0 umatrix_S1_c0_c0 umatrix_S1_c1 urange_S1 ublend_S2 uDstTextureSampler_S0 uTextureSampler_0_S1 uTextureSampler_1_S1"
+    },
+    {
+     "atMs": -2280.4,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    },
+    {
+     "atMs": -2264.1,
+     "takes": "uColor_S0"
+    },
+    {
+     "atMs": -2263.6,
+     "takes": "sk_RTAdjust inPosition inCoverage"
+    },
+    {
+     "atMs": -2234.8,
+     "takes": "ucolor_S1_c0 umatrix_S1_c1_c0 ublend_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2234.4,
+     "takes": "sk_RTAdjust umatrix_S1_c1_c0 position color localCoord"
+    },
+    {
+     "atMs": -2229.7,
+     "takes": "umatrix_S1_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2229.3,
+     "takes": "sk_RTAdjust umatrix_S1_c0 position color localCoord"
+    },
+    {
+     "atMs": -2211.3,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[2] uscale_S1_c0_c0_c0[8] ubias_S1_c0_c0_c0[8] ubias_S1_c0_c0_c1_c0 uscale_S1_c0_c0_c1_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2210.5,
+     "takes": "sk_RTAdjust ulocalMatrix_S0 umatrix_S1_c0_c0_c1 inPosition inColor inCircleEdge"
+    },
+    {
+     "atMs": -2197,
+     "takes": "umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2196.5,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -2189.9,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2189.4,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -2161.8,
+     "takes": "u_skRTFlip uinnerRect_S1 uradiusPlusHalf_S1 uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2161.4,
+     "takes": "sk_RTAdjust position localCoord"
+    },
+    {
+     "atMs": -2157.6,
+     "takes": "u_skRTFlip uthresholds_S1_c0_c0_c0[1] uscale_S1_c0_c0_c0[4] ubias_S1_c0_c0_c0[4] umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -2157,
+     "takes": "sk_RTAdjust umatrix_S1_c0_c0_c1 position color localCoord"
+    },
+    {
+     "atMs": -2151.4,
+     "takes": "u_skRTFlip ucircle_S1_c0 uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2150.8,
+     "takes": "sk_RTAdjust position localCoord"
+    },
+    {
+     "atMs": -2140.4,
+     "takes": "uTextureSampler_0_S0"
+    },
+    {
+     "atMs": -2140.1,
+     "takes": "sk_RTAdjust position coverage localCoord"
+    },
+    {
+     "atMs": -982.8,
+     "takes": "uclamp_S1_c0_c0_c0 umatrix_S1_c0_c0 uoffsetsAndKernel_S1_c0[14] udir_S1_c0 umatrix_S1 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -982.1,
+     "takes": "sk_RTAdjust umatrix_S1 position color localCoord"
+    },
+    {
+     "atMs": -51.9,
+     "takes": "u_skRTFlip ustart_S1_c0_c0_c0_c0 uend_S1_c0_c0_c0_c0 umatrix_S1_c0_c0_c1 uleftBorderColor_S1_c0_c0 urightBorderColor_S1_c0_c0 umatrix_S1_c1 urange_S1 uTextureSampler_0_S0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": -51.3,
+     "takes": "sk_RTAdjust uatlas_adjust_S0 umatrix_S1_c0_c0_c1 fillBounds affineMatrix translate color locations"
+    },
+    {
+     "atMs": 2.1,
+     "takes": "u_skRTFlip umatrix_S1_c0 urectUniform_S2_c0 uTextureSampler_0_S1"
+    },
+    {
+     "atMs": 3.1,
+     "takes": "sk_RTAdjust umatrix_S1_c0 radii_selector corner_and_radius_outsets aa_bloat_and_coverage radii_x radii_y skew translate_and_localrotate localrect color"
+    }
+   ],
+   "traceFile": "reallooks-leg3.trace.json.gz",
+   "eventsTotal": 2775304,
+   "eventsCut": 194817,
+   "medianFrameMs": 5.33,
+   "longFrames": [
+    22.6
+   ],
+   "window": {
+    "ms": 22.6,
+    "pointAtMs": -178.6,
+    "ringFirstFrameAtMs": -168.7,
+    "soundsAtMs": [
+     -234.2,
+     -170.8
+    ]
+   },
+   "threads": [
+    {
+     "thread": "Browser / ThreadPoolBackgroundWorker",
+     "busyMs": 22.58,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 22.58,
+       "atMs": -1007.4
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 22.58
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / CrGpuMain",
+     "busyMs": 22.58,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 20.3,
+       "atMs": -3.2
+      },
+      {
+       "name": "RunTask",
+       "ms": 2,
+       "atMs": 20.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.25,
+       "atMs": 20.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 20.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 20.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0,
+       "atMs": 20.3
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 22.58
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 22.57
+      },
+      {
+       "name": "Scheduler::RunTask",
+       "ms": 22.55
+      },
+      {
+       "name": "GpuChannel::ExecuteDeferredRequest",
+       "ms": 22.29
+      },
+      {
+       "name": "GPUTask",
+       "ms": 22.28
+      },
+      {
+       "name": "RendererMainThread",
+       "ms": 22.27
+      },
+      {
+       "name": "CommandBuffer::Flush",
+       "ms": 22.27
+      },
+      {
+       "name": "CommandBufferStub::OnAsyncFlush",
+       "ms": 22.27
+      },
+      {
+       "name": "CommandBufferService:PutChanged",
+       "ms": 22.26
+      },
+      {
+       "name": "GrDirectContextPriv::flushSurfaces",
+       "ms": 19.37
+      },
+      {
+       "name": "GrDrawingManager::flush",
+       "ms": 19.36
+      },
+      {
+       "name": "RasterDecoderImpl::DoEndRasterCHROMIUM",
+       "ms": 19.34
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / GpuVSyncThread",
+     "busyMs": 22.57,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 4.25,
+       "atMs": 2
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.15,
+       "atMs": 14.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.13,
+       "atMs": 10.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 4.11,
+       "atMs": 6.3
+      },
+      {
+       "name": "RunTask",
+       "ms": 3.9,
+       "atMs": 18.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 2.01,
+       "atMs": -2.2
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 22.57
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 22.55
+      },
+      {
+       "name": "WinVSyncProvider::GetVSyncIntervalIfAvailable",
+       "ms": 0.16
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 15.08,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 15.08,
+       "atMs": 4.5
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 15.08
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 15.08
+      },
+      {
+       "name": "GetVertexExecutableTask::run",
+       "ms": 15.06
+      },
+      {
+       "name": "D3DCompile",
+       "ms": 14.73
+      }
+     ]
+    },
+    {
+     "thread": "GPU Process / ThreadPoolForegroundWorker",
+     "busyMs": 6.45,
+     "topLevel": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 4.41,
+       "atMs": 4.5
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 1.25,
+       "atMs": 3.1
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.69,
+       "atMs": 2.1
+      },
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 0.1,
+       "atMs": 4.4
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "ThreadPool_RunTask",
+       "ms": 6.45
+      },
+      {
+       "name": "ANGLEPlatformImpl::RunWorkerTask",
+       "ms": 6.43
+      },
+      {
+       "name": "GetPixelExecutableTask::run",
+       "ms": 4.4
+      },
+      {
+       "name": "D3DCompile",
+       "ms": 4.29
+      },
+      {
+       "name": "ShaderTranslateTaskD3D::run",
+       "ms": 1.87
+      },
+      {
+       "name": "LinkTaskD3D::link",
+       "ms": 0.04
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / CrRendererMain",
+     "busyMs": 2.34,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 1.83,
+       "atMs": 20.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.43,
+       "atMs": -3.1
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.02,
+       "atMs": 0.5
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.02,
+       "atMs": 2
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.4
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 0.5
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 2.34
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 2.28
+      },
+      {
+       "name": "ProxyMain::BeginMainFrame",
+       "ms": 2.23
+      },
+      {
+       "name": "WebFrameWidgetImpl::BeginMainFrame",
+       "ms": 1.86
+      },
+      {
+       "name": "Blink.Animate.UpdateTime",
+       "ms": 1.86
+      },
+      {
+       "name": "PageAnimator::serviceScriptedAnimations",
+       "ms": 1.85
+      },
+      {
+       "name": "FrameRequestCallbackCollection::ExecuteFrameCallbacks",
+       "ms": 1.83
+      },
+      {
+       "name": "FireAnimationFrame",
+       "ms": 1.83
+      },
+      {
+       "name": "AsyncTask Run",
+       "ms": 1.82
+      },
+      {
+       "name": "v8.callFunction",
+       "ms": 1.79
+      },
+      {
+       "name": "FunctionCall",
+       "ms": 1.78
+      },
+      {
+       "name": "Commit",
+       "ms": 0.23
+      }
+     ]
+    },
+    {
+     "thread": "Browser / CacheThread_BlockFile",
+     "busyMs": 0.63,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 0.56,
+       "atMs": 20
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.05,
+       "atMs": 19.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.02,
+       "atMs": 19.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.01,
+       "atMs": 19.8
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 0.63
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.62
+      }
+     ]
+    },
+    {
+     "thread": "Renderer / Compositor",
+     "busyMs": 0.52,
+     "topLevel": [
+      {
+       "name": "RunTask",
+       "ms": 0.12,
+       "atMs": 1.9
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.1,
+       "atMs": 0.4
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.1,
+       "atMs": 20.6
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.1,
+       "atMs": 20.7
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.03,
+       "atMs": 20.7
+      },
+      {
+       "name": "RunTask",
+       "ms": 0.02,
+       "atMs": 8.1
+      }
+     ],
+     "heaviestNames": [
+      {
+       "name": "RunTask",
+       "ms": 0.39
+      },
+      {
+       "name": "ThreadControllerImpl::RunTask",
+       "ms": 0.35
+      },
+      {
+       "name": "Graphics.Pipeline",
+       "ms": 0.25
+      },
+      {
+       "name": "IOHandler::OnIOCompleted",
+       "ms": 0.14
+      },
+      {
+       "name": "SimpleWatcher::OnHandleReady",
+       "ms": 0.12
+      },
+      {
+       "name": "Receive mojo message",
+       "ms": 0.1
+      },
+      {
+       "name": "ProxyImpl::ReadyToCommit",
+       "ms": 0.1
+      },
+      {
+       "name": "ProxyImpl::ScheduledActionDraw",
+       "ms": 0.09
+      },
+      {
+       "name": "MainFrame.Draw",
+       "ms": 0.09
+      },
+      {
+       "name": "ExternalBeginFrameSource::OnBeginFrame",
+       "ms": 0.07
+      },
+      {
+       "name": "Scheduler::BeginFrame",
+       "ms": 0.06
+      },
+      {
+       "name": "viz::BeginFrameArgs",
+       "ms": 0.06
+      }
+     ]
+    }
+   ],
+   "otherEvents": [
+    "161x I disabled-by-default-skia.gpu SurfaceDrawContext::addDrawOp",
+    "47x I blink Canvas2DResourceProvider::Snapshot",
+    "12x f viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "11x I disabled-by-default-skia.gpu FillRRectOp",
+    "11x s viz,benchmark,graphics.pipeline Graphics.Pipeline",
+    "8x s gpu,toplevel.flow Scheduler::ScheduleTask",
+    "7x e cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "6x I gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "6x b cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "6x b cc,benchmark,disabled-by-default-devtools.timeline.frame BeginImplFrameToSendBeginMainFrame",
+    "5x I disabled-by-default-devtools.timeline.frame BeginFrame",
+    "5x I gpu,toplevel.flow Scheduler::ScheduleTask",
+    "5x e cc,benchmark,disabled-by-default-devtools.timeline.frame PipelineReporter",
+    "4x I disabled-by-default-devtools.timeline.frame DroppedFrame",
+    "4x I gpu DCompPresenter::CheckPendingFrames",
+    "3x I toplevel BlinkScheduler_PerformMicrotaskCheckpoint",
+    "3x I toplevel ThreadControllerImpl::RunTask",
+    "3x I gpu,toplevel.flow Scheduler::FinishTask",
+    "3x f gpu,toplevel.flow Scheduler::ScheduleTask",
+    "3x f gpu,toplevel.flow Scheduler::RunTask",
+    "3x s gpu,toplevel.flow Scheduler::RunTask",
+    "3x n cc ScheduledTasksState",
+    "2x I blink.user_timing tick",
+    "2x I devtools.timeline RequestAnimationFrame",
+    "2x I disabled-by-default-devtools.timeline UpdateCounters",
+    "2x I disabled-by-default-skia.gpu virtual void __cdecl (anonymous namespace)::FillRectOpImpl::onPrepareDraws(GrMeshDrawTarget *)",
+    "2x I cc auto cc::(anonymous namespace)::InsertNodeForTask(TaskGraph *, TileTask *, uint16_t, uint16_t, size_t, bool)::(lambda)::operator()()::(lambda)::operator()(uint32_t) const",
+    "2x I viz DisplayDamageTracker::HasPendingSurfaces",
+    "2x I viz All active surfaces ready",
+    "2x I cc auto cc::SchedulerStateMachine::ShouldThrottleSendBeginMainFrame()::(lambda)::operator()(uint32_t) const",
+    "2x I blink CanvasResourceSharedImage::Bitmap",
+    "2x s gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "2x f gpu,toplevel.flow CommandBuffer::OrderingBarrier",
+    "2x f blink AsyncTask Scheduled",
+    "2x s blink AsyncTask Scheduled",
+    "2x C gpu CommandBufferService::Paused",
+    "2x b cc,benchmark,disabled-by-default-devtools.timeline.frame EndActivateToSubmitCompositorFrame",
+    "2x e disabled-by-default-cc.debug.scheduler.frames Scheduler@cc\\scheduler\\scheduler.cc:65",
+    "2x e disabled-by-default-cc.debug.scheduler.frames LayerTreeHostImpl@cc\\trees\\layer_tree_host_impl.cc:596",
+    "2x e cc,benchmark,disabled-by-default-devtools.timeline.frame StartDrawToSwapStart"
+   ]
+  }
+ ]
+}
