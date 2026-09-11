@@ -117,7 +117,14 @@
           frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
-    7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
+    // Dreamcast (item 1231): two Jet Set Radio-manner skaters, cut from pixflux by
+    // assets/pixellab/era7-skater-cut.py; each figure about 68 px tall, so 1.3 table
+    // units a pixel stands it about 90 tall, the hand on the paddle box's top (dz 24).
+    // A STAND-IN: Tim ruled flat sprites out of the 3D eras (23:47 EDT 2026-09-10);
+    // this era's polygon-model card (item 1248's renderer) swaps these sheets out.
+    7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 1.3, res: 3, round: true,
+          sheets: { left: 'era7-skater-left-sheet', right: 'era7-skater-right-sheet' },
+          frame: { w: 44, h: 84 }, hand: { x: 44, y: 66 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 10 },
     // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
     // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
     // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
