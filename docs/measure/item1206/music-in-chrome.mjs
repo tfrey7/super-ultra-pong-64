@@ -105,12 +105,25 @@ async function main() {
     // Cross-fade at an era change, the rally's tempo, M mutes.
     await s.open(fileUrl('index.html') + '?era=1');
     await s.click(500, 380);
-    await sleep(600);
+    await sleep(2600);
     const t0 = await s.eval(read);
-    await s.eval('window.__pong.era = 2; true');
+    // The position the song had reached, read and the era changed in ONE
+    // evaluation, so no step can pass between the two.
+    const sw = await s.eval(`(() => { const m = window.__pongMusic; const p = m.position();
+      window.__pong.era = 2; m.update(window.__pong); return { before: p, at: m.lastSwitch }; })()`);
     await sleep(400);
     const t1 = await s.eval(read);
-    check('an era change cross-fades into the new loop', t1.crossfades === 1 && t1.era === 2 && t1.scheduled > t0.scheduled, { before: t0, after: t1 });
+    const beforeStep = sw.before.bar * 16 + sw.before.step, atStep = sw.at.bar * 16 + sw.at.step;
+    check('an era change cross-fades at the same bar and beat (the tune never restarts)',
+      t1.crossfades === 1 && t1.era === 2 && t1.scheduled > t0.scheduled && beforeStep > 0 && atStep === beforeStep,
+      { positionBefore: sw.before, positionAtChange: sw.at, after: t1 });
+    // The whole climb in one session, arcade to Super Nintendo.
+    const climb = await s.eval(`(async () => { const m = window.__pongMusic; const out = [];
+      for (const e of [0, 1, 2, 3, 4]) { window.__pong.era = e; await new Promise(r => setTimeout(r, 700));
+        out.push({ era: m.era, scheduled: m.scheduled, at: m.lastSwitch }); } return { out, errors: m.errors, crossfades: m.crossfades }; })()`);
+    check('one session climbs arcade to Super Nintendo, every change keeping its place',
+      climb.errors === 0 && climb.out.every((r, k) => r.era === k) && climb.out.every((r, k) => k === 0 || r.scheduled > climb.out[k - 1].scheduled),
+      climb);
     await s.eval('window.__pong.rally = 15; true');
     await sleep(200);
     const t2 = await s.eval(read);
