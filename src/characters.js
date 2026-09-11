@@ -136,10 +136,14 @@
     // stand-in pair until its own model card (1253-1258) names its own file.
     // The proof figure is an opt-in: ?model=player-proof-hi (both layers),
     // ?figure=<name> (the glTF layer only), or PongCharacters.forcedModel.
-    // Genesis (item 1226): the barbarian and the knight, pixflux sheets re-cut
-    // offline to 20 x 25 frames (assets/pixellab/era3-players-cut.mjs), so the
-    // scale is 3.2, not the bible's 2.6 for 12 x 52: 80 units tall, one paddle.
-    3:  { sheets: { left: 'era3-p1', right: 'era3-p2' }, frame: { w: 20, h: 25 },
+    // Genesis (item 1280): the barbarian and the knight drawn as text grids with
+    // tools/spritegen.mjs, not pixellab -- assets/spritegen/era3-barbarian.json
+    // and era3-knight.json, posed from parts by
+    // assets/spritegen/era3-players-compose.mjs and built into assets/pixellab/
+    // where the loader looks. Item 1226's 20 x 25 frame, hand and scale kept
+    // (3.2, not the bible's 2.6 for 12 x 52: 80 units tall, one paddle), so the
+    // figure holds the bat where it did.
+    3:  { sheets: { left: 'era3-barbarian', right: 'era3-knight' }, frame: { w: 20, h: 25 },
           hand: { x: 20, y: 13 }, scale: 3.2, fps: 10,
           skin: '#eeaa88', body: '#222266', res: 1 },
     // Super Nintendo (item 1227): two hover pilots, built from one pixellab pose
