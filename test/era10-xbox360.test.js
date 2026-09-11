@@ -169,18 +169,19 @@ test('post passes in order: bloom added twice, the grade, the vignette, grain, t
       o.fill.stops.some((s) => s[1] === T.shade(T.shade(R.paddleInk(g, 'right'), -0.05), 0.2)));
     assert.ok(soft < strip && strip < firstPaddle, 'no paddle is ever softened');
 
-    // Grain: three 128-pixel tiles of 1400 specks on grain mid, built once.
-    const tiles = made.filter((c) => c.width === 128 && c.height === 128);
-    assert.strictEqual(tiles.length, 3);
+    // Grain: three 128-pixel tiles of 1400 specks on grain mid, built once
+    // (the buffers outlive this document, so they are found through the pattern).
+    const grainAt = (time) => frame(rally({ time }), { canvas: true }).find((o) => o.comp === 'overlay').fill.img;
+    const tiles = [0, 1, 2].map((k) => grainAt(40 + k / 24 + 0.001));
+    assert.strictEqual(new Set(tiles).size, 3, 'a different tile each 24th of a second, three in turn');
+    assert.strictEqual(grainAt(40 + 3 / 24 + 0.001), tiles[0], 'and round again');
     for (const t of tiles) {
+      assert.deepStrictEqual([t.width, t.height], [128, 128]);
       const rects = t.ops.filter((o) => o.op === 'fillRect');
       assert.strictEqual(rects.length, 1401);
       assert.strictEqual(rects[0].fill, '#808080');
     }
-    frame(rally({ time: 30 + 1 / 24 }), { canvas: true });
-    assert.strictEqual(tiles[0].ops.length, made.filter((c) => c.width === 128)[0].ops.length, 'no tile is rebuilt');
-    const grainAt = (time) => frame(rally({ time }), { canvas: true }).find((o) => o.comp === 'overlay').fill.img;
-    assert.notStrictEqual(grainAt(40), grainAt(40 + 1 / 24), 'a different tile each 24th of a second');
+    assert.ok(made.length === 0 || made.every((c) => c.width !== 128), 'no tile is rebuilt');
   });
 });
 
@@ -236,7 +237,12 @@ test('Achievement Unlocked: WELCOME TO HD on arriving, 10G on every point, slidi
   assert.ok(t.y < 8 - 52, 'it starts above the frame');
   t = toast(Object.assign(g, { time: 100.1 }));
   assert.ok(t.y > -60 && t.y < 8, 'and slides down');
-  for (const time of [100.3, 101.2, 102.2]) assert.strictEqual(toast(Object.assign(g, { time })).y, 8, `held at y 8 (${time})`);
+  // Frames arrive every few milliseconds in play; a gap of more than half a
+  // second is an arrival, so walk the hold a tenth of a second at a time.
+  for (let k = 3; k <= 22; k++) {
+    const time = 100 + k / 10;
+    assert.strictEqual(toast(Object.assign(g, { time })).y, 8, `held at y 8 (${time})`);
+  }
   t = toast(Object.assign(g, { time: 102.4 }));
   assert.ok(t.y < 8, 'then slides back up');
   assert.strictEqual(toast(Object.assign(g, { time: 102.6 })), null, 'gone after 2.5 s');
