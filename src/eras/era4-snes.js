@@ -158,7 +158,7 @@
   // the same picture turned to another hue, both lit for dusk once, in code.
   var BALLOONS = [
     { x: 170, y: 66, h: 38, speed: 3, swap: false },
-    { x: 600, y: 30, h: 26, speed: 2, swap: true }
+    { x: 600, y: 96, h: 26, speed: 2, swap: true }      // low over the mountains, clear of the score
   ];
   var WRAP = 880;                    // drift off the right, back in on the left
   var PYLONS = [120, 300, 500, 680]; // field x, on the floor's far edge
