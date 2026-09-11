@@ -72,7 +72,7 @@ done. The repo itself binds nothing.
 node --test
 ```
 
-From the repo root, Node 18+. **351 tests, about two seconds** (1.8 s measured by item 1181, with all eleven eras built). It is the headless suite over the pure rules
+From the repo root, Node 18+. **373 tests, about three seconds** (2.7 s measured by item 1181 on master 1c8c0c3 merged in, with all eleven eras built). It is the headless suite over the pure rules
 in `src/game.js` — paddle bounces and their angles, wall bounces, scoring on each side, the serve
 reset, frame-rate independence and the era ladder — plus the era-look checks, which draw on a
 recording canvas and need no browser, and the sound checks (`test/sound.test.js`), which drive the
