@@ -94,7 +94,7 @@
   // One block per rung. Era 0 has none: the 1972 machine stays bars and a dot.
   var ERAS = {
     1:  { skin: '#d4a060', body: '#2c3c9c', scale: 2.5 },                    // Atari 2600
-    2:  { skin: '#fcbcb0', body: '#0000bc', scale: 2.5 },                    // NES
+    2:  { sheets: { left: 'era2-sheet-left', right: 'era2-sheet-right' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' }, // NES (item 1225: assets/pixellab/era2-players-sheet.mjs)
     3:  { skin: '#eeaa88', body: '#222266', scale: 2.5, res: 2 },            // Genesis
     // Super Nintendo (item 1227): two hover pilots, built from one pixellab pose
     // each by assets/pixellab/era4-players-build.mjs. The glove is on the frame's
@@ -376,8 +376,9 @@
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
+    // Headless there is no Image to load into, and the loader throws: that is
+    // "not loaded", and the placeholder draws (item 1225, the first real sheet).
     var image;
-    // No Image to load with (node --test): the placeholder stands in, as before a sheet loads.
     try { image = S.load(cfg.sheet); } catch (e) { return null; }
     if (!S.ready(cfg.sheet)) return null;
     var rects = {};
