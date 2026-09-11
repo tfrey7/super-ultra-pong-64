@@ -76,7 +76,7 @@ done. The repo itself binds nothing.
 node --test
 ```
 
-From the repo root, Node 18+. **333 tests, about two seconds** (2.3 s measured by item 1157, with all eleven eras built). It is the headless suite over the pure rules
+From the repo root, Node 18+. **373 tests, about three seconds** (2.7 s measured by item 1181 on master 1c8c0c3 merged in, with all eleven eras built). It is the headless suite over the pure rules
 in `src/game.js` — paddle bounces and their angles, wall bounces, scoring on each side, the serve
 reset, frame-rate independence and the era ladder — plus the era-look checks, which draw on a
 recording canvas and need no browser, and the sound checks (`test/sound.test.js`), which drive the
@@ -203,7 +203,12 @@ his emulator — never touch either.**
   the final one, so a hit and a bounce in one frame would lose a note. `src/sound.js` reads the list
   and writes nothing, plays the real game only (never the attract rally), and opens no audio until
   `begin()` in `src/main.js` unlocks it from a click or key -- browsers refuse sound before that.
-  An era's voice is its row in `VOICES` in `src/sound.js`.
+  An era's voice is its row in `VOICES` in `src/sound.js` (eras 0 to 4) or its look's `voice`
+  (eras 5 up), and every note field and effect in `docs/ERAS.md` section 3 is played (item 1181).
+  **Eras 0 to 4 are pinned call for call**: `tools/sound-eras0-4.json` holds every node, ramp and
+  connection they schedule, and a test compares the live player against it. A change to the player
+  that should leave them alone must leave that test green; a deliberate change to one of those
+  voices re-records it with `node tools/soundtrace.js`, committed with the change and said so.
 - **Nothing under `test/` may be a helper.** `node --test` runs every `.js` file under `test/`,
   which is why the era-look loader and scenes live in `tools/eralooks.js`.
 - **The computer paddle is deliberately beatable** — it only chases once the ball heads its way,

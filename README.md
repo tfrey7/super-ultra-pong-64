@@ -129,7 +129,7 @@ The point of the layout is that later eras are additions, not rewrites.
 | `src/game.js` | **The rules.** Pure state plus one `step(state, dt, intent)`. No canvas, no DOM, no timers, no input devices — which is why the tests can run headless. |
 | `src/render.js` | **The look.** Draws a state onto a canvas. Reads the state; never changes it. |
 | `src/input.js` | **The hands.** Turns mouse and keyboard into a plain intent object (`pointerY`, `up`, `down`). Knows nothing about the rules. |
-| `src/sound.js` | **The voice.** Each era's notes (`VOICES`), and a player that plays the step's `state.events` through Web Audio. Reads the state; never changes it. Silent until the first click or key. |
+| `src/sound.js` | **The voice.** Each era's notes (`VOICES` for eras 0 to 4, each 3D look's `voice` above them), and a player that plays the step's `state.events` through Web Audio -- oscillators, FM, noise, filters, unison, tremolo and drive, through each era's own echo, reverb and filter bus. Reads the state; never changes it. Silent until the first click or key. |
 | `src/main.js` | The loop that ties them together and hands `step` the real elapsed time. |
 | `src/eras/` | **One file per era**, each registering that era's look with the renderer. |
 | `test/game.test.js` | The headless suite over `src/game.js`, plus the era-look checks. |
