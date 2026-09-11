@@ -1,0 +1,192 @@
+{
+ "taken": "2026-09-11T04:29:40.985Z",
+ "eras": {
+  "5": {
+   "calm": {
+    "era": 5,
+    "intensity": 0,
+    "scheduled": 52,
+    "errors": 0,
+    "audio": "running",
+    "score": "0-0",
+    "rally": 0,
+    "booked3s": 48,
+    "pre": 0.07021588832139969,
+    "post": 0.0939716249704361,
+    "over": 0,
+    "reads": 60
+   },
+   "peak": {
+    "era": 5,
+    "intensity": 1,
+    "scheduled": 251,
+    "errors": 0,
+    "audio": "running",
+    "score": "5-5",
+    "rally": 12,
+    "booked3s": 179,
+    "pre": 0.12033494561910629,
+    "post": 0.17839601635932922,
+    "over": 0,
+    "reads": 60
+   }
+  },
+  "6": {
+   "calm": {
+    "era": 6,
+    "intensity": 0,
+    "scheduled": 27,
+    "errors": 0,
+    "audio": "running",
+    "score": "0-0",
+    "rally": 0,
+    "booked3s": 22,
+    "pre": 0.0532822459936142,
+    "post": 0.07899070531129837,
+    "over": 0,
+    "reads": 58
+   },
+   "peak": {
+    "era": 6,
+    "intensity": 1,
+    "scheduled": 167,
+    "errors": 0,
+    "audio": "running",
+    "score": "5-5",
+    "rally": 12,
+    "booked3s": 133,
+    "pre": 0.14759309589862823,
+    "post": 0.21880608797073364,
+    "over": 0,
+    "reads": 58
+   }
+  },
+  "7": {
+   "calm": {
+    "era": 7,
+    "intensity": 0,
+    "scheduled": 68,
+    "errors": 0,
+    "audio": "running",
+    "score": "0-0",
+    "rally": 0,
+    "booked3s": 62,
+    "pre": 0.07870203256607056,
+    "post": 0.10917999595403671,
+    "over": 0,
+    "reads": 58
+   },
+   "peak": {
+    "era": 7,
+    "intensity": 1,
+    "scheduled": 243,
+    "errors": 0,
+    "audio": "running",
+    "score": "5-5",
+    "rally": 12,
+    "booked3s": 155,
+    "pre": 0.14872846007347107,
+    "post": 0.22048920392990112,
+    "over": 0,
+    "reads": 49
+   }
+  },
+  "8": {
+   "calm": {
+    "era": 8,
+    "intensity": 0,
+    "scheduled": 65,
+    "errors": 0,
+    "audio": "running",
+    "score": "0-0",
+    "rally": 0,
+    "booked3s": 56,
+    "pre": 0.10448411107063293,
+    "post": 0.15489721298217773,
+    "over": 0,
+    "reads": 42
+   },
+   "peak": {
+    "era": 8,
+    "intensity": 1,
+    "scheduled": 263,
+    "errors": 0,
+    "audio": "running",
+    "score": "5-5",
+    "rally": 12,
+    "booked3s": 178,
+    "pre": 0.129250168800354,
+    "post": 0.19161270558834076,
+    "over": 0,
+    "reads": 41
+   }
+  },
+  "9": {
+   "calm": {
+    "era": 9,
+    "intensity": 0,
+    "scheduled": 34,
+    "errors": 0,
+    "audio": "running",
+    "score": "0-0",
+    "rally": 0,
+    "booked3s": 31,
+    "pre": 0.030986662954092026,
+    "post": 0.04453035071492195,
+    "over": 0,
+    "reads": 43
+   },
+   "peak": {
+    "era": 9,
+    "intensity": 1,
+    "scheduled": 280,
+    "errors": 0,
+    "audio": "running",
+    "score": "5-5",
+    "rally": 12,
+    "booked3s": 221,
+    "pre": 0.12559431791305542,
+    "post": 0.18619300425052643,
+    "over": 0,
+    "reads": 39
+   }
+  },
+  "10": {
+   "calm": {
+    "era": 10,
+    "intensity": 0,
+    "scheduled": 76,
+    "errors": 0,
+    "audio": "running",
+    "score": "0-0",
+    "rally": 0,
+    "booked3s": 64,
+    "pre": 0.02236594632267952,
+    "post": 0.03209930285811424,
+    "over": 0,
+    "reads": 34
+   },
+   "peak": {
+    "era": 10,
+    "intensity": 1,
+    "scheduled": 278,
+    "errors": 0,
+    "audio": "running",
+    "score": "5-5",
+    "rally": 12,
+    "booked3s": 177,
+    "pre": 0.20279836654663086,
+    "post": 0.3006476163864136,
+    "over": 0,
+    "reads": 35
+   },
+   "hot": {
+    "boostDb": 18,
+    "pre": 1.61696457862854,
+    "post": 0.8338302373886108,
+    "over": 0,
+    "reads": 35
+   }
+  }
+ }
+}

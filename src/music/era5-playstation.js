@@ -37,12 +37,21 @@
   },
   chain: { chorus: { rate: 0.5, depth: 0.003, mix: 0.2 } },
 
-  // 5 -- 1995 PlayStation: the SPU's 24 voices of compressed samples, and
-  // its hardware reverb.
+  // 5 -- 1994 PlayStation: the SPU's 24 voices of compressed samples, and
+  // its hardware reverb. Item 1243: Ridge Racer's rave and wipEout's club
+  // sound, built the way a 1994 techno record builds.
+  //   intro  (0)    the pad, the squelchy stabs, the rolling bass, a soft
+  //                 four-on-the-floor and the melody on the smooth lead
+  //   build  (0.3)  the Reese bass, the 909 hats open, the clap, a snare
+  //                 roll doubling into every section, the orchestra hit on B
+  //   climax (0.7)  the jungle break at double time over the four-on-the-
+  //                 floor, orchestra hits into each section, the lead doubled
+  //                 an octave up as a gated rave riff, a ride of 16th hats
   name: 'PlayStation',
-  about: 'Ambient techno: a soft four-on-the-floor under lush seventh-chord pads, squelchy off-beat stabs and a rolling bass, the melody on a smooth sampled lead, the whole mix breathing through a slow resonant filter sweep and washing out in reverb and a dotted-eighth delay.',
-  trait: 'CD-era sequenced samples: a slightly grainy compressed edge, real chords for the first time, resonant filter sweeps and the SPU\'s built-in reverb.',
+  about: 'Rave and techno, Ridge Racer and wipEout: lush seventh-chord pads, squelchy off-beat stabs and a rolling bass over a four-on-the-floor; as the rally builds a Reese bass growls in, the 909 hats open, a snare roll doubles into every section and the 90s orchestra hit slams the B section; at the top a jungle break races at double time and the lead doubles an octave up, the whole mix breathing through a slow resonant filter sweep.',
+  trait: 'CD-era sequenced samples: a slightly grainy compressed edge, real chords for the first time, resonant filter sweeps, the orchestra-hit sample every 1994 record used, and the SPU\'s built-in reverb.',
   parts: [
+    // ---------------------------------------------------------- the intro
     { play: 'melody', rule: 'full',
       voice: { wave: 'triangle', gain: 0.085, unison: [6],
                env: { a: 0.012, d: 0.3, s: 0.65, r: 0.25 }, legato: 0.9,
@@ -56,16 +65,37 @@
       voice: { wave: 'sawtooth', gain: 0.03, env: { a: 0.001, d: 0.16, s: 0, r: 0.04 },
                filter: { type: 'lowpass', freq: 3400, q: 9, sweep: { to: 380, time: 0.13 } } } },
     { play: 'bass', rule: 'octaves',
-      voice: { wave: 'sawtooth', gain: 0.12, env: { a: 0.002, d: 0.1, s: 0.45, r: 0.03 }, legato: 0.8,
+      voice: { wave: 'sawtooth', gain: 0.11, env: { a: 0.002, d: 0.1, s: 0.45, r: 0.03 }, legato: 0.8,
                filter: { type: 'lowpass', freq: 900, q: 7, sweep: { to: 200, time: 0.11 } } } },
     { play: 'drum', pattern: 'X . . . x . . . X . . . x . . .',
       voice: { wave: 'kick', freq: 115, gain: 0.3, env: { a: 0.001, d: 0.2, s: 0, r: 0.02 } } },
-    { play: 'drum', pattern: '. . x . . . x . . . x . . . x .', fill: '. . x . . . x . . . x . x x x x',
-      voice: { wave: 'noise', gain: 0.04, pan: 0.3, env: { a: 0.001, d: 0.05, s: 0, r: 0.01 },
-               filter: { type: 'highpass', freq: 8500, q: 0.7 } } },
-    { play: 'drum', pattern: '. . . . x . . . . . . . x . . .',
-      voice: { wave: 'noise', gain: 0.06, pan: -0.2, env: { a: 0.001, d: 0.14, s: 0, r: 0.04 },
-               filter: { type: 'bandpass', freq: 1500, q: 0.8 } } }
+    { play: 'drum', hit: 'hat', pattern: '. . x . . . x . . . x . . . x .' },
+    // ---------------------------------------------------------- the build
+    // The Reese: two saws a few cents apart under a low-pass, the growl of
+    // every 1994 jungle record, an octave under the bass line.
+    { play: 'bass', rule: 'held', octave: -1, from: 0.3,
+      voice: { wave: 'sawtooth', gain: 0.08, unison: [-16, 16], spread: 0.4,
+               env: { a: 0.01, d: 0.2, s: 0.85, r: 0.08 }, legato: 0.96,
+               filter: { type: 'lowpass', freq: 520, q: 2 } } },
+    { play: 'drum', hit: 'open', from: 0.3, pattern: '. . X . . . X . . . X . . . X .' },
+    { play: 'drum', hit: 'clap', from: 0.3, pattern: '. . . . X . . . . . . . X . . .' },
+    // The techno build: a snare roll doubling from quarters to eighths to
+    // sixteenths over the last bar of every section.
+    { play: 'drum', hit: 'snare', from: 0.3,
+      pattern: '. . . . . . . . . . . . . . . .', fill: 'x . . . x . . . x . x . x x X X' },
+    { play: 'drum', hit: 'hit', from: 0.3, sections: ['B'],
+      pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .' },
+    // --------------------------------------------------------- the climax
+    // The jungle break: an Amen-shaped snare and kick at double time.
+    { play: 'drum', hit: 'snare', from: 0.7, pattern: '. . . . X . . x . x X . . x X .' },
+    { play: 'drum', hit: 'kick', from: 0.7, pattern: 'X . X . . . . . . . X X . . . .' },
+    { play: 'drum', hit: 'hat', from: 0.7, pattern: 'x x . x x x . x x x . x x x . x' },
+    { play: 'drum', hit: 'hit', from: 0.7,
+      pattern: '. . . . . . . . . . . . . . . .', fill: 'X . . X . . X . . . . . . . . .' },
+    // The lead doubled an octave up, gated into sixteenths: the rave riff.
+    { play: 'melody', rule: 'arp', speed: 1, shape: [12, 12, 0, 12], octave: 0, from: 0.7,
+      voice: { wave: 'pulse25', gain: 0.035, env: { a: 0.001, d: 0.06, s: 0.3, r: 0.03 }, legato: 0.6,
+               filter: { type: 'lowpass', freq: 4200, q: 3, sweep: { to: 1400, time: 0.08 } } } }
   ],
   effects: { crush: 8, sweep: { freq: 2600, depth: 2100, bars: 4, q: 5 },
              echo: { time: 0.34, feedback: 0.32, mix: 0.22 },
