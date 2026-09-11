@@ -96,7 +96,15 @@
     1:  { skin: '#d4a060', body: '#2c3c9c', scale: 2.5 },                    // Atari 2600
     2:  { skin: '#fcbcb0', body: '#0000bc', scale: 2.5 },                    // NES
     3:  { skin: '#eeaa88', body: '#222266', scale: 2.5, res: 2 },            // Genesis
-    4:  { skin: '#f8c8a0', body: '#384878', scale: 2.5, res: 2 },            // Super Nintendo
+    // Super Nintendo (item 1227): two hover pilots, built from one pixellab pose
+    // each by assets/pixellab/era4-players-build.mjs. The glove is on the frame's
+    // right edge, so the figure stands wholly behind its paddle; at 1.2 a frame
+    // is 38 x 121 field units, the pad's back rim just past the wall. miss has
+    // two frames (the pad there and gone), so at fps 12 the conceding pad blinks.
+    4:  { skin: '#f8c8a0', body: '#384878', res: 2,
+          sheets: { left: 'era4-players-left', right: 'era4-players-right' },
+          frame: { w: 32, h: 101 }, hand: { x: 32, y: 41 }, scale: 1.2, fps: 12,
+          frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
@@ -360,7 +368,9 @@
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
-    var image = S.load(cfg.sheet);
+    var image;
+    // No Image to load with (node --test): the placeholder stands in, as before a sheet loads.
+    try { image = S.load(cfg.sheet); } catch (e) { return null; }
     if (!S.ready(cfg.sheet)) return null;
     var rects = {};
     for (var row = 0; row < BEATS.length; row++) {

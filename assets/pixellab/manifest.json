@@ -1227,6 +1227,100 @@
         "direction": "east",
         "no_background": true
       }
+    },
+    {
+      "name": "era4-players-left",
+      "file": "era4-players-left.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4102,
+      "date": "2026-09-11T03:22:43.007Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 96,
+        "height": 606
+      },
+      "bytes": 13669,
+      "sha256": "b634003b385ff5e610fdab67f4c1259de8b802b1e623ce0f4854099bcf24bb3a",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: red and white racing suit, round red helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4102,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era4-pilot-left.png",
+      "derivedBy": "node assets/pixellab/era4-players-build.mjs",
+      "how": "the one pose cut into the rig's six beats (idle, up, down, swing, miss, win; 2/2/2/3/2/2 frames), jet flame and raised arms drawn in code, 15-bit SNES colour, capped at #f8f8d0; frame 32x101, hand (32, 41)",
+      "card": "item 1227",
+      "verdict": "worn by era 4's players (src/characters.js, ERAS[4].sheets)"
+    },
+    {
+      "name": "era4-players-right",
+      "file": "era4-players-right.png",
+      "prompt": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+      "size": {
+        "width": 32,
+        "height": 128
+      },
+      "style": {
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 4103,
+      "date": "2026-09-11T03:23:02.185Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "pixels": {
+        "width": 96,
+        "height": 606
+      },
+      "bytes": 9292,
+      "sha256": "0cc9924325b70aacce2e229b8d5b8d99e5de6c2c10a5794be2cab53e9fb4e1ca",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "16-bit Super Nintendo sprite of a small hover-racing pilot standing facing right, side view, full body: blue and yellow racing suit, round blue helmet with a dark visor band and a white highlight, one arm stretched forward holding something, standing on a small grey hover disc pad, Super Mario World style soft saturated shading",
+        "image_size": {
+          "width": 32,
+          "height": 128
+        },
+        "seed": 4103,
+        "outline": "single color outline",
+        "shading": "detailed shading",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era4-pilot-right.png",
+      "derivedBy": "node assets/pixellab/era4-players-build.mjs",
+      "how": "the one pose cut into the rig's six beats (idle, up, down, swing, miss, win; 2/2/2/3/2/2 frames), jet flame and raised arms drawn in code, 15-bit SNES colour, capped at #f8f8d0; frame 32x101, hand (32, 41)",
+      "card": "item 1227",
+      "verdict": "worn by era 4's players (src/characters.js, ERAS[4].sheets)"
     }
   ]
 }
