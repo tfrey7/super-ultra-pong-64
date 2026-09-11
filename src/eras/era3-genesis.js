@@ -22,10 +22,21 @@
  * recording canvas in tools/eralooks.js can check it headless. A dimmed frame
  * (the attract rally behind the title) is the stock frame, as in every era.
  *
- * Arrival flourish: none yet, so the plain ring brings this era in. An era
- * brings its own by adding `flourish: function (ctx, p, origin, fromEra, toEra,
- * info)` to its look -- called every frame of the ring that brings THIS era in,
- * drawn over the ring's edge; the header of src/erachange.js is the contract.
+ * Arrival flourish: THE SHATTER. The old picture breaks like glass from the
+ * spot where the ball went out. The field around that point is cut into a
+ * fixed set of angular shards -- bands out from the origin, each band split
+ * into irregular wedges -- seeded from the origin itself, so the same point
+ * always shatters the same way. As the ring's edge reaches a shard it cracks
+ * in place, a clipped copy of the old era's frame with a lit edge; once the
+ * ring passes its middle it breaks loose, spins, and flies out away from the
+ * origin, shrinking as it goes, over the new era with its parallax planes
+ * already scrolling. A shard's flight is measured in ring radius and ends
+ * exactly when the ring reaches the far corner, so every shard has gone by
+ * the end of the wipe and nothing is left over play. Drawn only: polygon
+ * clips of one offscreen copy of the old frame, moved with transforms -- no
+ * per-pixel work -- and the ring stays the truth of which era is where.
+ * The sound half is the Genesis `score` row in src/sound.js: a point's note is
+ * the era it moved up TO, so that row plays exactly as this era arrives.
  */
 (function (root) {
   'use strict';
@@ -235,11 +246,278 @@
     if (state.serveDelay <= 0) drawBall(ctx, state);
   }
 
+  // ------------------------------------------------ the arrival: the shatter
+  var SHATTER = {
+    firstBand: 46,      // how deep the innermost band of shards is, in field units
+    growth: 1.24,       // each band out is this much deeper than the one inside it
+    wedge: 92,          // about how long a shard's outer edge is
+    minWedges: 5,
+    maxWedges: 36,
+    maxFlight: 300,     // ring radius a loose shard takes to fly off, at most
+    throwDist: 640,     // how far a shard has been thrown when its flight ends
+    edgeInk: '#b6dbff', // the lit edge of the glass (on the palette)
+    shadow: 'rgba(0,0,36,0.55)'
+  };
+
+  /** A small seeded generator (mulberry32): the same seed, the same sequence. */
+  function seeded(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** The seed for a break: the origin, rounded to the field unit. */
+  function shatterSeed(origin) {
+    return ((Math.round(origin.x) * 73856093) ^ (Math.round(origin.y) * 19349663) ^ 0x5e6a) >>> 0;
+  }
+
+  var shardCache = { key: '', list: null };
+
+  function edgePoints(pts, ox, oy, radius, a0, a1) {
+    if (!(radius > 0)) { pts.push(ox, oy); return; }
+    pts.push(ox + Math.cos(a0) * radius, oy + Math.sin(a0) * radius);
+    if (Math.abs(a1 - a0) * radius > 50) {
+      var am = (a0 + a1) / 2;
+      pts.push(ox + Math.cos(am) * radius, oy + Math.sin(am) * radius);
+    }
+    pts.push(ox + Math.cos(a1) * radius, oy + Math.sin(a1) * radius);
+  }
+
+  /**
+   * The shards for a break at origin on a width x height field: a fixed list,
+   * the same for the same point every time. Bands out from the origin, each cut
+   * into irregular wedges whose sides twist a little between their inner and
+   * outer ends, so the pieces read as broken glass rather than a dartboard.
+   * Shards wholly off the field are left out. Each shard is
+   *   pts   [x0, y0, x1, y1, ...] its corners in field units
+   *   cx,cy its centre     box  [x, y, w, h] on the field, for the copy
+   *   near  where the ring first touches it     mid  where it breaks loose
+   *   dirX, dirY  the way it is thrown           spin radians over its flight
+   *   throwK      how hard it is thrown (about 1)
+   */
+  function shards(origin, width, height) {
+    var key = Math.round(origin.x) + ',' + Math.round(origin.y) + ',' + width + ',' + height;
+    if (shardCache.key === key) return shardCache.list;
+    var rand = seeded(shatterSeed(origin));
+    var ox = origin.x;
+    var oy = origin.y;
+    var fx = Math.max(ox, width - ox);
+    var fy = Math.max(oy, height - oy);
+    var reach = Math.sqrt(fx * fx + fy * fy) + 40;
+    var TAU = Math.PI * 2;
+    var list = [];
+    var inner = 0;
+    var depth = SHATTER.firstBand;
+    while (inner < reach) {
+      var outer = inner + depth * (0.8 + 0.4 * rand());
+      var n = Math.max(SHATTER.minWedges,
+        Math.min(SHATTER.maxWedges, Math.round(TAU * outer / SHATTER.wedge)));
+      var step = TAU / n;
+      var start = rand() * TAU;
+      var cuts = [];
+      var k;
+      // Cut angles jittered by a quarter wedge and twisted by a fifth, so two
+      // neighbouring cuts can never cross.
+      for (k = 0; k < n; k++) {
+        var a = start + (k + (rand() - 0.5) * 0.5) * step;
+        cuts.push([a, a + (rand() - 0.5) * 0.4 * step]);
+      }
+      for (k = 0; k < n; k++) {
+        var c0 = cuts[k];
+        var c1 = cuts[(k + 1) % n];
+        var wrap = k === n - 1 ? TAU : 0;
+        var pts = [];
+        edgePoints(pts, ox, oy, inner, c0[0], c1[0] + wrap);
+        var outerPts = [];
+        edgePoints(outerPts, ox, oy, outer, c0[1], c1[1] + wrap);
+        for (var j = outerPts.length - 2; j >= 0; j -= 2) pts.push(outerPts[j], outerPts[j + 1]);
+
+        var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        var sx = 0, sy = 0, count = pts.length / 2;
+        for (j = 0; j < pts.length; j += 2) {
+          sx += pts[j]; sy += pts[j + 1];
+          if (pts[j] < minX) minX = pts[j];
+          if (pts[j] > maxX) maxX = pts[j];
+          if (pts[j + 1] < minY) minY = pts[j + 1];
+          if (pts[j + 1] > maxY) maxY = pts[j + 1];
+        }
+        var bx = Math.max(0, Math.floor(minX));
+        var by = Math.max(0, Math.floor(minY));
+        var bw = Math.min(width, Math.ceil(maxX)) - bx;
+        var bh = Math.min(height, Math.ceil(maxY)) - by;
+        // Two draws of rand per shard happen whether it is kept or not, so a
+        // shard's throw never depends on which of its neighbours were culled.
+        var throwAngle = (rand() - 0.5) * 0.7;
+        var spinDraw = rand();
+        if (bw <= 0 || bh <= 0) continue;
+        var cx = sx / count;
+        var cy = sy / count;
+        var d = Math.sqrt((cx - ox) * (cx - ox) + (cy - oy) * (cy - oy));
+        var base = d > 0.001 ? Math.atan2(cy - oy, cx - ox) : spinDraw * TAU;
+        list.push({
+          pts: pts, cx: cx, cy: cy, box: [bx, by, bw, bh],
+          // The chord between two corners dips inside the circle, so the ring
+          // touches a shard a little before it reaches the corners.
+          near: Math.max(0, inner * Math.cos(Math.min(Math.PI / 2, step)) - 2),
+          mid: d,
+          dirX: Math.cos(base + throwAngle), dirY: Math.sin(base + throwAngle),
+          spin: (spinDraw < 0.5 ? -1 : 1) * (2 + spinDraw * 6),
+          throwK: 0.75 + 0.5 * rand()
+        });
+      }
+      inner = outer;
+      depth *= SHATTER.growth;
+    }
+    shardCache = { key: key, list: list };
+    return list;
+  }
+
+  /**
+   * Where one shard is when the ring's edge is at `radius` and will end at
+   * `reach`: null while the ring has not reached it (the old frame is still
+   * whole there) and null once its flight is over; otherwise
+   *   { phase: 'crack' | 'fly', q, x, y, angle, scale, alpha }
+   * with x, y its offset from where it sat. A flight lasts at most maxFlight of
+   * ring radius and never past `reach`, so at the end of the wipe every shard
+   * has flown.
+   */
+  function shardPose(s, radius, reach) {
+    if (!(radius > s.near) || !(radius < reach)) return null;
+    if (radius < s.mid) {
+      return { phase: 'crack', q: 0, x: 0, y: 0, angle: 0, scale: 1, alpha: 1,
+               glint: (radius - s.near) / Math.max(1, s.mid - s.near) };
+    }
+    var span = Math.min(SHATTER.maxFlight, reach - s.mid);
+    if (!(span > 0)) return null;
+    var q = (radius - s.mid) / span;
+    if (q >= 1) return null;
+    var travel = SHATTER.throwDist * s.throwK * (0.3 * q + 0.7 * q * q);
+    return {
+      phase: 'fly', q: q,
+      x: s.dirX * travel, y: s.dirY * travel,
+      angle: s.spin * q * (0.6 + 0.4 * q),
+      scale: (1 - q * q) * (1 + 0.35 * q),
+      alpha: q < 0.7 ? 1 : (1 - q) / 0.3,
+      glint: 1 - q
+    };
+  }
+
+  // One offscreen copy of the old era's frame, redrawn each frame of the ring
+  // from the live state, so the paddles in the flying glass still move.
+  var oldCanvas = null;
+
+  function oldFrame(state, fromEra, dim, w, h) {
+    if (typeof document === 'undefined' || !document.createElement) return null;
+    if (!oldCanvas) oldCanvas = document.createElement('canvas');
+    if (oldCanvas.width !== w) oldCanvas.width = w;
+    if (oldCanvas.height !== h) oldCanvas.height = h;
+    var o = oldCanvas.getContext('2d');
+    o.setTransform(1, 0, 0, 1, 0, 0);
+    o.clearRect(0, 0, w, h);
+    o.save();
+    R.draw(o, Object.assign({}, state, { era: fromEra }), dim ? { ink: dim } : undefined);
+    o.restore();
+    return oldCanvas;
+  }
+
+  function tracePath(ctx, pts) {
+    ctx.beginPath();
+    ctx.moveTo(pts[0], pts[1]);
+    for (var i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]);
+    ctx.closePath();
+  }
+
+  function placeShard(ctx, s, pose, dx, dy) {
+    ctx.translate(s.cx + pose.x + dx, s.cy + pose.y + dy);
+    ctx.rotate(pose.angle);
+    ctx.scale(pose.scale, pose.scale);
+    ctx.translate(-s.cx, -s.cy);
+  }
+
+  function drawShard(ctx, s, pose, src, edge, dim) {
+    if (pose.phase === 'fly' && !dim) {
+      // Its shadow on the new era below, falling further as it rises.
+      ctx.save();
+      var lift = 6 + 22 * pose.q;
+      placeShard(ctx, s, pose, lift, lift);
+      ctx.globalAlpha = pose.alpha;
+      tracePath(ctx, s.pts);
+      ctx.fillStyle = SHATTER.shadow;
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.save();
+    placeShard(ctx, s, pose, 0, 0);
+    ctx.globalAlpha = pose.alpha;
+    tracePath(ctx, s.pts);
+    if (src) {
+      ctx.save();
+      ctx.clip();
+      var b = s.box;
+      ctx.drawImage(src, b[0], b[1], b[2], b[3], b[0], b[1], b[2], b[3]);
+      ctx.restore();
+    }
+    ctx.globalAlpha = pose.alpha * (0.35 + 0.65 * pose.glint);
+    ctx.lineWidth = 2 / Math.max(0.25, pose.scale);
+    ctx.strokeStyle = edge;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /**
+   * The flourish hook (src/erachange.js is the contract). Draws the impact
+   * flash, the cracking shards on the ring's edge, then the loose ones flying
+   * over the new era. Returns how many shards it drew.
+   */
+  function shatter(ctx, p, origin, fromEra, toEra, info) {
+    var r = info.radius;
+    if (!(r > 0) || !(p > 0) || p >= 1) return 0;
+    var w = info.width;
+    var h = info.height;
+    var reach = r / p;              // the ring's radius is p x its full reach
+    var dim = info.dim || null;
+    var edge = dim || SHATTER.edgeInk;
+    var list = shards(origin, w, h);
+    var src = oldFrame(info.state, fromEra, dim, w, h);
+
+    // The impact: a white flash at the point, gone by a fifth of the way.
+    if (p < 0.2 && ctx.createRadialGradient) {
+      var f = 1 - p / 0.2;
+      var g = ctx.createRadialGradient(origin.x, origin.y, 0, origin.x, origin.y, 60 + 260 * p);
+      g.addColorStop(0, 'rgba(255,255,255,' + (0.85 * f).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(182,219,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    var flying = [];
+    var drawn = 0;
+    for (var i = 0; i < list.length; i++) {
+      var pose = shardPose(list[i], r, reach);
+      if (!pose) continue;
+      if (pose.phase === 'fly') { flying.push(list[i], pose); continue; }
+      drawShard(ctx, list[i], pose, src, edge, dim);
+      drawn += 1;
+    }
+    for (var k = 0; k < flying.length; k += 2) {
+      drawShard(ctx, flying[k], flying[k + 1], src, edge, dim);
+      drawn += 1;
+    }
+    return drawn;
+  }
+
   R.registerEra({
     era: 3,
     name: '1989 Sega Genesis',
     paddleInk: paddleInk,
     draw: draw,
+    flourish: shatter,
+    shatter: { shards: shards, pose: shardPose, seed: shatterSeed, SHATTER: SHATTER },
     planes: planes,
     onPalette: onPalette,
     LEVELS: LEVELS,

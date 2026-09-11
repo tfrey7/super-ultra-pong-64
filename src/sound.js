@@ -77,9 +77,17 @@
     {
       paddle: [{ wave: 'sine', freq: 880, dur: 0.12, gain: 0.28, fm: { ratio: 3.5, index: 2.2 } }],
       wall:   [{ wave: 'sine', freq: 587, dur: 0.08, gain: 0.24, fm: { ratio: 2, index: 1.6 } }],
+      // A point's note is the era it moves the machine up TO, so this row plays
+      // exactly once a session: as the Genesis arrives and the NES picture
+      // shatters (the flourish in src/eras/era3-genesis.js). It is a sting --
+      // a growling FM slap bass dropping an octave, a metallic hit on top, and
+      // the bright bell stab riding in over them.
       score: [
-        { wave: 'sine', freq: 659, at: 0.00, dur: 0.18, gain: 0.26, fm: { ratio: 3.5, index: 2.5 } },
-        { wave: 'sine', freq: 988, at: 0.12, dur: 0.34, gain: 0.26, fm: { ratio: 3.5, index: 2.5 } }
+        { wave: 'sine', freq: 82, slideTo: 41, dur: 0.70, gain: 0.46, fm: { ratio: 2, index: 5 } },
+        { wave: 'sine', freq: 165, slideTo: 82, dur: 0.34, gain: 0.26, fm: { ratio: 3, index: 3.5 } },
+        { wave: 'sine', freq: 220, dur: 0.10, gain: 0.2, fm: { ratio: 7.1, index: 9 } },
+        { wave: 'sine', freq: 659, at: 0.08, dur: 0.18, gain: 0.2, fm: { ratio: 3.5, index: 2.5 } },
+        { wave: 'sine', freq: 988, at: 0.18, dur: 0.40, gain: 0.2, fm: { ratio: 3.5, index: 2.5 } }
       ]
     },
     // 4 -- 1991 Super Nintendo: a fuller, softer sound -- each note a small
