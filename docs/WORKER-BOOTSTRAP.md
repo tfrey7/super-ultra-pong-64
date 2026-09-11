@@ -108,6 +108,7 @@ the farthest corner from where the ball went out, and a check that once the ring
 canvas matches the new era drawn offscreen more closely than the old one -- or, when the two eras
 draw the very same frame (a `like: N` stand-in), matches the new era exactly.
 The changes alternate sides (item 1174): a change out of an even era (0 to 1, 2 to 3, ...) starts its ring at the left edge, a real miss past the player, and a change out of an odd era (1 to 2, 3 to 4, ...) starts it at the right edge, the player's own point put just past the computer's paddle -- and a check names the edge each ring came from.
+At every rung it also **times one second of ordinary play** on the page's own frame clock (item 1192), with the computer's paddle held on the ball so no point goes in mid-reading, and prints one check per era with its mean, p95 and max frame: an era whose mean is over 18.5 ms (the same line the ring check uses) FAILs, because the ring check alone lets an era that is already slow pass by comparing the ring with it.
 `--ladder` runs only that walk (about a minute for all eleven rungs); `--scoring` runs only the
 rally and the scoring check (about fifteen seconds a run); `--reference` also copies its eleven era
 frames and ten change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
@@ -321,6 +322,14 @@ his emulator — never touch either.**
   worked example). `index.html?display=off` draws straight onto the page as before, and the
   playtest's pixel check reads the native frame through `PongDisplay.canvas()` and draws its
   comparisons through `PongDisplay.render()`.
+
+- **Six "holds full frame rate in ordinary play" FAILs, eras 5 to 10, are card 1216's, not yours**
+  (until 1216 lands). The playtest's Chrome runs `--disable-gpu`, so every canvas is drawn on the
+  CPU, and there the display layer's per-frame work puts the 3D eras at 18.8 to 26.3 ms a frame and
+  the Xbox 360 at 64.6 ms (item 1192, idle machine, master 1c8c0c3). With `?display=off` eras 5-9
+  hold 16.7 ms, and with the GPU allowed every era runs at 4.2 ms:
+  `node docs/measure/item1192/eraspeed.mjs` re-takes all four setups in about two minutes. A FAIL
+  on eras 0 to 4, or one far above those numbers, is new and is yours to look at.
 
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
