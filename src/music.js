@@ -153,6 +153,9 @@
   //   chain    the period's production between the effects and the bus:
   //            tone (a low-pass, Hz), tape: { wow, flutter, sat }, chorus:
   //            { rate, depth, mix }, hall: { seconds, decay, mix, gate? }
+  //   level    optional dB trim on the era's whole bus (item 1275): what keeps
+  //            every rung within about 4 dB of its neighbours at the same
+  //            stage of a match -- docs/measure/item1275/render.mjs measures it
   //   from     on any part: the intensity (0..1, intensityOf) it joins at; the
   //            engine adds its own LIFT layers (tom roll 0.7, crash 0.9) to any
   //            era with those kit pieces
@@ -911,8 +914,11 @@
       if (current) { fadeOut(current); music.crossfades += 1; }
       var arr = arrangementFor(era);
       var bus = ctx.createGain();
-      bus.gain.setValueAtTime(first ? 1 : 0.0001, t);
-      if (!first) bus.gain.linearRampToValueAtTime(1, t + FADE_S);
+      // An era's `level` (dB) trims its whole bus, so every rung sits within a
+      // few dB of its neighbours at an era change (item 1275).
+      var top = arr && arr.level ? dbToGain(arr.level) : 1;
+      bus.gain.setValueAtTime(first ? top : 0.0001, t);
+      if (!first) bus.gain.linearRampToValueAtTime(top, t + FADE_S);
       bus.connect(duck);
       music.lastSwitch = { from: current ? current.era : null, to: era,
                            bar: Math.floor(pos / theme.steps), step: pos % theme.steps };
