@@ -26,6 +26,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { nesPalette, encodePng } from './era2-nes-quantize.mjs';
 
@@ -133,7 +134,6 @@ export function buildSheet(side, pal = nesPalette()) {
   const inks = PLAYERS[side];
   const w = FRAME.w * COLS, h = FRAME.h * ROWS.length;
   const rgba = Buffer.alloc(w * h * 4);
-  const counts = { 2: 1, 3: 1, 4: 1, 5: 1 };
   const framesOf = { idle: 2, up: 2, down: 2, swing: 3, miss: 1, win: 2 };
   ROWS.forEach((beat, row) => {
     for (let i = 0; i < framesOf[beat]; i++) {
@@ -152,18 +152,67 @@ export function buildSheet(side, pal = nesPalette()) {
       }
     }
   });
-  void counts;
   return { width: w, height: h, rgba };
+}
+
+// What each of the four era 2 player generations came to (item 1225).
+const VERDICTS = {
+  'era2-players-left': 'rejected: the 30 x 264 sprite sheet came back almost empty (a dozen stray pixels down a clear strip); pixflux does not draw a 3 x 6 sheet from a row-by-row prompt',
+  'era2-players-right': 'rejected: the same as era2-players-left -- a near-empty strip',
+  'era2-player-left-pose': 'reference only: a good 32 x 64 standing pose, but 28 pixels wide with the fists out and the room behind a paddle is 10; its headband, colours and big head are what era2-sheet-left.png is drawn to',
+  'era2-player-right-pose': 'reference only: as era2-player-left-pose, for the rival in the blue cap; era2-sheet-right.png is drawn to it'
+};
+
+/** The manifest, brought up to date: verdicts on the four generations, and one derived entry per sheet. */
+export function updateManifest(written) {
+  const file = path.join(HERE, 'manifest.json');
+  const m = JSON.parse(fs.readFileSync(file, 'utf8'));
+  for (const e of m.images) if (VERDICTS[e.name]) { e.verdict = VERDICTS[e.name]; e.card = 'item 1225'; }
+  for (const { side, buf, width, height } of written) {
+    const pose = m.images.find((e) => e.name === `era2-player-${side}-pose`);
+    const entry = {
+      name: `era2-sheet-${side}`,
+      file: `era2-sheet-${side}.png`,
+      prompt: pose.prompt,
+      size: { width, height },
+      style: pose.style,
+      seed: pose.seed,
+      date: pose.date,
+      cost: { type: 'derived', generations: 0 },
+      derivedFrom: pose.file,
+      derivedBy: 'node assets/pixellab/era2-players-sheet.mjs',
+      how: 'drawn pixel by pixel in the script from the art bible\'s era 2 silhouette (head 8 x 9, torso 8 x 14, legs 3 x 16, back-edge outline, hand at 10,22) in NES inks, the pose image as the reference for who the character is; six rows (idle, up, down, swing, miss, win) of 3 frames of 10 x 44',
+      card: 'item 1225',
+      verdict: 'worn by the ' + (side === 'left' ? 'player' : 'computer') + ' on era 2 (src/characters.js, the NES block\'s sheets.' + side + ')',
+      pixels: { width, height },
+      bytes: buf.length,
+      sha256: crypto.createHash('sha256').update(buf).digest('hex'),
+      endpoint: pose.endpoint,
+      request: pose.request
+    };
+    // Filed before the poses: a derived entry carries its pose's date, and the
+    // pixellab tool reads the cost of one image off the LAST of the newest
+    // entries (tools/pixellab.mjs describeCostOfOne), which must be a billed one.
+    const at = m.images.findIndex((e) => e.name === entry.name);
+    if (at >= 0) m.images.splice(at, 1);
+    m.images.splice(m.images.findIndex((e) => e.name === 'era2-player-left-pose'), 0, entry);
+  }
+  fs.writeFileSync(file, JSON.stringify(m, null, 2) + '\n');
 }
 
 export function main(log = console.log) {
   const pal = nesPalette();
+  const written = [];
   for (const side of ['left', 'right']) {
     const img = buildSheet(side, pal);
     const file = path.join(HERE, `era2-sheet-${side}.png`);
-    fs.writeFileSync(file, encodePng(img.width, img.height, img.rgba));
+    const buf = encodePng(img.width, img.height, img.rgba);
+    fs.writeFileSync(file, buf);
+    written.push({ side, buf, width: img.width, height: img.height });
     log(`${path.basename(file)}: ${img.width} x ${img.height}`);
   }
+  updateManifest(written);
+  log('manifest.json: verdicts on the 4 generations, 2 derived sheet entries');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main();

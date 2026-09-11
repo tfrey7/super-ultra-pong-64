@@ -974,7 +974,9 @@
         "detail": "low detail",
         "view": "side",
         "no_background": true
-      }
+      },
+      "verdict": "rejected: the 30 x 264 sprite sheet came back almost empty (a dozen stray pixels down a clear strip); pixflux does not draw a 3 x 6 sheet from a row-by-row prompt",
+      "card": "item 1225"
     },
     {
       "name": "era2-players-right",
@@ -1017,6 +1019,106 @@
         "shading": "basic shading",
         "detail": "low detail",
         "view": "side",
+        "no_background": true
+      },
+      "verdict": "rejected: the same as era2-players-left -- a near-empty strip",
+      "card": "item 1225"
+    },
+    {
+      "name": "era2-sheet-left",
+      "file": "era2-sheet-left.png",
+      "prompt": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12253,
+      "date": "2026-09-11T03:23:42.867Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "era2-player-left-pose.png",
+      "derivedBy": "node assets/pixellab/era2-players-sheet.mjs",
+      "how": "drawn pixel by pixel in the script from the art bible's era 2 silhouette (head 8 x 9, torso 8 x 14, legs 3 x 16, back-edge outline, hand at 10,22) in NES inks, the pose image as the reference for who the character is; six rows (idle, up, down, swing, miss, win) of 3 frames of 10 x 44",
+      "card": "item 1225",
+      "verdict": "worn by the player on era 2 (src/characters.js, the NES block's sheets.left)",
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 870,
+      "sha256": "4ffc5907cf8d40030280e5364f9026e68b123f2aa09e75c2d53f4e62ee159038",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player boy standing, side view facing right, red headband, white shirt, white shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12253,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era2-sheet-right",
+      "file": "era2-sheet-right.png",
+      "prompt": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+      "size": {
+        "width": 30,
+        "height": 264
+      },
+      "style": {
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 12254,
+      "date": "2026-09-11T03:24:06.548Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "derivedFrom": "era2-player-right-pose.png",
+      "derivedBy": "node assets/pixellab/era2-players-sheet.mjs",
+      "how": "drawn pixel by pixel in the script from the art bible's era 2 silhouette (head 8 x 9, torso 8 x 14, legs 3 x 16, back-edge outline, hand at 10,22) in NES inks, the pose image as the reference for who the character is; six rows (idle, up, down, swing, miss, win) of 3 frames of 10 x 44",
+      "card": "item 1225",
+      "verdict": "worn by the computer on era 2 (src/characters.js, the NES block's sheets.right)",
+      "pixels": {
+        "width": 30,
+        "height": 264
+      },
+      "bytes": 879,
+      "sha256": "74a3985417508b362bc756f1f0da991488eb376c5d540adc873e848f48cc81a2",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "NES 8-bit sprite, full body tennis player rival standing, side view facing right, blue cap, green shirt, dark blue shorts, orange skin, both fists held forward at chest height, big head, Super Mario Bros style",
+        "image_size": {
+          "width": 32,
+          "height": 64
+        },
+        "seed": 12254,
+        "outline": "single color black outline",
+        "shading": "basic shading",
+        "detail": "low detail",
+        "view": "side",
+        "direction": "east",
         "no_background": true
       }
     },
@@ -1064,7 +1166,9 @@
         "view": "side",
         "direction": "east",
         "no_background": true
-      }
+      },
+      "verdict": "reference only: a good 32 x 64 standing pose, but 28 pixels wide with the fists out and the room behind a paddle is 10; its headband, colours and big head are what era2-sheet-left.png is drawn to",
+      "card": "item 1225"
     },
     {
       "name": "era2-player-right-pose",
@@ -1110,7 +1214,9 @@
         "view": "side",
         "direction": "east",
         "no_background": true
-      }
+      },
+      "verdict": "reference only: as era2-player-left-pose, for the rival in the blue cap; era2-sheet-right.png is drawn to it",
+      "card": "item 1225"
     }
   ]
 }
