@@ -1,0 +1,10 @@
+﻿item 1291 before: . (G:\Claude Stuff\super-ultra-pong-64-item-1291)
+era 5; shot -> docs\shots\item-1291\before-era5-rally.png
+slab {"gl":true,"material":"MeshStandardMaterial","flat":false,"map":null,"affine":false,"rail":"MeshStandardMaterial"}
+frame window 1: 181 frames, mean 16.67 ms, p95 16.80 ms; 3D layer 182 draws at 1.87 ms each
+frame window 2: 155 frames, mean 19.57 ms, p95 33.40 ms; 3D layer 232 draws at 2.85 ms each
+frame window 3: 102 frames, mean 29.57 ms, p95 33.40 ms; 3D layer 124 draws at 3.42 ms each
+frame mean of the three windows: 21.94 ms a frame, 2.71 ms a 3D draw
+edge: the left bat's box [129,314,159,384] (ink #8cc8e8) on the 800 x 600 page, ?display=off
+edge: the bat's left edge over 58 rows, as [x, from row, rows]: [[140,320,8],[138,328,22],[135,350,28]]
+edge: 2 of 3 edge positions sit on a 2.5-pixel chunk boundary (x = 0, 2, 5, 7, 10, 12 ...); 1 of 1 inner runs are whole chunks tall (2 or 3 rows, or a multiple of 2.5 rounded)
