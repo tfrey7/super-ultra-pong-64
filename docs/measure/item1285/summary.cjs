@@ -6,7 +6,7 @@
 // ab-* = before, with one thing switched off by --pre (see each file's "pre")
 const fs = require('fs');
 const p = 'docs/measure/item1285/';
-const files = fs.readdirSync(p).filter((f) => /^pace-(before|after|final|early-raws|ab-.*)(-\d)?\.json$/.test(f)).sort();
+const files = fs.readdirSync(p).filter((f) => /^pace-(before|after|final|merged|master95ae|early-raws|ab-.*)(-\d)?\.json$/.test(f)).sort();
 for (const f of files) {
   const d = JSON.parse(fs.readFileSync(p + f));
   const rows = d.climb.filter((x) => x.ringMaxFrameMs !== undefined);

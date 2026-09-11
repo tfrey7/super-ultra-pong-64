@@ -444,14 +444,21 @@ Item 1203 traced 100-117 ms of shader compiles there, for era looks nothing had 
   wider than its band (about 0.57 s): each a rounded or circular fill of a new kind, and each a
   GPU program built mid-ring. At 1920x1080 with the GPU on that was two 58-83 ms frames on 3 of
   3 fresh climbs of master fc17b35; every flourish off, 29 ms; shadow alone or conic gradient
-  alone off, no change. `warmFlourishes` in `src/erachange.js` now draws every arrival's flourish
-  at nine raw moments of its ring (`WARM_RAWS`), on a layer shaped like the canvas the real ring
-  lands on then (the leaving era's surface until the ring covers the centre, the arriving era's
-  after, as `PongDisplay` sizes them), and copies the layer. The first ring is 29-33 ms after and
-  the Nintendo 64's -- the same two-hitch pattern, 71-76 ms before -- 42 ms
-  (`docs/measure/item1285/`, `pace-before-*` / `pace-after-*`). A new flourish is warmed for
-  free; one whose draws switch on at a moment none of `WARM_RAWS` reaches is not, so add the
-  moment. `docs/measure/item1285/probe.mjs` lists every canvas draw kind first seen during each
+  alone off, no change; on master 95ae4b9, 71-121 ms. `warmFlourishes` in `src/erachange.js` now
+  draws every arrival's flourish at eleven raw moments of its ring (`WARM_RAWS`), on a layer shaped
+  like the canvas the real ring lands on then (the leaving era's surface until the ring covers the
+  centre, the arriving era's after, as `PongDisplay` sizes them), and copies the layer, with
+  `eraChangedAt: -1` so no era's private "which arrival is playing" memory takes it for a real
+  one. Both hitches are gone on 9 of 9 climbs after; the Nintendo 64's arrival -- the same
+  two-hitch pattern in its own flourish, 71-76 ms before -- is 29-50 ms, and the PlayStation's
+  one frame at 0.11 s went once the two earliest moments were added (21-37 ms on the merged
+  tree). It costs the page 20 ms more at load. What is LEFT on the first ring is a third frame, at
+  about 0.8 s, when the ring covers the centre and the display switches to era 1: 54-71 ms on 3 of
+  3 merged climbs, and on master too (67-71 ms beside the other two); `probe.mjs` lists only the
+  display switch's draws as new there (era 1's native 160 x 192 frame and its RF tube's copies,
+  the roll band and snow on the page). A new flourish is warmed for free; one whose draws switch
+  on at a moment none of `WARM_RAWS` reaches is not, so add the moment. The readings are in
+  `docs/measure/item1285/` (`node docs/measure/item1285/summary.cjs`). `docs/measure/item1285/probe.mjs` lists every canvas draw kind first seen during each
   change, and that copy of `pace.mjs` takes `--pre "<expr>"` (an A/B switch run before the
   coin) and `--stop-after N`. `PongRender.ERA_CHANGE.warmMs` reports what the warm-up cost.
 - **A flourish that draws something no ring has drawn before brings a hitch back** as a GPU
