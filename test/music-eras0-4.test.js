@@ -101,6 +101,51 @@ function disjoint(parts) {
   return true;
 }
 
+/** A silent stand-in for the Web Audio API on a clock the test moves: every node and param, nothing else. */
+function silentContext(clock) {
+  const param = () => ({ value: 0, setValueAtTime() {}, linearRampToValueAtTime() {}, cancelScheduledValues() {},
+    exponentialRampToValueAtTime(v) { if (!(v > 0)) throw new RangeError('exponential ramp to ' + v); } });
+  const node = (extra) => Object.assign({ connect(to) { return to; }, disconnect() {}, start() {}, stop() {} }, extra);
+  return class {
+    constructor() { this.sampleRate = 8000; this.state = 'running'; this.destination = node(); }
+    get currentTime() { return clock.now; }
+    createOscillator() { return node({ frequency: param(), detune: param(), setPeriodicWave() {} }); }
+    createGain() { return node({ gain: param() }); }
+    createBiquadFilter() { return node({ frequency: param(), Q: param() }); }
+    createDelay() { return node({ delayTime: param() }); }
+    createConvolver() { return node(); }
+    createWaveShaper() { return node(); }
+    createStereoPanner() { return node({ pan: param() }); }
+    createDynamicsCompressor() { return node({ threshold: param(), knee: param(), ratio: param(), attack: param(), release: param() }); }
+    createPeriodicWave() { return {}; }
+    createBuffer(ch, len) { const d = new Float32Array(len); return { getChannelData: () => d }; }
+    createBufferSource() { return node(); }
+  };
+}
+
+test('up the ladder from the cabinet to the PlayStation, every change cross-fades at the bar and beat the tune had reached', () => {
+  const clock = { now: 0 };
+  const music = M.createMusic({ AudioContext: silentContext(clock) });
+  music.unlock();
+  const game = { phase: 'playing', era: 0, rally: 6, score: { left: 0, right: 0 }, rules: { matchPoints: 11 }, events: [], time: 0 };
+  for (let era = 0; era <= 5; era++) {
+    const before = music.position();
+    game.era = era;
+    game.score.left = era;   // a point per rung, as in a real match
+    const booked = music.scheduled;
+    for (let t = 0; t < 2.5; t += 0.05) { clock.now += 0.05; game.time += 0.05; music.update(game); }
+    assert.ok(music.scheduled > booked, 'era ' + era + ' books notes of its own');
+    if (era > 0) {
+      assert.deepStrictEqual({ bar: music.lastSwitch.bar, step: music.lastSwitch.step }, before,
+        `the change into era ${era} starts at the bar and beat era ${era - 1} had reached`);
+      assert.strictEqual(music.lastSwitch.from, era - 1);
+    }
+    assert.strictEqual(music.era, era);
+  }
+  assert.strictEqual(music.crossfades, 5);
+  assert.strictEqual(music.errors, 0, 'every era 0-4 note booked cleanly on the audio clock');
+});
+
 test('era 0, the 1972 cabinet, against the sheet: one beeper, and its blips quicken toward match point', () => {
   const { arr } = againstTheSheet(0);
   assert.ok(arr.parts.filter((p) => p.play !== 'drum').every((p) => p.rule === 'bones'), 'the melody is only ever hinted');
