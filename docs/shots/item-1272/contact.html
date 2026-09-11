@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><title>era3-barbarian: old and new</title>
+<style>body{background:#16161c;color:#e8e8e0;font:14px Consolas,monospace;margin:16px}
+h1{font-size:18px;margin:0 0 8px}.row{display:flex;gap:40px;align-items:flex-start;margin:10px 0}
+.col{display:flex;flex-direction:column;gap:6px}img{image-rendering:pixelated;background:#2a2c34}
+.lab{color:#9a9ca8}.num{white-space:pre;color:#c8e8c8;margin-top:12px}</style>
+<h1>era3-barbarian: old and new</h1>
+<div class="lab">game scale: one sheet pixel at the rig's 3.2x on the 800 x 600 page (what stands behind the paddle)</div>
+<div class="row"><div class="col"><span>OLD (pixellab, on screen today)</span><img src="../../../assets/pixellab/era3-p1.png" width="192" height="480"></div>
+<div class="col"><span>NEW (tools/spritegen.mjs)</span><img src="../../../assets/spritegen/era3-barbarian.png" width="192" height="480"></div></div>
+<div class="lab">4x</div>
+<div class="row"><div class="col"><span>OLD</span><img src="../../../assets/pixellab/era3-p1.png" width="240" height="600"></div>
+<div class="col"><span>NEW</span><img src="../../../assets/spritegen/era3-barbarian.png" width="240" height="600"></div></div>
+<div class="num">era3-barbarian: era 3 (Sega Genesis), 60 x 150 sheet, 12 frames of 20 x 25
+old: faults 1  colours 46  frames 12 (11 unique)  46 colours used; one Sega Genesis sprite palette holds 15
+new: faults 0  colours 14  frames 12 (9 unique)  opaque/frame 311  outline 35.4%  detail 10.2%
+prompt: The Genesis left player: a Golden Axe barbarian facing right, horned steel helmet, red beard, bare chest, fur loincloth, fur-cuffed boots, round wooden shield on the back arm, the front fist on the frame's right edge where the paddle is held. One character in every frame: same helmet, same shield, same costume.
+one sheet took 3.7 minutes of drawing (a Claude run authoring the grid); the tool builds it in 17 ms</div>
