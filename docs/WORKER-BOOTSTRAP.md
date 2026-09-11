@@ -275,6 +275,14 @@ his emulator — never touch either.**
   9952. Trust the call's own `cost` in the manifest, not `generationsUsed` (which records 0 for
   that image), for what one image costs.
 
+- **The ball carries more than its position and velocity** (item 1208): `ball.spin` bends its
+  flight and `ball.burst` is a smash's extra speed, and each paddle has a smoothed `vy`. Anything
+  that copies the ball to replay it -- the scripted scoring hand's `snapshotOf`/`copyOf`, the
+  playtest's `state()` -- must copy spin and burst too, or it plans against a straight ball that
+  is not coming. The spin read for the computer is `Pong.spinBend(state, x)` times
+  `rules.cpuSpinRead`; a spin change is re-measured with `node tools/beatability-sample.mjs`,
+  whose `track` row must stay between 35 and 60 percent (55.7 when item 1208 tuned it).
+
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
 
