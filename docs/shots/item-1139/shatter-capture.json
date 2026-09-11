@@ -1,0 +1,52 @@
+{
+  "url": "file:///G:/Claude%20Stuff/super-ultra-pong-64-item-1139/index.html?era=2",
+  "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "when": "2026-09-11T00:29:27.046Z",
+  "change": {
+    "from": 2,
+    "to": 3
+  },
+  "baseline": {
+    "frames": 240,
+    "mean": 4.17,
+    "p95": 4.3,
+    "max": 4.3
+  },
+  "during": {
+    "frames": 324,
+    "mean": 4.33,
+    "p95": 4.3,
+    "max": 25
+  },
+  "fullRate": true,
+  "shots": [
+    {
+      "file": "docs/shots/item-1139/shatter-mid.png",
+      "at": {
+        "p": 0.35757828176947587,
+        "wiping": true,
+        "from": 2,
+        "era": 3
+      }
+    },
+    {
+      "file": "docs/shots/item-1139/shatter-late.png",
+      "at": {
+        "p": 0.764665560054514,
+        "wiping": true,
+        "from": 2,
+        "era": 3
+      }
+    },
+    {
+      "file": "docs/shots/item-1139/shatter-after.png",
+      "at": {
+        "p": 1,
+        "wiping": false,
+        "from": 2,
+        "era": 3
+      }
+    }
+  ],
+  "pageErrors": []
+}
