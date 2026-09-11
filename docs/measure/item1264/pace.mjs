@@ -159,7 +159,7 @@ function line(kind, x) {
   return `${kind.padEnd(5)} era ${String(x.era).padStart(2)}: clock ${x.clock.toFixed(3)}  ball ${x.ballTablePerS.toFixed(3)} tables/s` +
     ` (screen ${x.ballScreenPerS.toFixed(3)})  rules ${x.rulesSpeedTablePerGameS.toFixed(3)}/game s` +
     `  hit-stop ${(x.hitStopShare * 100).toFixed(1)}%  slow ${(x.slowShare * 100).toFixed(1)}%  hits ${x.hits}` +
-    `  frame ${x.frameMs} ms (max ${x.maxFrameMs}, >50ms ${x.framesOver50ms})` + (x.pauseS !== undefined ? `  pause before ${x.pauseS} s` : '');
+    `  frame ${x.frameMs} ms (max ${x.maxFrameMs}, >50ms ${x.framesOver50ms})` + (x.pauseS !== undefined ? `  pause before ${x.pauseS} s (ring max ${x.ringMaxFrameMs} ms)` : '');
 }
 
 async function startGame(s) {
@@ -189,27 +189,34 @@ async function climb(s) {
   await sleep(900);
   await startGame(s);
   await waitFor(s, 'window.__pong.phase === "playing"', 3000);
-  let pauseS;
+  let pauseS, ringMax, ringLong;
   for (let rung = 0; rung <= 10; rung++) {
     const x = summarise(await s.eval(readingExpr(rung, SECONDS)));
-    if (pauseS !== undefined) x.pauseS = pauseS;
+    if (pauseS !== undefined) { x.pauseS = pauseS; x.ringMaxFrameMs = ringMax; x.ringLongFrames = ringLong; }
     rows.push(x);
     console.log(line('climb', x));
     if (x.longFrames.length) console.log('      long frames ' + JSON.stringify(x.longFrames));
+    if (x.ringLongFrames && x.ringLongFrames.length) console.log('      ring long frames ' + JSON.stringify(x.ringLongFrames));
     if (rung === 10) break;
     // One point: the ball put just past the computer's paddle, heading out; then
     // the real time until the next serve leaves the centre.
-    pauseS = await s.eval(`new Promise((done) => {
+    // Item 1264: the arrival itself (the ring and the name card, inside the serve
+    // pause) is timed too, frame by frame, since the reading above starts only once
+    // the serve leaves the centre. ringMaxFrameMs / ringLongFrames on the next row.
+    const pause = await s.eval(`new Promise((done) => {
       const g = window.__pong, r = g.right;
       g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0;
-      let t0 = null;
+      let t0 = null, last = null, max = 0; const long = [];
       function tick(now) {
+        if (last !== null && t0 !== null) { const dt = now - last; if (dt > max) max = dt; if (dt > 50) long.push({ ms: Math.round(dt), at: +((now - t0) / 1000).toFixed(2) }); }
+        last = now;
         if (t0 === null && g.era === ${rung + 1}) t0 = now;
-        if (t0 !== null && g.serveDelay <= 0) return done(+((now - t0) / 1000).toFixed(3));
-        if (t0 === null || now - t0 < 8000) requestAnimationFrame(tick); else done(-1);
+        if (t0 !== null && g.serveDelay <= 0) return done({ s: +((now - t0) / 1000).toFixed(3), max: +max.toFixed(1), long });
+        if (t0 === null || now - t0 < 8000) requestAnimationFrame(tick); else done({ s: -1, max: +max.toFixed(1), long });
       }
       requestAnimationFrame(tick);
     })`);
+    pauseS = pause.s; ringMax = pause.max; ringLong = pause.long;
   }
   return rows;
 }
