@@ -8,7 +8,11 @@
  * do. The 1972 arcade has no sound chip, so it only taps the melody's bones
  * over the cabinet's hum; the Atari plays it on two out-of-tune squares; the
  * NES on its pulse, triangle and noise channels; the Genesis as an FM groove;
- * the Super Nintendo as a small orchestra in the echo.
+ * the Super Nintendo as a small orchestra in the echo. Then the 3D table: the
+ * PlayStation as grainy ambient techno under a filter sweep, the Nintendo 64
+ * as a muffled synth orchestra, the Dreamcast as bright jazzy chords over a
+ * breakbeat, the PlayStation 2 as a wide dark film score, the Xbox as
+ * drop-tuned rock and the Xbox 360 as big-room with a wobbling bass.
  *
  * Every arrangement shares the bar count and the tempo, so the song position
  * is ONE clock: at an era change the old arrangement fades out and the new one
@@ -17,7 +21,7 @@
  *
  * Two halves, kept apart like src/sound.js:
  *   - THEME and ARRANGEMENTS are plain data, so a stranger adds an era's
- *     arrangement without reading the player. Rows 5 to 10 are empty slots.
+ *     arrangement without reading the player. A row may be null (silence).
  *     arrange() turns theme + arrangement into the notes of the loop.
  *   - createMusic() books those notes AHEAD on the audio clock (a lookahead
  *     scheduler: each tick books every step that starts in the next LOOKAHEAD
@@ -260,16 +264,213 @@
       effects: { lowpass: 5200, echo: { time: 0.23, feedback: 0.38, mix: 0.35 } }
     },
 
-    // 5 to 10 -- the 3D table, PlayStation to Xbox 360. Empty slots: the next
-    // card fills each one with another arrangement of the same THEME, in the
-    // format above. Until then an empty slot plays silence (the effects still
-    // sound).
-    null, // 5 PlayStation
-    null, // 6 Nintendo 64
-    null, // 7 Dreamcast
-    null, // 8 PlayStation 2
-    null, // 9 Xbox
-    null  // 10 Xbox 360
+    // 5 -- 1995 PlayStation: the SPU's 24 voices of compressed samples, and
+    // its hardware reverb.
+    {
+      name: 'PlayStation',
+      about: 'Ambient techno: a soft four-on-the-floor under lush seventh-chord pads, squelchy off-beat stabs and a rolling bass, the melody on a smooth sampled lead, the whole mix breathing through a slow resonant filter sweep and washing out in reverb and a dotted-eighth delay.',
+      trait: 'CD-era sequenced samples: a slightly grainy compressed edge, real chords for the first time, resonant filter sweeps and the SPU\'s built-in reverb.',
+      parts: [
+        { play: 'melody', rule: 'full',
+          voice: { wave: 'triangle', gain: 0.085, unison: [6],
+                   env: { a: 0.012, d: 0.3, s: 0.65, r: 0.25 }, legato: 0.9,
+                   filter: { type: 'lowpass', freq: 3200, q: 0.9 },
+                   vibrato: { rate: 5, cents: 10, delay: 0.25 } } },
+        { play: 'chords', rule: 'pad', voicing: 'seventh',
+          voice: { wave: 'sawtooth', gain: 0.03, unison: [-10, 10], spread: 0.6,
+                   env: { a: 0.6, d: 0.5, s: 0.85, r: 0.8 }, legato: 0.98,
+                   filter: { type: 'lowpass', freq: 1700, q: 0.8 } } },
+        { play: 'chords', rule: 'rhythm', pattern: '. . x . . . x . . . x . . . x .',
+          voice: { wave: 'sawtooth', gain: 0.03, env: { a: 0.001, d: 0.16, s: 0, r: 0.04 },
+                   filter: { type: 'lowpass', freq: 3400, q: 9, sweep: { to: 380, time: 0.13 } } } },
+        { play: 'bass', rule: 'octaves',
+          voice: { wave: 'sawtooth', gain: 0.12, env: { a: 0.002, d: 0.1, s: 0.45, r: 0.03 }, legato: 0.8,
+                   filter: { type: 'lowpass', freq: 900, q: 7, sweep: { to: 200, time: 0.11 } } } },
+        { play: 'drum', pattern: 'X . . . x . . . X . . . x . . .',
+          voice: { wave: 'kick', freq: 115, gain: 0.3, env: { a: 0.001, d: 0.2, s: 0, r: 0.02 } } },
+        { play: 'drum', pattern: '. . x . . . x . . . x . . . x .', fill: '. . x . . . x . . . x . x x x x',
+          voice: { wave: 'noise', gain: 0.04, pan: 0.3, env: { a: 0.001, d: 0.05, s: 0, r: 0.01 },
+                   filter: { type: 'highpass', freq: 8500, q: 0.7 } } },
+        { play: 'drum', pattern: '. . . . x . . . . . . . x . . .',
+          voice: { wave: 'noise', gain: 0.06, pan: -0.2, env: { a: 0.001, d: 0.14, s: 0, r: 0.04 },
+                   filter: { type: 'bandpass', freq: 1500, q: 0.8 } } }
+      ],
+      effects: { crush: 8, sweep: { freq: 2600, depth: 2100, bars: 4, q: 5 },
+                 echo: { time: 0.34, feedback: 0.32, mix: 0.22 },
+                 reverb: { seconds: 2.2, decay: 3, mix: 0.3 } }
+    },
+
+    // 6 -- 1996 Nintendo 64: samples squeezed onto a cartridge, played by the
+    // RSP, so everything sounds muffled and bathed in reverb.
+    {
+      name: 'Nintendo 64',
+      about: 'Synth-orchestral: a fat, slowly vibrating string pad, brassy stabs punching the chords, the melody on a breathy flute in the A section and a proud horn in the B, bowed basses, timpani and a crash at each section, all a little muffled and swimming in a big hall reverb.',
+      trait: 'Cartridge-squeezed samples: the whole mix rolled off above about 9 kHz, orchestral pads and brass, and a big reverb over everything.',
+      parts: [
+        { play: 'melody', rule: 'full', sections: ['A'],
+          voice: { wave: 'triangle', gain: 0.085, env: { a: 0.04, d: 0.25, s: 0.75, r: 0.2 }, legato: 0.92,
+                   filter: { type: 'lowpass', freq: 2600, q: 0.7 },
+                   vibrato: { rate: 5.2, cents: 16, delay: 0.18 } } },
+        { play: 'melody', rule: 'full', sections: ['B'],
+          voice: { wave: 'sawtooth', gain: 0.065, unison: [6], env: { a: 0.05, d: 0.25, s: 0.8, r: 0.2 }, legato: 0.92,
+                   filter: { type: 'lowpass', freq: 1500, q: 1.2 },
+                   vibrato: { rate: 5, cents: 14, delay: 0.25 } } },
+        { play: 'chords', rule: 'pad',
+          voice: { wave: 'sawtooth', gain: 0.028, unison: [-13, -5, 6, 12], spread: 0.6,
+                   env: { a: 0.45, d: 0.4, s: 0.85, r: 0.7 }, legato: 0.98,
+                   filter: { type: 'lowpass', freq: 2100, q: 0.7 },
+                   vibrato: { rate: 4.4, cents: 8, delay: 0.3 } } },
+        { play: 'chords', rule: 'rhythm', pattern: 'X . . x . . x . . . . . x . . .', fill: 'X . . x . . x . . . x . X . X .',
+          voice: { wave: 'sawtooth', gain: 0.04, unison: [8],
+                   env: { a: 0.015, d: 0.16, s: 0.45, r: 0.1 }, legato: 0.8,
+                   filter: { type: 'lowpass', freq: 850, q: 1.5, sweep: { to: 2700, time: 0.07 } } } },
+        { play: 'bass', rule: 'held',
+          voice: { wave: 'sawtooth', gain: 0.1, env: { a: 0.08, d: 0.3, s: 0.8, r: 0.25 }, legato: 0.95,
+                   filter: { type: 'lowpass', freq: 420, q: 0.8 } } },
+        { play: 'drum', pattern: 'X . . . . . . . x . . . . . . .', fill: 'X . . . . . . . x . . . x . x x',
+          voice: { wave: 'kick', freq: 95, gain: 0.26, env: { a: 0.002, d: 0.4, s: 0, r: 0.05 } } },
+        { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
+          voice: { wave: 'noise', gain: 0.06, env: { a: 0.002, d: 1.2, s: 0, r: 0.1 },
+                   filter: { type: 'highpass', freq: 4500, q: 0.6 } } }
+      ],
+      effects: { lowpass: 9000, reverb: { seconds: 3.2, decay: 2.5, mix: 0.42 } }
+    },
+
+    // 7 -- 1998 Dreamcast: the AICA's 64 voices at full CD quality, and a
+    // proper effects DSP.
+    {
+      name: 'Dreamcast',
+      about: 'Bright and upbeat: jazzy ninth chords comped on an electric piano, a funky bass popping octaves, the melody on a crisp synth lead, a vibraphone climbing the chords in the B section, over a swung breakbeat with ghost-note snares, a sizzling ride and a crash at each section.',
+      trait: 'Crisp, full-band sound for the first time: clean bright chords with real extensions, a breakbeat with real cymbals, and no filter muffling the top end.',
+      swing: 0.12,
+      parts: [
+        { play: 'melody', rule: 'full',
+          voice: { wave: 'sawtooth', gain: 0.06, unison: [5], env: { a: 0.004, d: 0.2, s: 0.7, r: 0.1 }, legato: 0.85,
+                   filter: { type: 'lowpass', freq: 5200, q: 0.8 },
+                   vibrato: { rate: 6, cents: 14, delay: 0.15 } } },
+        { play: 'chords', rule: 'rhythm', voicing: 'ninth', pattern: 'x - . . . . x - . . x . . . . .',
+          fill: 'x - . . . . x - . . x . x . x .',
+          voice: { wave: 'sine', gain: 0.07, fm: { ratio: 1, index: 1.3 },
+                   env: { a: 0.002, d: 0.45, s: 0.3, r: 0.18 }, legato: 0.9 } },
+        { play: 'chords', rule: 'broken', voicing: 'seventh', octave: 1, sections: ['B'],
+          voice: { wave: 'sine', gain: 0.045, pan: 0.35, fm: { ratio: 3.5, index: 0.8 },
+                   env: { a: 0.002, d: 0.35, s: 0, r: 0.1 } } },
+        { play: 'bass', rule: 'octaves',
+          voice: { wave: 'sine', gain: 0.18, fm: { ratio: 1, index: 2 },
+                   env: { a: 0.002, d: 0.14, s: 0.35, r: 0.03 }, legato: 0.75 } },
+        { play: 'drum', pattern: 'X . x . . . . . . . x x . . . .', fill: 'X . x . . . . . . . x . x . x .',
+          voice: { wave: 'kick', freq: 140, gain: 0.38, env: { a: 0.001, d: 0.15, s: 0, r: 0.02 } } },
+        { play: 'drum', pattern: '. . . . X . . x . x . . X . . x', fill: '. . . . X . . x . x . . X x X X',
+          voice: { wave: 'noise', gain: 0.13, env: { a: 0.001, d: 0.12, s: 0, r: 0.03 },
+                   filter: { type: 'bandpass', freq: 2100, q: 0.7 } } },
+        { play: 'drum', pattern: 'X . x x X . x x X . x x X . x x',
+          voice: { wave: 'noise', gain: 0.03, pan: -0.35, env: { a: 0.001, d: 0.2, s: 0, r: 0.04 },
+                   filter: { type: 'highpass', freq: 6500, q: 0.6 } } },
+        { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
+          voice: { wave: 'noise', gain: 0.06, pan: 0.4, env: { a: 0.001, d: 1.1, s: 0, r: 0.1 },
+                   filter: { type: 'highpass', freq: 5000, q: 0.5 } } }
+      ],
+      effects: { reverb: { seconds: 1.2, decay: 4, mix: 0.16 } }
+    },
+
+    // 8 -- 2000 PlayStation 2: streamed film-score audio, wide and dark.
+    {
+      name: 'PlayStation 2',
+      about: 'Cinematic: slow, wide strings singing the melody over a dark string bed, a low A drone that never lets go, a deep eighth-note pulse under it and a heartbeat of distant drums that swell into taiko hits at the end of each section.',
+      trait: 'Film-score texture: slow strings spread wide across the stereo field, a low drone and a deep pulse, dark and rolled off, in a long hall.',
+      parts: [
+        { play: 'melody', rule: 'full',
+          voice: { wave: 'sawtooth', gain: 0.06, unison: [-8, 7], spread: 0.7,
+                   env: { a: 0.22, d: 0.3, s: 0.9, r: 0.5 }, legato: 0.98,
+                   filter: { type: 'lowpass', freq: 1500, q: 0.8 },
+                   vibrato: { rate: 4.6, cents: 12, delay: 0.3 } } },
+        { play: 'chords', rule: 'pad', octave: -1,
+          voice: { wave: 'sawtooth', gain: 0.03, unison: [-14, 13], spread: 1,
+                   env: { a: 0.9, d: 0.4, s: 0.9, r: 1.2 }, legato: 0.99,
+                   filter: { type: 'lowpass', freq: 900, q: 0.7 } } },
+        { play: 'bass', rule: 'eighths', octave: -1,
+          voice: { wave: 'triangle', gain: 0.22, env: { a: 0.004, d: 0.14, s: 0.25, r: 0.05 }, legato: 0.7,
+                   filter: { type: 'lowpass', freq: 320, q: 0.9 } } },
+        { play: 'drum', pattern: 'X . . x . . . . X . . x . . . .', fill: 'X . . x . . . . X . . . X . X X',
+          voice: { wave: 'kick', freq: 70, gain: 0.34, env: { a: 0.002, d: 0.35, s: 0, r: 0.05 } } }
+      ],
+      drone: [
+        { wave: 'sawtooth', freq: 55, gain: 0.045, filter: { type: 'lowpass', freq: 240, q: 1 },
+          wobble: { rate: 0.13, depth: 0.4 } },
+        { wave: 'sine', freq: 110, gain: 0.025 }
+      ],
+      effects: { lowpass: 4200, reverb: { seconds: 4, decay: 2, mix: 0.45 } }
+    },
+
+    // 9 -- 2001 Xbox: a PC sound chip in a box, streaming real recordings;
+    // the soundtrack goes guitar.
+    {
+      name: 'Xbox',
+      about: 'Drop-tuned rock: low palm-muted power-chord chugs double-tracked hard left and right, the melody screamed out on an overdriven lead guitar, a growling bass an octave down, a heavy kick and a cracking snare that rolls into each new section, with a crash to open it.',
+      trait: 'A guitar amp in software: a saw through a heavy drive, power chords tuned down low, a heavy kick and snare and wide stereo.',
+      parts: [
+        { play: 'melody', rule: 'full',
+          voice: { wave: 'sawtooth', gain: 0.055, drive: 0.6, env: { a: 0.004, d: 0.2, s: 0.8, r: 0.1 }, legato: 0.92,
+                   filter: { type: 'lowpass', freq: 3600, q: 1 },
+                   vibrato: { rate: 6.2, cents: 28, delay: 0.14 } } },
+        { play: 'chords', rule: 'rhythm', voicing: 'power', octave: -1,
+          pattern: 'X - x x X - x x X - x x X x X x', fill: 'X - x x X - x x X - X - X - X -',
+          voice: { wave: 'sawtooth', gain: 0.045, unison: [-9, 9], spread: 1, drive: 0.85,
+                   env: { a: 0.002, d: 0.08, s: 0.55, r: 0.03 }, legato: 0.8,
+                   filter: { type: 'lowpass', freq: 3000, q: 0.9 } } },
+        { play: 'bass', rule: 'eighths', octave: -1,
+          voice: { wave: 'sawtooth', gain: 0.12, drive: 0.25, env: { a: 0.002, d: 0.1, s: 0.6, r: 0.03 }, legato: 0.85,
+                   filter: { type: 'lowpass', freq: 520, q: 1 } } },
+        { play: 'drum', pattern: 'X . . . . . x . X . x . . . . .', fill: 'X . . . . . x . X x X x X x X x',
+          voice: { wave: 'kick', freq: 125, gain: 0.5, env: { a: 0.001, d: 0.14, s: 0, r: 0.02 } } },
+        { play: 'drum', pattern: '. . . . X . . . . . . . X . . .', fill: '. . . . X . . . . . X . X X X X',
+          voice: { wave: 'noise', gain: 0.2, env: { a: 0.001, d: 0.15, s: 0, r: 0.03 },
+                   filter: { type: 'bandpass', freq: 1900, q: 0.8 } } },
+        { play: 'drum', pattern: 'x . x . x . x . x . x . x . x .',
+          voice: { wave: 'noise', gain: 0.04, pan: 0.45, env: { a: 0.001, d: 0.05, s: 0, r: 0.01 },
+                   filter: { type: 'highpass', freq: 8000, q: 0.7 } } },
+        { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
+          voice: { wave: 'noise', gain: 0.07, pan: -0.45, env: { a: 0.001, d: 1.0, s: 0, r: 0.1 },
+                   filter: { type: 'highpass', freq: 4500, q: 0.5 } } }
+      ],
+      effects: { reverb: { seconds: 1, decay: 4, mix: 0.12 } }
+    },
+
+    // 10 -- 2005 Xbox 360: the big-room era; the soundtrack is a festival.
+    {
+      name: 'Xbox 360',
+      about: 'Big-room: a huge four-on-the-floor kick, a wobbling bass whose filter throbs twice a beat, supersaw pads pumping against the kick, the melody spun into bright plucked arpeggios the whole way through, and for the B section a wide supersaw lead on the tune itself, with a snare roll building into each section.',
+      trait: 'Big-room production: a bass filter driven by a tempo-locked LFO, side-chain pumping on the pads, arpeggios and a huge kick, wide and loud.',
+      parts: [
+        { play: 'melody', rule: 'arp', speed: 1, shape: [0, 12, 7, 12],
+          voice: { wave: 'sawtooth', gain: 0.055, unison: [8], spread: 0.5,
+                   env: { a: 0.001, d: 0.12, s: 0.25, r: 0.05 }, legato: 0.85,
+                   filter: { type: 'lowpass', freq: 3000, q: 3, sweep: { to: 900, time: 0.1 } } } },
+        { play: 'melody', rule: 'full', sections: ['B'],
+          voice: { wave: 'sawtooth', gain: 0.045, unison: [-15, -7, 7, 15], spread: 0.9,
+                   env: { a: 0.01, d: 0.2, s: 0.8, r: 0.15 }, legato: 0.92,
+                   filter: { type: 'lowpass', freq: 5000, q: 0.8 } } },
+        { play: 'chords', rule: 'pad',
+          voice: { wave: 'sawtooth', gain: 0.03, unison: [-12, -5, 5, 12], spread: 0.8, pump: 0.8,
+                   env: { a: 0.05, d: 0.3, s: 0.9, r: 0.3 }, legato: 0.98,
+                   filter: { type: 'lowpass', freq: 3500, q: 0.7 } } },
+        { play: 'bass', rule: 'held', octave: -1,
+          voice: { wave: 'sawtooth', gain: 0.13, unison: [-10, 10], drive: 0.3,
+                   env: { a: 0.005, d: 0.1, s: 0.9, r: 0.05 }, legato: 0.97,
+                   filter: { type: 'lowpass', freq: 900, q: 8, lfo: { perBeat: 2, depth: 0.88 } } } },
+        { play: 'bass', rule: 'held', octave: -1,
+          voice: { wave: 'sine', gain: 0.1, pump: 0.6, env: { a: 0.005, d: 0.1, s: 0.9, r: 0.05 }, legato: 0.97 } },
+        { play: 'drum', pattern: 'X . . . X . . . X . . . X . . .',
+          voice: { wave: 'kick', freq: 165, gain: 0.6, env: { a: 0.001, d: 0.3, s: 0, r: 0.03 } } },
+        { play: 'drum', pattern: '. . . . X . . . . . . . X . . .', fill: '. . . . X . . . X . X . X X X X',
+          voice: { wave: 'noise', gain: 0.16, env: { a: 0.001, d: 0.11, s: 0, r: 0.03 },
+                   filter: { type: 'bandpass', freq: 1250, q: 1 } } },
+        { play: 'drum', pattern: '. . x . . . x . . . x . . . x .',
+          voice: { wave: 'noise', gain: 0.05, pan: -0.3, env: { a: 0.001, d: 0.06, s: 0, r: 0.01 },
+                   filter: { type: 'highpass', freq: 9000, q: 0.7 } } }
+      ],
+      effects: { reverb: { seconds: 1.8, decay: 3, mix: 0.2 } }
+    }
   ];
 
   // ============================================================ the numbers
