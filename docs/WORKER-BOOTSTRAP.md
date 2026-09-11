@@ -353,6 +353,16 @@ his emulator — never touch either.**
   `node docs/measure/item1192/eraspeed.mjs` re-takes all four setups in about two minutes. A FAIL
   on eras 0 to 4, or one far above those numbers, is new and is yours to look at.
 
+- **The ball carries more than its position and velocity** (item 1208): `ball.spin` bends its
+  flight and `ball.burst` is a smash's extra speed, and each paddle has a smoothed `vy`. Anything
+  that copies the ball to replay it -- the scripted scoring hand's `snapshotOf`/`copyOf`, the
+  playtest's `state()` -- must copy spin and burst too, or it plans against a straight ball that
+  is not coming. The spin read for the computer is `Pong.spinBend(state, x)` times
+  `rules.cpuSpinRead`, left on `state.right.spinRead` every step for whichever opponent moves
+  the paddle (the era profiles in `src/opponents.js` add it to their target). A spin or paddle
+  change is re-measured with `node tools/beatability-sample.mjs` (its `track` row between 35
+  and 60 percent: 58.3 after item 1208) and `--eras` (every era 30 to 65, the top the hardest).
+
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
 
