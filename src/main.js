@@ -61,7 +61,39 @@
     // then its name card, all inside the serve pause.
     var drawField = PongRender.drawEraFrame || PongRender.draw;
 
+    // The display (src/display.js): each era drawn at its own machine's
+    // resolution, then scaled up onto this canvas. ?display=off skips it and
+    // draws straight on, in field units, the way the page did before.
+    var display = root.PongDisplay && root.PongDisplay.enabled ? root.PongDisplay : null;
+
+    /** The page canvas's pixels match the screen's, so one scale-up is all there is. */
+    function fitCanvas() {
+      var box = canvas.getBoundingClientRect();
+      var w = Math.max(game.width, Math.round(box.width * (root.devicePixelRatio || 1)));
+      var h = Math.round(w * game.height / game.width);
+      if (canvas.width !== w) canvas.width = w;
+      if (canvas.height !== h) canvas.height = h;
+    }
+
     function drawFrame() {
+      if (display) {
+        fitCanvas();
+        var shown = game.phase === 'title' ? attract : game;
+        var era = display.shownEra(shown);
+        var native = display.begin(era, game.width, game.height);
+        if (game.phase === 'title') drawField(native, attract, { ink: ATTRACT_INK, card: false });
+        else drawField(native, game);
+        display.present(ctx, era, game.time);
+        if (game.phase === 'title') {
+          // The title is the cabinet's own lettering, kept sharp over the
+          // machine's picture rather than squeezed into its pixels.
+          ctx.save();
+          ctx.setTransform(canvas.width / game.width, 0, 0, canvas.height / game.height, 0, 0);
+          PongRender.drawTitle(ctx, game);
+          ctx.restore();
+        }
+        return;
+      }
       if (game.phase === 'title') {
         // The demo rally climbs the ladder too: its ring plays, dimmed, with no
         // card under the title.
