@@ -405,12 +405,16 @@ export function main(argv, log = console.log) {
     const old = decode(fs.readFileSync(ref));
     const rel = (p) => path.relative(path.dirname(path.resolve(out)), path.resolve(p)).replace(/\\/g, '/');
     const minutes = arg(argv, '--minutes', null);
+    // the old sheet, traced and put through the same checker, so both carry the same numbers
+    const was = lint(trace(old, { id: 'old', era: doc.era, frame: doc.frame, hand: doc.hand, beats: doc.beats }));
     const lines = [
       `${doc.id}: era ${doc.era} (${ERAS[doc.era].name}), ${img.width} x ${img.height} sheet, ${res.nums.frames} frames of ${doc.frame.w} x ${doc.frame.h}`,
+      `old: faults ${was.faults.length}  colours ${was.nums.colours}  frames ${was.nums.frames} (${was.nums.unique} unique)  ${was.faults.join('; ')}`,
       `new: ${line()}`,
       `prompt: ${doc.prompt || '-'}`,
       minutes ? `one sheet took ${minutes} minutes of drawing (a Claude run authoring the grid); the tool builds it in ${(performance.now() - t0).toFixed(0)} ms` : ''
     ].filter(Boolean);
+    fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
     fs.writeFileSync(out, contactHtml({ title: `${doc.id}: old and new`, oldSrc: rel(ref), newSrc: rel(sheet), oldSize: old, newSize: img, gameScale: +arg(argv, '--game-scale', 3), lines }));
     log(`CONTACT ${out} (sheet ${sheet})`);
     return 0;
