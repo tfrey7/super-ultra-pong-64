@@ -293,8 +293,8 @@
     P.drawText(ctx, game.score.left + '  ' + game.score.right, mid, 346, 9, 8);
     var eras = rules().ERAS || [];
     var lo = eras[Math.max(0, f.top - f.visited + 1)], hi = eras[f.top];
-    P.drawText(ctx, f.visited + ' ERAS VISITED', mid, 424, 4, 3);
-    if (lo && hi) P.drawText(ctx, lo.year + ' TO ' + hi.year, mid, 452, 4, 3);
+    P.drawText(ctx, f.visited + (f.visited === 1 ? ' ERA VISITED' : ' ERAS VISITED'), mid, 424, 4, 3);
+    if (lo && hi) P.drawText(ctx, lo === hi ? String(hi.year) : lo.year + ' TO ' + hi.year, mid, 452, 4, 3);
     ctx.restore();
   }
 

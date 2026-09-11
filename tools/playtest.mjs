@@ -511,13 +511,15 @@ async function matchEnd(s, baseUrl) {
   await sleep(1200);
   const geo = await geometry(s);
   const clip = { x: geo.left, y: geo.top, width: geo.width, height: geo.height };
+  // As if the match had climbed from the arcade (startEra 0), so the thanks
+  // screen counts the eleven eras a real match visits; the ladder walk plays one.
   await s.eval(`(() => { const g = window.__pong; g.score.left = 6; g.score.right = 4; g.serveDelay = 1.2; })()`);
   await sleep(300);
   const mp = await s.eval('window.Pong.isMatchPoint(window.__pong) && window.PongMatch.overlays(window.__pong)');
   const plate = await s.shot('finale-matchpoint', clip);
   check('ten points in, the next point is match point and MATCH POINT is up', mp === true, `isMatchPoint and the plate: ${mp}`);
   // The player's point: the ball just past the computer's paddle, heading out.
-  await s.eval(`(() => { const g = window.__pong, r = g.right; g.serveDelay = 0;
+  await s.eval(`(() => { const g = window.__pong, r = g.right; g.serveDelay = 0; g.startEra = 0;
     g.ball.x = r.x + r.w + 2; g.ball.y = g.height * 0.3; g.ball.vx = 600; g.ball.vy = 0; })()`);
   for (let i = 0; i < 60 && (await state(s)).phase === 'playing'; i++) await sleep(50);
   return [plate, ...await filmFinale(s, clip, 'match')];
