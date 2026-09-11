@@ -362,14 +362,20 @@
    * A loaded pixellab sheet, cut into its frames: { image, rects } where
    * rects[beat][i] is that frame's source rectangle. Null until it has loaded
    * (the placeholder draws meanwhile), and null for good if it failed.
+   *
+   * Null too when the loader cannot make an image at all -- under node --test
+   * there is no Image, and the default loader's `new Image()` throws (item
+   * 1249). Nothing is remembered about that, so a loader installed later (a
+   * test's stand-in) is asked afresh on the next frame.
    */
   var cut = {};
   function sheetFrames(cfg, sprites) {
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
-    var image = S.load(cfg.sheet);
-    if (!S.ready(cfg.sheet)) return null;
+    var image;
+    try { image = S.load(cfg.sheet); } catch (e) { return null; }
+    if (!image || !S.ready(cfg.sheet)) return null;
     var rects = {};
     for (var row = 0; row < BEATS.length; row++) {
       var list = rects[BEATS[row]] = [];

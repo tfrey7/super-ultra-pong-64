@@ -220,14 +220,11 @@ test('era 0 and the dimmed attract frame draw no players', () => {
 });
 
 test('every era from 1 up draws both players, the right one mirrored, and writes no state', () => {
-  // An era card's sheet is not decoded yet here (there is no Image under
-  // node), so an era with art draws its placeholder -- as a page does until
-  // the PNG has loaded (item 1232, the first era block to name sheets).
-  const fake = fakeSprites();
-  try { everyEraDrawsBoth(); } finally { fake.restore(); }
-});
-
-function everyEraDrawsBoth() {
+  // The real loader, and no Image under node: an era whose block names a
+  // sheet (era 8's `sheets`, item 1232) draws its placeholder rather than
+  // throwing -- as a page does until the PNG has loaded (item 1249).
+  assert.strictEqual(typeof globalThis.Image, 'undefined', 'node has no Image');
+  assert.strictEqual(globalThis.PongSprites, Sprites, 'the real loader, no stand-in');
   for (let e = 1; e <= 10; e++) {
     const g = playing(e);
     g.events = [{ type: 'paddle', side: 'left', era: e, time: g.time }];
@@ -239,7 +236,35 @@ function everyEraDrawsBoth() {
     assert.strictEqual(mirrors.length, 1, 'era ' + e + ': one mirrored player');
     assert.ok(ctx.calls.some(([k]) => k === 'fillRect'), 'era ' + e + ' drew its placeholder');
   }
-}
+});
+
+test('headless, a block naming `sheet` or `sheets` draws the placeholder on both sides and never throws', () => {
+  // The default loader's makeImage is `new Image()`, which throws under node.
+  assert.throws(() => Sprites.create().load('test-headless-probe'), /Image/, 'the real loader cannot make an image here');
+  const saved = C.ERAS[3];
+  try {
+    for (const block of [
+      { sheet: 'test-headless-one', frame: { w: 20, h: 40 }, hand: { x: 20, y: 20 }, scale: 2 },
+      { sheets: { left: 'test-headless-l', right: 'test-headless-r' }, frame: { w: 20, h: 40 }, hand: { x: 20, y: 20 }, scale: 2 }
+    ]) {
+      C.ERAS[3] = block;
+      const g = playing(3);
+      const ctx = recorder();
+      assert.doesNotThrow(() => C.drawPlayers(ctx, g, null, R), Object.keys(block)[0]);
+      assert.ok(!ctx.calls.some(([k]) => k === 'drawImage'), 'no sheet image drawn');
+      // Both players are the placeholder pose: each draws its torso in its paddle's ink.
+      const inks = ctx.calls.filter(([k]) => k === 'fillRect').length;
+      assert.ok(inks > 0, 'the placeholder is drawn');
+      assert.strictEqual(ctx.calls.filter(([k, a]) => k === 'scale' && a[0] === -1).length, 1, 'both sides drawn, one mirrored');
+      assert.strictEqual(ctx.calls.filter(([k]) => k === 'save').length, ctx.calls.filter(([k]) => k === 'restore').length,
+        'every save restored, even with the loader failing');
+      // And through the page's own wrapper too, which must not need its try/catch for this.
+      assert.doesNotThrow(() => R.draw(recorder(), g));
+    }
+  } finally {
+    C.ERAS[3] = saved;
+  }
+});
 
 test('through the renderer: PongRender.draw draws the era, then the players over it', () => {
   const g = playing(2);
