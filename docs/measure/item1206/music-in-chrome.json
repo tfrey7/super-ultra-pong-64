@@ -1,5 +1,5 @@
 {
-  "when": "2026-09-11T02:30:01.676Z",
+  "when": "2026-09-11T02:35:24.495Z",
   "results": [
     {
       "name": "era 0: its loop books notes",
@@ -29,7 +29,7 @@
         "available": true,
         "audio": "running",
         "era": 1,
-        "scheduled": 15,
+        "scheduled": 17,
         "crossfades": 0,
         "ducks": 0,
         "muted": false,
@@ -89,7 +89,7 @@
         "available": true,
         "audio": "running",
         "era": 4,
-        "scheduled": 18,
+        "scheduled": 19,
         "crossfades": 0,
         "ducks": 0,
         "muted": false,
@@ -111,12 +111,12 @@
         "era": 5,
         "scheduled": 0,
         "crossfades": 0,
-        "ducks": 0,
+        "ducks": 1,
         "muted": false,
         "off": false,
         "errors": 0,
-        "tempo": 132,
-        "rally": 0,
+        "tempo": 133.6,
+        "rally": 1,
         "gameEra": 5,
         "sfx": "running"
       }
@@ -127,19 +127,19 @@
       "detail": {
         "positionBefore": {
           "bar": 1,
-          "step": 8
+          "step": 9
         },
         "positionAtChange": {
           "from": 1,
           "to": 2,
           "bar": 1,
-          "step": 8
+          "step": 9
         },
         "after": {
           "available": true,
           "audio": "running",
           "era": 2,
-          "scheduled": 43,
+          "scheduled": 46,
           "crossfades": 1,
           "ducks": 1,
           "muted": false,
@@ -164,22 +164,22 @@
               "from": 2,
               "to": 0,
               "bar": 1,
-              "step": 12
+              "step": 13
             }
           },
           {
             "era": 1,
-            "scheduled": 115,
+            "scheduled": 109,
             "at": {
               "from": 0,
               "to": 1,
               "bar": 2,
-              "step": 2
+              "step": 3
             }
           },
           {
             "era": 2,
-            "scheduled": 143,
+            "scheduled": 139,
             "at": {
               "from": 1,
               "to": 2,
@@ -189,22 +189,22 @@
           },
           {
             "era": 3,
-            "scheduled": 189,
+            "scheduled": 185,
             "at": {
               "from": 2,
               "to": 3,
-              "bar": 2,
-              "step": 15
+              "bar": 3,
+              "step": 0
             }
           },
           {
             "era": 4,
-            "scheduled": 237,
+            "scheduled": 234,
             "at": {
               "from": 3,
               "to": 4,
               "bar": 3,
-              "step": 5
+              "step": 6
             }
           }
         ],
@@ -232,8 +232,8 @@
       "name": "the music ducks under paddle hits in real play",
       "ok": true,
       "detail": {
-        "ducks": 2,
-        "scheduled": 197
+        "ducks": 1,
+        "scheduled": 223
       }
     },
     {

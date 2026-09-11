@@ -118,8 +118,10 @@ async function main() {
       t1.crossfades === 1 && t1.era === 2 && t1.scheduled > t0.scheduled && beforeStep > 0 && atStep === beforeStep,
       { positionBefore: sw.before, positionAtChange: sw.at, after: t1 });
     // The whole climb in one session, arcade to Super Nintendo.
+    // The serve is held for the climb: a real point scored while it waits would
+    // move the era itself (seen once on the merged tree: 0 became 1 mid-wait).
     const climb = await s.eval(`(async () => { const m = window.__pongMusic; const out = [];
-      for (const e of [0, 1, 2, 3, 4]) { window.__pong.era = e; await new Promise(r => setTimeout(r, 700));
+      for (const e of [0, 1, 2, 3, 4]) { window.__pong.serveDelay = 30; window.__pong.era = e; await new Promise(r => setTimeout(r, 700));
         out.push({ era: m.era, scheduled: m.scheduled, at: m.lastSwitch }); } return { out, errors: m.errors, crossfades: m.crossfades }; })()`);
     check('one session climbs arcade to Super Nintendo, every change keeping its place',
       climb.errors === 0 && climb.out.every((r, k) => r.era === k) && climb.out.every((r, k) => k === 0 || r.scheduled > climb.out[k - 1].scheduled),
