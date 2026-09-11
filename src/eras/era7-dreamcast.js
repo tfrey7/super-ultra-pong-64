@@ -141,7 +141,9 @@
   /** Whether the match is on its match point, by the rules' own test. */
   function matchPoint(state) {
     var G = root.Pong;
-    try { return !!(G && typeof G.isMatchPoint === 'function' && G.isMatchPoint(state)); } catch (e) { return false; }
+    try {
+      if (!G && typeof require === 'function') G = require('../game.js');   // node --test, as src/feel.js does
+      return !!(G && typeof G.isMatchPoint === 'function' && G.isMatchPoint(state)); } catch (e) { return false; }
   }
 
   /** The sky bands, top to bottom: swapped (magenta on top) at match point. Pure. */
