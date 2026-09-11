@@ -100,7 +100,8 @@ On the way up it **films each of the four era changes**: a frame caught mid-ring
 (`change-era0-to-era1.png` to `change-era3-to-era4.png`), a check that the ring's radius reached
 the farthest corner from where the ball went out, and a check that once the ring has gone the live
 canvas matches the new era drawn offscreen more closely than the old one.
-`--ladder` runs only that walk (about half a minute); `--reference` also copies its five era frames
+`--ladder` runs only that walk (about half a minute); `--scoring` runs only the rally and the
+scoring check (about fifteen seconds a run); `--reference` also copies its five era frames
 and four change frames into the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
 `index.html?era=N` (N is 0 to 4) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
@@ -174,11 +175,16 @@ his emulator — never touch either.**
   the browser (`window.Pong`) and `node --test` (CommonJS). `tools/playtest.mjs` is `.mjs` because
   Node runs it, not the page.
 - **Run `node --test` from the repo root.** The suite reaches `src/game.js` by relative path.
-- **One playtest check is a coin flip and always has been.** "The player can score against the
-  computer" allows 22 seconds of ball-tracking play and asks for a point;
-  `node tools/beatability-sample.mjs` measures that at 44% over 300 sessions, identically on
-  master. Do not read a single failure of that one line as a regression you caused -- run the
-  sampler before you believe it.
+- **The scoring check plays a scripted hand, so believe its FAIL.** "The player can score against
+  the computer" used to give 22 seconds of plain ball-tracking and passed only 44% of the time --
+  the computer is beatable by design, not beatable every 22 seconds. Since item 1160 the harness
+  plays `tools/scoring-rally.js` instead, which asks the rules where to stand so the computer
+  cannot return the shot, and keeps shooting for up to 45 seconds (it stops at the point, usually
+  inside fifteen). A FAIL on that line now means scoring is really
+  broken, or the computer has been made unbeatable -- both regressions. `node tools/playtest.mjs
+  --scoring` runs just that check, about fifteen seconds a run. `node tools/beatability-sample.mjs` still
+  measures how beatable the game itself is: its `track` and `corner` rows are the design, its
+  `scripted` row is the check's hand.
 - **Eras 0 and 1 are pinned to the pixel.** `tools/eralooks-today.json` holds every draw call
   those two eras made before the ladder existed, and a test compares the live renderer against
   it. A deliberate change to either look re-records it: `node tools/eralooks.js`, committed with
@@ -197,9 +203,11 @@ his emulator — never touch either.**
 - **Fleet CI cannot run this repo yet** (item 1130). Every flourish card ran `node --test` by hand
   and said so in its note; do the same rather than waiting on a CI run that never starts.
 - **A flourish draws, and nothing else.** The hook is called from the renderer every frame of the
-  ring; a sound started from it (item 1138's NES chime did, for want of anywhere else) breaks that
-  contract and is queued to move onto the boot sting as item 1162. An arrival's sound belongs in
-  `src/sound.js`.
+  ring, and may be drawn twice in one frame (a recorder, a redraw), so a sound started from it
+  plays twice. An arrival's sound is the arriving voice's `boot` list in `src/sound.js`: the player
+  plays it in place of `score` for the point that moved the machine up (item 1162). Eras 1 and 2
+  are the worked examples, and each boot list starts with the era's own point note so the point is
+  still heard. Items 1137 and 1138 once patched the voice table from their flourishes; that is gone.
 - **The ring is under one field unit wide for its first frames.** The eased progress starts slow
   and the plain edge is skipped below a radius of 1, so a flourish that waits for the ring to have
   width misses the start of its own change -- item 1137's power-on line did until it keyed off
@@ -220,5 +228,54 @@ his emulator — never touch either.**
   compares the live canvas with each era drawn offscreen, and the card covers the middle 180 rows
   of both until the serve; a look that draws something important only there would pass unseen.
 
+- **A pixellab image drawn onto the live canvas breaks the playtest's pixel read, off disk.**
+  `tools/playtest.mjs` compares the live canvas with each era drawn offscreen by calling
+  `getImageData` in the page, and the page is opened from `file://`, where Chrome counts every
+  image as another origin: one `drawImage` of a `assets/pixellab/*.png` taints the canvas, and the
+  read throws a SecurityError. The first era card that draws pixellab art has to deal with that
+  check (serve the repo over HTTP for it, or compare screenshots instead); item 1177, which built
+  the loader, measured none of this in a browser -- it is reasoned from the harness's own code.
+- **The pixellab balance lags the bill.** `node tools/pixellab.mjs` reads the subscription's
+  generations left before and after a generation; on item 1177's test image the call was billed
+  1 generation, the count read 9953 both times, and a `balance` run about two minutes later read
+  9952. Trust the call's own `cost` in the manifest, not `generationsUsed` (which records 0 for
+  that image), for what one image costs.
+
 Add to this list every time a run loses time to something avoidable — it is the only section that
 earns its keep by growing.
+
+## 9. Talk in the room as you go (item 1170)
+
+*Copied word for word from the fleet console's own bootstrap, section 21a, so a worker here gets
+the same rule without leaving this repo (item 1171). If that section changes, copy it again.*
+
+Tim follows the fleet in this room, and a worker that says nothing until its report leaves it silent
+for twenty minutes. **There is no post command to learn: the room invents nothing and draws only
+your own markers** (`chatroom.py`). What you post with is the marker, written at the start of a line
+in your ordinary output, and recorded on the card straight after with
+`mcp__fleet__queue_step(id, text, commit)` (or `workitem.py step`). Post at four moments, a sentence
+or two each, in plain words for Tim -- no file, branch, function or test names, never a stack trace:
+
+| when | what you write | the room draws |
+| --- | --- | --- |
+| you start | `PLAN:` with each step saying what you will do and how | *plan* |
+| each step | `PROGRESS k/n: <what just got done>; next, <what is next>` | *progress* |
+| something did not work | the next `PROGRESS` line says what you tried, what failed and what you will try instead | *progress* |
+| you finish or hand back | the ending line (`DONE` / `FAILED` / `TIMED OUT` / `STOOD DOWN`), its first sentence written for Tim | *outcome* |
+
+**A failed attempt has no post of its own yet.** A `PROGRESS` line re-emitted at the step you are
+still on replaces that step's earlier post instead of adding one, so the failure rides your next
+real marker. Item 1175 asks for a post kind that says it on its own.
+
+One of each:
+
+```
+PLAN:
+1. Find why the board forgets which columns you collapsed, by reloading it with two columns shut
+2. Keep that choice across a reload and a console restart
+3. Check it on a phone-sized screen
+
+PROGRESS 1/3: the board only remembered collapsed columns until the page reloaded; next, keeping that choice somewhere that lasts.
+PROGRESS 2/3: keeping the choice in the browser did not work, because a console restart wiped it, so the console keeps it now; next, the phone-sized check.
+DONE: the board remembers which columns you collapsed, across reloads and restarts, on a wide screen and a narrow one.
+```

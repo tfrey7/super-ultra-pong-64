@@ -1,44 +1,50 @@
 {
   "page": "index.html?era=1",
   "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
-  "when": "2026-09-11T00:27:55.841Z",
+  "when": "2026-09-11T01:02:31.683Z",
   "change": {
     "fromEra": 1,
     "toEra": 2
   },
   "ordinaryPlay": {
     "frames": 60,
-    "meanMs": 16.67,
-    "p95Ms": 16.8,
+    "meanMs": 16.66,
+    "p95Ms": 16.7,
     "maxMs": 16.8
   },
   "duringRing": {
     "frames": 88,
     "meanMs": 16.67,
-    "p95Ms": 16.8,
+    "p95Ms": 16.7,
     "maxMs": 16.8
   },
   "sound": {
     "audio": "suspended",
-    "played": 2,
+    "played": 1,
     "errors": 0,
     "last": {
       "era": 2,
-      "type": "powerOn",
+      "type": "boot",
       "waves": [
+        "square",
+        "square",
+        "square",
+        "square",
+        "triangle",
         "square",
         "square",
         "triangle"
       ],
       "echo": false
-    }
+    },
+    "boots": 1
   },
   "heldFrame": {
     "era": 2,
     "from": 1,
-    "p": 0.35106064153600014,
-    "radius": 335.24583877207766,
-    "t": 0.6666000000000001,
+    "p": 0.3510606415359998,
+    "radius": 335.2458387720774,
+    "t": 0.6665999999999999,
     "origin": {
       "x": 0,
       "y": 156

@@ -2,13 +2,15 @@
 /*
  * Era 2's arrival flourish (src/eras/era2-nes.js, consoleSwap): the change
  * from the Atari to the NES plays as a cartridge reset -- a one-frame black
- * blink, tiles turning over just ahead of the ring from the miss outward, a
- * rolling band inside the edge, and a power-on chime in the NES voice.
+ * blink, tiles turning over just ahead of the ring from the miss outward, and
+ * a rolling band inside the edge -- under a power-on chime that is the NES
+ * voice's boot sting in src/sound.js, never a call from the flourish.
  * Headless: no document, so the tiles draw as flat panels on the recording
  * canvas; the browser half is proved by the playtest frame.
  */
 const test = require('node:test');
 const assert = require('node:assert');
+const fs = require('node:fs');
 const path = require('node:path');
 const eralooks = require('../tools/eralooks.js');
 
@@ -41,20 +43,50 @@ function frame(g, opts) {
   return rec.calls;
 }
 
-/** Hand the page's globals to the flourish for the length of fn: the voice table and a fake player. */
-function withPlayer(fn) {
-  const played = [];
-  const hadSound = 'PongSound' in globalThis;
-  const hadPlayer = '__pongSound' in globalThis;
-  const voices2 = Object.assign({}, Sound.VOICES[2]);
+/** A silent stand-in for Web Audio: just enough surface for the player to schedule notes. */
+function fakeAudio() {
+  const param = () => ({ value: 0, setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} });
+  const node = (extra) => Object.assign({ connect(to) { return to; } }, extra);
+  return class {
+    constructor() { this.currentTime = 0; this.state = 'running'; this.destination = node({}); }
+    createOscillator() { return node({ type: 'sine', frequency: param(), start() {}, stop() {} }); }
+    createGain() { return node({ gain: param() }); }
+    createDelay() { return node({ delayTime: param() }); }
+  };
+}
+
+/** The page's real player, unlocked on the stand-in, and what it sounded after each step. */
+function listener() {
+  const player = Sound.createPlayer({ AudioContext: fakeAudio() });
+  player.unlock();
+  const heard = [];
+  return {
+    player,
+    heard,
+    listen(g) {
+      const before = player.played;
+      player.handle(g);
+      if (player.played > before) heard.push({ type: player.last.type, era: player.last.era });
+    }
+  };
+}
+
+/** The page's sound globals where a flourish could reach them, every call counted, the table watched. */
+function withPageSound(fn) {
+  const calls = [];
+  const had = { sound: 'PongSound' in globalThis, player: '__pongSound' in globalThis };
+  const table = JSON.stringify(Sound.VOICES);
   globalThis.PongSound = Sound;
-  globalThis.__pongSound = { play(ev) { played.push(ev); return true; } };
+  globalThis.__pongSound = {
+    play(ev) { calls.push(ev); return true; },
+    handle() { calls.push('handle'); return 0; }
+  };
   try {
-    fn(played);
+    fn(calls);
+    assert.strictEqual(JSON.stringify(Sound.VOICES), table, 'the voice table is exactly as it loaded');
   } finally {
-    if (!hadSound) delete globalThis.PongSound;
-    if (!hadPlayer) delete globalThis.__pongSound;
-    for (const k of Object.keys(Sound.VOICES[2])) if (!(k in voices2)) delete Sound.VOICES[2][k];
+    if (!had.sound) delete globalThis.PongSound;
+    if (!had.player) delete globalThis.__pongSound;
   }
 }
 
@@ -134,7 +166,6 @@ test('the flourish never changes the state and never shows behind the title', ()
   frame(g);
   assert.strictEqual(JSON.stringify(g), before);
   // The dimmed rally: the plain ring and no flourish at all.
-  const calls = [];
   const orig = look.flourish;
   const rally = Pong.createGame({ rng: () => 0.3, phase: 'playing', era: 1 });
   concede(rally);
@@ -142,33 +173,55 @@ test('the flourish never changes the state and never shows behind the title', ()
   const dimmed = frame(rally, { ink: '#3a3a3a', card: false });
   assert.ok(!dimmed.some((c) => /^rgba\(0,0,0,/.test(c[0])), 'no turning tiles in the rally');
   assert.strictEqual(orig, look.flourish);
-  assert.strictEqual(calls.length, 0);
 });
 
-test('the power-on chime plays once per change, in the NES voice, after the point\'s arpeggio and inside the pause', () => {
-  withPlayer((played) => {
+test('the power-on chime is the NES voice\'s boot sting: after the point\'s arpeggio and inside the pause', () => {
+  const score = Sound.voicesFor(2, 'score');
+  const boot = Sound.voicesFor(2, 'boot');
+  assert.deepStrictEqual(boot.slice(0, score.length), score, 'the point\'s arpeggio is still heard first');
+  const chime = boot.slice(score.length);
+  assert.strictEqual(chime.length, 3, 'then the chime');
+  assert.ok(chime.every((v) => v.wave === 'square' || v.wave === 'triangle'), 'pulse and triangle only');
+  const arpeggioEnd = Math.max(...score.map((v) => (v.at || 0) + v.dur));
+  for (const v of chime) {
+    assert.ok(v.at >= arpeggioEnd, `starts at ${v.at} s, after the point's notes end at ${arpeggioEnd} s`);
+    assert.ok(v.at + v.dur <= Pong.RULES.eraChangePause, 'over inside the pause');
+  }
+  // Where item 1138 put it: 0.45 s to 0.85 s after the point.
+  assert.strictEqual(Math.min(...chime.map((v) => v.at)), 0.45);
+  assert.ok(Math.abs(Math.max(...chime.map((v) => v.at + v.dur)) - 0.85) < 1e-9);
+});
+
+test('the change into era 2 sounds the chime once, however often the ring is drawn', () => {
+  const ear = listener();
+  const g = atariGame();
+  concede(g);
+  ear.listen(g);
+  assert.deepStrictEqual(ear.heard, [{ type: 'boot', era: 2 }], 'the point that brings the NES in plays its boot sting');
+  // Every frame drawn twice -- the page's canvas and a recorder -- with the player handed every step.
+  for (let i = 0; i < 100; i++) { frame(g); frame(g); Pong.step(g, FRAME, {}); ear.listen(g); }
+  assert.strictEqual(ear.player.boots, 1, 'once for the whole ring');
+  assert.strictEqual(ear.heard.filter((h) => h.type === 'boot').length, 1);
+  assert.strictEqual(ear.player.errors, 0);
+});
+
+test('the flourish makes no sound call and leaves the voice table alone, in a real game and behind the title', () => {
+  withPageSound((calls) => {
     const g = atariGame();
     concede(g);
-    for (let i = 0; i < 110; i++) { frame(g); Pong.step(g, FRAME, {}); }
-    assert.strictEqual(played.length, 1, 'once for the whole ring');
-    assert.deepStrictEqual(played[0], { type: swap.chimeType, era: 2 });
-    const voices = Sound.voicesFor(2, swap.chimeType);
-    assert.ok(voices.length >= 2, 'the chime is in the voice table the player reads');
-    assert.ok(voices.every((v) => v.wave === 'square' || v.wave === 'triangle'), 'pulse and triangle only');
-    const arpeggioEnd = Math.max(...Sound.voicesFor(2, 'score').map((v) => (v.at || 0) + v.dur));
-    for (const v of voices) {
-      assert.ok(v.at >= arpeggioEnd, `starts at ${v.at} s, after the point's notes end at ${arpeggioEnd} s`);
-      assert.ok(v.at + v.dur <= Pong.RULES.eraChangePause, 'over inside the pause');
-    }
-    // The dimmed rally makes no sound.
-    const rally = Pong.createGame({ rng: () => 0.3, phase: 'playing', era: 1 });
+    for (let i = 0; i < 100; i++) { frame(g); Pong.step(g, FRAME, {}); }
+    const rally = atariGame();
     concede(rally);
     for (let i = 0; i < 30; i++) { frame(rally, { ink: '#3a3a3a', card: false }); Pong.step(rally, FRAME, {}); }
-    assert.strictEqual(played.length, 1, 'the title\'s rally stays silent');
+    assert.deepStrictEqual(calls, [], 'not one sound call from the flourish');
   });
+  const code = fs.readFileSync(path.join(ROOT, 'src', 'eras', 'era2-nes.js'), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  assert.ok(!/PongSound|__pongSound|VOICES|\.play\s*\(/.test(code),
+    'the era file never reaches for the sound module, the page\'s player or the voice table');
 });
 
-test('with no page player the flourish is silent and never throws', () => {
+test('with no page player at all the flourish still draws and never throws', () => {
   const g = atariGame();
   concede(g);
   assert.doesNotThrow(() => { for (let i = 0; i < 20; i++) { frame(g); Pong.step(g, FRAME, {}); } });

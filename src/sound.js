@@ -15,6 +15,11 @@
  *     the rules fill) into scheduled oscillators. It READS the state and never
  *     writes it.
  *
+ * An era's arrival sound is data too: a voice's `boot` list, which the player
+ * sounds in place of `score` for the point that brings that era in (the boot
+ * sting, docs/ERAS.md section 3). An arrival flourish draws and never plays a
+ * note, so a second render of the ring can never sound it again.
+ *
  * Browsers refuse to make sound before the player has touched the page, so the
  * player is silent until unlock() is called from a click or keypress. A page
  * with no AudioContext at all (an old browser, a headless run with no audio
@@ -43,6 +48,17 @@
   //   dur      seconds the note lasts;  gain  peak loudness, 0..1
   //   fm       optional { ratio, index }: a sine modulator at freq * ratio,
   //            swinging the carrier by freq * index Hz and decaying with it
+  // The Atari's and the NES's point notes, each shared by its era's `score` and
+  // the front of its `boot` sting: the point that brings the era in is still heard.
+  var ATARI_POINT = [{ wave: 'square', freq: 147, slideTo: 110, dur: 0.36, gain: 0.2 }];
+  var NES_POINT = [
+    { wave: 'square', freq: 523, at: 0.00, dur: 0.08, gain: 0.12 },
+    { wave: 'square', freq: 659, at: 0.08, dur: 0.08, gain: 0.12 },
+    { wave: 'square', freq: 784, at: 0.16, dur: 0.08, gain: 0.12 },
+    { wave: 'square', freq: 1047, at: 0.24, dur: 0.16, gain: 0.12 },
+    { wave: 'triangle', freq: 262, at: 0.00, dur: 0.40, gain: 0.3 }
+  ];
+
   var VOICES = [
     // 0 -- 1972 arcade: one square blip, nothing else. High for a paddle, an
     // octave down for a wall, a longer tone for a point.
@@ -56,7 +72,20 @@
     {
       paddle: [{ wave: 'square', freq: 440, dur: 0.06, gain: 0.2 }],
       wall:   [{ wave: 'square', freq: 220, dur: 0.05, gain: 0.2 }],
-      score:  [{ wave: 'square', freq: 147, slideTo: 110, dur: 0.36, gain: 0.2 }]
+      score:  ATARI_POINT,
+      // The boot sting (item 1137's TV warble, moved here by item 1162): the
+      // point that turns the machine to colour still buzzes, and under it the
+      // set comes on (the flourish in src/eras/era1-atari2600.js) -- a square
+      // hum sliding up an octave with a slow wobble, like a set not yet on its
+      // channel, then two coarse TIA steps as the picture locks. A third of the
+      // loudness of a paddle hit, and over by 0.86 s, inside the pause.
+      boot: ATARI_POINT.concat([
+        { wave: 'square', freq: 110, slideTo: 220, at: 0.00, dur: 0.46, gain: 0.07,
+          fm: { ratio: 0.06, index: 0.09 } },
+        { wave: 'square', freq: 294, at: 0.40, dur: 0.10, gain: 0.07 },
+        { wave: 'square', freq: 440, slideTo: 392, at: 0.52, dur: 0.34, gain: 0.06,
+          fm: { ratio: 0.016, index: 0.025 } }
+      ])
     },
     // 2 -- 1985 NES: pulse lead over the triangle channel's bass, and a point
     // is a little rising arpeggio.
@@ -68,13 +97,17 @@
       wall: [
         { wave: 'triangle', freq: 523, slideTo: 392, dur: 0.06, gain: 0.32 }
       ],
-      score: [
-        { wave: 'square', freq: 523, at: 0.00, dur: 0.08, gain: 0.12 },
-        { wave: 'square', freq: 659, at: 0.08, dur: 0.08, gain: 0.12 },
-        { wave: 'square', freq: 784, at: 0.16, dur: 0.08, gain: 0.12 },
-        { wave: 'square', freq: 1047, at: 0.24, dur: 0.16, gain: 0.12 },
-        { wave: 'triangle', freq: 262, at: 0.00, dur: 0.40, gain: 0.3 }
-      ]
+      score: NES_POINT,
+      // The boot sting (item 1138's power-on chime, moved here by item 1162):
+      // the point's arpeggio, then B5 and E6 on the pulse channel over an E on
+      // the triangle -- a bright little NES "on" while the tiles turn over (the
+      // flourish in src/eras/era2-nes.js). It starts at 0.45 s, after the
+      // arpeggio (0.40 s), and is over by 0.85 s, well inside the pause.
+      boot: NES_POINT.concat([
+        { wave: 'square', freq: 988, at: 0.45, dur: 0.07, gain: 0.12 },
+        { wave: 'square', freq: 1319, at: 0.52, dur: 0.30, gain: 0.12 },
+        { wave: 'triangle', freq: 330, at: 0.45, dur: 0.40, gain: 0.3 }
+      ])
     },
     // 3 -- 1989 Genesis: two-operator FM, the bright metallic YM2612 bell.
     {
@@ -179,12 +212,14 @@
     var ctx = null;
     var master = null;
     var echoIn = null;
+    var sounded = null;   // the era of the last event this player sounded
     var player = {
       unlocked: false,    // has the player touched the page yet?
       available: false,   // did an audio context actually open?
       played: 0,          // events turned into sound
       errors: 0,          // anything the audio API threw, swallowed
-      last: null,         // { era, type, waves } of the latest event played
+      boots: 0,           // boot stings played: one per change into an era that has one
+      last: null,         // { era, type, waves } of the latest event played ('boot' for a sting)
       unlock: unlock,
       handle: handle,
       play: play,
@@ -235,15 +270,36 @@
       if (!state || !state.events || !state.events.length) return 0;
       var n = 0;
       for (var i = 0; i < state.events.length && n < MAX_PER_FRAME; i++) {
-        if (play(state.events[i])) n += 1;
+        if (play(state.events[i], state)) n += 1;
       }
       return n;
     }
 
-    /** One event -> its era's voices, scheduled now. True if it was sounded. */
-    function play(ev) {
+    /**
+     * Did this point move the machine up? Handed the game, the rules say so
+     * exactly: they stamp eraChangedAt with the moment of the point that moved
+     * it, so a new match, or a page opened high up the ladder, can never fool
+     * it. A bare event falls back to docs/ERAS.md's wording: an era higher than
+     * the last one this player sounded.
+     */
+    function eraRose(ev, state) {
+      var era = clampEra(ev.era);
+      if (state && typeof state.eraChangedAt === 'number' && typeof ev.time === 'number') {
+        return state.eraChangedAt === ev.time && clampEra(state.era) === era;
+      }
+      return sounded !== null && era > sounded;
+    }
+
+    /**
+     * One event -> its era's voices, scheduled now. True if it was sounded.
+     * The boot sting: a point that moved the machine up plays the arriving
+     * era's `boot` list in place of `score`, when that voice has one.
+     */
+    function play(ev, state) {
       if (!ev || !ctx || !player.available) return false;
-      var voices = voicesFor(ev.era, ev.type);
+      var type = ev.type;
+      if (type === 'score' && eraRose(ev, state) && voicesFor(ev.era, 'boot').length) type = 'boot';
+      var voices = voicesFor(ev.era, type);
       if (!voices.length) return false;
       try {
         var echo = echoFor(ev.era);
@@ -251,9 +307,11 @@
         var t0 = ctx.currentTime + 0.005;
         for (var i = 0; i < voices.length; i++) voice(voices[i], t0, out);
         player.played += 1;
+        if (type === 'boot') player.boots += 1;
+        sounded = clampEra(ev.era);
         player.last = {
           era: clampEra(ev.era),
-          type: ev.type,
+          type: type,
           waves: voices.map(function (v) { return v.fm ? 'fm' : v.wave; }),
           echo: !!echo
         };
