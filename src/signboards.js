@@ -223,8 +223,11 @@
       ctx.fillRect(r.x + f, by + i * bh, r.w - 2 * f, bh);
     }
 
+    // The ERA line in blocks one Atari pixel wide (800 / 160 = 5), not the
+    // other rungs' 4, or the 2600's own screen smears it to a smudge.
+    var label = 'ERA ' + k.era, lc = 5;
     ctx.fillStyle = k.ink('label');
-    centred(ctx, k, 'ERA ' + k.era, r.y + 24, { h: 3 });
+    drawRun(ctx, label, k.mid - textWidth(label, lc, lc) / 2, r.y + 22, lc, lc, { h: 4 });
     k.nameTop = r.y + 62;
     nameLine(ctx, k, k.nameTop, k.ink('year'), k.ink('name'), { h: 5 });
   }
