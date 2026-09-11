@@ -183,3 +183,5 @@ frame, and they cost nothing measurable. The tenth hit is `docs/shots/item-1226/
   is in [sprites.md](sprites.md).
 - **Genesis colours are `levels(3)`**: 0, 36, 73, 109, 146, 182, 219 and 255 per channel. Write
   the palette in those values, and the checker refuses anything else, naming the nearest.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the stone panel already shows the knight's portrait beside the score, and the caption left over the court read as "PLAST ARETTSSSIP" at 320 x 224.

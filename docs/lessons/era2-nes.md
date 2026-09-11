@@ -200,3 +200,5 @@ North America), with the heft of *Super Mario Bros.* in the sprites.
   size, and the handle shows only where the sprite is transparent.
 - The order is now: court, floor past the ends, centre line, border, net, crowd, umpire, band,
   handles, paddles, ball shadow, ball, then the players. The ball is the last thing the era draws.
+
+- **The opponent's name is not drawn in this era (item 1261)**: the band along the top already says CPU beside the score, and the caption left over the court read as four garbled glyphs at 256 x 240.
