@@ -1,5 +1,5 @@
 {
- "taken": "2026-09-11T04:13:08.922Z",
+ "taken": "2026-09-11T04:16:01.221Z",
  "rows": [
   {
    "setup": "sprites",
@@ -10,7 +10,7 @@
    "frames": 60,
    "total": 1000,
    "mean": 16.67,
-   "p95": 16.8,
+   "p95": 16.7,
    "max": 16.8
   },
   {
@@ -19,8 +19,8 @@
    "display": "&models=off",
    "era": 6,
    "native": "320x240",
-   "frames": 60,
-   "total": 1000,
+   "frames": 61,
+   "total": 1016.6,
    "mean": 16.67,
    "p95": 16.7,
    "max": 16.8
@@ -31,8 +31,8 @@
    "display": "&models=off",
    "era": 7,
    "native": "640x480",
-   "frames": 60,
-   "total": 1000,
+   "frames": 61,
+   "total": 1016.6,
    "mean": 16.67,
    "p95": 16.7,
    "max": 16.8
@@ -43,11 +43,11 @@
    "display": "&models=off",
    "era": 8,
    "native": "512x448",
-   "frames": 36,
-   "total": 1000,
-   "mean": 27.78,
-   "p95": 33.4,
-   "max": 50
+   "frames": 29,
+   "total": 1016.5,
+   "mean": 35.05,
+   "p95": 50.1,
+   "max": 66.6
   },
   {
    "setup": "sprites",
@@ -56,9 +56,9 @@
    "era": 9,
    "native": "640x480",
    "frames": 30,
-   "total": 1016.6,
-   "mean": 33.89,
-   "p95": 33.4,
+   "total": 1033.3,
+   "mean": 34.44,
+   "p95": 50,
    "max": 50
   },
   {
@@ -67,11 +67,11 @@
    "display": "&models=off",
    "era": 10,
    "native": "960x720",
-   "frames": 13,
-   "total": 1050,
-   "mean": 80.77,
-   "p95": 83.4,
-   "max": 83.4
+   "frames": 12,
+   "total": 1016.6,
+   "mean": 84.72,
+   "p95": 116.7,
+   "max": 116.7
   },
   {
    "setup": "models",
@@ -79,8 +79,8 @@
    "display": "",
    "era": 5,
    "native": "320x240",
-   "frames": 60,
-   "total": 1000,
+   "frames": 61,
+   "total": 1016.6,
    "mean": 16.67,
    "p95": 16.8,
    "max": 16.8
@@ -91,8 +91,8 @@
    "display": "",
    "era": 6,
    "native": "320x240",
-   "frames": 61,
-   "total": 1016.6,
+   "frames": 60,
+   "total": 1000,
    "mean": 16.67,
    "p95": 16.7,
    "max": 16.8
@@ -103,10 +103,10 @@
    "display": "",
    "era": 7,
    "native": "640x480",
-   "frames": 61,
-   "total": 1016.6,
+   "frames": 60,
+   "total": 1000,
    "mean": 16.67,
-   "p95": 16.8,
+   "p95": 16.7,
    "max": 16.8
   },
   {
@@ -115,10 +115,10 @@
    "display": "",
    "era": 8,
    "native": "512x448",
-   "frames": 60,
-   "total": 1049.9,
-   "mean": 17.5,
-   "p95": 16.8,
+   "frames": 49,
+   "total": 1016.7,
+   "mean": 20.75,
+   "p95": 33.4,
    "max": 50
   },
   {
@@ -131,7 +131,7 @@
    "total": 1016.6,
    "mean": 36.31,
    "p95": 50,
-   "max": 50.1
+   "max": 50
   },
   {
    "setup": "models",
@@ -139,155 +139,11 @@
    "display": "",
    "era": 10,
    "native": "960x720",
-   "frames": 14,
-   "total": 1066.6,
-   "mean": 76.19,
-   "p95": 100,
-   "max": 100
-  },
-  {
-   "setup": "all-lo",
-   "gpu": false,
-   "display": "&model=player-proof-lo",
-   "era": 5,
-   "native": "320x240",
-   "frames": 60,
-   "total": 1000,
-   "mean": 16.67,
-   "p95": 16.8,
-   "max": 16.8
-  },
-  {
-   "setup": "all-lo",
-   "gpu": false,
-   "display": "&model=player-proof-lo",
-   "era": 6,
-   "native": "320x240",
-   "frames": 61,
-   "total": 1016.6,
-   "mean": 16.67,
-   "p95": 16.7,
-   "max": 16.8
-  },
-  {
-   "setup": "all-lo",
-   "gpu": false,
-   "display": "&model=player-proof-lo",
-   "era": 7,
-   "native": "640x480",
-   "frames": 61,
-   "total": 1016.7,
-   "mean": 16.67,
-   "p95": 16.8,
-   "max": 16.8
-  },
-  {
-   "setup": "all-lo",
-   "gpu": false,
-   "display": "&model=player-proof-lo",
-   "era": 8,
-   "native": "512x448",
-   "frames": 61,
-   "total": 1033.2,
-   "mean": 16.94,
-   "p95": 16.8,
-   "max": 33.3
-  },
-  {
-   "setup": "all-lo",
-   "gpu": false,
-   "display": "&model=player-proof-lo",
-   "era": 9,
-   "native": "640x480",
-   "frames": 30,
-   "total": 1016.6,
-   "mean": 33.89,
-   "p95": 49.9,
-   "max": 50
-  },
-  {
-   "setup": "all-lo",
-   "gpu": false,
-   "display": "&model=player-proof-lo",
-   "era": 10,
-   "native": "960x720",
-   "frames": 12,
-   "total": 1049.9,
-   "mean": 87.49,
-   "p95": 100,
-   "max": 100
-  },
-  {
-   "setup": "all-mid",
-   "gpu": false,
-   "display": "&model=player-proof-mid",
-   "era": 5,
-   "native": "320x240",
-   "frames": 61,
-   "total": 1016.6,
-   "mean": 16.67,
-   "p95": 16.7,
-   "max": 16.8
-  },
-  {
-   "setup": "all-mid",
-   "gpu": false,
-   "display": "&model=player-proof-mid",
-   "era": 6,
-   "native": "320x240",
-   "frames": 60,
-   "total": 1000,
-   "mean": 16.67,
-   "p95": 16.8,
-   "max": 16.8
-  },
-  {
-   "setup": "all-mid",
-   "gpu": false,
-   "display": "&model=player-proof-mid",
-   "era": 7,
-   "native": "640x480",
-   "frames": 60,
-   "total": 1000.1,
-   "mean": 16.67,
-   "p95": 16.8,
-   "max": 16.8
-  },
-  {
-   "setup": "all-mid",
-   "gpu": false,
-   "display": "&model=player-proof-mid",
-   "era": 8,
-   "native": "512x448",
-   "frames": 50,
-   "total": 1016.7,
-   "mean": 20.33,
-   "p95": 33.4,
-   "max": 33.4
-  },
-  {
-   "setup": "all-mid",
-   "gpu": false,
-   "display": "&model=player-proof-mid",
-   "era": 9,
-   "native": "640x480",
-   "frames": 30,
-   "total": 1050.1,
-   "mean": 35,
-   "p95": 50.1,
-   "max": 66.7
-  },
-  {
-   "setup": "all-mid",
-   "gpu": false,
-   "display": "&model=player-proof-mid",
-   "era": 10,
-   "native": "960x720",
    "frames": 13,
-   "total": 1049.9,
-   "mean": 80.76,
-   "p95": 83.4,
-   "max": 83.4
+   "total": 1099.9,
+   "mean": 84.61,
+   "p95": 100,
+   "max": 100
   }
  ]
 }
