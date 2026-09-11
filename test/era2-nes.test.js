@@ -189,8 +189,12 @@ test('plays exactly the same as era 1: same seed, same hands, same match', () =>
   // A seeded generator per game, so the serve angles and the computer's aim
   // really vary, and the two games draw the identical sequence.
   const seeded = (seed) => () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const one = Pong.createGame({ rng: seeded(7), phase: 'playing', era: 1 });
-  const two = Pong.createGame({ rng: seeded(7), phase: 'playing', era: 2 });
+  // eraChangePause 0: the two machines climb the ladder at different points
+  // (era 1 has further to go), and the longer pause after an era change is a
+  // rule about the ladder, not about the look -- this test is about the look.
+  const rules = { eraChangePause: 0 };
+  const one = Pong.createGame({ rng: seeded(7), phase: 'playing', era: 1, rules });
+  const two = Pong.createGame({ rng: seeded(7), phase: 'playing', era: 2, rules });
   const play = (g) => ({ ball: g.ball, left: g.left, right: g.right, score: g.score,
     rally: g.rally, serveDelay: g.serveDelay, time: g.time, lastEvent: g.lastEvent });
   let points = 0;

@@ -675,6 +675,45 @@ test('the ladder stops at the top: more points never pass the last era', () => {
   assert.strictEqual(Pong.advanceEra(g), false);
 });
 
+test('a point records where the ball left the field: the edge it crossed and its height', () => {
+  const g = newGame();
+  assert.strictEqual(g.missAt, null, 'nothing before the first point');
+  endServeDelay(g);
+  placeBall(g, 1, 140, -400, 0);
+  centrePaddle(g.left, 500);
+  Pong.step(g, 0.05, {});
+  assert.strictEqual(g.score.right, 1);
+  assert.deepStrictEqual(g.missAt, { x: 0, y: 140 + g.ball.size / 2 }, 'out past the player');
+
+  endServeDelay(g);
+  placeBall(g, g.width - 2, 420, 400, 0);
+  centrePaddle(g.right, 60);
+  Pong.step(g, 0.05, {});
+  assert.strictEqual(g.score.left, 1);
+  assert.deepStrictEqual(g.missAt, { x: g.width, y: 420 + g.ball.size / 2 }, 'out past the computer');
+
+  g.phase = 'title';
+  Pong.startGame(g);
+  assert.strictEqual(g.missAt, null, 'a new session forgets it');
+});
+
+test('an era-change point stretches the serve pause; a point at the top of the ladder does not', () => {
+  const g = newGame();
+  assert.ok(Pong.RULES.eraChangePause > Pong.RULES.serveDelay);
+  concede(g);
+  assert.strictEqual(g.era, 1);
+  assert.strictEqual(g.serveDelay, Pong.RULES.eraChangePause, 'room for the era change');
+  // The paddles still move while it waits.
+  const y0 = g.left.y;
+  Pong.step(g, 0.05, { pointerY: 100 });
+  assert.notStrictEqual(g.left.y, y0, 'the player paddle follows the hand during the pause');
+
+  const top = Pong.createGame({ rng: () => 0.5, phase: 'playing', era: Pong.TOP_ERA });
+  concede(top);
+  assert.strictEqual(top.era, Pong.TOP_ERA);
+  assert.strictEqual(top.serveDelay, Pong.RULES.serveDelay, 'no era change, the plain pause');
+});
+
 test('a game can be opened at any era, clamped to the ladder', () => {
   const g = Pong.createGame({ rng: () => 0.5, phase: 'playing', era: 3 });
   assert.strictEqual(g.era, 3);

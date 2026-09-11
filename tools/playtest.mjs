@@ -420,6 +420,71 @@ async function main() {
     check('and the next serve restarts from the centre', sawCentreServe,
       sawCentreServe ? 'ball re-centred' : 'did not observe the reset');
 
+    // 7b. An era change, forced: one point from the player's side at a known
+    // height, then the ring must play at full frame rate while the hand keeps
+    // moving the paddle. Frame timing is the page's own rAF clock, taken over
+    // ordinary play first and then over the ring.
+    const forcePoint = () => s.eval(`(() => { const g = window.__pong; const P = window.Pong;
+      if (g.era >= P.TOP_ERA) g.era = P.TOP_ERA - 1;   // room to climb one more rung
+      g.startEra = 0;
+      g.serveDelay = 0; g.ball.x = -8; g.ball.y = 150; g.ball.vx = -600; g.ball.vy = 0;
+      return g.era; })()`);
+    const frameTiming = (ms) => s.eval(`new Promise((done) => {
+      const stamps = [], ys = [], ring = []; const t0 = performance.now();
+      function tick(now) {
+        const g = window.__pong; const m = window.PongRender.eraChangeMoment(g);
+        stamps.push(now); ys.push(g.left.y); ring.push(!!(m && m.wiping));
+        if (now - t0 < ${ms}) requestAnimationFrame(tick); else done({ stamps, ys, ring });
+      }
+      requestAnimationFrame(tick);
+    })`);
+    const frameStats = (stamps) => {
+      const d = [];
+      for (let i = 1; i < stamps.length; i++) d.push(stamps[i] - stamps[i - 1]);
+      d.sort((a, b) => a - b);
+      const mean = d.reduce((a, b) => a + b, 0) / Math.max(1, d.length);
+      return { frames: d.length, mean, p95: d[Math.floor(d.length * 0.95)] || 0, max: d[d.length - 1] || 0 };
+    };
+    const fmtMs = (v) => v.toFixed(1) + ' ms';
+
+    await s.mouseTo(midX, toClientY(540));
+    const baseline = frameStats((await frameTiming(1000)).stamps);
+    const fromEra = await forcePoint();
+    await sleep(30);
+    const timing = frameTiming(1450);
+    for (let i = 0; i < 26; i++) {
+      await s.mouseTo(midX, toClientY(i % 2 ? 500 : 110));
+      await sleep(50);
+    }
+    const ringRun = await timing;
+    const ringStamps = ringRun.stamps.filter((_, i) => ringRun.ring[i]);
+    const during = frameStats(ringStamps);
+    const ringYs = ringRun.ys.filter((_, i) => ringRun.ring[i]);
+    const travel = ringYs.length ? Math.max(...ringYs) - Math.min(...ringYs) : 0;
+    const toEra = await s.eval('window.__pong.era');
+    check('an era change plays its ring at full frame rate',
+      during.frames >= 40 && during.mean <= Math.max(baseline.mean * 1.25, 18.5),
+      `era ${fromEra} to ${toEra}: ${during.frames} ring frames, mean ${fmtMs(during.mean)}, ` +
+      `p95 ${fmtMs(during.p95)}, max ${fmtMs(during.max)}; ordinary play just before: ` +
+      `mean ${fmtMs(baseline.mean)}, p95 ${fmtMs(baseline.p95)}, max ${fmtMs(baseline.max)}`);
+    check('and the paddle stays in the player\'s hands while it plays', travel > 150,
+      `the paddle travelled ${travel.toFixed(0)} field units during the ring`);
+
+    // The picture: a second forced point, captured with the ring about half way.
+    await sleep(600);
+    await s.mouseTo(midX, toClientY(430));
+    const shotFrom = await forcePoint();
+    let wipeAt = null;
+    for (let i = 0; i < 150 && wipeAt === null; i++) {
+      const p = await s.eval('(() => { const m = window.PongRender.eraChangeMoment(window.__pong); ' +
+        'return m && m.wiping ? m.p : null; })()');
+      if (p !== null && p >= 0.4) wipeAt = p;
+      else await sleep(8);
+    }
+    const wipeShot = await s.shot('era-wipe');
+    console.log(`      mid-wipe shot: era ${shotFrom} to ${shotFrom + 1}, eased progress ` +
+      `${wipeAt === null ? 'not caught' : wipeAt.toFixed(2)} when the capture was asked for`);
+
     await s.mouseTo(midX, toClientY(gm2.ball.y + 6));
     await sleep(500);
     const scoreShot = await s.shot('scoreboard');
@@ -427,7 +492,7 @@ async function main() {
     // 8. One whole match up the ladder, era by era.
     const ladderShots = await walkLadder(s, url.split('?')[0]);
     summarise([titleShot, firstFrameShot,
-      ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), scoreShot, ...ladderShots]);
+      ...(shotTaken ? [path.join(SHOTS, 'rally.png')] : []), wipeShot, scoreShot, ...ladderShots]);
   } finally {
     try { ws && ws.close(); } catch { /* already gone */ }
     chrome.kill();

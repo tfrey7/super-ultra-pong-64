@@ -41,6 +41,12 @@
   //   draw       optional: function (ctx, state, opts, PongRender) that takes
   //              over the whole frame; PongRender.drawBase is the stock frame
   //              an era can paint over.
+  //   card       optional: this era's name-card style (src/erachange.js STYLES)
+  //   flourish   optional: function (ctx, p, origin, fromEra, toEra, info),
+  //              called every frame while the ring that brings THIS era in is
+  //              growing, drawn over the ring's edge. p is the eased progress
+  //              0..1, origin {x, y} is where the ball went out. The header of
+  //              src/erachange.js is the full contract; no hook, plain ring.
   var LOOKS = [];
   var RESOLVED = [];
 

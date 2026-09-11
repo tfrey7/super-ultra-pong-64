@@ -90,13 +90,15 @@ title screen with the ball held still, that a click and a keypress each start it
 runs in real time, that the mouse and keys move the paddle, that rallies happen, that a miss
 scores, and that the next serve starts from the centre -- and that the title screen opens no audio,
 the first click switches sound on, the rally is heard, and every era's voice schedules on the real
-Web Audio API -- and, last, it **walks one match up the whole ladder**: a fresh era-0 machine, one
-point let through per rung, a check that each point moved it up exactly one era, a screenshot of
-each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to `ladder-era4-snes.png`, cropped
-to the field) and one more point to prove it stops on era 4. `--ladder` runs only that walk (about
-half a minute); `--reference` also copies its five frames into the tracked `docs/shots/eras/`.
-To look at one era without playing up to it, open `index.html?era=N` (N is 0 to 4) or pass
-`--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
+Web Audio API -- that a forced era change plays its ring at full frame rate (the page's own rAF
+timing over the ring, against ordinary play just before it) with the paddle still following the hand,
+saving `era-wipe.png` mid-ring -- and, last, it **walks one match up the whole ladder**: a fresh
+era-0 machine, one point let through per rung, a check that each point moved it up exactly one era,
+a screenshot of each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to
+`ladder-era4-snes.png`, cropped to the field) and one more point to prove it stops on era 4.
+`--ladder` runs only that walk (about half a minute); `--reference` also copies its five frames into
+the tracked `docs/shots/eras/`. To look at one era without playing up to it, open
+`index.html?era=N` (N is 0 to 4) or pass `--era N`. Chrome runs `--mute-audio`, so a playtest never beeps through the
 machine's speakers. `--no-audio` takes `AudioContext` away before the page loads and checks the game
 plays silently with no errors. Pass `--chrome "<path to chrome.exe>"` if
 it cannot find a browser, and `--port <n>` if 9333 is busy; each port gets its own Chrome profile,

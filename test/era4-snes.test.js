@@ -185,7 +185,9 @@ test('behind the title (a dimmed frame) era 4 keeps the stock frame, so the titl
 test('era 4 plays exactly like era 1: drawing it every frame changes nothing about the game', () => {
   const seeded = () => { let s = 7; return () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; };
   const play = (era, drawEachFrame) => {
-    const g = Pong.createGame({ rng: seeded(), phase: 'playing', era });
+    // eraChangePause 0: era 1 climbs the ladder and era 4 cannot, and the longer
+    // pause after an era change is a rule about the ladder, not the look.
+    const g = Pong.createGame({ rng: seeded(), phase: 'playing', era, rules: { eraChangePause: 0 } });
     const trail = [];
     for (let i = 0; i < 2400; i++) {
       const pointerY = i < 1200 ? 300 + 220 * Math.sin(i / 35) : 20;
