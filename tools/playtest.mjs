@@ -21,7 +21,7 @@ import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { launchChrome, portTaken, portTakenLine, pickOwnPage } from './chrome.mjs';
+import { launchChrome, portTakenWhy, portTakenLine, pickOwnPage } from './chrome.mjs';
 import { CdpConnection, DroppedConnection } from './cdp.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -391,8 +391,9 @@ async function main() {
   // Refuse a port that is already listening, before Chrome is even started: a
   // Chrome that cannot bind it runs on without one, and the endpoint on that
   // number belongs to whoever holds it (item 1215).
-  if (await portTaken(PORT)) {
-    console.error(portTakenLine(PORT));
+  const taken = await portTakenWhy(PORT);
+  if (taken) {
+    console.error(portTakenLine(PORT, taken));
     process.exitCode = 2;
     return;
   }

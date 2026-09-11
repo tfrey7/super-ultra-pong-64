@@ -34,26 +34,31 @@ import path from 'node:path';
  * 127.0.0.1 (where Chrome binds it), or if something answers a connect there
  * (a listener on 0.0.0.0 does not always stop a 127.0.0.1 bind on Windows).
  */
-export function portTaken(port, { host = '127.0.0.1', connectMs = 400 } = {}) {
+export async function portTaken(port, opts) {
+  return Boolean(await portTakenWhy(port, opts));
+}
+
+/** The same question, answered with the reason it is taken ('' when it is free). */
+export function portTakenWhy(port, { host = '127.0.0.1', connectMs = 400 } = {}) {
   const listens = () => new Promise((resolve) => {
     const server = net.createServer();
-    server.once('error', () => resolve(false));
-    server.listen(port, host, () => server.close(() => resolve(true)));
+    server.once('error', (e) => resolve(`cannot listen on ${host}:${port}: ${e.code || e.message}`));
+    server.listen(port, host, () => server.close(() => resolve('')));
   });
   const answers = () => new Promise((resolve) => {
     const sock = net.connect({ port, host });
-    const done = (yes) => { clearTimeout(timer); sock.destroy(); resolve(yes); };
-    const timer = setTimeout(() => done(false), connectMs);
-    sock.once('connect', () => done(true));
-    sock.once('error', () => done(false));
+    const done = (why) => { clearTimeout(timer); sock.destroy(); resolve(why); };
+    const timer = setTimeout(() => done(''), connectMs);
+    sock.once('connect', () => done(`something answered a connect on ${host}:${port}`));
+    sock.once('error', () => done(''));
   });
-  return listens().then(async (free) => !free || await answers());
+  return listens().then(async (why) => why || await answers());
 }
 
 /** The one line a harness prints when its port is taken; it names the port and the way out. */
-export function portTakenLine(port) {
-  return `playtest: port ${port} is already in use by another program (probably another worker's Chrome); ` +
-    `pick another with --port <n> -- nothing was launched`;
+export function portTakenLine(port, why) {
+  return `playtest: port ${port} is already in use by another program (probably another worker's Chrome` +
+    `${why ? '; ' + why : ''}); pick another with --port <n> -- nothing was launched`;
 }
 
 /** A URL compared as a file: no query, no hash, percent-decoded, and case-blind on Windows. */
