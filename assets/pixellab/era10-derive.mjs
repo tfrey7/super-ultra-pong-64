@@ -28,6 +28,7 @@
  *
  * Node 18+, no dependencies. The PNG codec is era 2's.
  */
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -192,17 +193,77 @@ export function embed(src, art) {
   return src.slice(0, a) + BEGIN + ' (written by assets/pixellab/era10-derive.mjs; do not edit by hand)\n' + rows + '\n  ' + src.slice(b);
 }
 
+/** A derived sheet's manifest entry (0 generations), from its source's; replaced on a re-run. */
+function recordDerived(srcFile, outFile, png, sheet, how) {
+  const mf = path.join(HERE, 'manifest.json');
+  const m = JSON.parse(fs.readFileSync(mf, 'utf8'));
+  const src = m.images.find((e) => e.file === srcFile);
+  if (!src) throw new Error(`no manifest entry for ${srcFile}`);
+  const entry = Object.assign({}, src, {
+    name: outFile.slice(0, -4),
+    file: outFile,
+    cost: { type: 'derived', generations: 0 },
+    derivedFrom: srcFile,
+    derivedBy: 'node assets/pixellab/era10-derive.mjs',
+    how: how || `${sheet.figures} figures found in the generated sheet, reposed per beat (POSES), graded toward #c9b89a, ` +
+         'a 1-pixel HDR-sun rim and its glow, seeded grain at 0.12, at twice the size with bilinear filtering',
+    card: 'item 1234',
+    verdict: 'drawn by the character rig (src/characters.js, era 10 block) behind its paddle',
+    pixels: { width: sheet.width, height: sheet.height },
+    bytes: png.length,
+    sha256: crypto.createHash('sha256').update(png).digest('hex')
+  });
+  const i = m.images.findIndex((e) => e.file === outFile);
+  if (i >= 0) m.images[i] = entry; else m.images.push(entry);
+  fs.writeFileSync(mf, JSON.stringify(m, null, 2) + '\n');
+}
+
+/**
+ * The gamerpics, cut from the players' own heads: a square around the top of
+ * each sheet's first idle figure, 32 x 32 on the toast's near-black. Two
+ * pixflux gamerpic rolls came back looking like one famous franchise helmet
+ * (ERAS.md rule 1.9 draws no trademark shape), so the picture is each
+ * soldier's own helmet instead -- which is also what a gamerpic of him is.
+ */
+export function heads(sheets) {
+  const W = 64, H = 32, out = new Uint8Array(W * H * 4);
+  for (let i = 0; i < W * H; i++) { out[i * 4] = 0x1b; out[i * 4 + 1] = 0x1b; out[i * 4 + 2] = 0x1b; out[i * 4 + 3] = 255; }
+  sheets.forEach((img, cell) => {
+    const f = findFigures(img)[0];
+    const side = Math.min(f.x1 - f.x0, (f.y1 - f.y0) * 0.42);
+    const x0 = (f.x0 + f.x1) / 2 - side / 2, y0 = f.y0 - side * 0.04;
+    for (let y = 0; y < 32; y++) {
+      for (let x = 0; x < 32; x++) {
+        const s = sample(img, x0 + (x + 0.5) * side / 32 - 0.5, y0 + (y + 0.5) * side / 32 - 0.5);
+        const a = Math.min(1, s[3]), i = (y * W + cell * 32 + x) * 4;
+        for (let c = 0; c < 3; c++) out[i + c] = Math.round(out[i + c] * (1 - a) + (a > 0 ? s[c] / s[3] : 0) * a);
+      }
+    }
+  });
+  return { width: W, height: H, rgba: out, figures: 2 };
+}
+
 export function main(log = console.log) {
   for (const side of ['left', 'right']) {
     const file = path.join(HERE, `era10-armour-${side}.png`);
     if (!fs.existsSync(file)) { log(`skipped ${side}: ${path.basename(file)} is not there`); continue; }
     const sheet = derive(decodePng(fs.readFileSync(file)), side === 'left' ? 360 : 361, side);
     const outFile = path.join(HERE, `era10-soldier-${side}.png`);
-    fs.writeFileSync(outFile, encodePng(sheet.width, sheet.height, Buffer.from(sheet.rgba)));
+    const png = encodePng(sheet.width, sheet.height, Buffer.from(sheet.rgba));
+    fs.writeFileSync(outFile, png);
+    recordDerived(path.basename(file), path.basename(outFile), png, sheet);
     log(`wrote ${path.basename(outFile)}: ${sheet.width}x${sheet.height} from ${sheet.figures} figures`);
   }
+  const srcs = ['left', 'right'].map((s) => decodePng(fs.readFileSync(path.join(HERE, `era10-armour-${s}.png`))));
+  const pics = heads(srcs);
+  const picPng = encodePng(pics.width, pics.height, Buffer.from(pics.rgba));
+  fs.writeFileSync(path.join(HERE, 'era10-gamerpics-heads.png'), picPng);
+  recordDerived('era10-armour-left.png', 'era10-gamerpics-heads.png', picPng, pics,
+    'the left and right sheets\' first idle figures, each head cropped square and scaled to 32 x 32 on #1b1b1b ' +
+    '(era10-gamerpics.png, two rolls, read as a famous franchise helmet and is not drawn)');
+  log('wrote era10-gamerpics-heads.png: 64x32 from both sheets');
   const uri = (n) => 'data:image/png;base64,' + fs.readFileSync(path.join(HERE, n)).toString('base64');
-  const art = { RUIN_URI: uri('era10-ruin.png'), BANNER_URI: uri('era10-banner.png'), GAMERPICS_URI: uri('era10-gamerpics.png') };
+  const art = { RUIN_URI: uri('era10-ruin.png'), BANNER_URI: uri('era10-banner.png'), GAMERPICS_URI: uri('era10-gamerpics-heads.png') };
   fs.writeFileSync(ERA_FILE, embed(fs.readFileSync(ERA_FILE, 'utf8'), art));
   log(`embedded ${Object.keys(art).join(', ')} in ${path.relative(process.cwd(), ERA_FILE)}`);
 }

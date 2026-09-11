@@ -1051,6 +1051,221 @@
         "detail": "highly detailed",
         "no_background": true
       }
+    },
+    {
+      "name": "era10-soldier-left",
+      "file": "era10-soldier-left.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 1326562740,
+      "date": "2026-09-11T03:36:49.365Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 1,
+      "seconds": 44.1,
+      "pixels": {
+        "width": 288,
+        "height": 792
+      },
+      "bytes": 248552,
+      "sha256": "0c738a2d5f0f8e4d3521cd8c436a096042f8afd072e95d2c751bbbbd4e20d62c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 1326562740,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "derivedFrom": "era10-armour-left.png",
+      "derivedBy": "node assets/pixellab/era10-derive.mjs",
+      "how": "11 figures found in the generated sheet, reposed per beat (POSES), graded toward #c9b89a, a 1-pixel HDR-sun rim and its glow, seeded grain at 0.12, at twice the size with bilinear filtering",
+      "card": "item 1234",
+      "verdict": "drawn by the character rig (src/characters.js, era 10 block) behind its paddle"
+    },
+    {
+      "name": "era10-soldier-right",
+      "file": "era10-soldier-right.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 2017111403,
+      "date": "2026-09-11T03:37:38.972Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 1,
+      "seconds": 31.1,
+      "pixels": {
+        "width": 288,
+        "height": 792
+      },
+      "bytes": 159207,
+      "sha256": "8671ea55dd96239c40a8893da6cc5382b3bc5ffb7260ea739cc6b89f543f325c",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing left, 2005 gritty sci-fi shooter, huge shoulder pads, mud brown cloth hood over the helmet, chest plate, thick forearms, battered dark armour with ash grey trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 2017111403,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "derivedFrom": "era10-armour-right.png",
+      "derivedBy": "node assets/pixellab/era10-derive.mjs",
+      "how": "8 figures found in the generated sheet, reposed per beat (POSES), graded toward #c9b89a, a 1-pixel HDR-sun rim and its glow, seeded grain at 0.12, at twice the size with bilinear filtering",
+      "card": "item 1234",
+      "verdict": "drawn by the character rig (src/characters.js, era 10 block) behind its paddle"
+    },
+    {
+      "name": "era10-ruin",
+      "file": "era10-ruin.png",
+      "prompt": "ruined city plaza at sunset, six broken concrete columns with jagged tops, bombed-out stone, umber and mud brown, dusty haze, gritty 2005 shooter backdrop, side view, desaturated",
+      "size": {
+        "width": 400,
+        "height": 120
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 7870210,
+      "date": "2026-09-11T03:49:39.203Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 17.9,
+      "pixels": {
+        "width": 400,
+        "height": 120
+      },
+      "bytes": 32643,
+      "sha256": "3f3321b3166494309ecc81669d4bf4c008b270e62e34c5186aebb075ec5d69d8",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "ruined city plaza at sunset, six broken concrete columns with jagged tops, bombed-out stone, umber and mud brown, dusty haze, gritty 2005 shooter backdrop, side view, desaturated",
+        "image_size": {
+          "width": 400,
+          "height": 120
+        },
+        "seed": 7870210,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era10-gamerpics",
+      "file": "era10-gamerpics.png",
+      "prompt": "two square avatar icons side by side, left a bulky original soldier helmet with a narrow slit visor in dark green armour, right the same kind of helmet in ash grey, dark background, 2005 console profile picture style, original design",
+      "size": {
+        "width": 64,
+        "height": 32
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "negative_description": "gold visor, orange visor, halo, master chief"
+      },
+      "seed": 1267114965,
+      "date": "2026-09-11T03:50:48.716Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 0,
+      "seconds": 12.6,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 2166,
+      "sha256": "e357477a122c1865dccaadf5222921554581dedc19c9c3272efd39211be14702",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "two square avatar icons side by side, left a bulky original soldier helmet with a narrow slit visor in dark green armour, right the same kind of helmet in ash grey, dark background, 2005 console profile picture style, original design",
+        "image_size": {
+          "width": 64,
+          "height": 32
+        },
+        "seed": 1267114965,
+        "negative_description": "gold visor, orange visor, halo, master chief",
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      }
+    },
+    {
+      "name": "era10-gamerpics-heads",
+      "file": "era10-gamerpics-heads.png",
+      "prompt": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+      "size": {
+        "width": 96,
+        "height": 396
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "seed": 1326562740,
+      "date": "2026-09-11T03:36:49.365Z",
+      "cost": {
+        "type": "derived",
+        "generations": 0
+      },
+      "generationsUsed": 1,
+      "seconds": 44.1,
+      "pixels": {
+        "width": 64,
+        "height": 32
+      },
+      "bytes": 4747,
+      "sha256": "b4430c44ac03f129dbd870fd504b26b86507aa88b823e66f61d20e937b2136f7",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "sprite sheet grid of 3 columns and 6 rows, each cell 32x66, the same heavy armoured soldier in every cell facing right, 2005 gritty sci-fi shooter, huge shoulder pads, small helmeted head, chest plate, thick forearms, battered grey-brown armour with blade green trims, desaturated brown and grey, warm rim light. row 1 idle breathing, row 2 crouched run leaning up, row 3 crouched run leaning down, row 4 shoving forward arms up, row 5 flinching arms shielding head, row 6 fist raised in victory",
+        "image_size": {
+          "width": 96,
+          "height": 396
+        },
+        "seed": 1326562740,
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "no_background": true
+      },
+      "derivedFrom": "era10-armour-left.png",
+      "derivedBy": "node assets/pixellab/era10-derive.mjs",
+      "how": "the left and right sheets' first idle figures, each head cropped square and scaled to 32 x 32 on #1b1b1b (era10-gamerpics.png, two rolls, read as a famous franchise helmet and is not drawn)",
+      "card": "item 1234",
+      "verdict": "drawn by the character rig (src/characters.js, era 10 block) behind its paddle"
     }
   ]
 }
