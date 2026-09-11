@@ -1,0 +1,48 @@
+{
+  "page": "index.html?era=1",
+  "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "when": "2026-09-11T00:27:55.841Z",
+  "change": {
+    "fromEra": 1,
+    "toEra": 2
+  },
+  "ordinaryPlay": {
+    "frames": 60,
+    "meanMs": 16.67,
+    "p95Ms": 16.8,
+    "maxMs": 16.8
+  },
+  "duringRing": {
+    "frames": 88,
+    "meanMs": 16.67,
+    "p95Ms": 16.8,
+    "maxMs": 16.8
+  },
+  "sound": {
+    "audio": "suspended",
+    "played": 2,
+    "errors": 0,
+    "last": {
+      "era": 2,
+      "type": "powerOn",
+      "waves": [
+        "square",
+        "square",
+        "triangle"
+      ],
+      "echo": false
+    }
+  },
+  "heldFrame": {
+    "era": 2,
+    "from": 1,
+    "p": 0.35106064153600014,
+    "radius": 335.24583877207766,
+    "t": 0.6666000000000001,
+    "origin": {
+      "x": 0,
+      "y": 156
+    },
+    "png": "flip-era1-to-2.png"
+  }
+}
