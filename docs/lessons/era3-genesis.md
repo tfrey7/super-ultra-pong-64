@@ -220,3 +220,11 @@ frame, and they cost nothing measurable. The tenth hit is `docs/shots/item-1226/
   at a mean of 16.7 ms, p95 16.8 ms (16.7 with the feel layer out). The tenth hit is
   [rally-era3.png](../shots/item-1280/rally-era3.png), and old beside new is
   [contact.png](../shots/item-1280/contact.png).
+- **LESSON (item 1300): size a figure to the strip it stands in, the wall to its paddle's outer face
+  -- `paddleInset`, 32 units -- before you draw it.** Item 1226's 20 x 25 frame at scale 3.2 was 64
+  units wide with the fist at that face, so each figure hung half off the screen; every one of
+  the twelve frames fills all 20 columns, so 1.6 is the largest scale that keeps the grip and
+  the whole body (`test/era3-players.test.js` holds every beat inside the field), and it costs
+  half the height and a sprite pixel smaller than the Genesis's own. Eras 1 and 2 fit because
+  their frames are 6 and 10 wide; a full-size Genesis figure wants a 12-wide frame at 2.5
+  ([before](../shots/item-1300/rally-era3-before.png), [after](../shots/item-1300/rally-era3-after.png)).
