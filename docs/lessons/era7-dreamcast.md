@@ -75,6 +75,7 @@ Look file: [src/eras/era7-dreamcast.js](../../src/eras/era7-dreamcast.js). Chapt
 | Look | `src/eras/era7-dreamcast.js` | Poster palette, graffiti score, speed lines, starburst. |
 | VGA screen | `src/display-tv.js` | `tv-vga`. |
 | Voice and music | the era file's `voice`, `src/music.js` row 7 | The slap bass and its filter sweep; the `swing` and `ninth` arrangement options. |
+| The rally counter and callouts as graffiti (item 1262) | `src/feel.js` `LETTERING[7]` | Leans them like the score, yellow over a magenta extrusion with a fat ink outline, so a callout reads as another tag on the wall. |
 
 ## START HERE
 

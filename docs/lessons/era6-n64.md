@@ -78,6 +78,7 @@ Look file: [src/eras/era6-n64.js](../../src/eras/era6-n64.js). Chapter 7 of [doc
 | Camera | `tools/table3d-cameras.js` | The close camera and its R3 check. |
 | Textures | `src/textures3d.js` | `court-grain`. |
 | Voice and music | the era file's `voice`, `src/music.js` row 6 | The muffling `bus` and the hall reverb. |
+| The rally counter and callouts in the toy HUD's lettering (item 1262) | `src/feel.js` `LETTERING[6]` | Sets RALLY and NICE/GREAT in fat toy-yellow type in the score's blue outline, the counter on a round blue plate; a new HUD word on this era takes that row. |
 
 ## START HERE
 
