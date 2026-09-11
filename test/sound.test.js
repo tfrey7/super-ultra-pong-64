@@ -267,6 +267,63 @@ test('only the Super Nintendo builds an echo, and builds it once', () => {
   assert.ok(loop, 'the delay feeds back through a gain');
 });
 
+// ------------------------------------------------------------- the boot sting
+test('the boot sting: the point that moves the machine up plays the arriving era\'s boot list instead of its score', () => {
+  const { FakeContext, log } = recorder();
+  const player = PongSound.createPlayer({ AudioContext: FakeContext });
+  player.unlock();
+  const g = newGame(0);
+  placeBall(g, g.width - 2, g.height / 2, 400, 0);
+  g.right.y = 20;
+  Pong.step(g, 0.05, {});
+  assert.strictEqual(g.era, 1);
+  assert.strictEqual(player.handle(g), 1);
+  assert.deepStrictEqual([player.last.type, player.last.era], ['boot', 1]);
+  assert.strictEqual(player.boots, 1);
+  const boot = PongSound.voicesFor(1, 'boot');
+  assert.ok(boot.length > PongSound.voicesFor(1, 'score').length, 'the Atari voice carries a boot list');
+  assert.strictEqual(log.oscillators.length, boot.reduce((n, v) => n + (v.fm ? 2 : 1), 0), 'every note of it scheduled');
+  assert.strictEqual(player.errors, 0);
+});
+
+test('a point that leaves the machine where it is plays its plain score', () => {
+  const { FakeContext } = recorder();
+  const player = PongSound.createPlayer({ AudioContext: FakeContext });
+  player.unlock();
+  // The rules stamp eraChangedAt with the moment of the point that moved the machine.
+  player.handle({ era: 1, eraChangedAt: 3, events: [{ type: 'score', era: 1, time: 5 }] });
+  assert.deepStrictEqual([player.last.type, player.boots], ['score', 0], 'an older change is not this point\'s');
+  player.handle({ era: 1, eraChangedAt: 5, events: [{ type: 'score', era: 1, time: 5 }] });
+  assert.deepStrictEqual([player.last.type, player.boots], ['boot', 1]);
+});
+
+test('a new match boots again even when the last thing heard was higher up the ladder', () => {
+  const { FakeContext } = recorder();
+  const player = PongSound.createPlayer({ AudioContext: FakeContext });
+  player.unlock();
+  player.play({ type: 'paddle', era: 4 });
+  const g = newGame(0);
+  placeBall(g, g.width - 2, g.height / 2, 400, 0);
+  g.right.y = 20;
+  Pong.step(g, 0.05, {});
+  player.handle(g);
+  assert.deepStrictEqual([player.last.type, player.last.era], ['boot', 1]);
+});
+
+test('a bare event, with no game to ask, boots only above the last era the player sounded', () => {
+  const { FakeContext } = recorder();
+  const player = PongSound.createPlayer({ AudioContext: FakeContext });
+  player.unlock();
+  player.play({ type: 'score', era: 1 });
+  assert.strictEqual(player.last.type, 'score', 'nothing sounded yet: no rise to judge');
+  player.play({ type: 'paddle', era: 0 });
+  player.play({ type: 'score', era: 1 });
+  assert.strictEqual(player.last.type, 'boot');
+  player.play({ type: 'score', era: 1 });
+  assert.strictEqual(player.last.type, 'score', 'the same era again is not a rise');
+  assert.strictEqual(player.boots, 1);
+});
+
 test('the player reads the game and never changes it', () => {
   const { FakeContext } = recorder();
   const player = PongSound.createPlayer({ AudioContext: FakeContext });
