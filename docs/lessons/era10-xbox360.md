@@ -129,6 +129,14 @@ at sunset, and the score blades carry gamerpics. A rally, as the playtest filmed
 
 **What did not work.**
 
+- **Flat sprites read as sprites on a 3D table, and Tim ruled them out** (23:47 EDT on
+  2026-09-10: *"btw if you are trying to do sprites in the 3d eras uh...that is not gonna look AAA
+  here dude"*). Even graded, rimmed, grained and pre-smoothed, a billboard soldier on a
+  perspective slab looks pasted on. It does not turn with the table, catch the sun or sit in the
+  depth of field. The soldiers on this page are **stand-ins** until this era's model card swaps in
+  polygon players made in Blender (item 1248's renderer). A one-era HD game starts from models,
+  not sheets. The concept carries over: who the two soldiers are, their trims, and the gamerpics
+  cut from their heads.
 - **pixflux does not draw sprite sheets to a grid.** Asked for 3 x 6 frames of 32 x 66, it
   drew front-facing soldiers two to a row with irregular band heights. One sheet had a
   fireball on a frame and the other a magenta visor. The poses barely differ from row to row
