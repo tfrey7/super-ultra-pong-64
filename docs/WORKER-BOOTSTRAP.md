@@ -269,6 +269,14 @@ his emulator — never touch either.**
   read throws a SecurityError. The first era card that draws pixellab art has to deal with that
   check (serve the repo over HTTP for it, or compare screenshots instead); item 1177, which built
   the loader, measured none of this in a browser -- it is reasoned from the harness's own code.
+  **Two eras have solved it by embedding, and that is the recipe:** era 2 (item 1178) and the six
+  3D eras (item 1187, `src/textures3d.js`, written by `assets/pixellab/tex3d-embed.mjs`) carry
+  their art as data: URIs, which do not taint, and the ladder walk reads every 3D frame cleanly
+  with the textures on.
+- **The playtest names a page exception by its own message now.** Until item 1187 a throw inside
+  an evaluated expression came back as the single word `Uncaught`; one climb on that card stopped
+  so while filming a change and could not be reproduced on the next two. The message and the page's
+  stack are printed in full since then, so a repeat says what it was.
 - **The pixellab balance lags the bill.** `node tools/pixellab.mjs` reads the subscription's
   generations left before and after a generation; on item 1177's test image the call was billed
   1 generation, the count read 9953 both times, and a `balance` run about two minutes later read
