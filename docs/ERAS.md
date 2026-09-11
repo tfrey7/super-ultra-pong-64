@@ -783,6 +783,11 @@ letterbox (section 12).
    a flare-blue radial gradient of radius 90 at 0.35, plus 5 ghosts on the line from the source
    through the screen centre, at `t` of 0.3, 0.55, 0.8, 1.2 and 1.5, with radii 18, 10, 26, 8 and
    40. The ghosts are hexagons, alternating flare blue and amber, at opacity 0.08 to 0.14 (R1).
+   **As built (card 1148), the light is `(120, -40, 60)`.** `(120, -400, 600)` projects 490 to 600
+   pixels above the canvas in every drift pose (this camera looks 60 degrees below the horizon), so
+   its source never showed and only two ghosts reached the frame. The built point sits just behind
+   the far rail and lands at screen `y` 25 to 54, under the top bar's edge, so the glow spills from
+   behind the letterbox and never sits over the table in any pose.
 6. **Dust motes and a glossy slab.** 40 motes in screen space (seeded positions) drift at
    `(+6, 3 * sin(t + i))` pixels a second, wrapping at the edges, sized 1 to 2.5 pixels, dust
    colour at an opacity flickering from 0.15 to 0.4. The table is a dark glossy slab with a sheen
