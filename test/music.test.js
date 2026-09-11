@@ -265,7 +265,7 @@ test('the PlayStation: real seventh chords, a grainy crush, a resonant sweep ove
   assert.strictEqual(pad.voicing, 'seventh', 'the first era where a chord is a real chord');
   const stab = partsOf(arr, 'chords', 'rhythm')[0];
   assert.ok(stab.voice.filter.q >= 5 && stab.voice.filter.sweep.to < stab.voice.filter.freq, 'the stab squelches shut');
-  assert.strictEqual(partsOf(arr, 'drum').filter((p) => p.voice.wave === 'kick')[0].pattern.split(' ').filter((t) => t !== '.').length, 4, 'four on the floor');
+  assert.strictEqual(partsOf(arr, 'drum').filter((p) => p.voice && p.voice.wave === 'kick')[0].pattern.split(' ').filter((t) => t !== '.').length, 4, 'four on the floor');
 });
 
 test('the Nintendo 64: muffled at about 9 kHz, a fat string pad, brass stabs and a big reverb', () => {
