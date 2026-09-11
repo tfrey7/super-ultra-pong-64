@@ -795,7 +795,7 @@ async function wholeMatch(s, baseUrl) {
       }
       if (g.phase === 'title' && R.stages.length) R.titleAgain = true;
       const ring = window.PongRender.eraChangeMoment(g);
-      const ordinary = g.phase === 'playing' && g.serveDelay <= 0 && !(ring && ring.wiping) &&
+      const ordinary = !window.__wholeBusy && g.phase === 'playing' && g.serveDelay <= 0 && !(ring && ring.wiping) &&
         !(m && (m.slow || m.hitStop > 0));
       if (ordinary && last !== null) (R.frames[g.era] = R.frames[g.era] || []).push(now - last);
       last = ordinary ? now : null;
@@ -828,9 +828,14 @@ async function wholeMatch(s, baseUrl) {
     let g = await playUntil(s, geo, 9000, track, (x) => x.serveDelay <= 0 || x.phase !== 'playing');
     if (g.phase !== 'playing') break;
     const startPts = points(g);
-    if (rung === 1) {
-      // A smash with spin off the player's own swing (curveShot, section 7).
+    if ((rung === 0 || rung === 2) && !(await s.eval('window.__whole.smash'))) {
+      // A smash with spin off the player's own swing (curveShot, section 7), on
+      // the arcade machine and once more on the NES if the first swing's smoothed
+      // paddle speed fell short of a smash. The frames it spends drawing its film
+      // strip in the page are the harness's, so the recorder leaves them out.
+      await s.eval('window.__wholeBusy = true');
       await curveShot(s);
+      await s.eval('window.__wholeBusy = false');
       g = await playUntil(s, geo, 1500, track);
     }
     if (WHOLE_RALLY_ERAS.includes(rung) && points(g) === startPts) {
@@ -842,7 +847,9 @@ async function wholeMatch(s, baseUrl) {
       while (Date.now() < until && points(g) === startPts && g.rally < 11) {
         await s.mouseTo(midX, toClientY(track(g)));
         if (!file && g.rally >= 7 && g.serveDelay <= 0) {
+          await s.eval('window.__wholeBusy = true');   // a capture stalls the frame it lands in
           file = await s.shot(`whole-rally-${ERA_NAMES[rung]}`, clip);
+          await s.eval('window.__wholeBusy = false');
         }
         await sleep(25);
         g = await state(s);
@@ -948,6 +955,7 @@ function summarise(shots) {
   console.log('\nscreenshots:');
   for (const f of shots) console.log('  ' + f);
   if (REFERENCE && CURVE_ONLY) console.log('the film strip was also copied to docs/shots/paddle-physics/curve-strip.png (tracked)');
+  else if (REFERENCE && WHOLE_ONLY) console.log(`the whole match's film and contact sheet were also copied to ${WHOLE_SHOTS} (tracked)`);
   else if (REFERENCE) console.log(`the era frames and the mid-change frames were also copied to ${ERA_SHOTS} (tracked)`);
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
