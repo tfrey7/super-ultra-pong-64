@@ -49,10 +49,14 @@
     ballCore: '#ffffff', ballRim: '#ffe9a8', ballEdge: '#f0b020'
   };
 
-  var FOG = { start: 0.25, end: 1.15, power: 1.2, max: 0.92, colour: PAL.fog };
+  // Thick before the far rail (item 1197): the last stretch of court is all but
+  // gone at d = 0.85, where the fog is already at its maximum, and mid-court
+  // (d = 0.5) is only lightly hazed. The paddle cap below keeps the far paddle
+  // legible and the ball is drawn after all of it, so neither is ever lost.
+  var FOG = { start: 0.25, end: 0.85, power: 1.4, max: 0.97, colour: PAL.fog };
   var PADDLE_FOG_CAP = 0.35;     // the far paddle is paler, never illegible
   var PADDLE_Z = 24;             // R6: 28 or less
-  var BALL_RADIUS = 0.7;         // a big round ball (the stock table ball is 0.6)
+  var BALL_RADIUS = 0.9;         // a big round ball: half as wide again as the stock 0.6 (item 1197)
   var BUFFER = { key: 'n64', w: 400, h: 300 };
   // Checker cells two texels wide: every cell is only two texels across when
   // the table magnifies it, so the smoothing smears half of each cell -- the
@@ -283,7 +287,7 @@
       target.restore();
     }
 
-    // the world ends in a pale wall: fully fogged from d = 1.15
+    // the world ends in a pale wall: fully fogged from d = 0.85, before the far rail
     var wall = target.createLinearGradient(0, farY - 60, 0, farY);
     wall.addColorStop(0, T.rgba(PAL.fog, 0));
     wall.addColorStop(1, T.rgba(PAL.fog, FOG.max));
@@ -304,19 +308,32 @@
       line: T.fogColour(PAL.toyYellow, 300, FOG),
       rail: railFace(T),
       railTop: T.fogColour(T.shade(PAL.rail, 0.3), -18, FOG),
-      nearLip: PAL.railDark
+      nearLip: PAL.railDark,
+      texture: TEXTURE.court,
+      trim: TEXTURE.trim
     });
 
     // 3. on the table: the fog band swallowing the far end
     T.fogBand(target, cam, FOG);
   }
 
+  // The pixellab tiles (item 1187), laid over the era's own fills through the
+  // shared table: bilinear-filtered (the N64 smoothed every texel), drawn into
+  // the half-resolution world so the blur takes them too, and the court's
+  // grain fades into the fog before the far end, as the cartridge's did.
+  var TEXTURE = {
+    court: { name: 'court-grain', alpha: 0.55, blend: 'overlay', period: 120, strip: 1, fade: 0.85, smooth: true },
+    trim: { name: 'trim', alpha: 0.35, blend: 'soft-light', period: 30, smooth: true },
+    paddle: { name: 'paddle', alpha: 0.3, blend: 'soft-light', period: 20, smooth: true },
+    ball: { name: 'ball', alpha: 0.35, blend: 'soft-light', period: 12, smooth: true }
+  };
+
   // --------------------------------------------------------------- paddles
   /** A smooth-shaded box with rounded caps, fogged at its depth up to the cap. */
   function paddle(ctx, T, cam, rect, ink) {
     var fogged = T.mix(ink, FOG.colour, Math.min(PADDLE_FOG_CAP, T.fogAmount(rect.y + rect.h, FOG)));
     var faces = T.box(ctx, cam, rect, 0, PADDLE_Z,
-      { ink: fogged, shade: 'gradient', light: { top: 0.3, near: 0, side: -0.3 }, outline: false });
+      { ink: fogged, shade: 'gradient', light: { top: 0.3, near: 0, side: -0.3 }, outline: false, texture: TEXTURE.paddle });
     // Rounded ends: a projected half-ellipse cap on the top face at each end.
     var r = rect.w / 2, cx = rect.x + r;
     var ends = [[rect.y + r, Math.PI], [rect.y + rect.h - r, 0]];
@@ -339,6 +356,7 @@
       radius: BALL_RADIUS,
       shadow: 'rgba(12,56,24,0.55)',
       outline: false,
+      texture: TEXTURE.ball,
       fill: function (sx, sy, sr) {
         // a smooth sphere: the hot spot at the upper-left third, rim to gold
         var g = ctx.createRadialGradient(sx - sr / 3, sy - sr / 3, 0, sx, sy, sr);

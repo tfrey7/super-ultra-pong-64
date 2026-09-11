@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Item 1198: every era at its native resolution</title>
+<style>
+  body { margin: 0; padding: 16px; background: #111; color: #ddd; font: 13px/1.3 system-ui, sans-serif; }
+  h1 { font-size: 16px; margin: 0 0 12px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 400px); gap: 14px; }
+  figure { margin: 0; }
+  canvas { display: block; width: 400px; height: 300px; background: #000; }
+  figcaption { margin-top: 4px; }
+  b { color: #fff; }
+</style>
+</head>
+<body>
+<h1>Every era drawn at its machine's native resolution, then scaled up to a 400 x 300 tile the way the page scales it (hard edges for eras 0-4, soft for 5-10)</h1>
+<div class="grid" id="grid"></div>
+<!-- The page's own scripts, in index.html's order. -->
+<script src="../../../src/game.js"></script>
+<script src="../../../src/sprites.js"></script>
+<script src="../../../src/render.js"></script>
+<script src="../../../src/display.js"></script>
+<script src="../../../src/display-crt.js"></script>
+<script src="../../../src/display-tv.js"></script>
+<script src="../../../src/table3d.js"></script>
+<script src="../../../src/eras/era0-arcade.js"></script>
+<script src="../../../src/eras/era1-atari2600.js"></script>
+<script src="../../../src/eras/era2-nes.js"></script>
+<script src="../../../src/eras/era3-genesis.js"></script>
+<script src="../../../src/eras/era4-snes.js"></script>
+<script src="../../../src/eras/era5-playstation.js"></script>
+<script src="../../../src/eras/era6-n64.js"></script>
+<script src="../../../src/eras/era7-dreamcast.js"></script>
+<script src="../../../src/eras/era8-ps2.js"></script>
+<script src="../../../src/eras/era9-xbox.js"></script>
+<script src="../../../src/eras/era10-xbox360.js"></script>
+<script src="../../../src/signboards.js"></script>
+<script src="../../../src/erachange.js"></script>
+<script>
+(function () {
+  var D = window.PongDisplay, R = window.PongRender, grid = document.getElementById('grid');
+  var TILE_W = 400, TILE_H = 300, scale = window.devicePixelRatio || 1;
+  Pong.ERAS.forEach(function (entry) {
+    var e = entry.era;
+    var g = Pong.createGame({ era: e, phase: 'playing' });
+    g.score.left = 3; g.score.right = 5;
+    g.serveDelay = 0; g.time = 12;
+    g.ball.x = 520; g.ball.y = 230;
+    g.left.y = 250; g.right.y = 180;
+    // The page's own pipeline: drawn in field units, ending in the native picture.
+    var nat = D.render(e, g.width, g.height, function (ctx) { R.draw(ctx, g); });
+    var row = D.row(e);
+    var fig = document.createElement('figure');
+    var c = document.createElement('canvas');
+    c.width = TILE_W * scale; c.height = TILE_H * scale;
+    var x = c.getContext('2d');
+    x.imageSmoothingEnabled = !!row.smooth;
+    x.imageSmoothingQuality = 'high';
+    x.drawImage(nat, 0, 0, row.w, row.h, 0, 0, c.width, c.height);
+    var cap = document.createElement('figcaption');
+    cap.innerHTML = '<b>' + e + ' ' + entry.year + ' ' + entry.machine + '</b> &middot; ' +
+      row.w + ' x ' + row.h + ' &middot; ' + (row.smooth ? 'soft' : 'hard') + ' scaling';
+    fig.appendChild(c); fig.appendChild(cap); grid.appendChild(fig);
+  });
+})();
+</script>
+</body>
+</html>
