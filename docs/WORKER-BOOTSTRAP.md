@@ -12,7 +12,11 @@ Every point either side scores moves the machine **up one era** -- 0 the 1972 ar
 1 the 1977 Atari 2600 (the turn to colour), 2 the NES, 3 the Genesis, 4 the Super Nintendo, then
 the 3D table: 5 the PlayStation, 6 the Nintendo 64, 7 the Dreamcast, 8 the PlayStation 2, 9 the
 Xbox and 10 the 2005 Xbox 360, where it stops. It does not matter which side scored, so a match's
-tenth point lands on era 10 and every point after that leaves it there. **All eleven rungs are
+tenth point lands on era 10, and the **eleventh, scored there, ends the match** (item 1211: a match
+is eleven points, `RULES.matchPoints`; the rules go to phase `'over'` with `winner`, and
+`src/match.js` plays MATCH POINT, the 360-style result, the rewind down every era and the 1972
+thanks screen, then `Pong.backToTitle`). A game with `matchPoints: 0` never ends -- the attract
+rally's rules, and a test that wants points to go on past eleven. **All eleven rungs are
 built** -- each has its own look, its own voice and a change moment -- and the README's *The era
 ladder* tables them, with a tracked reference frame of each in `docs/shots/eras/`. Eras 5 to 10
 are specified in `docs/ERAS.md`, the era bible. It opens on a **title screen** -- a real `phase` in
@@ -101,7 +105,10 @@ timing over the ring, against ordinary play just before it) with the paddle stil
 saving `era-wipe.png` mid-ring -- and, last, it **walks one match up the whole ladder**: a fresh
 era-0 machine, one point let through per rung, a check that each point moved it up exactly one era,
 a screenshot of each era in play (`docs/shots/playtest/ladder-era0-arcade.png` to
-`ladder-era10-xbox360.png`, cropped to the field) and one more point to prove it stops on era 10.
+`ladder-era10-xbox360.png`, cropped to the field) and one more point to prove it stops on era 10 --
+which is the eleventh, so it ends the match, and the walk films the finale to the attract screen
+(`finale-announce-ladder.png`, `finale-rewind-ladder.png`, `finale-thanks-ladder.png`; `--match`
+runs only that, from ten points in on the 360, in about twenty seconds).
 On the way up it **films each of the ten era changes**: a frame caught mid-ring
 (`change-era0-to-era1.png` to `change-era9-to-era10.png`), a check that the ring's radius reached
 the farthest corner from where the ball went out, and a check that once the ring has gone the live
