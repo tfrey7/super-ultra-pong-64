@@ -271,9 +271,8 @@ So the six era cards never touch the same line:
 - **The sound hook** (section 3), and `TOP_ERA` in `src/sound.js` following `Pong.ERAS` rather than
   the hard-coded 4. As built, a rung above the `VOICES` rows whose look has no `voice` yet plays the
   Super Nintendo's row and echo, so the placeholders are never silent. Of the section 3 additions,
-  1144 builds only the hook: `wave: 'noise'` notes are skipped rather than played, and `attack`,
-  `filter`, `unison`, `lfo`, `shape`, `reverb` and `bus` are still to build. The boot sting is
-  built (item 1162, section 3), and eras 1 and 2 already use it.
+  1144 built only the hook; item 1181 built the rest (every note field and effect, section 3), and
+  the boot sting is built too (item 1162, section 3).
 - **Name cards** carry `dots: null`, so no rung above 4 inherits the Super Nintendo's four
   buttons from `STYLES[4]` in `src/erachange.js`.
 
@@ -305,7 +304,7 @@ renderer and that era's file first, the way `test/erachange.test.js` loads the r
 
 **A voice** is `{ paddle: [...], wall: [...], score: [...], boot: [...], effects: {...} }`. Each
 list holds notes, and today's note fields keep their meaning: `wave`, `freq`, `slideTo`, `at`,
-`dur`, `gain` and `fm`. **Additions**, all optional, which the player ignores until they are built:
+`dur`, `gain` and `fm`. **Additions**, all optional, all played since item 1181:
 
 | Field | Meaning |
 | --- | --- |
@@ -320,6 +319,20 @@ list holds notes, and today's note fields keep their meaning: `wave`, `freq`, `s
 a ConvolverNode whose impulse is noise times `(1 - i / n) ** decay`, built once per era on first
 use (a one-time sample fill of an audio buffer, not a pixel loop); `bus: { type, freq, q }`, one
 filter every note of the era passes through.
+
+As built (item 1181): a note runs source (the oscillator, the unison's copies, or the looped noise,
+each noise note starting at a different place in the loop) → `shape` → `filter` → envelope → `lfo`
+into its era's bus. Each era builds its own effects the first time one of its notes plays and keeps
+them for that era alone, so the Dreamcast's 0.12 s echo is its own and not the Super Nintendo's
+0.14 s. An era's `shape` effect and its `bus` filter sit in that order at the head of the era's
+chain; with either, the chain's end feeds the speakers, the echo and the reverb, so a tail is
+muffled and driven with the note it came from. Without them, each note feeds the speakers and the
+sends itself, which is exactly what eras 0 to 4 always did: `tools/sound-eras0-4.json` holds their
+schedule call for call, `test/sound.test.js` compares against it, and `node tools/soundtrace.js`
+re-records it for a deliberate change. The noise and impulse fills use a fixed seed, so every
+session hears the same room. An audio context that has no node for a field (no `createConvolver`,
+say) plays the rest of the note and counts the miss in the player's `skipped`; the playtest
+requires `skipped` 0 on the real Web Audio API.
 
 **The boot sting.** When the player plays a `score` event whose `era` is higher than the last era
 it sounded, and that era's voice has a `boot` list, it plays `boot` instead of `score`. The sting
@@ -575,17 +588,21 @@ the strongest perspective. The flourish overshoot reaches tilt 28, a measured po
    `imageSmoothingEnabled = true`. It is copied up with smoothing **on**: a soft, smeared table.
    Paddles and ball are drawn on the main canvas afterwards, crisp (R4). *Null offscreen:* flat
    quads in table grass.
-2. **Heavy distance fog.** `fog = { start: 0.25, end: 1.15, power: 1.2, max: 0.92, colour: '#b9d4ec' }`.
+2. **Heavy distance fog.** `fog = { start: 0.25, end: 0.85, power: 1.4, max: 0.97, colour: '#b9d4ec' }`:
+   full fog from `d = 0.85`, **before** the far rail, so the rail and the last stretch of court are
+   all but gone, while mid-court (`d = 0.5`, fog 0.28) is only hazed (card 1197 pulled it in from
+   `start 0.25, end 1.15, power 1.2, max 0.92`, which left the whole court visible under a haze).
    `T.fogBand(ctx, cam, fog)` goes over the table at step 3. The rails and hills take
    `T.fogColour` at their depth, and scenery behind the far wall is drawn **fully fogged** from
-   `d = 1.15`, so the world simply ends in a pale wall. Paddles take fog too, **capped at 0.35**, so
+   `d = 0.85`, so the world simply ends in a pale wall. Paddles take fog too, **capped at 0.35**, so
    the far paddle is paler but always legible.
 3. **Smooth, rounded low-poly.** Paddles are boxes 24 tall with `shade: 'gradient'`, plus rounded
    ends: a projected half-ellipse cap on the top face at each end, in `T.shade(ink, 0.35)`. The
    rails are half-cylinders: a box whose near face takes a 3-stop vertical gradient, rail red dark
    to rail red to rail red dark. **The ball is a smooth sphere**: a radial gradient from a hot spot
-   at the upper-left third, `#ffffff` to `#ffe9a8` to `#f0b020` at the rim. That is the opposite of
-   the PlayStation's gem.
+   at the upper-left third, `#ffffff` to `#ffe9a8` to `#f0b020` at the rim, and **big**: radius
+   `0.9 x ball.size`, half as wide again as the PlayStation's stock 0.6 (card 1197). That is the
+   opposite of the PlayStation's gem.
 4. **Saturated cartoon world.** Behind the far wall: a sky gradient (sky top to sky horizon), 3
    rolling hill arcs (big ellipses, far hills first, fogged), and 2 clouds, each 3 overlapping white
    circles drifting at 4 units a second. Every material comes from the palette; no greys except the
