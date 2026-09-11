@@ -286,7 +286,7 @@ test('every 3D rung still waiting on its card draws era 5\'s table, and every 3D
     // Read from the look itself (item 1186): an era card that has landed brings its own
     // draw (and its own test file); only the rungs still waiting are pinned to era 5's table.
     if (look.placeholder) assert.strictEqual(look.draw, R.eraLook(5).draw, `era ${era} placeholder`);
-    else assert.strictEqual(typeof look.draw, 'function', `era ${era} is built and draws itself`);
+    else assert.notStrictEqual(look.draw, R.eraLook(5).draw, `era ${era} is built and draws its own frame`);
   }
   cards.add(JSON.stringify(R.eraLook(5).card));
   assert.strictEqual(cards.size, Pong.TOP_ERA - 4, 'a different name card on every 3D rung');
