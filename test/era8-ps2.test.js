@@ -110,7 +110,7 @@ test('era 8 is the PlayStation 2, built rather than a placeholder, wearing the c
   assert.strictEqual(typeof l.draw, 'function');
   assert.deepStrictEqual(l.camera, { tilt: 30, height: 1250, fov: 29, screenY: 281 }, 'the bible camera at rest');
   assert.strictEqual(l.card.dots, null, 'no Super Nintendo buttons on the card');
-  assert.notStrictEqual(typeof l.flourish, 'function', 'no borrowed arrival (era 1\'s): the flourish is a separate card');
+  assert.notStrictEqual(l.flourish, R.eraLook(1).flourish, 'no borrowed arrival (era 1\'s): its own, item 1154');
   const g = rally();
   assert.strictEqual(R.paddleInk(g, 'left'), R.eraLook(1).paddleInk(g, 'left'));
   assert.strictEqual(R.paddleInk(g, 'right'), R.eraLook(1).paddleInk(g, 'right'));

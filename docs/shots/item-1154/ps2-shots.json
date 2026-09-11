@@ -1,0 +1,76 @@
+{
+ "url": "file:///G:/Claude%20Stuff/super-ultra-pong-64-item-1154/index.html?era=7",
+ "baseline": {
+  "frames": 240,
+  "meanMs": 4.17,
+  "p95Ms": 4.3,
+  "maxMs": 4.3
+ },
+ "ringFrames": {
+  "frames": 323,
+  "meanMs": 4.66,
+  "p95Ms": 4.3,
+  "maxMs": 54.2
+ },
+ "serveAtLastRingFrame": 0.3001999999999982,
+ "paddle": {
+  "top": {
+   "era": 8,
+   "raw": 0.26113333333333344,
+   "p": 0.07122737328948157,
+   "wiping": true,
+   "cardUp": false,
+   "serveDelay": 1.4083000000000003,
+   "paddleY": 17.818731117824775,
+   "hook": "function"
+  },
+  "bottom": {
+   "era": 8,
+   "raw": 0.35286666666666555,
+   "p": 0.17574860889718352,
+   "wiping": true,
+   "cardUp": false,
+   "serveDelay": 1.2707000000000008,
+   "paddleY": 497.2749244712991,
+   "hook": "function"
+  },
+  "follows": true
+ },
+ "shots": [
+  {
+   "name": "ps2-beat1-bars",
+   "file": "G:\\Claude Stuff\\super-ultra-pong-64-item-1154\\docs\\shots\\item-1154\\ps2-beat1-bars.png",
+   "askedRaw": 0.3,
+   "rawBefore": 0.3027333333333561,
+   "pBefore": 0.11097897768417321,
+   "serveDelay": 1.3458999999999997
+  },
+  {
+   "name": "ps2-beat2-towers",
+   "file": "G:\\Claude Stuff\\super-ultra-pong-64-item-1154\\docs\\shots\\item-1154\\ps2-beat2-towers.png",
+   "askedRaw": 0.45,
+   "rawBefore": 0.4583333333333677,
+   "pBefore": 0.38512731481490137,
+   "serveDelay": 1.1125000000000005
+  },
+  {
+   "name": "ps2-beat3-flare",
+   "file": "G:\\Claude Stuff\\super-ultra-pong-64-item-1154\\docs\\shots\\item-1154\\ps2-beat3-flare.png",
+   "askedRaw": 0.72,
+   "rawBefore": 0.7305333333333882,
+   "pBefore": 0.9217336390068627,
+   "serveDelay": 0.7042000000000006
+  }
+ ],
+ "settled": {
+  "era": 8,
+  "raw": null,
+  "p": null,
+  "wiping": false,
+  "cardUp": false,
+  "serveDelay": -0.004099999999998149,
+  "paddleY": 258,
+  "hook": "function"
+ },
+ "errors": []
+}
