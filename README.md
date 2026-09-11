@@ -249,9 +249,19 @@ lines of 720p for the Xbox 360. The 2D machines are scaled with hard pixel edges
 colour), the 3D ones with the soft scaling a television gave them. During an era
 change the display switches to the new machine the moment the ring passes the
 centre. Each row of the table also names the screen the machine was seen on --
-an overlay kind and its strength; this card ships only `none`, and
-`src/display-crt.js` and `src/display-tv.js`, already in the page's script list,
-are where the CRT and TV overlays plug in. `index.html?display=off` draws
+an overlay kind and its strength, drawn over the scaled-up picture on the page.
+`src/display-crt.js` puts the five 2D machines on the screen of their day (item
+1199): the arcade on a black-and-white monitor (heavy scanlines, phosphor glow),
+the Atari on a 1970s colour TV over RF (soft scanlines, colour bleed, a slow
+rolling band and a little snow), the NES and Genesis on a 1980s TV over
+composite (scanlines, phosphor-triad grain, red and blue fringes, a rounded
+tube with a vignette) and the Super Nintendo over S-video (fine scanlines, a
+mild glow). The tube is pre-drawn once per picture size and multiplied over
+each frame; the glow and fringes are the native frame drawn again, added at low
+alpha -- no per-pixel work. The playtest's pixel checks read the native picture
+from before the overlay; the reference frames show what the page shows, and
+`docs/shots/crt/` holds a before-and-after pair per era (`pairs.py` rebuilds
+them). `src/display-tv.js` is where the TV overlays of eras 5-10 plug in. `index.html?display=off` draws
 straight onto the page as before. All eleven side by side:
 `docs/shots/eras/contact-sheet-native.png` (from
 `docs/measure/item1198/contact-sheet.html`).
