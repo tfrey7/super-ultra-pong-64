@@ -125,7 +125,7 @@ class Session extends CdpConnection {
 class ForeignPage extends Error {}
 
 // Attach only to the page this checkout asked for. The port was free a moment ago
-// (main() checks), but another worker's Chrome can still take it in between, and
+// (launchChrome checks), but another worker's Chrome can still take it in between, and
 // then our Chrome runs with no port at all while the endpoint answers with theirs.
 async function targetUrl(asked) {
   for (let i = 0; i < 60; i++) {
