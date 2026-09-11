@@ -1,0 +1,162 @@
+[
+  {
+    "era": 0,
+    "name": "1972 arcade",
+    "year": 1972,
+    "voices": 1,
+    "bars": 8,
+    "peak": 1,
+    "droppedPlain": 0,
+    "droppedWithLift": 0,
+    "stages": {
+      "intro": {
+        "intensity": 0,
+        "notes": 16,
+        "parts": 1
+      },
+      "build": {
+        "intensity": 0.5,
+        "notes": 32,
+        "parts": 2
+      },
+      "climax": {
+        "intensity": 0.8,
+        "notes": 64,
+        "parts": 3
+      },
+      "matchPoint": {
+        "intensity": 1,
+        "notes": 80,
+        "parts": 4
+      }
+    }
+  },
+  {
+    "era": 1,
+    "name": "Atari 2600",
+    "year": 1977,
+    "voices": 2,
+    "bars": 8,
+    "peak": 2,
+    "droppedPlain": 0,
+    "droppedWithLift": 16,
+    "stages": {
+      "intro": {
+        "intensity": 0,
+        "notes": 103,
+        "parts": 3
+      },
+      "build": {
+        "intensity": 0.5,
+        "notes": 125,
+        "parts": 5
+      },
+      "climax": {
+        "intensity": 0.8,
+        "notes": 189,
+        "parts": 8
+      },
+      "matchPoint": {
+        "intensity": 1,
+        "notes": 189,
+        "parts": 8
+      }
+    }
+  },
+  {
+    "era": 2,
+    "name": "NES",
+    "year": 1985,
+    "voices": 5,
+    "bars": 8,
+    "peak": 5,
+    "droppedPlain": 0,
+    "droppedWithLift": 7,
+    "stages": {
+      "intro": {
+        "intensity": 0,
+        "notes": 415,
+        "parts": 5
+      },
+      "build": {
+        "intensity": 0.5,
+        "notes": 541,
+        "parts": 9
+      },
+      "climax": {
+        "intensity": 0.8,
+        "notes": 631,
+        "parts": 12
+      },
+      "matchPoint": {
+        "intensity": 1,
+        "notes": 638,
+        "parts": 13
+      }
+    }
+  },
+  {
+    "era": 3,
+    "name": "Genesis",
+    "year": 1989,
+    "voices": 10,
+    "bars": 8,
+    "peak": 8,
+    "droppedPlain": 0,
+    "droppedWithLift": 0,
+    "stages": {
+      "intro": {
+        "intensity": 0,
+        "notes": 317,
+        "parts": 4
+      },
+      "build": {
+        "intensity": 0.5,
+        "notes": 437,
+        "parts": 7
+      },
+      "climax": {
+        "intensity": 0.8,
+        "notes": 548,
+        "parts": 10
+      },
+      "matchPoint": {
+        "intensity": 1,
+        "notes": 556,
+        "parts": 11
+      }
+    }
+  },
+  {
+    "era": 4,
+    "name": "Super Nintendo",
+    "year": 1991,
+    "voices": 8,
+    "bars": 8,
+    "peak": 8,
+    "droppedPlain": 0,
+    "droppedWithLift": 3,
+    "stages": {
+      "intro": {
+        "intensity": 0,
+        "notes": 97,
+        "parts": 3
+      },
+      "build": {
+        "intensity": 0.5,
+        "notes": 226,
+        "parts": 6
+      },
+      "climax": {
+        "intensity": 0.8,
+        "notes": 275,
+        "parts": 10
+      },
+      "matchPoint": {
+        "intensity": 1,
+        "notes": 283,
+        "parts": 11
+      }
+    }
+  }
+]

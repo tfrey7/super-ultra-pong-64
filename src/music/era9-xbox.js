@@ -35,43 +35,78 @@
   },
   chain: { tape: { wow: 0.05, flutter: 0.05, sat: 0.25 } },
 
-  // 9 -- 2001 Xbox: a PC sound chip in a box, streaming real recordings;
-  // the soundtrack goes guitar.
+  // 9 -- 2001 Xbox: a PC sound chip in a box, streaming real recordings.
+  // Item 1243: Halo -- the monk chant, the string ostinato, the war drums,
+  // and the turn from chant to rock guitar.
+  //   intro  (0)    the monk choir alone: the tune sung on "ah" (a saw
+  //                 through two formant band-passes) over a low "oo" chord
+  //   build  (0.3)  the string ostinato in sixteenths, war drums (taiko) on
+  //                 the beat and rolling into each section, a bass pulse
+  //   climax (0.7)  the rock turn: drop-tuned power chords double-tracked
+  //                 hard left and right, an overdriven lead guitar on the
+  //                 tune, the full rock kit, and the choir an octave up
   name: 'Xbox',
-  about: 'Drop-tuned rock: low palm-muted power-chord chugs double-tracked hard left and right, the melody screamed out on an overdriven lead guitar, a growling bass an octave down, a heavy kick and a cracking snare that rolls into each new section, with a crash to open it.',
-  trait: 'A guitar amp in software: a saw through a heavy drive, power chords tuned down low, a heavy kick and snare and wide stereo.',
+  about: 'Halo: a monk choir alone on the tune, singing "ah" over a low "oo" chord in a cathedral; as the rally builds the strings drive a sixteenth-note ostinato and war drums pound the beat; at the top it turns to rock the way Halo does, drop-tuned power chords double-tracked hard left and right, an overdriven lead guitar on the tune, a heavy kick and cracking snare, and the choir climbing an octave over it all.',
+  trait: 'A PC sound chip in a box streaming real recordings: a sung choir made from formant filters, strings, taiko and a guitar amp in software, wide and saturated.',
   parts: [
+    // ---------------------------------------------------------- the intro
+    // The monk choir on "ah": one saw per note through the first formant
+    // (about 750 Hz) here and the second (about 1150 Hz) on the echo below.
     { play: 'melody', rule: 'full',
-      voice: { wave: 'sawtooth', gain: 0.055, drive: 0.6, env: { a: 0.004, d: 0.2, s: 0.8, r: 0.1 }, legato: 0.92,
-               filter: { type: 'lowpass', freq: 3600, q: 1 },
-               vibrato: { rate: 6.2, cents: 28, delay: 0.14 } } },
+      voice: { wave: 'sawtooth', gain: 0.11, unison: [-6, 6],
+               env: { a: 0.14, d: 0.3, s: 0.9, r: 0.35 }, legato: 0.97,
+               filter: { type: 'bandpass', freq: 750, q: 3 },
+               vibrato: { rate: 5, cents: 10, delay: 0.2 } } },
+    { play: 'echo', of: 'melody', delay: 8 * 16,
+      voice: { wave: 'sawtooth', gain: 0.06, unison: [4],
+               env: { a: 0.14, d: 0.3, s: 0.9, r: 0.35 }, legato: 0.97,
+               filter: { type: 'bandpass', freq: 1150, q: 4 },
+               vibrato: { rate: 5.3, cents: 10, delay: 0.2 } } },
+    // The low monks on "oo": the chord an octave down through a low formant.
+    { play: 'chords', rule: 'pad', octave: -1,
+      voice: { wave: 'sawtooth', gain: 0.07, unison: [-8, 8], spread: 0.5,
+               env: { a: 0.6, d: 0.4, s: 0.9, r: 0.9 }, legato: 0.99,
+               filter: { type: 'bandpass', freq: 420, q: 2.5 } } },
+    // ---------------------------------------------------------- the build
+    // The string ostinato: the chord's notes cycled in sixteenths.
+    { play: 'chords', rule: 'arp', speed: 1, from: 0.3,
+      voice: { wave: 'sawtooth', gain: 0.035, unison: [7], spread: 0.4,
+               env: { a: 0.004, d: 0.09, s: 0.4, r: 0.05 }, legato: 0.8,
+               filter: { type: 'lowpass', freq: 2200, q: 1 } } },
+    { play: 'drum', hit: 'taiko', from: 0.3,
+      pattern: 'X . . . X . . . X . . . X . x .', fill: 'X . . X . . X . X . X . X X X X' },
+    { play: 'bass', rule: 'eighths', octave: -1, from: 0.3,
+      voice: { wave: 'sawtooth', gain: 0.11, drive: 0.25, env: { a: 0.002, d: 0.1, s: 0.6, r: 0.03 }, legato: 0.85,
+               filter: { type: 'lowpass', freq: 520, q: 1 } } },
+    // --------------------------------------------------------- the climax
     // The riff double-tracked: two takes, one hard left and one hard right,
     // a few cents apart, so the chugs fill the sides and leave the middle
     // to the kick, the bass and the lead.
-    { play: 'chords', rule: 'rhythm', voicing: 'power', octave: -1,
+    { play: 'chords', rule: 'rhythm', voicing: 'power', octave: -1, from: 0.7,
       pattern: 'X - x x X - x x X - x x X x X x', fill: 'X - x x X - x x X - X - X - X -',
-      voice: { wave: 'sawtooth', gain: 0.11, unison: [-7], pan: -1, drive: 0.85,
+      voice: { wave: 'sawtooth', gain: 0.1, unison: [-7], pan: -1, drive: 0.85,
                env: { a: 0.002, d: 0.08, s: 0.55, r: 0.03 }, legato: 0.8,
                filter: { type: 'lowpass', freq: 3000, q: 0.9 } } },
-    { play: 'chords', rule: 'rhythm', voicing: 'power', octave: -1,
+    { play: 'chords', rule: 'rhythm', voicing: 'power', octave: -1, from: 0.7,
       pattern: 'X - x x X - x x X - x x X x X x', fill: 'X - x x X - x x X - X - X - X -',
-      voice: { wave: 'sawtooth', gain: 0.11, unison: [8], pan: 1, drive: 0.85,
+      voice: { wave: 'sawtooth', gain: 0.1, unison: [8], pan: 1, drive: 0.85,
                env: { a: 0.003, d: 0.08, s: 0.55, r: 0.03 }, legato: 0.78,
                filter: { type: 'lowpass', freq: 2800, q: 0.9 } } },
-    { play: 'bass', rule: 'eighths', octave: -1,
-      voice: { wave: 'sawtooth', gain: 0.12, drive: 0.25, env: { a: 0.002, d: 0.1, s: 0.6, r: 0.03 }, legato: 0.85,
-               filter: { type: 'lowpass', freq: 520, q: 1 } } },
-    { play: 'drum', pattern: 'X . . . . . x . X . x . . . . .', fill: 'X . . . . . x . X x X x X x X x',
-      voice: { wave: 'kick', freq: 125, gain: 0.45, env: { a: 0.001, d: 0.14, s: 0, r: 0.02 } } },
-    { play: 'drum', pattern: '. . . . X . . . . . . . X . . .', fill: '. . . . X . . . . . X . X X X X',
-      voice: { wave: 'noise', gain: 0.2, env: { a: 0.001, d: 0.15, s: 0, r: 0.03 },
-               filter: { type: 'bandpass', freq: 1900, q: 0.8 } } },
-    { play: 'drum', pattern: 'x . x . x . x . x . x . x . x .',
-      voice: { wave: 'noise', gain: 0.04, pan: 0.45, env: { a: 0.001, d: 0.05, s: 0, r: 0.01 },
-               filter: { type: 'highpass', freq: 8000, q: 0.7 } } },
-    { play: 'drum', pattern: '. . . . . . . . . . . . . . . .', open: 'X . . . . . . . . . . . . . . .',
-      voice: { wave: 'noise', gain: 0.07, pan: -0.45, env: { a: 0.001, d: 1.0, s: 0, r: 0.1 },
-               filter: { type: 'highpass', freq: 4500, q: 0.5 } } }
+    // The lead guitar on the tune: the melody a whole loop late, which is
+    // the same step (the one tune, doubled), through a hard drive.
+    { play: 'echo', of: 'melody', delay: 8 * 16, from: 0.7,
+      voice: { wave: 'sawtooth', gain: 0.05, drive: 0.6, env: { a: 0.004, d: 0.2, s: 0.8, r: 0.1 }, legato: 0.92,
+               filter: { type: 'lowpass', freq: 3600, q: 1 },
+               vibrato: { rate: 6.2, cents: 28, delay: 0.14 } } },
+    // The choir an octave up.
+    { play: 'echo', of: 'melody', delay: 8 * 16, octave: 1, from: 0.7,
+      voice: { wave: 'sawtooth', gain: 0.06, unison: [-5, 5],
+               env: { a: 0.12, d: 0.3, s: 0.9, r: 0.35 }, legato: 0.97,
+               filter: { type: 'bandpass', freq: 1100, q: 3 },
+               vibrato: { rate: 5, cents: 10, delay: 0.2 } } },
+    { play: 'drum', hit: 'kick', from: 0.7, pattern: 'X . . . . . x . X . x . . . . .', fill: 'X . . . . . x . X x X x X x X x' },
+    { play: 'drum', hit: 'snare', from: 0.7, pattern: '. . . . X . . . . . . . X . . .', fill: '. . . . X . . . . . X . X X X X' },
+    { play: 'drum', hit: 'hat', from: 0.7, pattern: 'x . x . x . x . x . x . x . x .' }
   ],
-  effects: { reverb: { seconds: 1, decay: 4, mix: 0.12 } }
+  effects: { reverb: { seconds: 2.8, decay: 2.5, mix: 0.3 } }
 });

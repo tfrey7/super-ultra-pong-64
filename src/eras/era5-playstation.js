@@ -514,7 +514,9 @@
     T.path(c, cam, [[0, 0, 0], [800, 0, 0], [800, 600, 0], [0, 600, 0]]);
     c.fillStyle = PAL.void;
     c.fill();
-    T.table(c, cam, {
+    // Through the real 3D layer when the page has WebGL (item 1273): it then
+    // draws the table, bats, ball and shadow itself, and 3 and 4 are skipped.
+    var gl = T.field(c, cam, {
       surface: tex ? surface(T, sp, tex) : PAL.base,
       line: PAL.line,
       rail: gouraud(PAL.rail, PAL.railShadow),
@@ -522,13 +524,13 @@
       nearLip: gouraud(PAL.rail, PAL.railShadow),
       texture: TEXTURE.court,
       trim: TEXTURE.trim
-    });
+    }, state, P);
 
     // 2b. match point: both searchlights locked on the centre line, on the table, under the paddles (R4)
     if (finalRound) beams(c, T, cam, t, true);
 
     // 3. the contact shadow at the ball's true footprint (R5); hidden with the ball
-    if (state.serveDelay <= 0) {
+    if (!gl && state.serveDelay <= 0) {
       var b = state.ball;
       var foot = T.project(cam, b.x + b.size / 2, b.y + b.size / 2, 0);
       c.save();
@@ -544,11 +546,12 @@
     // 4. paddles, the far one (smaller rect.y + rect.h) first
     var sides = ['left', 'right'];
     if (state.right.y + state.right.h < state.left.y + state.left.h) sides.reverse();
-    for (var i = 0; i < sides.length; i++) paddle(c, T, cam, sp, state[sides[i]], P.paddleInk(state, sides[i]));
+    for (var i = 0; !gl && i < sides.length; i++) paddle(c, T, cam, sp, state[sides[i]], P.paddleInk(state, sides[i]));
 
     // 8. the score goes INTO the buffer on purpose, so it is as chunky as the rest (R8: above the far edge)
     score(c, state, sp, P);
     hud(c, state, sp, P);
+    return gl;
   }
 
   /**
@@ -804,22 +807,24 @@
 
     ctx.save();
     ctx.globalAlpha = 1;
+    var gl;
     if (buf) {
       var b = buf.ctx;
       b.save();
       b.globalAlpha = 1;
       b.imageSmoothingEnabled = false;    // nearest texels: no bilinear filtering on this machine
-      scene(b, state, cam, T, P, { px: 1, field: BUFFER.scale });
+      gl = scene(b, state, cam, T, P, { px: 1, field: BUFFER.scale });
       b.restore();
       b.setTransform(1, 0, 0, 1, 0, 0);
       ctx.imageSmoothingEnabled = false;  // scaled up sharp: every chunk 2.5 pixels, hard-edged
       ctx.drawImage(buf.canvas, 0, 0, state.width, state.height);
     } else {
-      scene(ctx, state, cam, T, P, { px: 1 / BUFFER.scale, field: 0 });
+      gl = scene(ctx, state, cam, T, P, { px: 1 / BUFFER.scale, field: 0 });
     }
 
-    // 7. the ball, full resolution and last of everything (R1, R2); hidden in the serve pause
-    if (state.serveDelay <= 0) gem(ctx, T.ballScreen(cam, state), T);
+    // 7. the ball, full resolution and last of everything (R1, R2); hidden in the serve pause.
+    // The 3D layer drew its own (item 1273).
+    if (!gl && state.serveDelay <= 0) gem(ctx, T.ballScreen(cam, state), T);
     ctx.restore();
   }
 

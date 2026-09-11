@@ -262,7 +262,10 @@ test('the engine lifts every era with a tom and a crash: a roll into each sectio
   const arr = M.ARRANGEMENTS[10];
   const plain = M.arrange(arr);
   const lifted = M.arrange(arr, T, { lift: true });
-  const extra = (score) => score.reduce((n, list) => n + list.filter((e) => e.from > 0).length, 0);
+  // A lift event is one of the parts the engine appended after the arrangement's own
+  // (item 1243: the arrangements now carry `from` layers of their own).
+  const isLift = (e) => e.part >= arr.parts.length;
+  const extra = (score) => score.reduce((n, list) => n + list.filter(isLift).length, 0);
   assert.strictEqual(extra(plain), 0, 'the arrangement on its own has no lift layers');
   const crashes = [], toms = [];
   lifted.forEach((list, s) => list.forEach((e) => {
@@ -274,7 +277,7 @@ test('the engine lifts every era with a tom and a crash: a roll into each sectio
   assert.ok(toms.length > 0);
   assert.ok(toms.every((s) => lastBars.includes(Math.floor(s / T.steps))), 'the roll only in the last bar of a section');
   // Everything the arrangement plays is still there, in the same place.
-  plain.forEach((list, s) => assert.deepStrictEqual(lifted[s].filter((e) => !(e.from > 0)).length, list.length, `step ${s}`));
+  plain.forEach((list, s) => assert.deepStrictEqual(lifted[s].filter((e) => !isLift(e)).length, list.length, `step ${s}`));
   assert.strictEqual(M.arrange(M.ARRANGEMENTS[0], T, { lift: true }).reduce((n, l) => n + l.length, 0),
     M.arrange(M.ARRANGEMENTS[0]).reduce((n, l) => n + l.length, 0), 'the cabinet has no kit, so nothing lifts it');
 });

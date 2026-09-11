@@ -37,8 +37,69 @@
     under: { text: '64  REMASTERED', cell: 7, gap: 5, top: 326 },
     coin: { text: 'INSERT COIN', cell: 10, gap: 8, top: 430 },
     how: { text: 'MOUSE OR ARROW KEYS TO PLAY', cell: 4, gap: 3, top: 520 },
-    credit: { cell: 4, gap: 3, top: 566 }
+    credit: { cell: 4, gap: 3, top: 566 },
+    // "NOW WITH: <newest feature> \u00b7 <sha>" (item 1276), dim and small in the
+    // gap between 64 REMASTERED and INSERT COIN; cell 2 when 3 will not fit.
+    version: { sizes: [{ cell: 3, gap: 2 }, { cell: 2, gap: 2 }], top: 384, max: 760, ink: '#7a7a7a' }
   };
+
+  var DOT = '\u00b7';   // not in the block font: drawText leaves a gap, drawn by hand
+
+  function glyphRows(ch) {
+    var R = root.PongRender;
+    return (R.DIGITS && R.DIGITS[ch]) || (R.LETTERS && R.LETTERS[ch]) || null;
+  }
+
+  /** Upper case, and anything the block font cannot draw becomes a space. */
+  function blockSafe(str) {
+    var s = String(str || '').toUpperCase(), out = '';
+    for (var i = 0; i < s.length; i++) out += glyphRows(s[i]) ? s[i] : ' ';
+    return out.replace(/\s+/g, ' ').trim();
+  }
+
+  /** Width in field units, the way PongRender.drawText lays a line out. */
+  function lineWidth(str, cell, gap) {
+    var w = 0;
+    for (var i = 0; i < str.length; i++) {
+      var rows = glyphRows(str[i]);
+      w += (i ? gap : 0) + (rows ? rows[0].length : 2) * cell;
+    }
+    return w;
+  }
+
+  /**
+   * The version line for a stamp ({ feature, item, sha, date }, src/version.js):
+   * { text, cell, gap, dotAt }, or null with no stamp. The sha is always whole;
+   * a feature too long for the line is cut short with '...'.
+   */
+  function versionLine(stamp, max) {
+    if (!stamp || !stamp.sha) return null;
+    var v = TITLE.version, limit = max || v.max;
+    var sha = blockSafe(stamp.sha), feature = blockSafe(stamp.feature);
+    var make = function (f) { return 'NOW WITH: ' + (f ? f + ' ' : '') + DOT + ' ' + sha; };
+    var size, text;
+    for (var i = 0; i < v.sizes.length; i++) {
+      size = v.sizes[i];
+      text = make(feature);
+      if (lineWidth(text, size.cell, size.gap) <= limit) break;
+    }
+    while (feature && lineWidth(text, size.cell, size.gap) > limit) {
+      feature = feature.slice(0, -1).replace(/\s+$/, '');
+      text = make(feature ? feature + '...' : '');
+    }
+    return { text: text, cell: size.cell, gap: size.gap, dotAt: text.indexOf(DOT) };
+  }
+
+  function drawVersion(ctx, mid) {
+    var line = versionLine(root.PongVersion);
+    if (!line) return;
+    var v = TITLE.version;
+    ctx.fillStyle = v.ink;
+    root.PongRender.drawText(ctx, line.text, mid, v.top, line.cell, line.gap);
+    var left = mid - lineWidth(line.text, line.cell, line.gap) / 2 +
+      lineWidth(line.text.slice(0, line.dotAt), line.cell, line.gap) + line.gap;
+    ctx.fillRect(left + line.cell / 2, v.top + 2 * line.cell, line.cell, line.cell);
+  }
 
   /** Does this query string skip the cabinet and open straight into play? */
   function straightIn(search) {
@@ -175,6 +236,8 @@
       text(ctx, TITLE.name, mid);
       ctx.shadowBlur = 0;
       text(ctx, TITLE.under, mid);
+      drawVersion(ctx, mid);
+      ctx.fillStyle = INK;
       if (root.PongRender.promptLit(game)) text(ctx, TITLE.coin, mid);
       ctx.fillStyle = '#9a9a9a';
       text(ctx, TITLE.how, mid);
@@ -220,6 +283,9 @@
     return cab;
   }
 
-  root.PongAttract = { create: create, straightIn: straightIn, WARM: WARM, COIN_HOLD: COIN_HOLD };
+  root.PongAttract = {
+    create: create, straightIn: straightIn, versionLine: versionLine,
+    TITLE: TITLE, WARM: WARM, COIN_HOLD: COIN_HOLD
+  };
   if (typeof module === 'object' && module.exports) module.exports = root.PongAttract;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

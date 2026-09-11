@@ -24,6 +24,14 @@ landed cards' reports. Where nothing has been learned yet, the page says so rath
 
 All eleven at their native resolution, side by side: [contact-sheet-native.png](../shots/eras/contact-sheet-native.png).
 
+**The realism ladder** (item 1265): from pong in the arcade and Atari eras to real table tennis in
+the 3D eras, one step per era. Why it exists is on [realism-ladder.md](realism-ladder.md), and the
+rungs themselves are in the art bible, [docs/ART.md](../ART.md), sections 6 to 9.
+
+The figures on the 2D eras (1 to 4) are drawn the EarthBound way: as text grids, checked against
+what the machine could draw. [sprites.md](sprites.md) covers the tool, what carried over and how long
+one sheet takes.
+
 ## The six headings every page answers
 
 The headings are fixed, and [test/lessons.test.js](../../test/lessons.test.js) fails if a page loses one or
@@ -58,7 +66,10 @@ machine.
    - `src/sound.js`
    - `src/music.js`
    - the one `src/eras/eraN-*.js` you want
-   - `src/table3d.js` and `src/textures3d.js` for a 3D era
+   - `src/table3d.js` and `src/textures3d.js` for a 3D era, plus `vendor/three.js` and
+     `src/field3d.js`, the real 3D layer its field draws through ([3d-layer.md](3d-layer.md)).
+     Eras 5 to 10 draw their field through that one checked-in 3D library, and everything else
+     stays canvas 2D.
    - `src/sprites.js` for an era that draws pixellab art from files
    - `src/characters.js` if you want the players (item 1223). From era 1 up, a figure stands
      behind each paddle with its hand on it. The figure only reads the state, and its beats come

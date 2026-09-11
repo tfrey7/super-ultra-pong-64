@@ -98,7 +98,7 @@ display samples the frame down to (`src/display.js`):
 projection of the paddle's outer edge with the hand `dz` 18 units off the table, scaled by the
 table's depth there -- the "depth-scaled figure at the paddle's projected spot" the climb asks
 for. Every 3D page draws its figure 90 table units tall and about 40 wide (twice the paddle box's
-height of 22 to 28 is the point: the players read as people standing at the table's ends). Because
+height of 22 to 28 is the point: the players read as people standing at the table's ends). Those 90 units are the sprite stand-ins'. The realism ladder's players, which the polygon cards build, stand 250 units tall on a floor below the table (section 8). Because
 the rig draws after the era's own frame, **the era's treatment is not applied to the players by
 the era's draw**: each 3D page's TREATMENT says what the sheet carries baked in (its shading,
 outline, grade) and what the era card adds in the rig's draw for its era (a fog tint by depth, a
@@ -159,9 +159,188 @@ Anything a page does not list is drawn in code.
 - **The 2D eras' images are drawn with `drawImage` only once decoded**, with a hand-drawn stand-in
   until then and always under `node --test` (the era 3 file is the worked example).
 
+### 5a. What draws what: canvas 2D, and one 3D library for the 3D eras' field (item 1273)
+
+**Eras 5 to 10 draw their field through the checked-in 3D library; everything else stays canvas
+2D.** The library is three.js, bundled once into one plain script, `vendor/three.js`
+(`window.THREE`, with its glTF loader and skeleton utilities for the model cards that follow).
+The game gains no build step, no modules and no network at play time. `src/field3d.js` renders the
+table, its centre line, the net, the two bats, the ball and its contact shadow, lit by one light,
+onto a WebGL canvas of its own. That picture is copied into the era's frame with one `drawImage` at
+the exact place `src/table3d.js` painted the table: it uses the same camera numbers and the same
+field-to-screen mapping, and a test pins that. So each era's painted arena behind the table, its HUD
+and effects in front, the display, the CRT and TV overlays, the ring wipes and eras 0 to 4 are
+untouched. Play still never changes (rule 1): the paddle rectangle is the hit zone, and the 3D
+draws only what the state says.
+
+- **An era wires its field as `T.field(ctx, cam, tableStyle, state, api)`** in place of
+  `T.table(...)`. When it answers true, the era skips its own paddles, its ball and anything that
+  belongs under them (shadows, reflections).
+- **With no WebGL, `T.field` paints today's canvas table**, and the era draws everything else as
+  before. That covers `?gl=off`, `node --test`, and a browser that refuses a context. The canvas
+  projection and item 1248's polygon players in `src/models3d.js` are that fallback.
+- **Each era's look may carry `render` knobs** for tuning its look later: `resolution`, `filter`,
+  `fog` and `lighting`. The header of `src/field3d.js` lists them. No era sets any yet.
+- The lessons page for the layer is [docs/lessons/3d-layer.md](lessons/3d-layer.md).
+
+---
+
+## The realism ladder: from Atari pong to table tennis (item 1265)
+
+Tim, 2026-09-11: *"ok as far as art style goes: i was imagining it starting out as pong in the
+atari world and becoming more and more like real life table tennis, where finally in the 3d eras
+you can see the characters standing around the tables"*.
+
+This sits on top of the flagship rule above and changes none of it: each era still looks like
+that year's AAA game, and the characters that landed stay who they are. The ladder decides four
+other things per era: **what the playfield is, what the ball and the bats look like, where the
+view sits, and how much of each player you see.** Each era page below opens with its rung.
+
+### 6. What the ladder never changes
+
+- **Play.** Shared rule 1 stands whole. The table top is the rules' field, 800 by 600 field
+  units: the top and bottom walls are the table's side edges, the left and right edges its ends.
+  The paddle rectangle is the whole hit zone and moves along its end of the table. The ball is the
+  ball. The ladder changes how things are drawn and never how they move.
+- **Pong's bar is a table tennis bat seen from above.** A bat held upright, blade toward the net,
+  looks from straight overhead like a thin bar as long as its blade. So the bar never changes
+  shape in play. Each rung adds something around it: a handle, a hand, a table under it, and
+  finally a whole player standing behind it.
+- **The sizes are already close to real.** A 40 mm ball on a 2.74 m table is 11.7 units in 800,
+  and the ball is 12. The table is deeper than a real one: a real top would be 800 by 445, and the
+  ladder keeps the rules' 600 rather than shrink play to match. The blade (84 units, about 29 cm)
+  is twice a real blade's width. Both are kept, because both are play.
+- **Readability wins every tie with realism.** ERAS.md's R1 to R10 hold on every rung. The net is
+  the one thing a real table has that stands up in play, so it is the one thing the ladder limits
+  (below).
+
+### 7. The rungs
+
+| Era | Machine | Playfield | Ball | Bats | View | Each player |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | 1972 arcade | a bare court: black, dashed centre line | the square dot | white bars | flat, top-down | nothing |
+| 1 | 1977 Atari 2600 | a bare court in the *Combat* arena: playfield wall and stand | the 2 x 4 block | bars in the earned inks | flat, top-down | a block: the one-colour athlete |
+| 2 | 1985 NES | **the table appears**: the court's border becomes the table's white edge lines, the net and its two posts cross the middle, a centre line runs end to end, the tennis lines go | a round white ball with its shadow sprite | **the bar gains a handle**, gripped by one fist | flat, top-down | a side figure with a bat, the whole small sprite |
+| 3 | 1989 Genesis | **a drawn table with every marking**: a table-tennis blue top, white edge and centre lines, the net as a band with posts and a shadow, the arena's stone floor round it | the landed chrome orb, its shadow on the blue | **bats that read as bats**: rubber in the earned ink on the inner face, black on the outer, a wood edge, a handle | flat, top-down | a side figure with a bat, as landed |
+| 4 | 1991 Super Nintendo | **the table in perspective**: the whole top tilted back in Mode 7, net and lines foreshortened with it | the landed glowing orb, its shadow on the table | as era 3, foreshortened | **tilted**: far edge at least 0.85 of the near edge's width | **the upper body**: waist up behind each end, the end of the table hiding the legs |
+| 5 | 1994 PlayStation | **a real table tennis table in 3D**: top, edge and centre lines, net on posts, legs to a floor | ERAS.md's era 5 ball, unchanged | 3D bats: a blade with rounded top, rubber and handle | **full 3D with the players in frame** | **a whole standing character behind its end**, bat in hand |
+| 6 | 1996 Nintendo 64 | the table as era 5, in the era's toy colours and fog | ERAS.md's era 6 ball | as era 5 | as era 5 | as era 5: the penguin and the frog |
+| 7 | 1999 Dreamcast | the table as era 5, cel-shaded and ink-outlined | ERAS.md's era 7 ball | as era 5, cel bands | as era 5 | as era 5: the two skaters |
+| 8 | 2000 PlayStation 2 | the table as era 5, glossy, inside the letterbox | ERAS.md's era 8 ball | as era 5, with reflections | as era 5, inside the bars | as era 5: the two operatives |
+| 9 | 2001 Xbox | the table as era 5, bump-mapped plate, hard shadows from the ball | ERAS.md's era 9 ball | as era 5, specular | as era 5 | as era 5: the marine and the cyborg |
+| 10 | 2005 Xbox 360 | the table as era 5, bloom, grade and depth of field | ERAS.md's era 10 ball | as era 5, rim-lit | as era 5 | as era 5: the two soldiers |
+
+So eras 0 and 1 are pure pong, the arcade and the Atari. Eras 2 to 4 walk to table tennis one
+step each: the table, then its markings and real bats, then the tilt and the bodies. Eras 5 to 10
+are the same real table tennis in 3D, and what changes between them is the machine's treatment,
+already written in ERAS.md and on each page.
+
+### 8. The numbers every rung builds to
+
+**The table in 2D (eras 2 to 4).** Its ends are drawn at the paddles' **outer faces**, x 32 and
+768, so each bat stands on its end of the table and each player stands on the floor behind it, in
+the 32 units shared rule 2 gives. A ball past x 32 has gone off the end, which is a point in real
+table tennis too. The edge lines are 6 field units wide, and the centre line (y 300, from end to
+end) is 3. All of them use the court-line colour the era already has, darker than the ball's core
+(R1). The net is at x 400, across the whole top, 8 units wide, with a post 10 units square on each
+side edge. Every line and the net are drawn before the ball.
+
+**The table in 3D (eras 5 to 10).** The top stays the slab each era builds now, 0 to 800 by 0 to
+600, so every arena, rail and R3 measurement holds; its ends are x 0 and 800. On it, drawn as
+world shapes on the table (ERAS.md's step 3):
+
+- edge lines 6 units wide round all four edges, and the centre line along y 300, 3 units wide, in
+  the era's line colour;
+- the **net** across x 400, 24 units tall, from a post at y -20 to a post at y 620, its body a
+  mesh at 0.5 opacity or less and its top tape the era's line colour. A real net would be 45 units
+  (15.25 cm); 24 keeps it below the bats' 28 (R6's paddle height). The side camera's eye is at
+  x 400, so it sees the net nearly edge on: it covers about as much as the centre line does. It is
+  drawn before the ball every frame, so the ball always passes over it;
+- **legs** under the top to a **floor 110 units below it**, in the era's rail colours. They stand
+  inside the top's footprint, so nothing is drawn between the camera and the near edge (R6).
+
+**The players in 3D.** They are a real player's proportions against a real table: a 76 cm table
+top against a 175 cm player puts the top at **0.43 of the player's height**. Real scale here
+would make a player 510 units tall, taller than the table is deep, so the ladder takes the
+players and the table's height at half scale together: the **floor 110 units below the top and a
+player 250 units tall**. Each stands with the front foot **30 units behind its end** (x -30 on the
+left, 830 on the right), centred on its paddle's `y` and following it along the end. It faces the
+net, and holds the bat's handle in its near hand, reaching over its end. Feet stay on the floor in
+every beat except win's hop.
+
+**The camera in 3D.** It is the side camera ERAS.md section 2.1 describes, standing in front of
+the near edge and looking across, pulled back and raised until **both players are whole, feet to
+head, with the paddle at `y` 300**. With the paddle at either wall, no more than the head may pass
+behind the HUD band. R3's four conditions still hold, measured by `tools/table3d-cameras.js`. If no
+camera holds both whole figures and passes R3, the players and the floor shrink together, keeping
+the 0.43, to the largest size that passes, and the card names that size.
+
+**The bat in 3D.** The paddle box stays the hit zone and R5's true footprint. It is drawn as a
+**blade**: the top corners rounded to a 10-unit radius, the inner face and top in rubber of the
+earned ink, and the outer face black rubber (`#1a1a1a` before the era's grade). The near face keeps
+the earned ink at full saturation, after any grade (R4). A **handle**, a box 20 x 6 x 6 in wood
+(`#b07a44` *(new)*, through the era's treatment), comes off the outer face's middle at `z` 14, and
+the player's hand is on its far end.
+
+**The bat in 2D.** The bar keeps its rectangle. From era 2 a handle comes off the outer face's
+middle into the player's room: 3 native pixels long on the NES, 4 on the Genesis and the Super
+Nintendo, in the era's nearest wood brown. The figure's hand pixel, which the rig already puts at
+the paddle's outer middle, is where the handle ends. From era 3 the bar is split along its length:
+the inner half is rubber in the earned ink, the outer half black rubber, with a 1-pixel wood line
+between them.
+
+### 9. What each queued card delivers
+
+- **Eras 0 and 1: no card.** Both are pinned to the pixel (`tools/eralooks-today.json`) and stay as
+  they are.
+- **Card 1267, eras 2 to 4, the field becomes a table.** It delivers rungs 2, 3 and 4 as the table
+  above and section 8's 2D numbers give them: era 2's tennis paint turned into the table (edge
+  lines, net and posts, and the centre line kept; the service lines, singles sidelines and centre
+  marks painted out) and the handle; era 3's blue top, full markings, net band and shadow, and the
+  two-rubber bats; era 4's Mode 7 tilt of the table in play, at 0.85 or more, with the pointer
+  still reaching the same field `y`. One snag for its planner: **era 4's upper-body view cannot be
+  drawn by the era file**, because the rig draws the players after the era's frame, so nothing
+  the era draws covers a leg. The two ways that stay inside 1267's files are a re-cut sheet under
+  the same pixellab names, its frames holding the pilot from the waist up and made offline from the
+  landed sheet (0 generations), or, failing that, a finding naming the one line of era 4's block in
+  `src/characters.js` that would crop it.
+- **Card 1266, the 3D table and camera.** It delivers section 8's 3D table (lines, net and posts,
+  legs, floor) and the camera, in `src/table3d.js`, keeping the projection's contract. One snag
+  for its planner: its goal asks for the stand-ins to stand behind each end, but the rig puts them
+  at the paddle's outer edge, and 1266 may not touch `src/characters.js`. So 1266's screenshots
+  show the stand-ins where the rig draws them, plus the room the camera leaves behind each end for
+  a whole figure. Standing figures on the floor is the polygon cards' work. If the stand-ins should
+  move before those cards land, that is one `anchor` line per era block in `src/characters.js`, and
+  a small card of its own.
+  **Card 1263** (a per-era camera, so the Dreamcast arena shows) was folded into 1266, because
+  both work on the same camera. So 1266 also owes era 7's skyline, posters, water tower and blimp
+  in frame and clear of the score HUD, with before and after shots, and each 3D arena's share of
+  the frame before and after. A per-era camera override is the way to give different eras
+  different framings, where one camera does not suit all six.
+- **Cards 1253 to 1258, the polygon players, one per era from 5 to 10.** Each delivers its era's
+  two characters as its page names them. They stand as section 8's 3D players do: 250 units tall,
+  feet on the floor 1266 draws, the front foot 30 units behind the end, centred on the paddle's
+  `y`, the near hand on the bat's handle, and the whole body in frame. That staging replaces each
+  card's own line saying the figure holds its paddle where the look card placed the stand-in: the
+  stand-ins were placed for the shield-and-board grips the ladder retires. Each card sets it in
+  its own era's block in `src/characters.js`, after 1266 has landed. What each player wears and how
+  each beat reads stay as the page gives them. Only the grip changes, to a bat held by its
+  handle:
+
+  | Card | Era | The two characters | Budget each, from the card (fewer if 1248's measurements say so) |
+  | --- | --- | --- | --- |
+  | 1253 | 5 PlayStation | the red-gi and blue-top fighters | about 200 triangles |
+  | 1254 | 6 Nintendo 64 | the penguin and the frog | about 350 triangles |
+  | 1255 | 7 Dreamcast | the orange and blue skaters | about 600 triangles |
+  | 1256 | 8 PlayStation 2 | the midnight and slate operatives | about 800 triangles |
+  | 1257 | 9 Xbox | the space marine and the steel cyborg | about 1000 triangles |
+  | 1258 | 10 Xbox 360 | the green-trim and grey-trim soldiers | about 1200 triangles |
+
 ---
 
 ## Era 0: 1972 arcade Pong
+
+**Realism rung 0 of 10: pure pong.** A bare court, the square dot, white bars, a flat top-down view, and no player at all. The ladder starts here and never touches it.
 
 **It stays 1972 Pong: two white bars, a square dot and a dashed centre line on black**, because
 1972's flagship game *was* Pong -- the arcade machine is already the AAA game of its year, and it
@@ -172,6 +351,8 @@ machine's two block numbers, and no generated assets. Era 0 is pinned to the pix
 ---
 
 ## Era 1: 1977 Atari 2600
+
+**Realism rung 1 of 10: pong in the Atari world.** A bare court in the *Combat* arena, the 2 x 4 block ball, bars in the earned inks, a flat top-down view, and each player a one-colour block beside its bar. No table, no net, no handle: everything on this page stays as it is.
 
 ### FLAGSHIP LOOK
 
@@ -265,6 +446,8 @@ in code from the silhouette rows above.
 
 ## Era 2: 1985 NES
 
+**Realism rung 2 of 10: the table appears.** Still flat and top-down, but the court is now a table: white edge lines round it, the net and posts across the middle and a centre line from end to end, with the tennis lines gone. The ball is a round white ball with its shadow, and each bar gains a handle gripped by one fist of a side figure. Card 1267 builds it (the realism ladder, sections 7 to 9); where a line below still says tennis court, this rung wins.
+
 ### FLAGSHIP LOOK
 
 Style targets: *Super Mario Bros.* (1985), *Tennis* (1984 in Japan, a 1985 launch title in North
@@ -285,14 +468,19 @@ America) and *Duck Hunt* (1985). What the era borrows:
 
 ### SCENE
 
-- **Where:** a floodlit night tennis court. The floor is `era2-court.png`: the pixellab
-  generation's teal floor and its dark tile grid, and nothing else. The generation was a football
-  pitch, and item 1259 painted out every pitch marking offline. Over it, drawn in code in `$10`
-  (darker than the ball's `$30` core), are Tennis's court lines: a baseline at each end in front of
-  the paddles, doubles sidelines along the top and bottom walls with the singles sidelines inside
-  them, a service line on each side of the net, the centre service line between them, and a centre
-  mark on each baseline. The white border and the dotted net between two posts stay. The net is
-  still the game's centre line.
+- **Where:** a floodlit night hall with a table tennis table filling it, seen from overhead. The
+  floor is `era2-court.png`: the pixellab generation's teal floor and its dark tile grid, and
+  nothing else, and it is now read as the table's top. (The generation was a football pitch, and
+  item 1259 painted out every pitch marking offline.) As landed, item 1259 draws *Tennis*'s court
+  lines over it in code, in `$10` (darker than the ball's `$30` core): a baseline at each end in
+  front of the paddles, doubles sidelines along the top and bottom walls with the singles sidelines
+  inside them, a service line on each side of the net, the centre service line between them and a
+  centre mark on each baseline, inside the white border and with the dotted net between two posts.
+  **Rung 2 turns that into a table.** It keeps the white border as the table's edge lines, with the
+  ends moved to the paddles' outer faces (x 32 and 768). It keeps the dotted net and its posts,
+  which stay the game's centre line, and runs the centre service line from end to end as the
+  table's centre line. It paints out the baselines, the service lines, the singles sidelines and the
+  centre marks.
 - **What fills the frame:** the court, plus a **crowd** of 8 x 8 tiles in the top 2 tile rows
   behind the top wall line: 32 tiles, 3 crowd patterns, in `$0C`, `$1C`, `$2D` (dark cyan, teal,
   grey) so it stays under the 0.35 luminance line; an **umpire's chair** at top centre, 2 x 3
@@ -311,8 +499,8 @@ America) and *Duck Hunt* (1985). What the era borrows:
 - **Silhouette:** 10 x 44 sheet pixels: head 8 x 9 with the headband or cap, torso 8 x 14, legs 2
   at 3 x 16, a 1-pixel black outline on the outside edge only (NES sprites had none; *Super Mario
   Bros.* drew one in the palette).
-- **How it holds the paddle:** two-handed, like a bat held upright, both fists on the paddle's
-  outer face at its middle 12 pixels.
+- **How it holds the bat:** one fist on the end of the handle, which comes 3 native pixels off
+  the paddle's outer face at its middle (rung 2); the other arm free.
 - **idle:** a knee bend, 2 frames. **move:** a shuffle, feet apart and together. **swing:** the
   body turns side-on for the contact frame, the fists jump 6 pixels up the paddle. **miss:** the
   head turns away, shoulders slump 2 pixels. **win:** a fist in the air, the *Duck Hunt* dog's
@@ -322,8 +510,9 @@ America) and *Duck Hunt* (1985). What the era borrows:
 
 ### BALL
 
-A **tennis ball** sprite: 4 x 5 native pixels (12 field units) in `$30` white with a `$38`
-pale-yellow seam pixel, drawn over era 2's existing pixellab ball when it has decoded, and a 4 x 2
+A **table tennis ball** sprite (rung 2): 4 x 5 native pixels (12 field units) in `$30` white. At
+that size a tennis ball and a table tennis ball are the same sprite, so the `$38` seam pixel is
+dropped with the tennis lines. It is drawn over era 2's existing pixellab ball when it has decoded, and a 4 x 2
 `$0F` black shadow 3 pixels below it (one extra sprite, as *Tennis* drew it). The ball's white is
 the brightest thing on screen (R1).
 
@@ -368,6 +557,8 @@ shadow and the flashes. The court, net and ball sprite already on master stay.
 
 ## Era 3: 1989 Sega Genesis
 
+**Realism rung 3 of 10: a drawn table with every marking.** Still flat and top-down: a table-tennis blue top (snapped to the 512 colours) with white edge and centre lines, the net as a band with its posts and a shadow, set on the torch-lit arena's stone floor. The ball is the landed chrome orb, its shadow now on the blue. The bats read as bats: the inner half of each bar is rubber in the earned ink, the outer half black rubber, with a wood line between and a handle 4 native pixels long. The barbarian and the knight stay, as side figures holding the bats by their handles. Card 1267 builds it (the realism ladder, sections 7 to 9).
+
 ### FLAGSHIP LOOK
 
 Style targets: *Altered Beast* (1989, the launch pack-in), *Golden Axe* (1989 on the Genesis) and
@@ -391,7 +582,8 @@ Style targets: *Altered Beast* (1989, the launch pack-in), *Golden Axe* (1989 on
   pixellab night court, stars and the distant range, drifting at one third of the near speed) and
   the near plane of hills at 18 units a second -- with the near plane replaced by an **arena
   wall**: a band of stone blocks 24 native lines tall across the top, with **4 torches** on it at x
-  100, 300, 500 and 700 field units. The floor is the court.
+  100, 300, 500 and 700 field units. The floor is stone, and the table (rung 3) fills the play
+  area on it, its ends at the paddles' outer faces.
 - **Backdrop layers:** 3 -- far plane, near plane (the wall and torches), court floor.
 - **What moves on its own:** torch flames, 3 frames at 0.1 s each, in `#ff9200`, `#ffdb00`,
   `#db2400` (the flame's brightest, `#ffdb00`, is under the ball's white); the far plane's drift
@@ -407,8 +599,8 @@ Style targets: *Altered Beast* (1989, the launch pack-in), *Golden Axe* (1989 on
 - **Silhouette:** 12 x 52 sheet pixels: a broad-shouldered V (shoulders 12 wide, waist 7), head 7 x 9,
   stepped two-tone shading (lit toward the centre, one palette step darker away from it), 1-pixel
   dark outline in the palette's darkest.
-- **How it holds the paddle:** as a **tower shield**, the near arm's forearm across it at the
-  paddle's middle, the far fist on its top corner.
+- **How it holds the bat:** by the handle, in the near fist at the paddle's middle (rung 3 retires
+  the tower-shield grip); the far arm raised in guard.
 - **idle:** a breathing heave, shoulders up 1 pixel. **move:** a crouched step, 2 frames.
   **swing:** a *Golden Axe* shield bash -- the body lunges 2 pixels toward the paddle, the smear
   (shared rule 1) in the palette's lightest orange. **miss:** knocked back 3 pixels, knees bent.
@@ -467,6 +659,8 @@ the images decode. The far plane and the chrome ball on master stay.
 
 ## Era 4: 1991 Super Nintendo
 
+**Realism rung 4 of 10: the table in perspective.** The whole table top is tilted back in play with Mode 7, the far edge at least 0.85 as wide as the near edge, with the net and lines foreshortened on it; the dusk sky, mountains and checker floor stay round it. The ball is the landed glowing orb, its shadow on the table. The bats are rung 3's, foreshortened. Each pilot is seen from the waist up behind its end: the table's end hides the hover pad, the flame and the legs in play, so the beats that move them read in the torso's bob and lean instead. Card 1267 builds it (the realism ladder, sections 7 to 9, and the snag about cropping the figures).
+
 ### FLAGSHIP LOOK
 
 Style targets: *Super Mario World* (1991 in North America), *F-Zero* (1991) and *Pilotwings*
@@ -501,9 +695,8 @@ Style targets: *Super Mario World* (1991 in North America), *F-Zero* (1991) and 
   highlight, `#f8f8d0`, 2 pixels, under the ball's white.
 - **Silhouette:** 10 x 44 sheet pixels: a round helmet 8 x 8 with a dark visor band, a slim suit,
   the pad an ellipse 10 x 3 at the feet with its flame 3 x 5 under it.
-- **How it holds the paddle:** as a **glowing energy board** gripped at both ends by
-  outstretched arms; the paddle's own sprite is unchanged, the hands sit on its outer face at its
-  top and bottom quarters.
+- **How it holds the bat:** by the handle, one gloved hand at the paddle's outer middle (rung 4
+  retires the energy-board grip); the other arm out for balance.
 - **idle:** the pad bobs 1 pixel, the flame flickers 2 frames. **move:** the body leans 2 pixels
   into the travel, the flame stretches to 8 pixels. **swing:** a spin -- 3 frames of the pilot
   turning, *F-Zero*'s spin attack. **miss:** the pad dips 3 pixels and the flame gutters.
@@ -560,6 +753,8 @@ flame's stretch. The sky, the Mode 7 floor, the paddle and the ball on master st
 
 ## Era 5: 1994 Sony PlayStation
 
+**Realism rung 5 of 10: real table tennis, in 3D.** The table tennis table in 3D, per the realism ladder's section 8: edge and centre lines, the net on its posts and legs down to a floor, with this era's arena round it and the pulled-back side camera card 1266 sets. The bats are blades with a handle. Both players stand whole behind their ends, 250 units tall, bat in hand. The figure sizes on this page (40 x 90 table units) are the sprite stand-ins'; the polygon player that card 1253 builds is section 8's. Everything else on this page stays.
+
 ### FLAGSHIP LOOK
 
 Style targets: *Ridge Racer* (1994, the Japanese launch), *Tekken* (1995 on the PlayStation, a
@@ -598,8 +793,8 @@ the era borrows:
 - **Silhouette:** a blocky low-poly fighter, shoulders 12 of the frame's 20 pixels, every face one
   flat colour (lit toward the table, the far side 0.4 darker, the paddles' flat light), the head a
   plain box with a painted face.
-- **How it holds the paddle:** in a fighting stance, the lead forearm along the paddle's outer
-  face at its middle, the rear fist on its top edge.
+- **How it holds the bat:** in a fighting stance, the bat's handle in the lead hand, reaching over
+  its end; the rear fist up in guard.
 - **idle:** a two-frame stance bob. **move:** the side-step,
   legs split. **swing:** a palm strike -- the lead arm to 80 at contact. **miss:** the stagger,
   torso back 15. **win:** a *Tekken*-style victory: one fist up to 160, the other on the hip.
@@ -657,6 +852,8 @@ snap, the skyline boxes, the searchlights, the health bars and the damage chunk.
 
 ## Era 6: 1996 Nintendo 64
 
+**Realism rung 6 of 10: real table tennis, in 3D, in toy colours and fog.** The table tennis table in 3D, per the realism ladder's section 8: edge and centre lines, the net on its posts and legs down to a floor, with this era's arena round it and the pulled-back side camera card 1266 sets. The bats are blades with a handle. Both players stand whole behind their ends, 250 units tall, bat in hand. The figure sizes on this page (40 x 90 table units) are the sprite stand-ins'; the polygon player that card 1254 builds is section 8's. The players are fogged at their own depth as the TREATMENT below says.
+
 ### FLAGSHIP LOOK
 
 Style targets: *Super Mario 64* (1996), *Wave Race 64* (1996) and *Pilotwings 64* (1996). What
@@ -690,8 +887,8 @@ the era borrows:
   green, toy yellow, `#9ee6a0` *(new)* belly). Brightest figure colour: the penguin's belly,
   `#f4f0e0`, below the ball's white.
 - **Silhouette:** a big round head on a pear-shaped body, stubby arms, drawn smooth.
-- **How it holds the paddle:** hugged to the chest, both flippers or hands wrapped round its outer
-  face at the middle, the way a toy holds a board.
+- **How it holds the bat:** by the handle in one flipper or hand, reaching over its end; the other
+  held out for balance.
 - **idle:** a waddle-bob, squashing 5% at the bottom of each bob. **move:** a hop-step, the body
   tilting 12 into the travel. **swing:** a belly bump -- the body lunges 6 units toward the paddle
   at contact. **miss:** a spin-out, drawn mid-turn with 3 stars round the head (miss is one frame).
@@ -747,6 +944,8 @@ meters and the shake.
 
 ## Era 7: 1999 Sega Dreamcast
 
+**Realism rung 7 of 10: real table tennis, in 3D, cel-shaded.** The table tennis table in 3D, per the realism ladder's section 8: edge and centre lines, the net on its posts and legs down to a floor, with this era's arena round it and the pulled-back side camera card 1266 sets. The bats are blades with a handle. Both players stand whole behind their ends, 250 units tall, bat in hand. The figure sizes on this page (40 x 90 table units) are the sprite stand-ins'; the polygon player that card 1255 builds is section 8's. The table's lines, net and legs are ink-outlined like every other shape.
+
 ### FLAGSHIP LOOK
 
 Style targets: *Soulcalibur* (1999), *Sonic Adventure* (1999 in North America) and *Jet Set
@@ -782,8 +981,8 @@ What the era borrows:
   ball's luminance).
 - **Silhouette:** tall and lean with big feet: long legs, the headphones two 4 x 4 x 4
   boxes on the head, the hood a 12 x 12 x 6 box behind it.
-- **How it holds the paddle:** one-handed, at arm's length, like a skater holding a board out
-  sideways; the free arm out for balance at 60.
+- **How it holds the bat:** one-handed by the handle, at arm's length over its end; the free arm
+  out for balance at 60.
 - **idle:** rolling on the spot, the skates sliding 2 units back and forth. **move:** a skating
   stride, legs split plus and minus 25. **swing:** a spin -- the figure turns 180 and back across the
   swing's 3 frames, the paddle hand leading. **miss:** a stumble, torso forward 20 then back. **win:** a
@@ -840,6 +1039,8 @@ tags and the splat.
 
 ## Era 8: 2000 PlayStation 2
 
+**Realism rung 8 of 10: real table tennis, in 3D, in the letterbox.** The table tennis table in 3D, per the realism ladder's section 8: edge and centre lines, the net on its posts and legs down to a floor, with this era's arena round it and the pulled-back side camera card 1266 sets. The bats are blades with a handle. Both players stand whole behind their ends, 250 units tall, bat in hand. The figure sizes on this page (40 x 90 table units) are the sprite stand-ins'; the polygon player that card 1256 builds is section 8's. Both players' heads stay inside the picture between the bars (the rig's clip, item 1249), and the table, net and legs are reflected in the slab.
+
 ### FLAGSHIP LOOK
 
 Style targets: *SSX* (2000), *Tekken Tag Tournament* (2000 on the PlayStation 2) and *Metal Gear
@@ -873,8 +1074,8 @@ Solid 2* (2001, a year past the rung: the film look ERAS.md gives the era). What
   amber light or flare blue at 0.8 -- never white.
 - **Silhouette:** lean and tall, a tactical belt (a box 10 x 16 x 3 at the waist), the visor a
   box 2 units deep across the head's front.
-- **How it holds the paddle:** low and ready, both hands on its outer face near the bottom, like a
-  riot shield carried at hip height.
+- **How it holds the bat:** low and ready, the handle in the near hand at hip height; the other
+  hand open beside it.
 - **idle:** a slow breath, 1.5-unit bob every 2 s (half the shared rate). **move:** a crouched
   run, legs split plus and minus 20, torso forward 15. **swing:** a shoulder charge into the
   paddle. **miss:** the head turns to follow the ball out. **win:** a two-finger salute,
@@ -931,6 +1132,8 @@ name plates and the typed subtitle.
 
 ## Era 9: 2001 Xbox
 
+**Realism rung 9 of 10: real table tennis, in 3D, lit by the ball.** The table tennis table in 3D, per the realism ladder's section 8: edge and centre lines, the net on its posts and legs down to a floor, with this era's arena round it and the pulled-back side camera card 1266 sets. The bats are blades with a handle. Both players stand whole behind their ends, 250 units tall, bat in hand. The figure sizes on this page (40 x 90 table units) are the sprite stand-ins'; the polygon player that card 1257 builds is section 8's. The net and legs cast hard shadows from the ball's light as the paddles do (R5: lighter than the contact shadow). The gamertags stay at `z` 60 over the paddles, so with rung 9's players they sit at chest height, not head height.
+
 ### FLAGSHIP LOOK
 
 Style targets: *Halo: Combat Evolved* (2001), *Dead or Alive 3* (2001) and *Project Gotham
@@ -966,8 +1169,8 @@ Racing* (2001). What the era borrows:
   Brightest figure colour: the visor's specular, `#e8ffe0` at 0.7, never the ball's white at full.
 - **Silhouette:** broad and top-heavy: the shoulder pads, a helmet box 11 x 11 x 11, the visor a
   box 2 deep across its front.
-- **How it holds the paddle:** as a deployable **energy shield**, the lead arm through it at the
-  middle, the other hand on its top edge.
+- **How it holds the bat:** in the armoured lead fist by its handle (rung 9 retires the
+  energy-shield grip); the other hand at the belt.
 - **idle:** a weapon-ready bob, 1 unit. **move:** a strafing step, legs split plus and minus 18,
   torso level. **swing:** a melee bash, the shield arm to 80, the contact frame the widest.
   **miss:** the armour flashes shield alarm red on its outline for 0.3 s and the torso rocks back.
@@ -1024,6 +1227,8 @@ the ribs, the rotating wedge, the steam, the tracker and every flash.
 
 ## Era 10: 2005 Xbox 360
 
+**Realism rung 10 of 10: real table tennis, in 3D, with every post-process.** The table tennis table in 3D, per the realism ladder's section 8: edge and centre lines, the net on its posts and legs down to a floor, with this era's arena round it and the pulled-back side camera card 1266 sets. The bats are blades with a handle. Both players stand whole behind their ends, 250 units tall, bat in hand. The figure sizes on this page (40 x 90 table units) are the sprite stand-ins'; the polygon player that card 1258 builds is section 8's. The top of the ladder: the table, net and players all under the bloom, the grade and the grain.
+
 ### FLAGSHIP LOOK
 
 Style targets: *Project Gotham Racing 3* (2005), *Perfect Dark Zero* (2005) and *Gears of War*
@@ -1058,8 +1263,8 @@ borrows:
   0.6 -- never bloom white.
 - **Silhouette:** a wide wedge -- the huge pads, a chest plate box 16 x 16 x 4 over the torso, thick
   forearms (5 x 5 x 11).
-- **How it holds the paddle:** braced behind it as **cover**, one shoulder against its outer face,
-  both hands on its top edge -- the cover system the era is remembered for.
+- **How it holds the bat:** by the handle in the lead hand, crouched low behind its end -- the
+  cover crouch the era is remembered for, without the cover; the free hand on the knee.
 - **idle:** a heavy breath, the pads rising 1 unit every 2 s. **move:** a roadie run, torso forward
   25, legs plus and minus 20. **swing:** a mantle-and-shove, the torso up over the paddle's top
   edge to 80 and back. **miss:** a flinch, the head down 30 and the arms up to shield it.

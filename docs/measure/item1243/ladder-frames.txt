@@ -1,0 +1,22 @@
+Item 1243: the playtest's per-era frame lines, one ladder walk on branch item-1243 at d14717e
+(node tools/playtest.mjs --ladder --port 9391, headless Chrome with --disable-gpu, 2026-09-11 00:3x EDT),
+beside the two runs item 1241 recorded in docs/measure/item1241/ (ab-ladder-base.txt = merge base
+f678c3b with tonight's loops, ab-ladder-branch.txt = item 1241's engine with tonight's loops).
+
+era  this branch (new arrangements)   1241 base   1241 branch   line
+0    16.7 ms mean  PASS                   -           -          18.5
+1    16.7 ms mean  PASS                   -           -          18.5
+2    16.7 ms mean  PASS                   -           -          18.5
+3    16.7 ms mean  PASS                   -           -          18.5
+4    16.7 ms mean  PASS                   -           -          18.5
+5    27.5 ms mean  FAIL                 26.1        26.8         18.5
+6    34.4 ms mean  FAIL                 33.3        32.8         18.5
+7    28.2 ms mean  FAIL                 32.3        29.0         18.5
+8    35.6 ms mean  FAIL                 38.3        35.1         18.5
+9    38.3 ms mean  FAIL                 38.3        33.3         18.5
+10   90.9 ms mean  FAIL                 90.3        82.1         18.5
+
+The six 3D misses are card 1216's (docs/WORKER-BOOTSTRAP.md, section 8: the display layer drawn on
+the CPU in the playtest's GPU-less Chrome), and they fail the same way before any of the music work:
+every new number sits inside the spread of the two earlier runs, one run each, so this is a
+same-ballpark reading, not a precise A/B. 35/41 checks passed; the six FAILs are these lines.

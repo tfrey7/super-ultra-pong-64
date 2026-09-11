@@ -68,10 +68,14 @@ stack every layer without the output ever clipping.
   and the theme's bones tapped as lonely beeps two a bar, the melody hinted and never stated.
 - **Voices: 1.** One beeper. No kit.
 - **Chain.** None: a bare speaker in a plywood box (a gentle low-pass at 5 kHz is all).
-- **Epic devices.** Restraint. At match point the hum swells and the taps come on every beat; the
-  arcade has nothing else to give, and should not pretend to.
-- **Plan.** Intro: hum and two taps a bar. Build: the taps double to four a bar. Climax: the room
-  murmur rises under a tap on every beat.
+- **Epic devices.** Restraint. The build is the same blip coming faster, never a second note at
+  once; the arcade has nothing else to give, and should not pretend to.
+- **Plan.** Intro: hum and two taps a bar. Build: the wall blip answers on beats two and four, a tap
+  every beat. Climax: a high tick on every off-beat eighth. Match point: two quick blips push into
+  every bar.
+- **Changed by item 1242.** The first draft had the hum swell and a room murmur rise at the climax.
+  The engine's drones have no intensity (they run the whole time the era is on, and item 1242 does
+  not touch the engine), so the build is carried by the taps alone, doubling twice and then racing.
 
 ## Era 1: 1977, the Atari 2600
 
@@ -85,11 +89,19 @@ stack every layer without the output ever clipping.
 - **Kit.** Kick: a low square thump falling fast. Snare: the TIA's white-noise mode, band-passed.
   Hat: the metallic noise mode, high-passed and short.
 - **Chain.** Tape: a hint of wow and saturation, the television speaker's warmth.
-- **Epic devices.** The Star Wars fanfare shape on the theme's opening (the leap up to E5 hit
-  hard, a triplet pickup into each bar); the disco octave bass *I Feel Love* made famous, in
-  eighths, sour and wobbling; a snare roll into the B section.
-- **Plan.** Intro: tune and bass. Build: the octave bass and a four-on-the-floor thump. Climax: the
-  snare roll into every section and the lead doubling in octaves on alternate bars.
+- **Epic devices.** The Star Wars fanfare's pickup: three quick notes on E, a fourth under the A
+  each section opens on, into each section; the disco octave bass *I Feel Love* made famous, in
+  eighths, sour and wobbling, with the kick as its "oom"; a snare roll into each section.
+- **Plan.** Intro: the tune, the octave bass and the kick on one and three. Build: the snare hiss
+  on two and four (four on the floor) and the fanfare pickup. Climax: sixteenth hats on every
+  off-sixteenth and a snare roll into every section.
+- **Changed by item 1242.** Two things the first draft asked for do not fit two channels. *The lead
+  doubling in octaves* needs a third voice: channel two is the bass and the whole kit, and a
+  doubling there drops the bass, so it is left out. *The kick joining in the build* cannot be
+  either: every drum steals the bass note under it for good (the steal is part of the loop, not of
+  the intensity), so the kick is in from the serve and is what makes the octave bass "oom-pah".
+  Every later layer sits on a sixteenth the bass never uses. The engine's own tom and crash never
+  find a free channel on the Atari, which is true to a chip with two voices.
 
 ## Era 2: 1985, the NES
 
@@ -103,11 +115,20 @@ stack every layer without the output ever clipping.
   plus a short pitched body. Hat: the short noise mode, very high.
 - **Chain.** Hall with a gate: the 1985 gated reverb, big for a quarter of a second and then cut,
   over the snare.
-- **Epic devices.** The Konami anthem: melody in the 25 percent pulse with vibrato, the second
-  pulse harmonising a third below in the B section, chords only as whirring arpeggios, the
-  triangle leaping octaves, a DPCM snare fill before each section.
-- **Plan.** Intro: lead, arpeggio, triangle. Build: the second pulse harmonises and the DPCM kit
-  enters. Climax: the lead goes to 12.5 percent, the arpeggio doubles speed and the fill rolls in.
+- **Epic devices.** The Konami anthem: melody in the 25 percent pulse with vibrato, narrowing to
+  12.5 percent for the B section, the second pulse answering the tune in the B section, chords only
+  as whirring arpeggios (four notes a step), the triangle leaping octaves, a DPCM snare fill before
+  each section. The kit is shared out as a sound driver would: the hats and the snare hiss take
+  turns on the noise channel, the kick, the sampled snare and the fill on the DPCM, and the noise
+  channel leaves each downbeat free so the engine's match-point crash lands.
+- **Plan.** Intro: lead, arpeggio, triangle, ticking hats. Build: the second pulse answers the tune
+  and the DPCM kit enters under a noise snare on two and four. Climax: the hats double to
+  sixteenths and the DPCM fill rolls in.
+- **Changed by item 1242.** The arrangement is one loop that only ever adds parts, and five channels
+  have to hold the whole climax at once: so the duty change rides the sections (12.5 percent in
+  the B section, the loop's own climax) and the arpeggio whirs at full speed from the start, rather
+  than either swapping at an intensity. The second pulse answers the tune (a dotted eighth late,
+  the engine's `echo`) rather than a third below: the vocabulary has no "a third below" rule.
 
 ## Era 3: 1989, the Sega Genesis
 
@@ -124,8 +145,13 @@ stack every layer without the output ever clipping.
 - **Epic devices.** The FM slap bass in sixteenths, a DX7 tine piano (FM ratio 1 and 14 bell)
   stabbing house chords on the off-beats, new jack swing on the hats, an FM brass lead, and the
   PSG square doubling the tune an octave up for the climax.
-- **Plan.** Intro: slap bass and kick. Build: the house piano and the clap. Climax: the brass
-  lead, the octave square and a snare roll into each section.
+- **Plan.** Intro: slap bass, the brass lead on the tune, the kick on every beat and ticking hats.
+  Build: the house piano, the snare-and-clap on two and four, the open hat on every "and".
+  Climax: the octave square and a snare roll into each section.
+- **Changed by item 1242.** The brass lead is on the tune from the serve, because every era's base
+  loop carries the tune (the section plan above); the clap is a layer of the snare (one sample, one
+  voice), so the loop never needs more than nine of the ten voices and the engine's tom and crash
+  always have one.
 
 ## Era 4: 1991, the Super Nintendo
 
@@ -144,6 +170,12 @@ stack every layer without the output ever clipping.
   two formant band-passes for "ah") swelling in the B section, a brass fanfare on the turnaround.
 - **Plan.** Intro: pizzicato bass, strings and the melody on flute. Build: the brass takes the tune
   and the timpani enters. Climax: the choir, a cymbal on the downbeat and a timpani roll.
+- **As item 1242 built it.** The brass is horns an octave under the flute (the flute keeps
+  playing: a part only ever joins), a harp climbs the chords from the build, the timpani lands on
+  every downbeat, and at the climax a military snare roll joins the timpani roll. The choir is one
+  formant ("ah") rather than two, so the loop fits eight channels and still leaves one free on each
+  downbeat for the engine's cymbal. There is no separate fanfare on the turnaround: the horns'
+  B-G#-E-B descent on the E major bar is it.
 
 ## Era 5: 1994, the PlayStation
 
@@ -236,7 +268,9 @@ stack every layer without the output ever clipping.
 - **Chain.** A huge hall, and nothing else: the modern, clean, loud master.
 - **Epic devices.** The trailer build: string ostinato, low brass on the tune, choir on the B
   section, taiko on every beat, a riser into each section, and the achievement sting (a bright
-  two-note chime) when a point moves the machine up; the big-room drop from the current loop stays
-  as the climax's pulse.
+  two-note chime, B5 then E6) on the E major turnaround at the end of every loop from the climax up;
+  the big-room drop from the current loop stays as the climax's pulse. (Item 1243: an arrangement
+  cannot hear the point that moves the machine up, so the chime lives on the turnaround; a sting on
+  the point itself would be the arriving voice's `boot` sound in `src/sound.js`, not the music.)
 - **Plan.** Intro: the ostinato and the pulse. Build: brass and taiko. Climax: the choir, the full
   trailer percussion, the supersaw and every crash the engine has.

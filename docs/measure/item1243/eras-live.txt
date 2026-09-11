@@ -1,0 +1,8 @@
+﻿era 5  calm: intensity 0, 48 notes in 3 s, audio running | peak: intensity 1, 179 notes in 3 s, loudest in 0.12 out 0.178, 0 samples over 0.89 in 60 reads | errors 0
+era 6  calm: intensity 0, 22 notes in 3 s, audio running | peak: intensity 1, 133 notes in 3 s, loudest in 0.148 out 0.219, 0 samples over 0.89 in 58 reads | errors 0
+era 7  calm: intensity 0, 62 notes in 3 s, audio running | peak: intensity 1, 155 notes in 3 s, loudest in 0.149 out 0.22, 0 samples over 0.89 in 49 reads | errors 0
+era 8  calm: intensity 0, 56 notes in 3 s, audio running | peak: intensity 1, 178 notes in 3 s, loudest in 0.129 out 0.192, 0 samples over 0.89 in 41 reads | errors 0
+era 9  calm: intensity 0, 31 notes in 3 s, audio running | peak: intensity 1, 221 notes in 3 s, loudest in 0.126 out 0.186, 0 samples over 0.89 in 39 reads | errors 0
+era 10  calm: intensity 0, 64 notes in 3 s, audio running | peak: intensity 1, 177 notes in 3 s, loudest in 0.203 out 0.301, 0 samples over 0.89 in 35 reads | errors 0
+era 10  hot (+18 dB): loudest in 1.617 out 0.834, 0 samples over 0.89 in 35 reads
+wrote G:\Claude Stuff\super-ultra-pong-64-item-1243\docs\measure\item1243\eras-live.json
