@@ -103,18 +103,25 @@
       return true;
     }
 
-    /** The title screen, whole: paint() draws the attract rally under it. */
+    /**
+     * The title screen, whole: paint() draws the attract rally under it and the
+     * cabinet adds its own scanlines. With paint null the picture is already
+     * underneath (src/display.js draws it, with its own tube over it), so this
+     * draws only the lettering and the warm-up's black, on a clear layer.
+     */
     function drawTitle(ctx, game, paint) {
       var w = game.width, h = game.height, t = game.time;
       if (!cab.warm && t >= WARM) cab.warm = true;
       if (cab.warm) {
         scene(ctx, game, paint);
-        glass(ctx, w, h);
+        if (paint) glass(ctx, w, h);
         return;
       }
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, w, h);
       var cx = w / 2, cy = h / 2;
+      if (t < 0.7) {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, w, h);
+      }
       ctx.save();
       if (t < 0.35) {
         // The dot: a pin of light blooming out of the black.
@@ -136,15 +143,14 @@
       } else {
         // The picture: the line opens top and bottom, over-bright at first.
         var u = (t - 0.7) / (WARM - 0.7);
-        var band = Math.max(4, h * ease(u / 0.75));
-        ctx.beginPath();
-        ctx.rect(0, cy - band / 2, w, band);
-        ctx.clip();
+        var band = Math.min(h, Math.max(4, h * ease(u / 0.75)));
+        var top = cy - band / 2, bottom = cy + band / 2;
         scene(ctx, game, paint);
         ctx.fillStyle = 'rgba(220,240,255,' + (0.75 * (1 - ease(u))).toFixed(3) + ')';
-        ctx.fillRect(0, 0, w, h);
-        ctx.restore();
-        ctx.save();
+        ctx.fillRect(0, top, w, band);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, w, top);
+        ctx.fillRect(0, bottom, w, h - bottom);
         ctx.shadowColor = '#bfe4ff';
         ctx.shadowBlur = 16;
         ctx.fillStyle = INK;
@@ -154,13 +160,13 @@
         }
       }
       ctx.restore();
-      glass(ctx, w, h);
+      if (paint) glass(ctx, w, h);
     }
 
     /** The attract picture: the rally, then PONG and the invitation over it. */
     function scene(ctx, game, paint) {
       var mid = game.width / 2;
-      paint();
+      if (paint) paint();
       ctx.save();
       ctx.fillStyle = INK;
       text(ctx, TITLE.over, mid);

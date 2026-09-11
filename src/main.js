@@ -91,7 +91,7 @@
         if (game.phase === 'title') drawField(native, attract, { ink: ATTRACT_INK, card: false });
         else drawField(native, game);
         display.present(ctx, era, game.time);
-        if (game.phase === 'title') {
+        if (game.phase === 'title' || (cabinet && cabinet.stage(game) !== 'play')) {
           // The title is the cabinet's own lettering, kept sharp over the
           // machine's picture rather than squeezed into its pixels: drawn at
           // field size and scaled up hard, so its blocks have no seams.
@@ -102,7 +102,11 @@
           }
           var tctx = titleCanvas.getContext('2d');
           tctx.clearRect(0, 0, game.width, game.height);
-          PongRender.drawTitle(tctx, game);
+          // The cabinet's warm-up, attract screen and coin moment ride this
+          // layer; with paint null it leaves the picture to the display.
+          if (!cabinet) PongRender.drawTitle(tctx, game);
+          else if (game.phase === 'title') cabinet.drawTitle(tctx, game, null);
+          else cabinet.drawOver(tctx, game);
           ctx.save();
           ctx.setTransform(1, 0, 0, 1, 0, 0);
           ctx.imageSmoothingEnabled = false;
