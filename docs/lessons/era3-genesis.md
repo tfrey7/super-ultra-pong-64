@@ -137,9 +137,12 @@ frame, and they cost nothing measurable. The tenth hit is `docs/shots/item-1226/
   bottom rows are a bright floor edge; only the top 36 rows are drawn.
 - **The computer's name tag ("BLAST PROCESSOR", from `src/opponents.js`) now sits on the stone
   wall** rather than on dark sky. It still reads, but it is the busiest spot on the screen.
-- **The rig and its tests assumed no era had a sheet.** Loading one under `node --test` threw
-  (there is no `Image`), and a test pinned every era but 2 as a placeholder. Both were fixed in one
-  line each. The nine sibling era cards will meet the same two lines, so expect a trivial conflict.
+- **The rig's tests assumed no era had a sheet.** Loading one under `node --test` threw (there is
+  no `Image`), and a test pinned every era but 2 as a placeholder. This card and item 1232 (the
+  PlayStation 2) each fixed both at the same time, and 1232 landed first. Its version (a stand-in
+  loader in the test, an era with art skipped) is the one that stands, and this branch took it at
+  the merge. Ten era cards editing one shared test is a conflict waiting to happen: take master's
+  side.
 
 **What a one-era game would copy**
 

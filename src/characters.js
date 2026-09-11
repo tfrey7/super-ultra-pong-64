@@ -105,7 +105,15 @@
     5:  { skin: '#d8a888', body: '#303848', scale: 3.2, res: 2, round: true }, // PlayStation
     6:  { skin: '#e8b890', body: '#283080', scale: 3.2, res: 3, round: true }, // Nintendo 64
     7:  { skin: '#f0c0a0', body: '#1a2a50', scale: 3.2, res: 3, round: true }, // Dreamcast
-    8:  { skin: '#dcae8c', body: '#20242c', scale: 3.2, res: 4, round: true }, // PlayStation 2
+    // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
+    // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
+    // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
+    // fps 3, not the bible's 8: the rig has one rate for idle, move and win,
+    // and at 8 a two-frame breath reads as a flicker.
+    8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
+          sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
+          frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
+          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3 },
     9:  { skin: '#d6a684', body: '#1c2a1c', scale: 3.2, res: 4, round: true }, // Xbox
     10: { skin: '#e2b294', body: '#2a2e36', scale: 3.2, res: 4, round: true }  // Xbox 360
   };
@@ -365,10 +373,7 @@
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
-    // A loader that cannot make an image (node --test has no Image) throws;
-    // that is "not loaded", so the placeholder draws (item 1226, the first real sheet).
-    var image;
-    try { image = S.load(cfg.sheet); } catch (e) { return null; }
+    var image = S.load(cfg.sheet);
     if (!S.ready(cfg.sheet)) return null;
     var rects = {};
     for (var row = 0; row < BEATS.length; row++) {

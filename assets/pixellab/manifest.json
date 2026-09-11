@@ -933,6 +933,274 @@
       }
     },
     {
+      "name": "era8-suit-left",
+      "file": "era8-suit-left.png",
+      "prompt": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a midnight navy sneaking suit with a tactical belt and a glowing amber orange visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 8001,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 8,
+      "seconds": 26.1,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 21890,
+      "sha256": "8739202a91fa07b9b2efe9904724d315bb228e7d85a0a6bafb53ce2aab1f40ec",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a midnight navy sneaking suit with a tactical belt and a glowing amber orange visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 8001,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "note": "entry rebuilt by item 1232: three generations ran in parallel and the tool's manifest writes raced, keeping only the last; prompt, seed, request and bill are as sent and billed"
+    },
+    {
+      "name": "era8-suit-right",
+      "file": "era8-suit-right.png",
+      "prompt": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a slate grey sneaking suit with a tactical belt and a glowing light blue visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 8002,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 8,
+      "seconds": 61.8,
+      "pixels": {
+        "width": 72,
+        "height": 324
+      },
+      "bytes": 13946,
+      "sha256": "fc25e235a20b0b01585db1135db76bfce0fff30e0c93463ef931476fc01b6bae",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a slate grey sneaking suit with a tactical belt and a glowing light blue visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 8002,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      }
+    },
+    {
+      "name": "era8-sheet-left",
+      "file": "era8-sheet-left.png",
+      "prompt": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a midnight navy sneaking suit with a tactical belt and a glowing amber orange visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 8001,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "seconds": 0,
+      "pixels": {
+        "width": 120,
+        "height": 504
+      },
+      "bytes": 16687,
+      "sha256": "39152c69753176d0cd4a1f1589feda968c86322992a88a71a4b5090b86464456",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a midnight navy sneaking suit with a tactical belt and a glowing amber orange visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 8001,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era8-suit-left.png",
+      "note": "derived by assets/pixellab/era8-sheets.mjs: the figures re-cut into the rig's 3 x 6 sheet of 40 x 84 frames and graded (0 generations)"
+    },
+    {
+      "name": "era8-sheet-right",
+      "file": "era8-sheet-right.png",
+      "prompt": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a slate grey sneaking suit with a tactical belt and a glowing light blue visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+      "size": {
+        "width": 72,
+        "height": 324
+      },
+      "style": {
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "seed": 8002,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "seconds": 0,
+      "pixels": {
+        "width": 120,
+        "height": 504
+      },
+      "bytes": 13543,
+      "sha256": "30411a74aeabb5b1064515ec9af32a0871fca8e0f173608e0377e87d9ce5a9a6",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "pixel art sprite sheet grid, 3 columns by 6 rows of equal cells, the same character in every cell, full body, side view facing right: a lean tall tactical operative in a slate grey sneaking suit with a tactical belt and a glowing light blue visor across the face, holding a riot shield low at hip height with both hands. row 1 idle breathing, row 2 crouched run, row 3 crouched run, row 4 shoulder charge forward, row 5 head turned back watching, row 6 two-finger salute with one arm raised. moody night lighting, soft bevel highlights, PlayStation 2 era game",
+        "image_size": {
+          "width": 72,
+          "height": 324
+        },
+        "seed": 8002,
+        "outline": "selective outline",
+        "shading": "detailed shading",
+        "detail": "highly detailed",
+        "view": "side",
+        "direction": "east",
+        "no_background": true
+      },
+      "derivedFrom": "era8-suit-right.png",
+      "note": "derived by assets/pixellab/era8-sheets.mjs: the figures re-cut into the rig's 3 x 6 sheet of 40 x 84 frames and graded (0 generations)"
+    },
+    {
+      "name": "tex3d-era8-skyline",
+      "file": "tex3d-era8-skyline.png",
+      "prompt": "night city skyline seen from a skyscraper rooftop helipad, eight dark slate grey skyscraper towers of different heights in silhouette against a deep navy sky, scattered small amber lit windows, light rain, cinematic moody, pixel art",
+      "size": {
+        "width": 400,
+        "height": 100
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 8003,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 0
+      },
+      "generationsUsed": 0,
+      "seconds": 0,
+      "pixels": {
+        "width": 400,
+        "height": 100
+      },
+      "bytes": 29778,
+      "sha256": "0143a3e3df79b56421ad01e3d7a3b0ff95ca84f45a7504c73cc79d7e968c7345",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "night city skyline seen from a skyscraper rooftop helipad, eight dark slate grey skyscraper towers of different heights in silhouette against a deep navy sky, scattered small amber lit windows, light rain, cinematic moody, pixel art",
+        "image_size": {
+          "width": 400,
+          "height": 100
+        },
+        "seed": 8003,
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "derivedFrom": "era8-skyline.png",
+      "note": "a byte-for-byte copy of era8-skyline.png under the name assets/pixellab/tex3d-embed.mjs embeds (0 generations; the bill is era8-skyline's)"
+    },
+    {
+      "name": "era8-skyline",
+      "file": "era8-skyline.png",
+      "prompt": "night city skyline seen from a skyscraper rooftop helipad, eight dark slate grey skyscraper towers of different heights in silhouette against a deep navy sky, scattered small amber lit windows, light rain, cinematic moody, pixel art",
+      "size": {
+        "width": 400,
+        "height": 100
+      },
+      "style": {
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "seed": 8003,
+      "date": "2026-09-11T03:36:12.762Z",
+      "cost": {
+        "type": "generations",
+        "generations": 1
+      },
+      "generationsUsed": 8,
+      "seconds": 16.9,
+      "pixels": {
+        "width": 400,
+        "height": 100
+      },
+      "bytes": 29778,
+      "sha256": "0143a3e3df79b56421ad01e3d7a3b0ff95ca84f45a7504c73cc79d7e968c7345",
+      "endpoint": "POST /v1/generate-image-pixflux",
+      "request": {
+        "description": "night city skyline seen from a skyscraper rooftop helipad, eight dark slate grey skyscraper towers of different heights in silhouette against a deep navy sky, scattered small amber lit windows, light rain, cinematic moody, pixel art",
+        "image_size": {
+          "width": 400,
+          "height": 100
+        },
+        "seed": 8003,
+        "shading": "detailed shading",
+        "detail": "highly detailed"
+      },
+      "note": "entry rebuilt by item 1232: three generations ran in parallel and the tool's manifest writes raced, keeping only the last; prompt, seed, request and bill are as sent and billed"
+    },
+    {
       "name": "era3-players-left",
       "file": "era3-players-left.png",
       "prompt": "16-bit Sega Genesis sprite sheet, 3 columns by 6 rows of the same barbarian warrior, side view facing right, bare-chested, horned helmet, fur boots, holding a tall tower shield in front. row 1 idle breathing, row 2 stepping up, row 3 stepping down, row 4 shield bash lunge forward, row 5 knocked back knees bent, row 6 victory raising an axe overhead. Golden Axe style, saturated colours",
