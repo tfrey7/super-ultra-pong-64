@@ -32,9 +32,9 @@ const alive = (pid) => {
 };
 
 function run(label, how, port) {
-  const code = `import { launchChrome } from ${JSON.stringify(HELPER)};
+  const code = `import { launchChrome, refusePortTaken } from ${JSON.stringify(HELPER)};
     const c = await launchChrome(${JSON.stringify(CHROME)}, ['--headless=new', '--disable-gpu', '--mute-audio',
-      '--remote-debugging-port=${port}', '--no-first-run', '--no-default-browser-check', 'about:blank'], { name: 'abort' });
+      '--remote-debugging-port=${port}', '--no-first-run', '--no-default-browser-check', 'about:blank'], { name: 'abort' }).catch(refusePortTaken);
     console.log(JSON.stringify({ profile: c.profile, pid: c.pid }));
     let up = false;
     for (let i = 0; i < 100 && !up; i++) {
