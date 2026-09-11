@@ -368,7 +368,9 @@
     var S = sprites || root.PongSprites;
     if (!cfg.sheet || !S) return null;
     if (cut[cfg.sheet]) return cut[cfg.sheet];
-    var image = S.load(cfg.sheet);
+    var image;
+    try { image = S.load(cfg.sheet); } catch (e) { return null; }   // no Image (node --test): the placeholder
+    if (!image) return null;
     if (!S.ready(cfg.sheet)) return null;
     var rects = {};
     for (var row = 0; row < BEATS.length; row++) {

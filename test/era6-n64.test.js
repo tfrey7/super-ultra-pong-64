@@ -126,7 +126,9 @@ test('the ball is the last thing drawn on the table: a smooth sphere, then its w
   const g = rally();
   prime(g);
   const log = frame(g);
-  const fills = log.filter((o) => o.op === 'fill');
+  // the HUD comes after the table: its power meters' slices (item 1230) are not the table's
+  const meter = new Set(['#ffc72c', '#1f5fd6']);
+  const fills = log.filter((o) => o.op === 'fill' && !meter.has(o.fill));
   const dot = fills[fills.length - 1];
   const body = fills[fills.length - 2];
   assert.strictEqual(dot.fill, '#ffffff', 'the specular dot is the last fill');
