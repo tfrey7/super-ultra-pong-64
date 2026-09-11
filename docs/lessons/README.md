@@ -66,7 +66,10 @@ machine.
    - `src/sound.js`
    - `src/music.js`
    - the one `src/eras/eraN-*.js` you want
-   - `src/table3d.js` and `src/textures3d.js` for a 3D era
+   - `src/table3d.js` and `src/textures3d.js` for a 3D era, plus `vendor/three.js` and
+     `src/field3d.js`, the real 3D layer its field draws through ([3d-layer.md](3d-layer.md)).
+     Eras 5 to 10 draw their field through that one checked-in 3D library, and everything else
+     stays canvas 2D.
    - `src/sprites.js` for an era that draws pixellab art from files
    - `src/characters.js` if you want the players (item 1223). From era 1 up, a figure stands
      behind each paddle with its hand on it. The figure only reads the state, and its beats come

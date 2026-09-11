@@ -26,8 +26,11 @@ self-playing demo rally behind it, drawn from the score's own block font. `src/a
 a coin whose CREDIT 1 / PLAYER 1 READY plays inside a held first serve -- so the game is already
 `'playing'` 150 ms after the click, which is what the playtest checks. `Pong.backToTitle(game)` is
 the one call that returns a finished match to it; `?title=off` or any `?era=N` skips it. It is plain HTML and plain JavaScript — **no npm, no
-`package.json`, no build step, no framework, no dependencies of any kind** — and that is a
-deliberate property to preserve, not an accident of it being early. The layout exists so later
+`package.json`, no build step, no framework** — and that is a deliberate property to preserve,
+not an accident of it being early. There is exactly **one** library, checked in as a plain script:
+`vendor/three.js`, three.js bundled once (item 1273). Eras 5 to 10 draw their field through it on
+WebGL (`src/field3d.js`), and everything else stays canvas 2D. Nothing is installed or fetched at
+play time. `docs/lessons/3d-layer.md` covers the layer. The layout exists so later
 eras are *additions*: `src/game.js` is the rules, `src/render.js` the look, `src/input.js` the
 hands, `src/sound.js` the voice (each era's notes, synthesised on the page), `src/main.js` the loop
 that ties them together, and `src/eras/` one file per era's look.
@@ -155,6 +158,12 @@ to restart** after a merge. Those nulls are a description rather than an unfinis
 game you open off disk has no build output and no service to bounce, and since the playtest
 screenshots became ignored output there is no path a merge has to tread carefully around. If
 you ever add one of those things, this is the file that has to say so.
+
+Its one non-null extra is **`"stamp"`** (item 1276): `node tools/stamp.mjs --item {item} --title
+{title} --sha {sha}`, the command a landing runs to rewrite `src/version.js`, the checked-in stamp
+the title screen's small `NOW WITH: <feature> · <sha>` line reads (the date is the script's own).
+The page never works a version out at play time and never fetches one; `--out <path>` writes
+elsewhere, which is how `test/version.test.js` runs it without touching the real stamp.
 
 ## 6. What never to commit
 

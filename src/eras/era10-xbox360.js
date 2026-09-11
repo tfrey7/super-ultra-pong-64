@@ -806,10 +806,10 @@
 
     backdrop(ctx, T, farY, state.time || 0);                   // 1
     if (bloom) sun(bloom.ctx, farY, true, breathe);
-    T.table(ctx, cam, tableStyle(T));                          // 2
+    var gl = T.field(ctx, cam, tableStyle(T), state, P);      // 2, through the 3D layer when it can (item 1273)
     railDetail(ctx, T, cam, bloom);
     farStripSoft(ctx, T, cam);                                 // 3
-    var drawn = paddles(ctx, T, cam, state, P, bloom);         // 4
+    var drawn = gl ? [] : paddles(ctx, T, cam, state, P, bloom);   // 4 (the 3D layer drew the bats)
     if (ball) motionBlur(ctx, T, cam, state, ball);            // 5
     if (bloom) {
       if (ball) halo(bloom.ctx, ball);
@@ -821,7 +821,7 @@
     grainPass(ctx, T, state);
     ashPass(ctx, state);
     restoreInks(ctx, drawn);
-    if (ball) T.ball(ctx, cam, state.ball, { fill: ballFill(ctx), texture: TEXTURE.ball });   // 7
+    if (ball && !gl) T.ball(ctx, cam, state.ball, { fill: ballFill(ctx), texture: TEXTURE.ball });   // 7
     hud(ctx, state, P, farY - 6);                              // 8
     if (toast) drawToast(ctx, P, toast);
     ctx.restore();

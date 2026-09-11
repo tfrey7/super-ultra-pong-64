@@ -63,6 +63,12 @@
   <!-- The shared 3D table the eras from the PlayStation up stand on
        (docs/ERAS.md section 2); PongRender hands it to every era as table3d. -->
   <script src="src/table3d.js"></script>
+  <!-- The real 3D layer (item 1273): three.js, bundled once into one plain
+       script (vendor/three.js, window.THREE), and the field the eras from the
+       PlayStation up draw through it on WebGL -- table, net, bats, ball -- with
+       the canvas table above as the fallback: window.PongField3D. -->
+  <script src="vendor/three.js"></script>
+  <script src="src/field3d.js"></script>
   <!-- One file per era, in ladder order, each registering its look with the
        renderer. An era card replaces its own file and touches no other; a new
        rung is one new file and one line here. -->
@@ -97,6 +103,9 @@
   <!-- The voice: every era's notes, synthesised on the page, silent until the
        first click or key. -->
   <script src="src/sound.js"></script>
+  <!-- The version stamp the title's NOW WITH line reads (item 1276):
+       tools/stamp.mjs rewrites it at each landing: window.PongVersion. -->
+  <script src="src/version.js"></script>
   <!-- The cabinet: power-on warm-up, INSERT COIN, and the coin moment. -->
   <script src="src/attract.js"></script>
   <script src="src/input.js"></script>

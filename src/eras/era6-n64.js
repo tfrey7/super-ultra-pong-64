@@ -440,8 +440,9 @@
     target.fillStyle = ground;
     target.fillRect(0, farY, W, H - farY);
 
-    // 2. the table
-    T.table(target, cam, {
+    // 2. the table: through the real 3D layer when the page has WebGL (item 1273),
+    // which then draws the bats and the ball too
+    var gl = T.field(target, cam, {
       surface: surface(T, pattern),
       line: T.fogColour(PAL.toyYellow, 300, FOG),
       rail: railFace(T),
@@ -449,11 +450,12 @@
       nearLip: PAL.railDark,
       texture: TEXTURE.court,
       trim: TEXTURE.trim
-    });
+    }, state, R);
     flagpoles(target, T, cam, state.time);
 
     // 3. on the table: the fog band swallowing the far end
     T.fogBand(target, cam, FOG);
+    return gl;
   }
 
   // The pixellab tiles (item 1187), laid over the era's own fills through the
@@ -631,28 +633,29 @@
 
     // 1-3. the world, at half resolution, copied up smoothed: the blur
     var buf = T.offscreen(BUFFER.key, BUFFER.w, BUFFER.h);
+    var gl;
     if (buf) {
       var b = buf.ctx;
       b.setTransform(BUFFER.w / state.width, 0, 0, BUFFER.h / state.height, 0, 0);
       b.imageSmoothingEnabled = true;
-      world(b, T, cam, state, grassPattern(T, b));
+      gl = world(b, T, cam, state, grassPattern(T, b));
       b.setTransform(1, 0, 0, 1, 0, 0);
       ctx.imageSmoothingEnabled = true;
       ctx.drawImage(buf.canvas, 0, 0, state.width, state.height);
     } else {
       // headless: the same world straight onto the canvas, flat grass
-      world(ctx, T, cam, state, null);
+      gl = world(ctx, T, cam, state, null);
     }
 
     // 4. paddles, crisp on the main canvas, the far one first
     var sides = ['left', 'right'];
     if (state.right.y + state.right.h < state.left.y + state.left.h) sides.reverse();
-    for (var i = 0; i < sides.length; i++) {
+    for (var i = 0; !gl && i < sides.length; i++) {
       paddle(ctx, T, cam, state[sides[i]], P.paddleInk(state, sides[i]));
     }
 
     // 7. the ball, last of everything on the table; hidden in the serve pause
-    if (state.serveDelay <= 0) {
+    if (!gl && state.serveDelay <= 0) {
       var s = T.ball(ctx, cam, state.ball, ballStyle(ctx));
       // the specular dot: the hottest, sharpest point on screen
       ctx.beginPath();
