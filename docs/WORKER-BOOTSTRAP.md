@@ -461,6 +461,22 @@ Item 1203 traced 100-117 ms of shader compiles there, for era looks nothing had 
   `docs/measure/item1285/` (`node docs/measure/item1285/summary.cjs`). `docs/measure/item1285/probe.mjs` lists every canvas draw kind first seen during each
   change, and that copy of `pace.mjs` takes `--pre "<expr>"` (an A/B switch run before the
   coin) and `--stop-after N`. `PongRender.ERA_CHANGE.warmMs` reports what the warm-up cost.
+- **A warm-up on a LAYER does not warm what an overlay draws onto the PAGE** (item 1313). Two of
+  era 1's RF tube's effects are painted straight onto the page canvas rather than onto a copy of
+  the native picture -- the band of brightness rolling down the tube (a linear gradient filled
+  `'lighter'` through a rect clip) and its snow (a repeating pattern, `'lighter'`) -- and
+  `warmOverlays`, which warms every row on a page-sized layer and copies the layer, left both cold.
+  They were drawn on the page for the first time the frame the first ring passed the centre, which
+  cost 45.8, 54.1 and 104.2 ms on 3 of 3 fresh climbs at 1920x1080 with the GPU on. The A/B that
+  named them, and the shape to copy: `--pre` on `docs/measure/item1285/pace.mjs` switching off one
+  part of the tube at a time (`row(1).overlay='none'` 8.3 ms; the band and snow off, the rest on,
+  4.4 ms; the fringes and glow off, the band and snow on, 50 ms). `warmOverlays` now warms every
+  row a second time straight onto the page and **reads one pixel of the page back into a scratch
+  canvas before the clear** -- taking the page as a drawing source forces Chrome to execute the
+  pending draws, which is what item 1218's layer was standing in for, and it is allowed on a page
+  an off-disk image has tainted where `getImageData` on the page itself is not. Without that read
+  the second pass changes nothing. Each row is also warmed with a stand-in native picture at its
+  OWN size now, so a tube's native-sized work canvases are not rebuilt at the switch.
 - **A flourish that draws something no ring has drawn before brings a hitch back** as a GPU
   program built mid-ring (item 1218: the Super Nintendo tilt's first turned strip, 13-25 ms at raw
   0.12 on 15 of 20 cold legs). A/B with the flourish off first -- item 1218's copy of the recorder,

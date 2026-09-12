@@ -283,7 +283,19 @@
    *    clear discards them (item 1218's rule, which the layer was standing in
    *    for): without it the second pass changes nothing.
    *    Readings: docs/measure/item1285/pace-1313-*.json.
+   * 3. Both passes warm at WARM_TIME, not at time 0. An overlay that moves with
+   *    the clock can put its draw entirely outside the picture at one moment,
+   *    and a draw that falls outside the clip is culled -- it builds nothing.
+   *    era 1's band is at `rect.y - band` at time 0, which is wholly above the
+   *    tube and clipped away, so the first pass onto the page (which had the
+   *    read-back and everything else) still left 45.9, 70.9 and 75.0 ms on 3 of
+   *    3 climbs. WARM_TIME puts the band across the middle of the picture.
    */
+  // The band rolling down era 1's tube sits at ((t * 0.09) % 1) of its travel;
+  // 5.56 s puts it at half way, wholly inside the picture, which is the only
+  // place a warm-up can actually draw it.
+  var WARM_TIME = 5.5556;
+
   function warmOverlays(pageCtx) {
     var page = pageCtx && pageCtx.canvas;
     var native = live.native;
@@ -302,7 +314,7 @@
         x.drawImage(stand, 0, 0, stand.width, stand.height, rect.x, rect.y, rect.w, rect.h);
         // era -1: no real era, so an overlay that keeps a previous frame (the
         // 720p panel's smear) never blends this one into a real frame.
-        OVERLAYS[r.overlay](x, rect, r, { era: -1, time: 0, native: stand });
+        OVERLAYS[r.overlay](x, rect, r, { era: -1, time: WARM_TIME, native: stand });
         drew++;
       } catch (rowErr) {
         // this row stays cold; the rest still warm
