@@ -200,11 +200,22 @@ is also, today, the only thing that cleans up after this era (below).
   with `parts.ballMat.opacity = 0` and hands it straight back the moment `T.field` returns, so no
   other era can ever meet it hidden. "Restore it when another era draws" cannot be implemented by
   the era that hid it: it is not running then.
-- **Cleaning up after yourself is the lighting knob.** Changing `lighting` makes the layer rebuild
-  every material and empty its group, disposing of anything an era added. Era 7 is the only era
-  asking for `'phong'`, so its ring and its lift go when the machine moves on. **If a second era
-  ever picks the same lighting model, that cleanup stops happening** and both will need a real
-  teardown hook. `fieldSetup` notices a rebuild by the material objects being new ones.
+- **There is no teardown, and the chain relies on that.** Changing `lighting` makes the layer
+  rebuild every material and empty its group, disposing of anything an era added -- which is the
+  only cleanup there is. Coming up from era 6 (`'lambert'`) that rebuild happens, so era 7 starts
+  from clean parts. Going on to era 8 it does **not**: era 8 asks for `'phong'` too, and it calls
+  era 7's own `fieldSetup` on purpose, to carry this field forward. So era 7's ring and its lift
+  are still there on the PS2, by the chain's design rather than by accident. The one thing that
+  must not carry is the hidden ball: era 8 draws no ball of its own, so era 7 hides the layer's
+  ball **only on frames whose era is 7**, and a test pins it.
+- **Dress the material the mesh is wearing now.** Era 6's `fieldSetup` runs first (era 7 calls it)
+  and hands the slab mesh a textured material of its own, so `parts.surfaceMat` is no longer what
+  the table is painted with. Era 7 dresses `parts.slab.material` when the two differ, and takes the
+  Nintendo 64's grain off every frame, because era 6 puts it back every frame. Two readings from
+  getting this wrong: with era 6's material left alone the table stayed a dark N64 checker (field
+  mean 81.6), and with era 7's emissive lift stacked on top of era 6's own the table blew out to
+  near-white (**203** of 255). Setting that material's *colour* is what works -- safe, because
+  `pose()` writes only `surfaceMat.color`.
 
 **What the change is worth, measured** -- same frame, the field band only (the table, under the sky
 and above the near lip):
@@ -212,7 +223,7 @@ and above the near lip):
 | | distinct colours | mean brightness | brightest pixel in the frame |
 | --- | --- | --- | --- |
 | before (cel) | 7,500 | 72.4 | 249, 238, 233 -- **not** on the ball |
-| after (1999) | 17,855 | 97.7 | 254, 254, 254 -- **on the ball itself** |
+| after (1999) | 19,564 | 121.2 | 253, 254, 254 -- **on the ball itself** |
 
 The colour count is the reading that separates the two looks: flat poster fills against real smooth
 shading. Nothing reaches a pure 255 because the display's tube overlay tints the whole page, so R1

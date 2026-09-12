@@ -22,17 +22,17 @@
     "width": 1440,
     "height": 900,
     "brightest": {
-      "x": 949,
-      "y": 608,
+      "x": 965,
+      "y": 630,
       "rgb": [
-        254,
+        253,
         254,
         254
       ]
     },
     "brightestIsWhite": false,
     "whitePixels": 0,
-    "fieldColours": 17855,
-    "fieldMeanBrightness": 97.7
+    "fieldColours": 19564,
+    "fieldMeanBrightness": 121.2
   }
 ]

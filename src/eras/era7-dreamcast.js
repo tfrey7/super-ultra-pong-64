@@ -68,6 +68,9 @@
   // remembered for. See docs/lessons/era7-dreamcast.md.
   var STAGE = {
     slab: { lift: '#10407e', specular: '#9ad7ff', shininess: 90 },
+    // The same stage, when era 6 handed the slab mesh a material of its own: the
+    // colour is ours to set there, so the lift only has to carry the gleam.
+    stage: { colour: '#2f74d6', lift: '#08203f', specular: '#9ad7ff', shininess: 90 },
     net: { colour: '#eaf6ff', lift: '#2b5f92', specular: '#ffffff', shininess: 60 },
     // The bats keep the colour the session earned (R4), so their lift is only a
     // little off black and their gleam is grey: a white specular at the
@@ -436,7 +439,15 @@
     return true;
   }
 
-  var stage = { mats: null, ring: null };
+  /** Take a texture map off a shared material: the 1999 picture is clean and sharp. */
+  function clearGrain(mat) {
+    if (!mat || !mat.map) return false;
+    mat.map = null;
+    if (mat.needsUpdate !== undefined) mat.needsUpdate = true;
+    return true;
+  }
+
+  var stage = { mats: null, slabMat: null, ring: null };
 
   /**
    * This era's work inside the shared 3D scene, called from draw() before
@@ -454,15 +465,31 @@
       try { six.fieldSetup(I, state); } catch (e) { /* era 6 owns its own errors */ }
     }
     var p = I.parts;
-    var fresh = stage.mats !== p.surfaceMat;
+    // Era 6 (which ran just above) may have put its own textured material on the
+    // slab mesh, so the material to dress is the one the mesh is wearing NOW.
+    var slabMat = p.slab && p.slab.material ? p.slab.material : p.surfaceMat;
+    var fresh = stage.mats !== p.surfaceMat || stage.slabMat !== slabMat;
     if (fresh) {
       dress(p.surfaceMat, STAGE.slab);
+      // Era 6's own slab material is already lifted, so stacking era 7's lift on
+      // it blew the table out to white (measured: field mean 203 of 255). Taking
+      // it over means setting its colour -- which is safe, because pose() writes
+      // only `surfaceMat.color`, not the mesh's material when era 6 replaced it.
+      if (slabMat !== p.surfaceMat) dress(slabMat, STAGE.stage);
+      stage.slabMat = slabMat;
       dress(p.netMat, STAGE.net);
       if (p.bats) ['left', 'right'].forEach(function (s) { if (p.bats[s]) dress(p.bats[s].mat, STAGE.bat); });
       dress(p.ballMat, STAGE.ball);
       stage.ring = addRing(I);
       stage.mats = p.surfaceMat;
     }
+    // Era 6's fieldSetup ran first (above) and lays the Nintendo 64's grain over
+    // the slab. Era 7 is the rung where the picture got sharp, so the 1999 stage
+    // takes it off again -- every frame, because era 6 puts it back on every
+    // frame. This is the "then apply your own change on top" half of the brief.
+    clearGrain(p.surfaceMat);
+    clearGrain(slabMat);
+    clearGrain(p.ballMat);
     // The ball is hidden only when era 7 is the era being drawn. Era 8 calls
     // this function to carry era 7's field forward (item 1295), and era 8 draws
     // no ball of its own -- hiding it there would take the ball off the table.
