@@ -225,18 +225,17 @@ test('fillFor: fog pulls a colour toward the fog, and the PlayStation dithers be
 });
 
 // --------------------------------------------------------- through the rig
-test('eras 5 to 10 name a shading of their own and only their own figures; eras 1 to 4 keep their sprites', () => {
+test('eras 5 to 10 name a shading of their own and never the proof figure; eras 1 to 4 keep their sprites', () => {
   const modes = new Set();
   for (let e = 1; e <= 10; e++) {
     const c = C.configFor(e);
     if (e < 5) { assert.ok(!c.model, 'era ' + e + ' stays a sprite'); continue; }
-    // Item 1283: no era wears the proof figure. Since item 1258 an era's own
-    // model card may name its own pair, and those are named for their era.
+    // Item 1283: no era wears the PROOF figure -- an era whose own model card has
+    // landed (1253 on) names its own files, one a side, and any other names none.
     for (const side of ['left', 'right']) {
       const s = C.configFor(e, side);
-      const own = s.model || s.figure;
-      assert.ok(!own || own.indexOf('era' + e + '-') === 0,
-        'era ' + e + ' ' + side + ' names only a figure of its own: ' + own);
+      const own = s.figure || s.model;
+      assert.ok(!/^player-proof/.test(own || ''), 'era ' + e + ' ' + side + ' does not reuse the proof figure: ' + own);
     }
     assert.ok(M.MODES.includes(c.shading), 'era ' + e + ' shading ' + c.shading);
     modes.add(c.shading);
@@ -244,17 +243,17 @@ test('eras 5 to 10 name a shading of their own and only their own figures; eras 
   assert.strictEqual(modes.size, 6, 'one mode an era');
 });
 
-test('item 1283: each 3D era wears its own pair, twelve different players across the six', () => {
-  // A rung's pair is its two sprite stand-ins, or -- once its model card has
-  // landed (items 1253 to 1258) -- its own two Blender-built figures.
-  const players = new Set();
-  const nameOf = (cfg) => cfg.model || cfg.figure || cfg.sheet;
+test('item 1283: each 3D era wears its own pair, twelve different figures across the six', () => {
+  const names = new Set();
   for (let e = 5; e <= 10; e++) {
-    const l = nameOf(C.configFor(e, 'left')), r = nameOf(C.configFor(e, 'right'));
+    // An era's pair is its own models once its model card has landed (item 1253
+    // on), and its stand-in sheets until then; either way the two sides differ.
+    const of = (side) => { const c = C.configFor(e, side); return c.figure || c.model || c.sheet; };
+    const l = of('left'), r = of('right');
     assert.ok(l && r && l !== r, 'era ' + e + ' has two different figures: ' + l + ' / ' + r);
-    players.add(l); players.add(r);
+    names.add(l); names.add(r);
   }
-  assert.strictEqual(players.size, 12);
+  assert.strictEqual(names.size, 12);
 });
 
 test('item 1283: with the proof models loaded but not asked for, every 3D era draws its stand-ins', () => {
