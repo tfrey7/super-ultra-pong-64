@@ -237,3 +237,71 @@ LESSONS: the reference games moved this rung from "a low-resolution 3D table" to
 and the whole of that move is one texture mapped without perspective correction across eight big
 triangles; the resolution, the filtering and the flat shading were already knobs, and the 64 x 64
 checker that kinks and swims is the thing a player recognises.
+
+---
+
+What item 1253 learned **building the two fighters to the machine's budget** — the karateka in the
+gi and the taller kickboxer — in Blender, headless, from
+[tools/blender/era5-players.py](../../tools/blender/era5-players.py):
+[a rally with both of them standing](../shots/item-1253/rally-era5-playstation.png).
+
+**Modelling to a 1994 budget**
+
+- **The budget is a shape, not a slider.** Item 1274's proof figure is 244 triangles at its lowest
+  setting, and that is the whole PlayStation allowance for a character here. There is no subdivision
+  to turn down afterwards: a figure at this count is *made* out of three-sided limbs, a four-sided
+  torso, a 5 x 3 head, a 4 x 2 crop of hair and cube hands and feet, and every one of those numbers
+  is chosen before the first primitive goes in. The two fighters come out at **248 and 236
+  triangles**, 106 and 105 KB a file, most of that the six clips sampled at 15 a second and not the
+  mesh at all.
+- **Where the triangles went, counted once**: eight limbs at 8 triangles each, two heads' worth of
+  sphere and hair at about 40, the torso's three parts at about 36, four cubes (hands and feet) at
+  48, and the gear — the belt and the headband, or the top-knot — at 12 to 24. Adding a part costs
+  more than refining one: one extra prism is 8 triangles, and raising every limb from three sides to
+  six is 64.
+- **At this count the silhouette is the whole character, so spend the budget on the outline.**
+  Flared gi sleeves against bare arms, a heavy belt against a bare waist, a headband against a
+  top-knot, and 3 units of height between them: those five decisions are what tell the two fighters
+  apart at 320 x 240, and together they cost about 30 triangles. Face detail, fingers and folds cost
+  the same triangles and disappear in the chunk grid.
+- **Colour cannot carry who is who here.** The shirt material is the one the game repaints every
+  frame in that paddle's colour (the contract's `ink`), and this era borrows era 1's paddle inks,
+  which the session picks at random — so the gi and the top are never a fixed red and blue. Only the
+  skin, trousers, shoes and hair are yours to keep, and they are the small part of the figure.
+- **Flat shading is free authenticity and it changes how you model.** Every face is one colour with
+  no smoothing, so a cylinder of three sides reads as a deliberate chamfered prism rather than as a
+  low-resolution tube. It is the same reason *Tekken*'s fighters look carved: at this budget you are
+  modelling the faces, not the surface.
+- **Write both files from one script.** The same parts, posed six times, are the no-WebGL fallback
+  (`pong-model-1`, drawn on canvas) and the same parts bound to an armature are the glTF the real 3D
+  layer stands. One run writes `.glb`, its base64 `.glb.js`, the `.json` and its `.js` — so a page
+  with no WebGL never falls back to the rig's placeholder figure, which is what "no era reuses that
+  primitive character" actually requires.
+
+- **Two rigged figures cost about a quarter of a millisecond a frame.** On the graphics card, the
+  same pinned rally with the players standing runs at **5.95 ms a frame and 2.25 ms a 3D draw**,
+  against **5.68 and 2.05** with them switched off (`?characters=off`), each the median of three
+  three-second windows — a difference inside the noise between windows, and a sixth of the 16.7 ms
+  frame either way. `node docs/measure/item1253/figures.mjs --label with --gpu` re-takes it, and the
+  readings are beside it. In the playtest's software-drawn Chrome the whole era reads 26.1 ms a
+  frame (mean of 39 frames), which is the known `--disable-gpu` reading every 3D era gives and card
+  1216's subject, not this one's.
+
+**What did not work**
+
+- **A check that said both ends of the table wear the same thing.** The shared rig's test asserted
+  that an era with no sprite sheets has *identical* configuration on the left and the right. That was
+  true while every 3D era's two players were one file mirrored; it is false the moment an era names
+  one figure a side, which is what "visually distinct" asks for. The check now allows the figure name
+  to differ and pins each side to the one its own block names.
+
+**What a one-era PlayStation game would copy**
+
+- The build table at the top of the script: one dictionary of side counts (`limb`, `torso`, `head`,
+  `hair`) shared by every character, and a per-character dictionary of proportions and gear. Two
+  fighters that differ in eleven numbers are two fighters; two that differ in a texture are one.
+
+LESSONS: a PlayStation character is about 240 flat triangles, and at that size the budget is spent
+before you start — three-sided limbs, boxes for hands and feet, and every spare triangle in the
+silhouette (sleeves, a belt, a headband, a top-knot), because at 320 x 240 the outline is the only
+thing that tells two fighters apart once the game repaints their shirts in the paddles' colours.

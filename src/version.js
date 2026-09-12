@@ -6,9 +6,9 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "the 3D figures are warmed before their era arrives, so the first frame no longer hitches",
-    "item": "1298",
-    "sha": "d7ce07d",
+    "feature": "era 5 gets its own polygon fighters, built in Blender, standing at the PlayStation table",
+    "item": "1253",
+    "sha": "ba4e6f0",
     "date": "2026-09-12"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
