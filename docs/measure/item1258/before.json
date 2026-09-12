@@ -1,0 +1,34 @@
+{
+  "label": "before",
+  "root": "G:/Claude Stuff/super-ultra-pong-64",
+  "W": 960,
+  "H": 720,
+  "frame": {
+    "frames": 60,
+    "mean": 45.99166666666667,
+    "p95": 66.19999998807907,
+    "max": 70
+  },
+  "webgl": true,
+  "sides": {
+    "left": {
+      "name": null,
+      "state": null,
+      "sheet": "era10-soldier-left",
+      "modelScale": 1.8,
+      "shading": "hd"
+    },
+    "right": {
+      "name": null,
+      "state": null,
+      "sheet": "era10-soldier-right",
+      "modelScale": 1.8,
+      "shading": "hd"
+    }
+  },
+  "stoodGltf": false,
+  "ink": {
+    "left": "#d2a44a",
+    "right": "#54b899"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "label": "before-gpu",
+  "root": "G:/Claude Stuff/super-ultra-pong-64",
+  "W": 960,
+  "H": 720,
+  "frame": {
+    "frames": 60,
+    "mean": 4.16166666696469,
+    "p95": 4.9000000059604645,
+    "max": 5.199999988079071
+  },
+  "webgl": true,
+  "sides": {
+    "left": {
+      "name": null,
+      "state": null,
+      "sheet": "era10-soldier-left",
+      "modelScale": 1.8,
+      "shading": "hd"
+    },
+    "right": {
+      "name": null,
+      "state": null,
+      "sheet": "era10-soldier-right",
+      "modelScale": 1.8,
+      "shading": "hd"
+    }
+  },
+  "stoodGltf": false,
+  "ink": {
+    "left": "#548ad2",
+    "right": "#84c8fc"
+  }
+}

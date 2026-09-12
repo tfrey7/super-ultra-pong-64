@@ -125,8 +125,9 @@ async function targetUrl(asked) {
 }
 
 const url = 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') + '?era=10';
+const GPU = process.argv.includes('--gpu');     // --gpu lets Chrome use the real one (the player's case)
 const chrome = await launchChrome(CHROME, [
-  '--headless=new', '--disable-gpu', '--enable-unsafe-swiftshader', '--hide-scrollbars', '--mute-audio',
+  '--headless=new', ...(GPU ? [] : ['--disable-gpu']), '--enable-unsafe-swiftshader', '--hide-scrollbars', '--mute-audio',
   '--allow-file-access-from-files', '--window-size=960,720', '--remote-debugging-port=' + PORT,
   '--no-first-run', '--no-default-browser-check', url
 ], { name: 'item1258' }).catch(refusePortTaken);
