@@ -1,0 +1,49 @@
+{
+ "taken": "2026-09-12T13:51:39.574Z",
+ "label": "master",
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64",
+ "timing": {
+  "frames": 90,
+  "meanMs": 76.1,
+  "p95Ms": 250,
+  "maxMs": 333.2,
+  "era": 10
+ },
+ "posed": {
+  "gl": true,
+  "why": ""
+ },
+ "probe": {
+  "names": {},
+  "sheets": {
+   "left": "era8-sheet-left",
+   "right": "era8-sheet-right"
+  },
+  "files": {
+   "left": null,
+   "right": null
+  },
+  "beats": {
+   "left": "swing",
+   "right": "down"
+  },
+  "renderSize": [
+   512,
+   384
+  ],
+  "figures": [],
+  "letterbox": {
+   "barFieldUnits": 52,
+   "barPx": 33.3,
+   "heightPx": 384
+  },
+  "figuresInsideLetterbox": true,
+  "rect": {
+   "x": 47.671875,
+   "y": 0,
+   "w": 882.65625,
+   "h": 662
+  }
+ },
+ "png": "G:\\Claude Stuff\\super-ultra-pong-64-item-1256\\docs\\shots\\item-1256\\master.png"
+}
