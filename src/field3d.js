@@ -347,6 +347,7 @@
   // Item 1299: what the first frame that draws a figure pays, in ms, and what
   // the warm-up paid instead. figureTimings() answers it; a measurement reads it.
   var figTimes = { parseMs: 0, buildMs: 0, compileMs: 0, warmMs: 0, warms: 0, warmed: [] };
+  var builtThisFrame = false;   // this frame built a posed copy, so its render builds a shader
   function nowMs() { return root.performance && root.performance.now ? root.performance.now() : 0; }
 
   /** The clip a src/characters.js beat plays. */
@@ -431,6 +432,7 @@
     figKept[key] = { side: side, name: name, body: body, mixer: mixer, actions: actions, ink: ink, shadow: shadow,
       pong: f.pong, clip: null, since: 0, prev: null, prevAt: 0 };
     figTimes.buildMs += nowMs() - tBuild;
+    builtThisFrame = true;
     return figKept[key];
   }
 
@@ -507,6 +509,84 @@
     return slabs;
   }
 
+  // ------------------------------------------------- warming them (item 1299)
+  // The FIRST frame that draws a figure pays for WebGL building its skinned
+  // shader program: 133-150 ms on a cold Xbox page in the playtest's software
+  // renderer, against 3 ms to unpack the file and 3 ms to build both posed
+  // copies (docs/measure/item-1299/). Item 1274 measured that frame inside
+  // ordinary play and suspected this; the readings beside figfirst.mjs prove it.
+  //
+  // So the layer warms ahead of itself: every frame it draws, it asks for the
+  // files THIS era and the NEXT era want (a script tag each, so the loads
+  // overlap and nothing waits), and then, one side per frame, builds that
+  // figure's posed copy and stands it in this frame's render a thousandth of
+  // its size at the table's centre -- far under a pixel, so nothing is seen,
+  // but the real draw call is made and the program is built. By the time the
+  // next era arrives its figures are already compiled and its first real frame
+  // costs nothing. Nothing is loaded for eras the match has not nearly reached.
+  var WARM_TINY = 0.001;        // the size a warming figure is drawn at
+  var warmWanted = [];          // { side, name } still to warm, this era's first
+  var warmDone = {};            // side + ':' + name -> warmed
+  var warmAsked = {};           // name -> its file has been asked for
+
+  /** The figure names an era's two sides want, or none when the era has no 3D figures. */
+  function figureNamesFor(era) {
+    var C = root.PongCharacters, out = [];
+    if (figuresOff || !C || typeof C.configFor !== 'function' || !C.enabled) return out;
+    ['left', 'right'].forEach(function (side) {
+      var cfg = C.configFor(era, side);
+      if (!cfg || !cfg.is3d) return;
+      var name = cfg.figure || cfg.model;
+      if (typeof name === 'string' && FIG_NAME.test(name)) out.push({ side: side, name: name });
+    });
+    return out;
+  }
+
+  /**
+   * Line up the figures this era and the next one want, and ask for their files
+   * now. Asking is a script tag and costs the frame nothing; it is the waiting
+   * that a mid-match arrival cannot afford.
+   */
+  function warmFigures(era) {
+    era = Math.floor(era) || 0;
+    for (var e = era; e <= era + 1; e++) {
+      figureNamesFor(e).forEach(function (job) {
+        var key = job.side + ':' + job.name;
+        if (warmDone[key] || figKept[key]) return;
+        for (var i = 0; i < warmWanted.length; i++) if (warmWanted[i].side + ':' + warmWanted[i].name === key) return;
+        warmWanted.push(job);
+        if (!warmAsked[job.name]) { warmAsked[job.name] = true; figure(job.name); }
+      });
+    }
+    return warmWanted.length;
+  }
+
+  /**
+   * One warming step, at most one figure a frame: the first wanted figure whose
+   * file has arrived is built and handed back for this frame's render to draw
+   * at WARM_TINY. Answers null when there is nothing to warm, or nothing ready.
+   */
+  function warmStep() {
+    for (var i = 0; i < warmWanted.length; i++) {
+      var job = warmWanted[i];
+      if (!warmAsked[job.name]) { warmAsked[job.name] = true; figure(job.name); }
+      var known = figFiles[job.name];
+      if (known && known.state === 'failed') { warmWanted.splice(i, 1); warmDone[job.side + ':' + job.name] = true; i--; continue; }
+      var f = figure(job.name);
+      if (!f) continue;                       // still loading, or it has none: leave it in the line
+      warmWanted.splice(i, 1);
+      var key = job.side + ':' + job.name;
+      warmDone[key] = true;
+      var already = !!figKept[key];
+      var k = kept(job.side, job.name, f);
+      if (already && k.body.visible) return null;   // this frame draws it for real anyway
+      figTimes.warms++;
+      figTimes.warmed.push(key);
+      return k;
+    }
+    return null;
+  }
+
   /** How many device pixels the context draws per field unit. */
   function pixelScale(ctx) {
     if (typeof ctx.getTransform !== 'function') return 1;
@@ -522,6 +602,7 @@
    */
   function draw(ctx, cam, state, look) {
     figuresTaken = false;
+    builtThisFrame = false;
     if (switchedOff || !ctx || !cam || !state || !ensure()) return false;
     var t0 = root.performance && root.performance.now ? root.performance.now() : 0;
     look = look || {};
@@ -539,12 +620,27 @@
       });
       figuresTaken = true;
     }
+    // Item 1299: ask for the next era's figures and warm one of them into this
+    // frame's render, under a pixel wide, so no later frame pays for its shader.
+    warmFigures(state.era);
+    var warm = warmStep();
+    if (warm) {
+      warm.body.visible = true;
+      warm.body.position.set(0, 0, 0);
+      warm.body.scale.set(WARM_TINY, WARM_TINY, WARM_TINY);
+      warm.shadow.visible = false;
+    }
     var gl = state3.gl;
     var k = pixelScale(ctx) * (knobs.resolution || 1);
     var w = Math.max(1, Math.round(W * k)), h = Math.max(1, Math.round(H * k));
     var c = gl.domElement;
     if (c.width !== w || c.height !== h) gl.setSize(w, h, false);
+    var tRender = (warm || builtThisFrame) ? nowMs() : 0;
     gl.render(state3.scene, state3.camera);
+    if (tRender) {
+      var cost = nowMs() - tRender;
+      if (warm) figTimes.warmMs += cost; else figTimes.compileMs += cost;
+    }
     var prevSmooth = ctx.imageSmoothingEnabled;
     if (knobs.filter !== undefined) ctx.imageSmoothingEnabled = !!knobs.filter;
     ctx.drawImage(c, 0, 0, w, h, 0, 0, W, H);
@@ -574,6 +670,15 @@
     clipFor: clipFor,
     clipTime: clipTime,
     figureState: function (name) { var f = figFiles[name]; return f ? { state: f.state, why: f.why || '' } : null; },
+    /**
+     * Item 1299: line up this era's and the next era's figures and ask for
+     * their files now, so no arrival waits on one. draw() calls it every frame;
+     * a page that wants them warmed earlier still may call it itself. Answers
+     * how many are still to warm.
+     */
+    warmFigures: function (era) { return ensure() ? warmFigures(era) : 0; },
+    /** The { side, name } figures an era wants, none when that era has no 3D figures. */
+    figureNamesFor: figureNamesFor,
     /** Item 1299: what unpacking, building and compiling the figures has cost this page, in ms. */
     figureTimings: function () {
       return { parseMs: +figTimes.parseMs.toFixed(2), buildMs: +figTimes.buildMs.toFixed(2),
