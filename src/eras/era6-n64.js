@@ -614,6 +614,263 @@
     return true;
   }
 
+  // ------------------------------------------------ the 3D field (item 1292)
+  // Super Mario 64 (1996) ADDS the blob shadow: "a faux shadow directly beneath
+  // each object regardless of the area's lighting", which its designers called
+  // an iron-clad necessity -- so a soft dark disc on the floor under each
+  // standing player and one under the ball. The Nintendo 64 CHANGES the
+  // inherited field: 320 x 240 (0.8 of the 400 x 300 world buffer), three-point
+  // filtered, fogged, Gouraud-lit, round, and one tiny texture (TMEM's 4,096
+  // bytes: 32 x 64 texels at 16 bits) stretched and smeared over the whole top.
+  // Everything here reaches the shared scene through PongField3D.internals();
+  // src/field3d.js is not edited.
+  var RAD = Math.PI / 180;
+  var BLOB = {
+    behind: 30,                 // the foot spot: this far behind its end of the table
+    player: { rx: 26, ry: 18 }, // a flattened disc under each player
+    ball: 1.9,                  // the ball's disc, in ball radii (the contact shadow is 1)
+    lift: 0.3,                  // over the top, under the contact shadow's 0.6
+    opacity: 0.35,              // R5: lighter than the contact shadow's 0.55
+    texels: 32                  // the disc's soft edge, as a tiny alpha texture
+  };
+  var TMEM = { w: 32, h: 64, bits: 16, bytes: 4096 };
+
+  /**
+   * How far the camera sees a point of the table at depth d (0 near edge, 1 far
+   * edge): the depth along the view direction, which is what THREE.Fog measures.
+   * The camera looks down its tilt at the table's centre from (0, height, back).
+   */
+  function viewDepth(spec, d) {
+    var t = (spec.tilt || 0) * RAD, h = spec.height;
+    var back = h * Math.tan(t);
+    var z = (1 - d) * 600 - 300;              // the field row at depth d, in world z
+    return h * Math.cos(t) - (z - back) * Math.sin(t);
+  }
+
+  /** The canvas fog band's start and end, turned into camera distances for the 3D fog. */
+  function fogNearFar(spec, fog) {
+    return { near: Math.round(viewDepth(spec, fog.start)), far: Math.round(viewDepth(spec, fog.end)) };
+  }
+
+  var FOG3 = fogNearFar(CAMERA, FOG);
+  var RENDER = { resolution: 0.8, filter: true, fog: { colour: PAL.fog, near: FOG3.near, far: FOG3.far }, lighting: 'lambert' };
+
+  /**
+   * Where the three blob shadows sit, from the state: field x and y, height z
+   * (up off the top), the disc's radii and opacity. Players stand at the
+   * realism ladder's foot spot, BLOB.behind past their end, centred on the
+   * paddle, on the floor; with no floor (floorZ not a number) on the top's end.
+   * The ball's disc lies on the top under it, or on the floor once it is past
+   * an end. Pure: node --test reads it.
+   */
+  function blobSpots(state, floorZ) {
+    var W = state.width || 800, hasFloor = typeof floorZ === 'number';
+    var out = {};
+    ['left', 'right'].forEach(function (side) {
+      var p = state[side], end = side === 'left' ? 0 : W, away = side === 'left' ? -1 : 1;
+      out[side] = { x: hasFloor ? end + away * BLOB.behind : end, y: p.y + p.h / 2, z: hasFloor ? floorZ : 0,
+                    rx: BLOB.player.rx, ry: BLOB.player.ry, opacity: BLOB.opacity, shown: true };
+    });
+    var b = state.ball, bx = b.x + b.size / 2, over = bx >= 0 && bx <= W;
+    var r = b.size * 0.6 * BLOB.ball;             // the layer's ball radius (0.6 of its size), times BLOB.ball
+    out.ball = { x: bx, y: b.y + b.size / 2, z: over || !hasFloor ? BLOB.lift : floorZ,
+                 rx: r, ry: r, opacity: BLOB.opacity, shown: !(state.serveDelay > 0) };
+    return out;
+  }
+
+  /**
+   * The slab's one texture: 32 x 64 texels of grass, two-texel cells in the
+   * era's greens with a few dark tufts, every channel cut to 5 bits (RGBA 5551,
+   * 16 bits a texel). RGBA8 bytes out, so three.js can upload it anywhere. Pure.
+   */
+  function slabTexels() {
+    var w = TMEM.w, h = TMEM.h, data = new Uint8Array(w * h * 4);
+    function rgb(hex) { var n = parseInt(hex.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+    function five(v) { return Math.round(Math.round(v / 255 * 31) * 255 / 31); }
+    var light = rgb(PAL.grassLight), mid = rgb(PAL.grass), dark = rgb(PAL.grassDark);
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        var cell = ((x >> 1) + (y >> 1)) & 1;
+        var hash = ((x * 73856093) ^ (y * 19349663)) >>> 0;
+        var ink = hash % 23 === 0 ? dark : (cell ? light : mid);
+        var i = (y * w + x) * 4;
+        data[i] = five(ink[0]); data[i + 1] = five(ink[1]); data[i + 2] = five(ink[2]); data[i + 3] = 255;
+      }
+    }
+    return data;
+  }
+
+  // What this file has put into the shared scene, and what it swapped out.
+  var field = { scene: null, blobs: null, own: null, pending: false, applied: null, capsules: {} };
+
+  function blobTexture(THREE) {
+    var n = BLOB.texels, data = new Uint8Array(n * n * 4);
+    for (var y = 0; y < n; y++) {
+      for (var x = 0; x < n; x++) {
+        var dx = (x + 0.5) / n * 2 - 1, dy = (y + 0.5) / n * 2 - 1;
+        var r = Math.sqrt(dx * dx + dy * dy), a = r >= 1 ? 0 : Math.pow(1 - r * r, 1.5);   // soft to the rim
+        var i = (y * n + x) * 4;
+        data[i] = data[i + 1] = data[i + 2] = 255;
+        data[i + 3] = Math.round(a * 255);
+      }
+    }
+    var tex = new THREE.DataTexture(data, n, n, THREE.RGBAFormat);
+    tex.magFilter = tex.minFilter = THREE.LinearFilter;
+    tex.needsUpdate = true;
+    return tex;
+  }
+
+  /** The three discs, made once and added straight to the scene (not the layer's group, which a relight empties). */
+  function addBlobs(I) {
+    var THREE = I.THREE, tex = blobTexture(THREE), blobs = {};
+    ['left', 'right', 'ball'].forEach(function (key) {
+      var mat = new THREE.MeshBasicMaterial({ color: 0x000000, map: tex, transparent: true, opacity: BLOB.opacity,
+        depthWrite: false, fog: false });
+      var m = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
+      m.rotation.x = -Math.PI / 2;
+      m.renderOrder = -1;          // before the contact shadow (0), the net (1) and the ball (2): R1
+      m.name = 'era6-blob-' + key;
+      m.userData.era = 6;
+      m.visible = false;
+      I.scene.add(m);
+      blobs[key] = m;
+    });
+    return blobs;
+  }
+
+  /**
+   * A bat's blade with round caps, as the unit box the layer scales to the
+   * paddle (w x 22 x h): a capsule along the paddle whose caps are exactly half
+   * the paddle's width long once scaled, with its normals carried through the
+   * squash so the caps shade smooth. Kept per cap length.
+   */
+  function capsuleBlade(THREE, w, h) {
+    var c = Math.min(0.5, Math.max(0.01, (w / 2) / Math.max(1, h)));
+    var key = c.toFixed(3);
+    if (field.capsules[key]) return field.capsules[key];
+    var g = new THREE.CapsuleGeometry(0.5, 1, 5, 14);    // along y: body |y| <= 0.5, caps to |y| = 1
+    var pos = g.attributes.position, nor = g.attributes.normal;
+    for (var i = 0; i < pos.count; i++) {
+      var y = pos.getY(i), s = y < 0 ? -1 : 1, a = Math.abs(y);
+      if (a <= 0.5) pos.setY(i, y * (1 - 2 * c));
+      else {
+        pos.setY(i, s * ((0.5 - c) + (a - 0.5) * 2 * c));
+        var nx = nor.getX(i), ny = nor.getY(i) / (2 * c), nz = nor.getZ(i), l = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
+        nor.setXYZ(i, nx / l, ny / l, nz / l);
+      }
+    }
+    g.rotateX(Math.PI / 2);                                // the paddle's length runs along world z
+    field.capsules[key] = g;
+    return g;
+  }
+
+  /** This era's own materials and geometry, made once: none carries another era's shader chunks. */
+  function ownParts(THREE) {
+    var tex = new THREE.DataTexture(slabTexels(), TMEM.w, TMEM.h, THREE.RGBAFormat);
+    tex.magFilter = tex.minFilter = THREE.LinearFilter;   // the three-point filter's smear
+    tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;    // one texture, stretched over the whole top
+    if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+    tex.needsUpdate = true;
+    return {
+      slabTexture: tex,
+      slab: new THREE.MeshLambertMaterial({ color: 0xffffff, map: tex }),
+      ball: new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 1, fog: false }),
+      ballGeo: new THREE.SphereGeometry(1, 14, 10),       // few polygons, smooth normals: Gouraud-round
+      blade: { left: new THREE.MeshLambertMaterial({ color: 0xffffff, fog: false }),
+               right: new THREE.MeshLambertMaterial({ color: 0xffffff, fog: false }) },
+      handle: new THREE.MeshLambertMaterial({ color: 0xffffff, fog: false }),
+      handleGeo: new THREE.CapsuleGeometry(4, 18, 3, 10)  // the layer's handle (r 4, 26 long), round-ended
+    };
+  }
+
+  /** Swap this era's look onto the layer's parts for one frame, remembering what was there. */
+  function applyOwn(p, state) {
+    var o = field.own, was = { slab: p.slab, saved: [] };
+    function swap(mesh, key, value) { was.saved.push([mesh, key, mesh[key]]); mesh[key] = value; }
+    swap(p.slab, 'material', o.slab);
+    o.ball.color.copy(p.ballMat.color);
+    swap(p.ball, 'material', o.ball);
+    swap(p.ball, 'geometry', o.ballGeo);
+    ['left', 'right'].forEach(function (side) {
+      var bat = p.bats && p.bats[side], r = state && state[side];
+      if (!bat) return;
+      o.blade[side].color.copy(bat.mat.color);
+      swap(bat.blade, 'material', o.blade[side]);
+      if (r) swap(bat.blade, 'geometry', capsuleBlade(field.THREE, r.w, r.h));
+      o.handle.color.copy(bat.handle.material.color);
+      swap(bat.handle, 'material', o.handle);
+      swap(bat.handle, 'geometry', o.handleGeo);
+    });
+    field.applied = was;
+  }
+
+  /** Put back what applyOwn took, unless the layer has since rebuilt its parts (then there is nothing of ours on them). */
+  function restoreOwn(p) {
+    var was = field.applied;
+    field.applied = null;
+    if (!was || !p || p.slab !== was.slab) return;
+    for (var i = was.saved.length - 1; i >= 0; i--) was.saved[i][0][was.saved[i][1]] = was.saved[i][2];
+  }
+
+  /**
+   * Called by the scene just before every render of it (after the layer has
+   * posed and, on a change of lighting, rebuilt its parts): on this era's
+   * frames the N64 look goes on and the discs show; on any other era's frame
+   * the discs hide and the parts are handed back as the layer made them.
+   */
+  function beforeRender() {
+    var I = field.I, p = I && I.parts;
+    if (!p) return;
+    restoreOwn(p);
+    var mine = field.pending;
+    for (var k in field.blobs) field.blobs[k].visible = mine && field.blobs[k].userData.shown;
+    if (mine && p.slab && p.ball) applyOwn(p, field.state);
+  }
+
+  /**
+   * The era's scene work, called from draw before T.field: era 5's own setup
+   * first when it has one, then this era's add and change on top. Adds the
+   * discs once (tagged era 6) and moves them every frame; the material change
+   * rides the scene's onBeforeRender so it lands after the layer's relight.
+   * Does nothing, and answers false, when there is no 3D layer (I null).
+   */
+  function fieldSetup(I, state) {
+    if (!I || !I.THREE || !I.scene || !state) return false;
+    var five = R && typeof R.eraLook === 'function' ? R.eraLook(5) : null;
+    if (five && typeof five.fieldSetup === 'function' && five.fieldSetup !== fieldSetup) five.fieldSetup(I, state);
+    var THREE = I.THREE;
+    if (field.scene !== I.scene) {
+      field.scene = I.scene;
+      field.THREE = THREE;
+      field.blobs = addBlobs(I);
+      field.own = ownParts(THREE);
+      field.capsules = {};
+      field.applied = null;
+      var prev = I.scene.onBeforeRender;
+      I.scene.onBeforeRender = function () {
+        if (typeof prev === 'function') prev.apply(this, arguments);
+        beforeRender();
+      };
+    }
+    field.I = I;
+    field.state = state;
+    var F = root.PongField3D;
+    // item 1266's floor, where the layer has one; none, and the players' discs sit on the top's ends
+    var floor = F && F.SIZES && F.SIZES.legs && typeof F.SIZES.legs.floor === 'number' ? F.SIZES.legs.floor : null;
+    var spots = blobSpots(state, floor);
+    for (var key in spots) {
+      var s = spots[key], m = field.blobs[key];
+      m.position.set(s.x - 400, s.z, s.y - 300);
+      m.scale.set(s.rx, s.ry, 1);
+      m.userData.shown = s.shown;
+    }
+    field.pending = true;
+    return true;
+  }
+
+  /** The frame is drawn: the next render of the shared scene is another era's unless setup runs again. */
+  function fieldDone() { field.pending = false; }
+
   // ------------------------------------------------------------------ draw
   function draw(ctx, state, opts, api) {
     var P = api || R;
@@ -631,6 +888,14 @@
     ctx.fillStyle = PAL.skyHorizon;
     ctx.fillRect(-8, -8, state.width + 16, state.height + 16);
 
+    // the 3D layer's scene, when this page has one: the blob shadows and the N64 look (item 1292)
+    var F3 = root.PongField3D;
+    var I3 = F3 && typeof F3.available === 'function' && F3.available() && typeof F3.internals === 'function'
+      ? F3.internals() : null;
+    // through the look, not the local function, so a measurement can take it off for an A/B
+    var mine = P && typeof P.eraLook === 'function' ? P.eraLook(6) : null;
+    if (I3 && mine && typeof mine.fieldSetup === 'function') mine.fieldSetup(I3, state);
+
     // 1-3. the world, at half resolution, copied up smoothed: the blur
     var buf = T.offscreen(BUFFER.key, BUFFER.w, BUFFER.h);
     var gl;
@@ -646,6 +911,7 @@
       // headless: the same world straight onto the canvas, flat grass
       gl = world(ctx, T, cam, state, null);
     }
+    fieldDone();
 
     // 4. paddles, crisp on the main canvas, the far one first
     var sides = ['left', 'right'];
@@ -969,6 +1235,11 @@
       effects: { bus: { type: 'lowpass', freq: 3200, q: 0.7 }, reverb: { seconds: 1.0, decay: 3, mix: 0.2 } }
     },
     draw: draw,
+    // the 3D layer's knobs (src/field3d.js reads them every frame) and this era's scene work (item 1292)
+    render: RENDER,
+    fieldSetup: fieldSetup,
+    field3d: { BLOB: BLOB, TMEM: TMEM, blobSpots: blobSpots, slabTexels: slabTexels, fogNearFar: fogNearFar,
+               viewDepth: viewDepth, fieldDone: fieldDone, capsuleBlade: function (THREE, w, h) { return capsuleBlade(THREE, w, h); } },
     arrival: { spec: ARRIVAL, pourAt: pourAt, cubeAt: cubeAt, cubeFaces: cubeFaces, edgeStrength: edgeStrength },
     flourish: arrival,
     // the AAA dressing (item 1230, docs/ART.md Era 6), for the tests

@@ -162,3 +162,57 @@ and [after the fixes it called for](../shots/item1230/era6-after-fixes.png).*
    only the world itself go fully into the wall.
 4. **The toy park and the round HUD**: poles, pennants and butterflies drawn in code into the
    half-resolution world; an eight-slice pie meter filling with the rally; stars on a point.
+
+## LESSONS: Super Mario 64's blob shadows and the machine's smear (item 1292)
+
+The reference game is **Super Mario 64** (1996). What its team took as an iron-clad necessity was
+"a faux shadow directly beneath each object regardless of the area's lighting" -- a shadow that is
+not a light's shadow at all, but a dark disc pinned under the thing, so a player can tell where an
+object is over the ground. That is this era's **add**: a soft round disc on the floor under each
+standing player, at the realism ladder's foot spot, and one under the ball, all three following
+what they belong to every frame. No era below the Nintendo 64 has a shadow under a player.
+
+The **change** is the machine: the field it inherited from the PlayStation is now rendered at the
+N64's 320 x 240, filtered as it is stretched back over the table, fogged between the same two
+depths the canvas fog band uses, lit flat (Lambert), with round-capped bats, a smooth low-polygon
+ball, and one 32 x 64 texture at 16 bits -- exactly TMEM's 4,096 bytes -- stretched over the whole
+top and smeared by the filter.
+
+### What the measurements said
+
+`docs/shots/item-1292/rally.mjs` poses one page (the ball pinned mid-court, both bats held, the
+rally at four), shoots it with this card taken off the look, puts the card back, shoots again, and
+diffs the two frames inside the page, so the pair is the same frame with one thing changed.
+
+- **The shadows are real on the page**: switching the card on darkened 5,646 pixels by a mean 25.3
+  of 255, in patches centred on each player's feet. They read as soft shading under the figures at
+  this camera rather than as obvious discs -- see `rally-era6-before.png` against
+  `rally-era6-after.png`.
+- **The machine's frame**: 400 x 300 before this card, **320 x 240** after, stretched over the same
+  800 x 600 field. The layer's own frame count and cost were 293 frames at 8.0 ms; the page held
+  16.7 ms a frame either way.
+- **The blur prediction did not reproduce, and it should not have been expected to.** The card
+  asked for the far rail's edge to span more pixels than era 5's. It does not: era 5's field is
+  *already* rendered at 320 x 240, because its own world buffer is that size, so the two machines
+  draw the same number of pixels. Measured at that edge, era 6's strongest step spans 1 row against
+  era 5's 3. **What separates era 6 from era 5 is the filtering, the fog and the flat lighting, not
+  a coarser frame.** A later era that wants to be visibly softer than the one below it has to reach
+  for something other than `resolution`.
+- **A content-based sharpness score is no use for this.** Averaging the edge strength over the
+  table says era 6 is *harder*-edged than era 5 (15.1 against 6.3 of 255), because era 6's grass
+  texture is high-contrast: the score measures what is drawn, not how sharply it is drawn.
+
+### What a one-era game would copy
+
+1. **A fake shadow under every object beats a real one.** A disc that ignores the lights, drawn
+   before the object and lighter than its contact shadow, is what makes a 3D game readable; it
+   costs one textured quad each.
+2. **Scene work belongs on the look, not in the draw.** Calling the era's own `fieldSetup` through
+   `PongRender.eraLook(6)` rather than the local function is what let the browser run take the
+   before picture -- the same page, the same pose, the card switched off at the look.
+3. **Hand the shared scene back.** The eras from the PlayStation up share one 3D scene, so an era
+   that swaps materials and geometry onto it must put back exactly what it took the moment another
+   era draws, and hide its own meshes. The hook for that is the scene's own before-render call,
+   which runs after the layer has posed and relit.
+4. **Check what the era below you actually does before claiming to differ from it.** Half of this
+   card's "change" was already true of era 5.

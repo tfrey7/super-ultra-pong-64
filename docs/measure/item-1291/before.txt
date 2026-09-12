@@ -1,0 +1,89 @@
+﻿master checkout at 5af49b5
+item 1291 before: ..\super-ultra-pong-64 (G:\Claude Stuff\super-ultra-pong-64)
+era 5; shot -> docs\shots\item-1291\before-era5-rally.png
+slab {"gl":true,"material":"MeshStandardMaterial","flat":false,"map":null,"affine":false,"rail":"MeshStandardMaterial"}
+frame window 1: 181 frames, mean 16.67 ms, p95 16.70 ms; 3D layer 182 draws at 1.82 ms each
+frame window 2: 140 frames, mean 21.67 ms, p95 33.40 ms; 3D layer 212 draws at 3.16 ms each
+frame window 3: 101 frames, mean 30.20 ms, p95 33.40 ms; 3D layer 126 draws at 3.68 ms each
+frame mean of the three windows: 22.84 ms a frame, 2.89 ms a 3D draw
+edge: the left bat's box [129,314,159,384] (ink #54b899) on the 800 x 600 page, ?display=off
+edge: the bat's left edge over 56 rows, as [x, from row, rows]: [[140,320,8],[138,328,22],[135,350,15],[140,365,3],[135,370,8]]
+edge: 5 of 5 edge positions sit on a 2.5-pixel chunk boundary (x = 0, 3, 5, 8, 10, 13 ...); 3 of 3 inner runs are whole chunks tall (2 or 3 rows, or a multiple of 2.5 rounded)
+item 1291 before: ..\super-ultra-pong-64 (G:\Claude Stuff\super-ultra-pong-64)
+era 5; shot -> docs\shots\item-1291\before-era5-rally.png
+slab {"gl":true,"material":"MeshStandardMaterial","flat":false,"map":null,"affine":false,"rail":"MeshStandardMaterial"}
+frame window 1: 181 frames, mean 16.67 ms, p95 16.70 ms; 3D layer 182 draws at 1.87 ms each
+frame window 2: 138 frames, mean 21.86 ms, p95 33.40 ms; 3D layer 211 draws at 3.15 ms each
+frame window 3: 101 frames, mean 30.20 ms, p95 33.40 ms; 3D layer 126 draws at 3.64 ms each
+frame mean of the three windows: 22.91 ms a frame, 2.89 ms a 3D draw
+edge: the left bat's box [129,314,159,384] (ink #a459d0) on the 800 x 600 page, ?display=off
+edge: the bat's left edge over 58 rows, as [x, from row, rows]: [[140,320,8],[138,328,22],[135,350,28]]
+edge: 3 of 3 edge positions sit on a 2.5-pixel chunk boundary (x = 0, 3, 5, 8, 10, 13 ...); 1 of 1 inner runs are whole chunks tall (2 or 3 rows, or a multiple of 2.5 rounded)
+
+=== attempt 2, software WebGL (--disable-gpu --enable-unsafe-swiftshader), 6 s warm-up thrown away, 4 windows of 3 s; before is the same tree less this card, reference checkout 95ae4b9 ===
+﻿item 1291 before: ..\super-ultra-pong-64-item-1291-base (G:\Claude Stuff\super-ultra-pong-64-item-1291-base)
+era 5; shot -> docs\shots\item-1291\before-era5-rally.png
+slab {"gl":true,"material":"MeshStandardMaterial","flat":false,"map":null,"affine":false,"rail":"MeshStandardMaterial"}
+warm-up thrown away: 6 s, 346 frames, mean 17.39 ms, p95 16.80 ms; 3D layer 427 draws at 2.22 ms each
+frame window 1: 101 frames, mean 29.87 ms, p95 33.40 ms; 3D layer 120 draws at 3.45 ms each
+frame window 2: 82 frames, mean 36.79 ms, p95 50.10 ms; 3D layer 100 draws at 7.18 ms each
+frame window 3: 76 frames, mean 39.91 ms, p95 50.10 ms; 3D layer 108 draws at 6.44 ms each
+frame window 4: 89 frames, mean 34.08 ms, p95 33.40 ms; 3D layer 90 draws at 4.73 ms each
+frame mean of the 4 windows: 35.16 ms a frame, 5.45 ms a 3D draw
+frame MEDIAN of the 4 windows: 35.43 ms a frame, 5.59 ms a 3D draw
+edge: the left bat's box [129,314,159,384] (ink #e03a3e) on the 800 x 600 page, ?display=off
+edge: the bat's left edge over 58 rows, as [x, from row, rows]: [[140,320,8],[138,328,2],[129,330,5],[132,335,2],[129,337,3],[138,340,10],[135,350,5],[129,355,13],[135,368,10]]
+edge: 5 of 9 edge positions sit on a 2.5-pixel chunk boundary (x = 0, 3, 5, 8, 10, 13 ...); 7 of 7 inner runs are whole chunks tall (2 or 3 rows, or a multiple of 2.5 rounded)
+
+﻿item 1291 before: ..\super-ultra-pong-64-item-1291-base (G:\Claude Stuff\super-ultra-pong-64-item-1291-base)
+era 5; shot -> docs\shots\item-1291\before-era5-rally.png
+slab {"gl":true,"material":"MeshStandardMaterial","flat":false,"map":null,"affine":false,"rail":"MeshStandardMaterial"}
+warm-up thrown away: 6 s, 346 frames, mean 17.39 ms, p95 16.80 ms; 3D layer 437 draws at 1.94 ms each
+frame window 1: 107 frames, mean 28.35 ms, p95 33.40 ms; 3D layer 129 draws at 3.18 ms each
+frame window 2: 92 frames, mean 32.79 ms, p95 50.00 ms; 3D layer 113 draws at 5.82 ms each
+frame window 3: 86 frames, mean 35.08 ms, p95 50.00 ms; 3D layer 122 draws at 5.20 ms each
+frame window 4: 93 frames, mean 32.44 ms, p95 33.40 ms; 3D layer 94 draws at 4.35 ms each
+frame mean of the 4 windows: 32.16 ms a frame, 4.64 ms a 3D draw
+frame MEDIAN of the 4 windows: 32.61 ms a frame, 4.78 ms a 3D draw
+
+﻿item 1291 before: ..\super-ultra-pong-64-item-1291-base (G:\Claude Stuff\super-ultra-pong-64-item-1291-base)
+era 5; shot -> docs\shots\item-1291\before-era5-rally.png
+slab {"gl":true,"material":"MeshStandardMaterial","flat":false,"map":null,"affine":false,"rail":"MeshStandardMaterial"}
+warm-up thrown away: 6 s, 361 frames, mean 16.67 ms, p95 16.80 ms; 3D layer 453 draws at 1.87 ms each
+frame window 1: 179 frames, mean 16.85 ms, p95 16.70 ms; 3D layer 220 draws at 2.29 ms each
+frame window 2: 163 frames, mean 18.51 ms, p95 33.30 ms; 3D layer 195 draws at 4.34 ms each
+frame window 3: 171 frames, mean 17.64 ms, p95 33.30 ms; 3D layer 253 draws at 3.19 ms each
+frame window 4: 181 frames, mean 16.67 ms, p95 16.80 ms; 3D layer 182 draws at 2.56 ms each
+frame mean of the 4 windows: 17.42 ms a frame, 3.10 ms a 3D draw
+frame MEDIAN of the 4 windows: 17.25 ms a frame, 2.88 ms a 3D draw
+
+=== attempt 2, the SAME pair on the real graphics card (--gpu: no --disable-gpu, no SwiftShader), 6 s warm-up thrown away, 4 windows of 3 s ===
+﻿item 1291 before: ..\super-ultra-pong-64-item-1291-base (G:\Claude Stuff\super-ultra-pong-64-item-1291-base)
+era 5; shot -> docs\shots\item-1291\before-era5-rally.png
+slab {"gl":true,"material":"MeshStandardMaterial","flat":false,"map":null,"affine":false,"rail":"MeshStandardMaterial"}
+warm-up thrown away: 6 s, 1281 frames, mean 4.69 ms, p95 8.30 ms; 3D layer 1482 draws at 1.04 ms each
+frame window 1: 620 frames, mean 4.87 ms, p95 8.40 ms; 3D layer 689 draws at 1.09 ms each
+frame window 2: 600 frames, mean 5.01 ms, p95 12.50 ms; 3D layer 665 draws at 1.21 ms each
+frame window 3: 709 frames, mean 4.23 ms, p95 4.30 ms; 3D layer 710 draws at 0.28 ms each
+frame window 4: 680 frames, mean 4.42 ms, p95 4.30 ms; 3D layer 802 draws at 0.29 ms each
+frame mean of the 4 windows: 4.63 ms a frame, 0.72 ms a 3D draw
+frame MEDIAN of the 4 windows: 4.64 ms a frame, 0.69 ms a 3D draw
+
+﻿item 1291 before: ..\super-ultra-pong-64-item-1291-base (G:\Claude Stuff\super-ultra-pong-64-item-1291-base)
+era 5; shot -> docs\shots\item-1291\before-era5-rally.png
+slab {"gl":true,"material":"MeshStandardMaterial","flat":false,"map":null,"affine":false,"rail":"MeshStandardMaterial"}
+warm-up thrown away: 6 s, 1285 frames, mean 4.67 ms, p95 8.30 ms; 3D layer 1493 draws at 1.03 ms each
+frame window 1: 612 frames, mean 4.92 ms, p95 12.50 ms; 3D layer 673 draws at 1.13 ms each
+frame window 2: 592 frames, mean 5.07 ms, p95 12.50 ms; 3D layer 651 draws at 1.26 ms each
+frame window 3: 586 frames, mean 5.13 ms, p95 8.40 ms; 3D layer 830 draws at 0.31 ms each
+frame window 4: 716 frames, mean 4.20 ms, p95 4.30 ms; 3D layer 717 draws at 0.33 ms each
+frame mean of the 4 windows: 4.83 ms a frame, 0.76 ms a 3D draw
+frame MEDIAN of the 4 windows: 4.99 ms a frame, 0.73 ms a 3D draw
+
+=== attempt 2, the picture and the bat-edge check, bat ink pinned to #a459d0 (nothing else in the era wears it) ===
+﻿item 1291 before: ..\super-ultra-pong-64-item-1291-base (G:\Claude Stuff\super-ultra-pong-64-item-1291-base)
+era 5; shot -> docs\shots\item-1291\before-era5-rally.png
+slab {"gl":true,"material":"MeshStandardMaterial","flat":false,"map":null,"affine":false,"rail":"MeshStandardMaterial"}
+edge: the left bat's box [129,314,159,384] (ink #a459d0) on the 800 x 600 page, ?display=off
+edge: the bat's left edge over 58 rows, as [x, from row, rows]: [[140,320,8],[138,328,22],[135,350,28]]
+edge: 3 of 3 edge positions sit on a 2.5-pixel chunk boundary (x = 0, 3, 5, 8, 10, 13 ...); 1 of 1 inner runs are whole chunks tall (2 or 3 rows, or a multiple of 2.5 rounded)

@@ -6,9 +6,9 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "era 3's Genesis barbarian and knight stand whole at their ends of the table, fists still on their bats",
-    "item": "1300",
-    "sha": "824eb2a",
+    "feature": "era 6 takes Super Mario 64's look -- blob shadows under the players and the N64's smeared filtering",
+    "item": "1295",
+    "sha": "a9b730d",
     "date": "2026-09-12"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
