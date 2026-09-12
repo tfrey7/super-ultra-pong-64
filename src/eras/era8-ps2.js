@@ -583,6 +583,274 @@
     }
   }
 
+  // ------------------------------------ the mirrored field (item 1295, MGS2)
+  /*
+   * The CHANGE of the reference ladder (docs/ART.md, Reference games, era 8):
+   * the film presentation of the inherited field, the PlayStation 2 way. The
+   * PS2 had no pixel shaders, so a glossy floor was a second copy of the
+   * geometry mirrored through the floor's plane and drawn under a translucent
+   * floor -- Metal Gear Solid 2's tanker deck. Here: copies of the layer's two
+   * bats, its net and its ball, mirrored through the table's plane (height z to
+   * -z), under the slab made translucent at 0.82, so the copies read at 0.18.
+   * An opaque backing sheet just under the slab stops the painted arena showing
+   * through the table, and hides the part of a copy deeper than the slab.
+   *
+   * RENDER.resolution is 1, not the 0.64 the card wrote: the layer multiplies
+   * the knob by the picture's own scale, and era 8's picture is already the
+   * display's 512 x 448 native canvas (0.64 of 800), so 1 is what renders the
+   * field 512 wide. 0.64 would render it 328 wide.
+   */
+  var RENDER = { resolution: 1, filter: true, lighting: 'phong' };
+  var MIRROR = { slab: 0.82, backing: '#0a0f1a', netSeen: 0.45, tag: 8 };
+  var INTERLACE = { alpha: 0.06, rate: 60 };
+  // The layer's own sizes (src/field3d.js SIZES), for when it is not loaded.
+  var LAYER = { slab: 14, bat: { z: 22, handle: 26, handleR: 4 }, ballRadius: 0.6,
+    net: { x: 400, z: 24, w: 1.5, y0: -20, y1: 620, tape: 2.5 } };
+
+  function layerSizes() {
+    var F = root.PongField3D;
+    return (F && F.SIZES && F.SIZES.bat && F.SIZES.net) ? F.SIZES : LAYER;
+  }
+
+  /**
+   * Where each mirrored copy stands this frame, from the state alone: world
+   * axes as the layer's (x = field x - 400, y = height, z = field y - 300),
+   * every height negated. heights: { left, right } blade heights when the
+   * figures hold taller bats (the layer's own), else the layer's bat height.
+   * Pure: node --test pins it.
+   */
+  function mirrorTransforms(state, heights, S) {
+    S = S || layerSizes();
+    var out = {};
+    ['left', 'right'].forEach(function (side) {
+      var r = state[side];
+      var h = (heights && heights[side]) || S.bat.z;
+      var handleY = (heights && heights[side]) ? Math.max(S.bat.z / 2, h - 6) : S.bat.z / 2;
+      var cz = r.y + r.h / 2 - 300;
+      var outward = side === 'left' ? -1 : 1;
+      var hx = side === 'left' ? r.x : r.x + r.w;
+      out[side] = {
+        blade: { position: [r.x + r.w / 2 - 400, -h / 2, cz], scale: [r.w, -h, r.h] },
+        handle: { position: [hx + outward * S.bat.handle / 2 - 400, -handleY, cz], scale: [1, -1, 1] }
+      };
+    });
+    var N = S.net, body = N.z - N.tape, span = N.y1 - N.y0, nz = (N.y0 + N.y1) / 2 - 300;
+    out.net = { position: [N.x - 400, -body / 2, nz], scale: [N.w, -body, span] };
+    out.tape = { position: [N.x - 400, -(body + N.tape / 2), nz], scale: [N.w * 2, -N.tape, span] };
+    var b = state.ball, rad = b.size * S.ballRadius;
+    out.ball = { position: [b.x + b.size / 2 - 400, -rad, b.y + b.size / 2 - 300], scale: [rad, -rad, rad],
+      visible: !(state.serveDelay > 0) };
+    return out;
+  }
+
+  var setup = { scene: null, group: null, meshes: null, parts: null, armed: false, shown: true,
+    slabMat: null, hidden7: [] };
+
+  function place(m, tr) {
+    m.position.set(tr.position[0], tr.position[1], tr.position[2]);
+    m.scale.set(tr.scale[0], tr.scale[1], tr.scale[2]);
+  }
+
+  /** The copies and the backing sheet, made once per scene, tagged era 8. */
+  function buildMirror(THREE, scene) {
+    var S = layerSizes();
+    var g = new THREE.Group();
+    g.name = 'era8-mirror';
+    g.userData.era = MIRROR.tag;
+    function mesh(geo, colour, name) {
+      var m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: colour }));
+      m.name = name;
+      m.userData.era = MIRROR.tag;
+      g.add(m);
+      return m;
+    }
+    var unit = new THREE.BoxGeometry(1, 1, 1);
+    var meshes = {};
+    ['left', 'right'].forEach(function (side) {
+      var handle = mesh(new THREE.CylinderGeometry(S.bat.handleR, S.bat.handleR, S.bat.handle, 10), '#6a4a2a', 'era8-mirror-handle-' + side);
+      handle.rotation.z = Math.PI / 2;
+      meshes[side] = { blade: mesh(unit, '#ffffff', 'era8-mirror-bat-' + side), handle: handle };
+    });
+    meshes.net = mesh(unit, '#e8e8e8', 'era8-mirror-net');
+    meshes.tape = mesh(unit, '#9aa3b5', 'era8-mirror-tape');
+    meshes.ball = mesh(new THREE.SphereGeometry(1, 20, 14), '#ffffff', 'era8-mirror-ball');
+    // Just under the slab's underside, the table's footprint, facing up.
+    meshes.backing = mesh(new THREE.PlaneGeometry(800, 600), MIRROR.backing, 'era8-mirror-backing');
+    meshes.backing.rotation.x = -Math.PI / 2;
+    meshes.backing.position.set(0, -(S.slab + 0.25), 0);
+    scene.add(g);
+    setup.scene = scene;
+    setup.group = g;
+    setup.meshes = meshes;
+    // The frame the layer renders decides who shows: the copies only on a frame
+    // this setup ran for (eras 8 up, which call it), the slab put back otherwise.
+    var prev = scene.onBeforeRender;
+    scene.onBeforeRender = function () {
+      if (typeof prev === 'function') prev.apply(this, arguments);
+      beforeRender(THREE);
+    };
+  }
+
+  var MAT_KEYS = ['surfaceMat', 'railMat', 'lineMat', 'netMat', 'tapeMat', 'postMat', 'ballMat'];
+
+  /** Era 7's toon materials, where they are, swapped for smooth Phong ones. Answers how many. */
+  function smoothen(THREE, p) {
+    var swaps = [];
+    function swap(old) {
+      if (!old || !old.isMeshToonMaterial) return old;
+      var m = new THREE.MeshPhongMaterial({ color: old.color ? old.color.clone() : 0xffffff, shininess: 40,
+        transparent: !!old.transparent, opacity: old.opacity, depthWrite: old.depthWrite !== false });
+      swaps.push([old, m]);
+      return m;
+    }
+    MAT_KEYS.forEach(function (k) { if (p[k]) p[k] = swap(p[k]); });
+    if (p.bats) ['left', 'right'].forEach(function (s) { if (p.bats[s]) p.bats[s].mat = swap(p.bats[s].mat); });
+    if (swaps.length && p.group) {
+      p.group.traverse(function (o) {
+        for (var i = 0; i < swaps.length; i++) if (o.material === swaps[i][0]) o.material = swaps[i][1];
+      });
+    }
+    return swaps.length;
+  }
+
+  /** Era 7 hides the layer's ball on its frames; era 8's frames show it (in play, not in the serve pause). */
+  function showBall(p) {
+    if (!p.ball) return;
+    p.ball.visible = setup.shown;
+    if (p.ball.material) {
+      p.ball.material.visible = true;
+      if (p.ball.material.opacity !== undefined) p.ball.material.opacity = 1;
+    }
+  }
+
+  function isOutline7(o) {
+    return o.userData && o.userData.era === 7 && (o.userData.outline || /outline|ink/i.test(o.name || ''));
+  }
+
+  function beforeRender(THREE) {
+    var armed = setup.armed, p = setup.parts;
+    setup.armed = false;
+    if (setup.group) setup.group.visible = armed;
+    if (!p || !p.slab) return;
+    if (armed) {
+      smoothen(THREE, p);
+      showBall(p);
+      var mat = p.slab.material;
+      if (!mat.transparent || mat.opacity !== MIRROR.slab) {
+        mat.transparent = true;
+        mat.opacity = MIRROR.slab;
+        mat.needsUpdate = true;
+      }
+      p.slab.renderOrder = -1;      // first of the see-through pass: the ball's shadow stays over it
+      setup.slabMat = mat;
+      // The copies follow the blades the layer really stood (the figures' taller bats) and their ink.
+      var heights = {}, m = setup.meshes;
+      ['left', 'right'].forEach(function (s) {
+        var bat = p.bats && p.bats[s];
+        if (!bat) return;
+        heights[s] = Math.abs(bat.blade.scale.y);
+        if (bat.mat && bat.mat.color) m[s].blade.material.color.copy(bat.mat.color);
+      });
+      if (setup.state) {
+        var tr = mirrorTransforms(setup.state, heights);
+        ['left', 'right'].forEach(function (s) { place(m[s].blade, tr[s].blade); place(m[s].handle, tr[s].handle); });
+      }
+      m.ball.visible = !!p.ball.visible;
+      setup.hidden7 = [];
+      if (setup.scene) setup.scene.traverse(function (o) { if (o.visible && isOutline7(o)) { o.visible = false; setup.hidden7.push(o); } });
+    } else {
+      if (setup.slabMat) {
+        setup.slabMat.transparent = false;
+        setup.slabMat.opacity = 1;
+        setup.slabMat.needsUpdate = true;
+        setup.slabMat = null;
+      }
+      p.slab.renderOrder = 0;
+      setup.hidden7.forEach(function (o) { o.visible = true; });
+      setup.hidden7 = [];
+    }
+  }
+
+  /**
+   * Era 8's scene work, called from its draw before T.field (and by the eras
+   * above it, which carry it forward): era 7's first when it has one, then the
+   * mirror on top. I is PongField3D.internals(); null does nothing. Answers
+   * whether it set anything up.
+   */
+  function fieldSetup(I, state) {
+    if (!I || !I.THREE || !I.scene || !I.parts || !state || !state.ball) return false;
+    var L7 = R.eraLook(7);
+    if (L7 && typeof L7.fieldSetup === 'function' && L7.fieldSetup !== fieldSetup) L7.fieldSetup(I, state);
+    if (setup.scene !== I.scene) buildMirror(I.THREE, I.scene);
+    var p = I.parts;
+    setup.parts = p;
+    setup.state = state;
+    setup.shown = !(state.serveDelay > 0);
+    smoothen(I.THREE, p);
+    showBall(p);
+    var tr = mirrorTransforms(state, null), m = setup.meshes;
+    ['left', 'right'].forEach(function (s) { place(m[s].blade, tr[s].blade); place(m[s].handle, tr[s].handle); });
+    place(m.net, tr.net);
+    place(m.tape, tr.tape);
+    place(m.ball, tr.ball);
+    m.ball.visible = tr.ball.visible;
+    setup.group.visible = true;
+    setup.armed = true;
+    return true;
+  }
+
+  // The interlace flicker: the PS2's 448 lines were two fields of 224 a frame
+  // apart, so every other line of the picture dims a little and the dim lines
+  // swap each 1/60 s. Two pre-built stripe tiles, one per parity, laid as a
+  // pattern with one fill -- never a per-pixel pass.
+  /** Which lines dim at game time t: parity 0 dims the odd device rows, 1 the even. */
+  function interlacePlan(t) {
+    return { parity: Math.floor(Math.max(0, t || 0) * INTERLACE.rate + 1e-9) % 2, alpha: INTERLACE.alpha };
+  }
+
+  var stripe = { tiles: null, ctx: null, patterns: null };
+  function stripeTiles() {
+    if (stripe.tiles) return stripe.tiles;
+    var doc = root.document;
+    if (!doc || typeof doc.createElement !== 'function') return false;   // headless: nothing to build on, ask again next frame
+    stripe.tiles = [0, 1].map(function (parity) {
+      var c = doc.createElement('canvas');
+      c.width = 1;
+      c.height = 2;
+      var x = c.getContext('2d');
+      x.fillStyle = 'rgba(0,0,0,' + INTERLACE.alpha + ')';
+      x.fillRect(0, parity ? 0 : 1, 1, 1);
+      return c;
+    });
+    return stripe.tiles;
+  }
+
+  function interlace(ctx, state) {
+    if (typeof ctx.getTransform !== 'function' || typeof ctx.createPattern !== 'function') return false;
+    var tiles = stripeTiles();
+    if (!tiles) return false;
+    if (stripe.ctx !== ctx) {
+      stripe.ctx = ctx;
+      stripe.patterns = tiles.map(function (c) { return ctx.createPattern(c, 'repeat'); });
+    }
+    var plan = interlacePlan(state.time);
+    var m = ctx.getTransform();
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = stripe.patterns[plan.parity];
+    ctx.fillRect(m.e, m.f, 800 * m.a, 600 * m.d);
+    ctx.restore();
+    return true;
+  }
+
+  function internals() {
+    var F = root.PongField3D;
+    if (!F || typeof F.available !== 'function' || typeof F.internals !== 'function') return null;
+    return F.available() ? F.internals() : null;
+  }
+
   // The players are drawn by src/characters.js AFTER this era's frame, so over
   // the letterbox. The bible clips them to the picture between the bars, and
   // the rig does that itself: era 8's block there carries clip { y0: 52,
@@ -603,8 +871,11 @@
 
     // 1. backdrop
     backdrop(ctx, state, T, cam);
-    // 2. the table: a dark glossy slab
+    // 2. the table: a dark glossy slab -- in the 3D layer, the field mirrored in
+    //    it (item 1295), and the composite interlaced like a PS2 picture
+    fieldSetup(internals(), state);
     var gl = T.field(ctx, cam, TABLE_STYLE, state, P);   // through the 3D layer when it can (item 1273)
+    if (gl) interlace(ctx, state);
     // 3. on the table: the mood, the mirrored paddles, the dust in the air
     vignette(ctx, state, T, cam);
     if (!gl) reflections(ctx, state, T, cam, P);
@@ -881,6 +1152,13 @@
     arrivalPlan: planFor,
     camera: CAMERA,
     drift: poseAt,
+    render: RENDER,               // the 3D layer's knobs (item 1295)
+    fieldSetup: fieldSetup,       // the mirror in the slab, carried forward by eras 9 and 10
+    mirrorTransforms: mirrorTransforms,
+    interlacePlan: interlacePlan,
+    interlace: interlace,         // the one pattern fill, for the era's own test
+    MIRROR: MIRROR,
+    INTERLACE: INTERLACE,
     card: { flash: '#9fc4ff', wipe: ['#000000', '#141c33', '#2d3e50'], box: '#0b1020', border: '#2d3e50',
             inner: '#3a4a66', year: '#ffb347', name: '#c9d6e8', label: '#6f84a3', dots: null },
     voice: {
