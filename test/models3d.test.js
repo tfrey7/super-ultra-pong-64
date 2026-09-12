@@ -225,15 +225,18 @@ test('fillFor: fog pulls a colour toward the fog, and the PlayStation dithers be
 });
 
 // --------------------------------------------------------- through the rig
-test('eras 5 to 10 name a shading of their own and no model by default; eras 1 to 4 keep their sprites', () => {
+test('eras 5 to 10 name a shading of their own and only their own figures; eras 1 to 4 keep their sprites', () => {
   const modes = new Set();
   for (let e = 1; e <= 10; e++) {
     const c = C.configFor(e);
     if (e < 5) { assert.ok(!c.model, 'era ' + e + ' stays a sprite'); continue; }
-    // Item 1283: no era wears the proof figure until its own model card lands.
+    // Item 1283: no era wears the proof figure. Since item 1258 an era's own
+    // model card may name its own pair, and those are named for their era.
     for (const side of ['left', 'right']) {
       const s = C.configFor(e, side);
-      assert.ok(!s.model && !s.figure, 'era ' + e + ' ' + side + ' names no model: ' + (s.model || s.figure));
+      const own = s.model || s.figure;
+      assert.ok(!own || own.indexOf('era' + e + '-') === 0,
+        'era ' + e + ' ' + side + ' names only a figure of its own: ' + own);
     }
     assert.ok(M.MODES.includes(c.shading), 'era ' + e + ' shading ' + c.shading);
     modes.add(c.shading);
@@ -241,14 +244,17 @@ test('eras 5 to 10 name a shading of their own and no model by default; eras 1 t
   assert.strictEqual(modes.size, 6, 'one mode an era');
 });
 
-test('item 1283: each 3D era wears its own pair, twelve different sheets across the six', () => {
-  const sheets = new Set();
+test('item 1283: each 3D era wears its own pair, twelve different players across the six', () => {
+  // A rung's pair is its two sprite stand-ins, or -- once its model card has
+  // landed (items 1253 to 1258) -- its own two Blender-built figures.
+  const players = new Set();
+  const nameOf = (cfg) => cfg.model || cfg.figure || cfg.sheet;
   for (let e = 5; e <= 10; e++) {
-    const l = C.configFor(e, 'left').sheet, r = C.configFor(e, 'right').sheet;
+    const l = nameOf(C.configFor(e, 'left')), r = nameOf(C.configFor(e, 'right'));
     assert.ok(l && r && l !== r, 'era ' + e + ' has two different figures: ' + l + ' / ' + r);
-    sheets.add(l); sheets.add(r);
+    players.add(l); players.add(r);
   }
-  assert.strictEqual(sheets.size, 12);
+  assert.strictEqual(players.size, 12);
 });
 
 test('item 1283: with the proof models loaded but not asked for, every 3D era draws its stand-ins', () => {
