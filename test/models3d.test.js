@@ -225,15 +225,17 @@ test('fillFor: fog pulls a colour toward the fog, and the PlayStation dithers be
 });
 
 // --------------------------------------------------------- through the rig
-test('eras 5 to 10 name a shading of their own and no model by default; eras 1 to 4 keep their sprites', () => {
+test('eras 5 to 10 name a shading of their own and never the proof figure; eras 1 to 4 keep their sprites', () => {
   const modes = new Set();
   for (let e = 1; e <= 10; e++) {
     const c = C.configFor(e);
     if (e < 5) { assert.ok(!c.model, 'era ' + e + ' stays a sprite'); continue; }
-    // Item 1283: no era wears the proof figure until its own model card lands.
+    // Item 1283: no era wears the PROOF figure -- an era whose own model card has
+    // landed (1253 on) names its own files, one a side, and any other names none.
     for (const side of ['left', 'right']) {
       const s = C.configFor(e, side);
-      assert.ok(!s.model && !s.figure, 'era ' + e + ' ' + side + ' names no model: ' + (s.model || s.figure));
+      const own = s.figure || s.model;
+      assert.ok(!/^player-proof/.test(own || ''), 'era ' + e + ' ' + side + ' does not reuse the proof figure: ' + own);
     }
     assert.ok(M.MODES.includes(c.shading), 'era ' + e + ' shading ' + c.shading);
     modes.add(c.shading);
@@ -241,14 +243,17 @@ test('eras 5 to 10 name a shading of their own and no model by default; eras 1 t
   assert.strictEqual(modes.size, 6, 'one mode an era');
 });
 
-test('item 1283: each 3D era wears its own pair, twelve different sheets across the six', () => {
-  const sheets = new Set();
+test('item 1283: each 3D era wears its own pair, twelve different figures across the six', () => {
+  const names = new Set();
   for (let e = 5; e <= 10; e++) {
-    const l = C.configFor(e, 'left').sheet, r = C.configFor(e, 'right').sheet;
+    // An era's pair is its own models once its model card has landed (item 1253
+    // on), and its stand-in sheets until then; either way the two sides differ.
+    const of = (side) => { const c = C.configFor(e, side); return c.figure || c.model || c.sheet; };
+    const l = of('left'), r = of('right');
     assert.ok(l && r && l !== r, 'era ' + e + ' has two different figures: ' + l + ' / ' + r);
-    sheets.add(l); sheets.add(r);
+    names.add(l); names.add(r);
   }
-  assert.strictEqual(sheets.size, 12);
+  assert.strictEqual(names.size, 12);
 });
 
 test('item 1283: with the proof models loaded but not asked for, every 3D era draws its stand-ins', () => {
