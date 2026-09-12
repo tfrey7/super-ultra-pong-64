@@ -6,9 +6,9 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "era 7 takes 1999's own look: Soulcalibur and Sonic Adventure, smooth and bright, with the contact effects back over the ball",
-    "item": "1293",
-    "sha": "ad5e880",
+    "feature": "era 5 gets its own polygon fighters, built in Blender, standing at the PlayStation table",
+    "item": "1253",
+    "sha": "ba4e6f0",
     "date": "2026-09-12"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
