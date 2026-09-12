@@ -321,6 +321,8 @@
   function warmUp(ctx, state, opts) {
     warmed = true;
     if (typeof document === 'undefined' || !document.createElement || !ctx || !ctx.canvas) return;
+    var clock = root.performance && typeof root.performance.now === 'function' ? root.performance : Date;
+    var began = clock.now(), flourishesFrom = began;
     var P = root.Pong;
     var top = P && typeof P.TOP_ERA === 'number' ? P.TOP_ERA : 4;
     var origin = { x: -8, y: state.height / 4 };
@@ -342,9 +344,13 @@
         }
       }
       warmTurnedPicture(ctx);
+      flourishesFrom = clock.now();
+      warmFlourishes(ctx, state, top);
     } catch (e) {
       // A warm-up is only ever an optimisation: never let it stop the page.
     } finally {
+      // What it cost, on the page's own thread, for a measurement to read.
+      R.ERA_CHANGE.warmMs = { total: +(clock.now() - began).toFixed(1), flourishes: +(clock.now() - flourishesFrom).toFixed(1) };
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.restore();
@@ -395,6 +401,72 @@
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.drawImage(into, 0, 0);
     ctx.restore();
+  }
+
+  /**
+   * Every arrival's flourish, drawn at the moments of its own ring where it
+   * first draws something new (item 1285). The ring's composite above warms
+   * the two eras and the edge, but no flourish; a flourish's draws change kind
+   * as its ring grows -- era 1's television switches its rolled picture,
+   * scanlines, colour bleed and glowing band on only once the ring is wider
+   * than one field unit, and its rings open holes once it is wider than its
+   * band -- and Chrome's graphics process builds a GPU program (rounded-rect
+   * and circle fills, `FillRRectOp`) the first time each kind reaches the
+   * screen. At 1920 x 1080 with the GPU on, the first change (0 to 1) had two
+   * 58-83 ms frames at 0.18 s and 0.57 s into its ring on 3 of 3 fresh climbs,
+   * 29 ms with every flourish switched off (docs/measure/item1285/).
+   *
+   * Each sample is the ring's own moment (its raw progress, eased), drawn on a
+   * layer shaped like the canvas the real ring lands on then -- the leaving
+   * era's until the ring covers the centre, the arriving era's after, as the
+   * display sizes them -- and the layer copied onto the canvas, which is what
+   * makes Chrome rasterise it (a draw made straight onto the canvas is thrown
+   * away by the clear that ends the warm-up). A flourish only draws, so
+   * drawing it here plays nothing and writes no state.
+   */
+  var WARM_RAWS = [0.03, 0.06, 0.1, 0.14, 0.2, 0.3, 0.4, 0.5, 0.65, 0.8, 0.95];
+  function warmFlourishes(ctx, state, top) {
+    var D = root.PongDisplay && root.PongDisplay.enabled ? root.PongDisplay : null;
+    var W = state.width, H = state.height;
+    var origin = { x: -8, y: H / 4 };
+    var cx = W / 2 - origin.x, cy = H / 2 - origin.y;
+    for (var k = 1; k <= top; k++) {
+      var look = R.eraLook(k);
+      if (!look || typeof look.flourish !== 'function') continue;
+      // eraChangedAt -1: no real change ever has it, so an era's private memory of
+      // "which arrival is playing" (the PlayStation's lift, its old picture) never
+      // mistakes this for one.
+      var s = Object.assign({}, state, { era: k, eraChangedAt: -1 });
+      for (var i = 0; i < WARM_RAWS.length; i++) {
+        var raw = WARM_RAWS[i];
+        var p = easeWipe(raw);
+        var radius = ringRadius(p, origin, W, H);
+        var on = radius >= Math.sqrt(cx * cx + cy * cy) ? k : k - 1;
+        var row = D ? D.row(on) : null;
+        var smooth = !!(row && row.smooth);
+        var lw = smooth ? row.w : (D ? W : ctx.canvas.width);
+        var lh = smooth ? row.h : (D ? H : ctx.canvas.height);
+        var x = layer(2, lw, lh);
+        if (!x) return;
+        x.save();
+        try {
+          if (smooth) D.prepare(x, on, W, H);
+          else if (!D && typeof ctx.getTransform === 'function') x.setTransform(ctx.getTransform());
+          look.flourish(x, p, { x: origin.x, y: origin.y }, k - 1, k, {
+            radius: radius, t: raw * WIPE_S, duration: WIPE_S,
+            width: W, height: H, state: s, dim: null
+          });
+        } catch (e) {
+          // one flourish's failure never stops the others warming
+        } finally {
+          x.restore();
+        }
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.drawImage(x.canvas, 0, 0);
+        ctx.restore();
+      }
+    }
   }
 
   /**

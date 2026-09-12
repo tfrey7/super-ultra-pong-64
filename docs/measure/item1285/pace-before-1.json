@@ -1,0 +1,365 @@
+{
+ "taken": "2026-09-11T05:18:33.043Z",
+ "label": "before-1",
+ "gpu": true,
+ "size": "1920,1080",
+ "seconds": 2,
+ "query": "",
+ "fresh": [],
+ "climb": [
+  {
+   "era": 0,
+   "wallS": 2,
+   "clock": 1,
+   "ballTablePerS": 0.438,
+   "ballScreenPerS": 0.438,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.18,
+   "maxFrameMs": 8.3,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 0,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1
+  },
+  {
+   "era": 1,
+   "wallS": 2,
+   "clock": 1,
+   "ballTablePerS": 0.438,
+   "ballScreenPerS": 0.438,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.17,
+   "maxFrameMs": 4.4,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 1,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.8,
+   "ringMaxFrameMs": 70.9,
+   "ringLongFrames": [
+    {
+     "ms": 71,
+     "at": 0.18
+    },
+    {
+     "ms": 71,
+     "at": 0.58
+    }
+   ]
+  },
+  {
+   "era": 2,
+   "wallS": 2,
+   "clock": 1,
+   "ballTablePerS": 0.438,
+   "ballScreenPerS": 0.438,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.17,
+   "maxFrameMs": 4.4,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 2,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.804,
+   "ringMaxFrameMs": 4.3,
+   "ringLongFrames": []
+  },
+  {
+   "era": 3,
+   "wallS": 2,
+   "clock": 1,
+   "ballTablePerS": 0.437,
+   "ballScreenPerS": 0.437,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.18,
+   "maxFrameMs": 10.4,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 3,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.804,
+   "ringMaxFrameMs": 29.1,
+   "ringLongFrames": []
+  },
+  {
+   "era": 4,
+   "wallS": 2,
+   "clock": 1,
+   "ballTablePerS": 0.438,
+   "ballScreenPerS": 0.438,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.17,
+   "maxFrameMs": 4.4,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 4,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.804,
+   "ringMaxFrameMs": 25,
+   "ringLongFrames": []
+  },
+  {
+   "era": 5,
+   "wallS": 2,
+   "clock": 0.983,
+   "ballTablePerS": 0.43,
+   "ballScreenPerS": 0.296,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0.017,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.17,
+   "maxFrameMs": 5.1,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 5,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.804,
+   "ringMaxFrameMs": 112.4,
+   "ringLongFrames": [
+    {
+     "ms": 112,
+     "at": 0.16
+    },
+    {
+     "ms": 79,
+     "at": 0.24
+    }
+   ]
+  },
+  {
+   "era": 6,
+   "wallS": 2,
+   "clock": 0.983,
+   "ballTablePerS": 0.429,
+   "ballScreenPerS": 0.311,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0.017,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.17,
+   "maxFrameMs": 5.6,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 6,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.8,
+   "ringMaxFrameMs": 71,
+   "ringLongFrames": [
+    {
+     "ms": 58,
+     "at": 0.17
+    },
+    {
+     "ms": 71,
+     "at": 0.62
+    }
+   ]
+  },
+  {
+   "era": 7,
+   "wallS": 2,
+   "clock": 0.983,
+   "ballTablePerS": 0.43,
+   "ballScreenPerS": 0.318,
+   "rulesSpeedTablePerGameS": 0.452,
+   "hitStopShare": 0.017,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.17,
+   "maxFrameMs": 4.4,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 7,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.804,
+   "ringMaxFrameMs": 50.1,
+   "ringLongFrames": [
+    {
+     "ms": 50,
+     "at": 1.06
+    }
+   ]
+  },
+  {
+   "era": 8,
+   "wallS": 2,
+   "clock": 0.983,
+   "ballTablePerS": 0.431,
+   "ballScreenPerS": 0.297,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0.017,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.17,
+   "maxFrameMs": 4.6,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 8,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.804,
+   "ringMaxFrameMs": 45.8,
+   "ringLongFrames": []
+  },
+  {
+   "era": 9,
+   "wallS": 2,
+   "clock": 0.983,
+   "ballTablePerS": 0.431,
+   "ballScreenPerS": 0.306,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0.017,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.18,
+   "maxFrameMs": 8.4,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 9,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.804,
+   "ringMaxFrameMs": 45.9,
+   "ringLongFrames": []
+  },
+  {
+   "era": 10,
+   "wallS": 2,
+   "clock": 0.983,
+   "ballTablePerS": 0.432,
+   "ballScreenPerS": 0.322,
+   "rulesSpeedTablePerGameS": 0.453,
+   "hitStopShare": 0.017,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 1,
+   "frameMs": 4.35,
+   "maxFrameMs": 12.8,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 10,
+   "matchPoint": true,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.804,
+   "ringMaxFrameMs": 50,
+   "ringLongFrames": []
+  }
+ ],
+ "climbConvolverSets": [
+  {
+   "ms": 2.6,
+   "len": 13440,
+   "era": 1
+  },
+  {
+   "ms": 5.9,
+   "len": 57600,
+   "era": 2
+  },
+  {
+   "ms": 16.1,
+   "len": 105600,
+   "era": 4
+  },
+  {
+   "ms": 9.6,
+   "len": 57600,
+   "era": 5
+  },
+  {
+   "ms": 23.8,
+   "len": 153600,
+   "era": 5
+  },
+  {
+   "ms": 9.4,
+   "len": 48000,
+   "era": 6
+  },
+  {
+   "ms": 9.4,
+   "len": 57600,
+   "era": 6
+  },
+  {
+   "ms": 28.9,
+   "len": 192000,
+   "era": 7
+  },
+  {
+   "ms": 21.8,
+   "len": 134400,
+   "era": 8
+  },
+  {
+   "ms": 22.3,
+   "len": 134400,
+   "era": 8
+  },
+  {
+   "ms": 10.9,
+   "len": 67200,
+   "era": 9
+  },
+  {
+   "ms": 30.6,
+   "len": 168000,
+   "era": 9
+  },
+  {
+   "ms": 14.4,
+   "len": 86400,
+   "era": 9
+  },
+  {
+   "ms": 26.6,
+   "len": 120000,
+   "era": 10
+  }
+ ]
+}

@@ -6,10 +6,10 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "Sprites: bring the EarthBound generator to pong, prove one",
-    "item": "1272",
-    "sha": "032d429",
-    "date": "2026-09-11"
+    "feature": "era 3's Genesis barbarian and knight stand whole at their ends of the table, fists still on their bats",
+    "item": "1300",
+    "sha": "824eb2a",
+    "date": "2026-09-12"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

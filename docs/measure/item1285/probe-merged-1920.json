@@ -1,0 +1,2016 @@
+{
+ "taken": "2026-09-11T05:36:46.426Z",
+ "label": "merged-1920",
+ "size": "1920,1080",
+ "query": "",
+ "rungs": [
+  {
+   "rung": 1,
+   "pause": 1.8,
+   "fresh": [
+    {
+     "key": "800x600 drawImage HTMLImageElement scaled smoothoff source-over a1 noclip scale2  ",
+     "n": 385,
+     "phase": "ring",
+     "raw": 0,
+     "era": 1,
+     "t": 6.268
+    },
+    {
+     "key": "160x192 drawImage canvas scaled smoothoff source-over a1 noclip id  ",
+     "n": 230,
+     "phase": "ring",
+     "raw": 0.43,
+     "era": 1,
+     "t": 6.982
+    },
+    {
+     "key": "160x192 drawImage canvas scaled smoothoff copy a1 noclip id  ",
+     "n": 230,
+     "phase": "ring",
+     "raw": 0.43,
+     "era": 1,
+     "t": 6.982
+    },
+    {
+     "key": "160x192 drawImage canvas smoothoff source-over a1 noclip id  ",
+     "n": 460,
+     "phase": "ring",
+     "raw": 0.43,
+     "era": 1,
+     "t": 6.982
+    },
+    {
+     "key": "160x192 fillRect  colour multiply a1 noclip id  ",
+     "n": 460,
+     "phase": "ring",
+     "raw": 0.43,
+     "era": 1,
+     "t": 6.982
+    },
+    {
+     "key": "160x192 drawImage canvas scaled smoothlow lighter a<1 noclip id  ",
+     "n": 690,
+     "phase": "ring",
+     "raw": 0.43,
+     "era": 1,
+     "t": 6.982
+    },
+    {
+     "key": "40x48 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+     "n": 230,
+     "phase": "ring",
+     "raw": 0.43,
+     "era": 1,
+     "t": 6.982
+    },
+    {
+     "key": "PAGE fillRect  lin lighter a<1 clip1:rect id  ",
+     "n": 230,
+     "phase": "ring",
+     "raw": 0.43,
+     "era": 1,
+     "t": 6.982
+    },
+    {
+     "key": "PAGE fillRect  pattern lighter a<1 clip1:rect id  ",
+     "n": 230,
+     "phase": "ring",
+     "raw": 0.43,
+     "era": 1,
+     "t": 6.982
+    }
+   ]
+  }
+ ],
+ "all": [
+  {
+   "key": "800x600 fillRect  colour source-over a1 noclip id  ",
+   "n": 306665,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.115
+  },
+  {
+   "key": "18x168 fillRect  colour source-over a1 noclip id  ",
+   "n": 255,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.119
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothoff source-over a1 noclip id  ",
+   "n": 110,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.12
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothoff source-over a1 noclip scale2  ",
+   "n": 95,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.12
+  },
+  {
+   "key": "800x600 drawImage canvas smoothlow source-over a1 noclip id  ",
+   "n": 475,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.12
+  },
+  {
+   "key": "800x600 drawImage canvas smoothlow source-over a1 clip1:arc id  ",
+   "n": 372,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.12
+  },
+  {
+   "key": "800x600 fill [arc] rad source-over a1 noclip id  ",
+   "n": 334,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.12
+  },
+  {
+   "key": "800x600 stroke [arc] colour w>2 source-over a1 noclip id  ",
+   "n": 334,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.121
+  },
+  {
+   "key": "800x600 drawImage HTMLImageElement scaled smoothoff source-over a1 noclip id  ",
+   "n": 706,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.127
+  },
+  {
+   "key": "30x264 fillRect  colour source-over a1 noclip id  ",
+   "n": 170,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.131
+  },
+  {
+   "key": "800x600 fillRect  colour-a source-over a1 noclip id  ",
+   "n": 1443,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.142
+  },
+  {
+   "key": "60x150 fillRect  colour source-over a1 noclip id  ",
+   "n": 85,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.144
+  },
+  {
+   "key": "800x600 fillRect  colour source-over a<1 noclip id  ",
+   "n": 1390,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.16
+  },
+  {
+   "key": "18x26 drawImage HTMLImageElement smoothlow source-over a1 noclip id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.161
+  },
+  {
+   "key": "18x26 fillRect  colour-a source-atop a1 noclip id  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.161
+  },
+  {
+   "key": "18x26 drawImage HTMLImageElement smoothlow source-over a1 noclip id filter ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.161
+  },
+  {
+   "key": "800x600 fill [lineTo] colour source-over a1 noclip id  ",
+   "n": 686,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.163
+  },
+  {
+   "key": "800x600 fill [lineTo] colour-a source-over a1 noclip id  ",
+   "n": 28,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.163
+  },
+  {
+   "key": "800x600 fillRect  lin source-over a1 noclip id  ",
+   "n": 55,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.163
+  },
+  {
+   "key": "800x600 fill [arc] colour source-over a<1 noclip id  ",
+   "n": 484,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.163
+  },
+  {
+   "key": "800x600 fill [lineTo] lin source-over a1 noclip id  ",
+   "n": 116,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.163
+  },
+  {
+   "key": "800x600 fill [arc] rad source-over a1 noclip scale2  ",
+   "n": 20,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.164
+  },
+  {
+   "key": "800x600 strokeRect  colour w<=2 source-over a1 noclip id  ",
+   "n": 20,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.164
+  },
+  {
+   "key": "800x600 fill [arc] colour source-over a1 noclip id  ",
+   "n": 44,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.164
+  },
+  {
+   "key": "36x252 fillRect  colour source-over a1 noclip id  ",
+   "n": 91,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.165
+  },
+  {
+   "key": "320x240 fillRect  colour source-over a1 noclip id  ",
+   "n": 1248,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.181
+  },
+  {
+   "key": "4x4 fillRect  colour source-over a1 noclip id  ",
+   "n": 256,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.181
+  },
+  {
+   "key": "320x240 fillRect  pattern source-over a1 noclip id  ",
+   "n": 120,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.182
+  },
+  {
+   "key": "320x240 fill [lineTo] colour source-over a<1 noclip scale  ",
+   "n": 144,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.183
+  },
+  {
+   "key": "320x240 fill [lineTo] colour source-over a1 noclip scale  ",
+   "n": 248,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.184
+  },
+  {
+   "key": "64x64 fillRect  colour source-over a1 noclip id  ",
+   "n": 97,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.184
+  },
+  {
+   "key": "320x240 drawImage canvas scaled smoothoff source-over a1 noclip scale  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.664
+  },
+  {
+   "key": "60x180 fillRect  colour source-over a1 noclip id  ",
+   "n": 73,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.665
+  },
+  {
+   "key": "60x180 fill [arc] colour source-over a1 noclip id  ",
+   "n": 12,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.665
+  },
+  {
+   "key": "16x16 fillRect  colour source-over a1 noclip id  ",
+   "n": 68,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.681
+  },
+  {
+   "key": "400x300 fillRect  lin source-over a1 noclip scale  ",
+   "n": 24,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.681
+  },
+  {
+   "key": "400x300 fill [arc] colour source-over a1 noclip scale  ",
+   "n": 64,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.682
+  },
+  {
+   "key": "400x300 fill [arc] colour source-over a1 noclip scale2  ",
+   "n": 72,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.682
+  },
+  {
+   "key": "400x300 drawImage canvas scaled smoothlow source-over a1 noclip scale  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.722
+  },
+  {
+   "key": "400x300 stroke [lineTo] colour w>2 source-over a1 noclip scale  ",
+   "n": 16,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.723
+  },
+  {
+   "key": "400x300 fill [lineTo+quadraticCurveTo] colour source-over a1 noclip scale  ",
+   "n": 32,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.723
+  },
+  {
+   "key": "400x300 fill [lineTo] lin source-over a1 noclip scale  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.723
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+   "n": 281,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.723
+  },
+  {
+   "key": "800x600 stroke [lineTo] colour w<=2 source-over a1 noclip id  ",
+   "n": 288,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.724
+  },
+  {
+   "key": "800x600 stroke [arc] colour w<=2 source-over a1 noclip id  ",
+   "n": 24,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.724
+  },
+  {
+   "key": "800x600 fillText  colour source-over a1 noclip id  ",
+   "n": 40,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.727
+  },
+  {
+   "key": "32x44 drawImage HTMLImageElement scaled smoothlow source-over a1 noclip id  ",
+   "n": 16,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.728
+  },
+  {
+   "key": "32x44 fillRect  colour source-atop a<1 noclip id  ",
+   "n": 16,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.728
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a1 noclip subpx  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.728
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a1 noclip scale2  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.728
+  },
+  {
+   "key": "800x600 stroke [lineTo] colour w>2 source-over a1 noclip id  ",
+   "n": 266,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.869
+  },
+  {
+   "key": "132x504 fillRect  colour source-over a1 noclip id  ",
+   "n": 73,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.875
+  },
+  {
+   "key": "132x504 fill [arc] colour source-over a1 noclip id  ",
+   "n": 12,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.875
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothoff source-over a1 noclip subpx  ",
+   "n": 20,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.876
+  },
+  {
+   "key": "800x600 fillRect  rad source-over a1 noclip id  ",
+   "n": 20,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.912
+  },
+  {
+   "key": "800x600 drawImage HTMLImageElement scaled smoothlow source-over a1 noclip id  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.913
+  },
+  {
+   "key": "800x600 fill [lineTo] rad source-over a1 noclip id  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.913
+  },
+  {
+   "key": "800x600 fill [arc] rad lighter a1 noclip id  ",
+   "n": 307,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.914
+  },
+  {
+   "key": "800x600 fill [lineTo] colour-a lighter a1 noclip id  ",
+   "n": 40,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.914
+  },
+  {
+   "key": "800x600 stroke [lineTo] colour w<=2 source-over a<1 noclip id  ",
+   "n": 40,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.914
+  },
+  {
+   "key": "120x504 fillRect  colour source-over a1 noclip id  ",
+   "n": 73,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.915
+  },
+  {
+   "key": "120x504 fill [arc] colour source-over a1 noclip id  ",
+   "n": 12,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.915
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothoff source-over a1 clip1:rect subpx  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.915
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothoff source-over a1 clip1:rect scale2  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.915
+  },
+  {
+   "key": "64x64 fill [lineTo] colour source-over a1 noclip id  ",
+   "n": 288,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.926
+  },
+  {
+   "key": "64x64 fill [lineTo] colour destination-out a1 noclip id  ",
+   "n": 72,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.927
+  },
+  {
+   "key": "800x600 fill [arc] rad lighter a1 noclip scale2  ",
+   "n": 16,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.93
+  },
+  {
+   "key": "800x600 fill [arc] rad lighter a1 clip1:lineTo scale2  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.93
+  },
+  {
+   "key": "800x600 fillRect  pattern lighter a<1 clip3:lineTo scale2  ",
+   "n": 96,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.93
+  },
+  {
+   "key": "800x600 fill [lineTo] colour source-over a<1 noclip id  ",
+   "n": 88,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.93
+  },
+  {
+   "key": "800x600 fill [arc] colour lighter a1 noclip id  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.931
+  },
+  {
+   "key": "800x600 fillRect  colour-a source-over a1 noclip turned  ",
+   "n": 160,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.931
+  },
+  {
+   "key": "800x600 strokeRect  colour w<=2 source-over a1 noclip turned  ",
+   "n": 160,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.931
+  },
+  {
+   "key": "84x324 fillRect  colour source-over a1 noclip id  ",
+   "n": 73,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.931
+  },
+  {
+   "key": "84x324 fill [arc] colour source-over a1 noclip id  ",
+   "n": 12,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.931
+  },
+  {
+   "key": "267x200 fillRect  lin source-over a1 noclip scale2  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.943
+  },
+  {
+   "key": "267x200 fill [arc] rad source-over a1 noclip scale2  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.943
+  },
+  {
+   "key": "267x200 fill [arc] colour source-over a1 noclip scale2  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.943
+  },
+  {
+   "key": "267x200 fillRect  colour source-over a1 noclip scale2  ",
+   "n": 52,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.943
+  },
+  {
+   "key": "267x200 fillRect  colour-a source-over a1 noclip scale2  ",
+   "n": 44,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.943
+  },
+  {
+   "key": "267x200 fill [lineTo] colour source-over a1 noclip scale2  ",
+   "n": 24,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.944
+  },
+  {
+   "key": "200x150 fill [arc] rad source-over a1 noclip scale  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.944
+  },
+  {
+   "key": "200x150 stroke [lineTo] colour w>2 source-over a1 noclip scale  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.945
+  },
+  {
+   "key": "400x300 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.945
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a<1 clip1:rect id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.945
+  },
+  {
+   "key": "200x150 fill [lineTo] colour source-over a1 noclip scale  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.945
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow lighter a<1 noclip id  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.945
+  },
+  {
+   "key": "100x75 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.945
+  },
+  {
+   "key": "800x600 fillRect  colour saturation a<1 noclip id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.945
+  },
+  {
+   "key": "800x600 fillRect  colour multiply a<1 noclip id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.945
+  },
+  {
+   "key": "128x128 fillRect  colour source-over a1 noclip id  ",
+   "n": 4203,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.946
+  },
+  {
+   "key": "800x600 fillRect  pattern overlay a<1 noclip id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.956
+  },
+  {
+   "key": "800x600 stroke [lineTo] colour-a w<=2 source-over a1 noclip id  ",
+   "n": 16,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.956
+  },
+  {
+   "key": "800x600 stroke [rect] colour w<=2 source-over a1 noclip id  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.959
+  },
+  {
+   "key": "800x600 fill [lineTo+quadraticCurveTo] colour-a source-over a1 noclip id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.96
+  },
+  {
+   "key": "800x600 stroke [lineTo+quadraticCurveTo] colour-a w<=2 source-over a1 noclip id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.96
+  },
+  {
+   "key": "800x600 fillText  colour source-over a1 noclip id  shadow",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.963
+  },
+  {
+   "key": "288x792 fillRect  colour source-over a1 noclip id  ",
+   "n": 73,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.963
+  },
+  {
+   "key": "288x792 fill [arc] colour source-over a1 noclip id  ",
+   "n": 12,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.963
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a1 clip1:rect turned  ",
+   "n": 29,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.972
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a<1 clip1:rect turned  ",
+   "n": 549,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.972
+  },
+  {
+   "key": "800x600 fillRect  lin lighter a1 noclip id  ",
+   "n": 70,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.972
+  },
+  {
+   "key": "800x600 fillRect  colour-a lighter a1 noclip id  ",
+   "n": 69,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.972
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow copy a1 noclip id  ",
+   "n": 348,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "800x600 fillRect  colour multiply a1 noclip id  ",
+   "n": 348,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "800x600 fillRect  colour source-over a1 clip1:arc id  ",
+   "n": 183,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "800x600 drawImage canvas smoothlow lighter a1 clip1:arc id  ",
+   "n": 696,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "800x600 fillRect  lin source-over a1 clip1:arc id  ",
+   "n": 174,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "1x3 fillRect  colour source-over a1 noclip id  ",
+   "n": 598,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "800x600 fillRect  pattern source-over a<1 clip1:arc id  ",
+   "n": 299,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "800x600 fill [arc] conic screen a<1 noclip id  ",
+   "n": 897,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "800x600 fillRect  pattern lighter a<1 clip1:arc id  ",
+   "n": 299,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "800x600 stroke [arc] colour w>2 source-over a1 noclip id  shadow",
+   "n": 299,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.973
+  },
+  {
+   "key": "800x600 fillRect  colour-a source-over a1 clip1:arc id  ",
+   "n": 9,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 0.981
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a1 clip1:lineTo id  ",
+   "n": 32,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.003
+  },
+  {
+   "key": "800x600 fill [lineTo] colour-a source-over a1 noclip turned  ",
+   "n": 58,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.01
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a1 clip1:lineTo turned  ",
+   "n": 58,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.01
+  },
+  {
+   "key": "800x600 stroke [lineTo] colour w<=2 source-over a<1 noclip turned  ",
+   "n": 37,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.01
+  },
+  {
+   "key": "800x600 fill [lineTo] colour-a source-over a<1 noclip turned  ",
+   "n": 36,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.014
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a<1 clip1:lineTo turned  ",
+   "n": 36,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.014
+  },
+  {
+   "key": "800x600 stroke [lineTo] colour w>2 source-over a<1 noclip turned  ",
+   "n": 57,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.014
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a<1 clip1:rect scale2  ",
+   "n": 72,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.024
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a1 clip1:rect scale2  ",
+   "n": 72,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.024
+  },
+  {
+   "key": "620x170 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.036
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a<1 noclip turned  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.036
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothlow source-over a1 noclip turned  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.037
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothoff source-over a1 clip1:lineTo turned  ",
+   "n": 67,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.04
+  },
+  {
+   "key": "800x600 drawImage canvas scaled smoothoff source-over a1 clip1:lineTo scale  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.04
+  },
+  {
+   "key": "10x10 fillRect  colour source-over a1 noclip id  ",
+   "n": 16,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.043
+  },
+  {
+   "key": "800x600 fill [lineTo] pattern evenodd source-over a1 noclip id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.043
+  },
+  {
+   "key": "320x240 fill [lineTo] pattern evenodd source-over a1 noclip scale  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.044
+  },
+  {
+   "key": "320x240 stroke [lineTo] colour w>2 source-over a1 noclip scale  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.044
+  },
+  {
+   "key": "320x240 fillRect  colour source-over a<1 noclip scale  ",
+   "n": 3,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.044
+  },
+  {
+   "key": "320x240 fill [arc] rad source-over a1 noclip scale  ",
+   "n": 29,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.044
+  },
+  {
+   "key": "160x120 drawImage canvas scaled smoothhigh source-over a1 noclip id  ",
+   "n": 9,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.044
+  },
+  {
+   "key": "160x120 fillRect  rad destination-in a1 noclip id  ",
+   "n": 9,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.044
+  },
+  {
+   "key": "320x240 drawImage canvas scaled smoothlow source-over a1 noclip scale  ",
+   "n": 9,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.044
+  },
+  {
+   "key": "320x240 fill [arc] rad source-over a<1 noclip scale  ",
+   "n": 26,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.044
+  },
+  {
+   "key": "320x240 fillRect  lin source-over a1 clip1:arc scale  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.045
+  },
+  {
+   "key": "320x240 fill [arc] rad source-over a1 clip1:arc scale  ",
+   "n": 24,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.045
+  },
+  {
+   "key": "320x240 fill [lineTo] lin source-over a1 noclip scale  ",
+   "n": 7,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.046
+  },
+  {
+   "key": "320x240 stroke [lineTo] colour w<=2 source-over a1 noclip scale  ",
+   "n": 7,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.046
+  },
+  {
+   "key": "320x240 fill [lineTo] lin source-over a<1 noclip scale  ",
+   "n": 6,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.046
+  },
+  {
+   "key": "320x240 stroke [lineTo] colour w<=2 source-over a<1 noclip scale  ",
+   "n": 6,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.046
+  },
+  {
+   "key": "320x240 fill [arc] colour source-over a<1 noclip scale  ",
+   "n": 6,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.047
+  },
+  {
+   "key": "320x240 fill [arc] colour source-over a1 noclip scale  ",
+   "n": 12,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.047
+  },
+  {
+   "key": "320x240 stroke [lineTo] colour w>2 source-over a1 clip1:arc scale  ",
+   "n": 139,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.047
+  },
+  {
+   "key": "320x240 fill [lineTo] colour-a source-over a1 clip1:arc scale  ",
+   "n": 42,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.047
+  },
+  {
+   "key": "320x240 stroke [arc] colour w>2 source-over a1 noclip scale  ",
+   "n": 7,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.047
+  },
+  {
+   "key": "320x240 fill [arc] colour evenodd source-over a<1 noclip scale  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.048
+  },
+  {
+   "key": "640x480 stroke [lineTo] colour w>2 source-over a1 clip1:arc scale  ",
+   "n": 82,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.049
+  },
+  {
+   "key": "640x480 fill [lineTo] colour-a source-over a1 clip1:arc scale  ",
+   "n": 24,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.049
+  },
+  {
+   "key": "640x480 fill [arc] colour evenodd source-over a<1 noclip scale  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.049
+  },
+  {
+   "key": "640x480 stroke [arc] colour w>2 source-over a1 noclip scale  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.049
+  },
+  {
+   "key": "640x480 stroke [lineTo] colour w>2 source-over a1 noclip scale  ",
+   "n": 20,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.049
+  },
+  {
+   "key": "640x480 strokeRect  colour w>2 source-over a1 noclip scale  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.049
+  },
+  {
+   "key": "640x480 stroke [lineTo] colour w>2 source-over a<1 noclip scale  ",
+   "n": 36,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.049
+  },
+  {
+   "key": "640x480 strokeRect  colour w>2 source-over a<1 noclip scale  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.049
+  },
+  {
+   "key": "640x480 fillRect  colour source-over a1 noclip scale  ",
+   "n": 14,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.05
+  },
+  {
+   "key": "640x480 fill [arc] rad saturation a1 noclip scale  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.05
+  },
+  {
+   "key": "512x448 fill [arc] rad saturation a1 noclip scale2  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.051
+  },
+  {
+   "key": "512x448 fillRect  lin lighter a1 noclip scale2  ",
+   "n": 56,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.051
+  },
+  {
+   "key": "512x448 stroke [lineTo] colour w<=2 lighter a<1 noclip scale2  ",
+   "n": 6,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.051
+  },
+  {
+   "key": "512x448 fillRect  colour source-over a<1 noclip scale2  ",
+   "n": 27,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.051
+  },
+  {
+   "key": "512x448 fillRect  colour source-over a1 noclip scale2  ",
+   "n": 8,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.051
+  },
+  {
+   "key": "512x448 fill [arc] rad lighter a1 noclip scale2  ",
+   "n": 14,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.051
+  },
+  {
+   "key": "512x448 fill [lineTo] colour-a lighter a1 noclip scale2  ",
+   "n": 9,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.051
+  },
+  {
+   "key": "512x448 stroke [arc] lin w>2 source-over a1 noclip scale2  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.052
+  },
+  {
+   "key": "512x448 stroke [arc] colour w<=2 lighter a1 noclip scale2  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.052
+  },
+  {
+   "key": "512x448 stroke [arc] colour-a w>2 lighter a1 noclip scale2  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.052
+  },
+  {
+   "key": "512x448 stroke [lineTo] colour-a w>2 lighter a1 noclip scale2  shadow",
+   "n": 20,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.052
+  },
+  {
+   "key": "512x448 stroke [lineTo] colour-a w<=2 lighter a1 noclip scale2  shadow",
+   "n": 10,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.052
+  },
+  {
+   "key": "640x480 fill [arc] rad lighter a1 noclip scale  ",
+   "n": 14,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.053
+  },
+  {
+   "key": "640x480 stroke [lineTo] colour-a w>2 lighter a1 noclip scale  shadow",
+   "n": 40,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.053
+  },
+  {
+   "key": "640x480 stroke [lineTo] colour-a w<=2 lighter a1 noclip scale  shadow",
+   "n": 20,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.053
+  },
+  {
+   "key": "640x480 stroke [arc] lin w>2 source-over a1 noclip scale  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.053
+  },
+  {
+   "key": "640x480 stroke [arc] colour w<=2 lighter a1 noclip scale  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.053
+  },
+  {
+   "key": "640x480 stroke [arc] colour-a w>2 lighter a1 noclip scale  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.053
+  },
+  {
+   "key": "640x480 fillRect  colour-a source-over a1 noclip scale  ",
+   "n": 3,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.053
+  },
+  {
+   "key": "640x480 fillRect  colour-a screen a1 noclip scale  ",
+   "n": 6,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.054
+  },
+  {
+   "key": "640x480 fill [arc] rad lighter a1 clip1:arc scale  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.054
+  },
+  {
+   "key": "640x480 fill [arc] pattern overlay a<1 clip1:arc scale  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.054
+  },
+  {
+   "key": "640x480 fill [lineTo] colour source-over a<1 clip1:arc scale  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.054
+  },
+  {
+   "key": "640x480 stroke [lineTo] colour w<=2 source-over a<1 clip1:arc scale  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.054
+  },
+  {
+   "key": "960x720 fill [arc] rad lighter a1 clip1:arc scale  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.055
+  },
+  {
+   "key": "960x720 fill [arc] pattern overlay a<1 clip1:arc scale  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.055
+  },
+  {
+   "key": "960x720 fill [lineTo] colour source-over a<1 clip1:arc scale  ",
+   "n": 20,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.055
+  },
+  {
+   "key": "960x720 stroke [lineTo] colour w<=2 source-over a<1 clip1:arc scale  ",
+   "n": 20,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.055
+  },
+  {
+   "key": "1440x1080 drawImage canvas scaled smoothoff source-over a1 noclip id  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.055
+  },
+  {
+   "key": "300x150 drawImage canvas scaled smoothoff copy a1 noclip id  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.056
+  },
+  {
+   "key": "75x38 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.056
+  },
+  {
+   "key": "300x150 drawImage canvas scaled smoothlow lighter a<1 noclip id  ",
+   "n": 11,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.056
+  },
+  {
+   "key": "1440x1080 drawImage canvas scaled smoothoff source-over a1 clip1:rect id  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.056
+  },
+  {
+   "key": "1440x1080 fillRect  colour source-over a1 noclip id  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.056
+  },
+  {
+   "key": "1440x1080 fillRect  lin source-over a1 noclip id  ",
+   "n": 1120,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.057
+  },
+  {
+   "key": "1440x1080 fillRect  colour multiply a1 noclip id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.058
+  },
+  {
+   "key": "1440x1080 fillRect  rad multiply a1 noclip id  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.058
+  },
+  {
+   "key": "1440x1080 fill [lineTo+quadraticCurveTo+rect] colour evenodd source-over a1 noclip id  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.058
+  },
+  {
+   "key": "1440x1080 drawImage canvas smoothoff multiply a1 clip1:rect id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.058
+  },
+  {
+   "key": "300x150 drawImage canvas smoothoff source-over a1 noclip id  ",
+   "n": 6,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.058
+  },
+  {
+   "key": "300x150 fillRect  colour multiply a1 noclip id  ",
+   "n": 6,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.058
+  },
+  {
+   "key": "1440x1080 fillRect  lin lighter a<1 clip1:rect id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.058
+  },
+  {
+   "key": "96x96 fillRect  colour source-over a1 noclip id  ",
+   "n": 701,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.059
+  },
+  {
+   "key": "1440x1080 fillRect  pattern lighter a<1 clip1:rect id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.06
+  },
+  {
+   "key": "6x1 fillRect  colour source-over a1 noclip id  ",
+   "n": 12,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.061
+  },
+  {
+   "key": "1440x1080 fillRect  pattern multiply a1 noclip id  ",
+   "n": 4,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.062
+  },
+  {
+   "key": "100x50 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+   "n": 3,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.062
+  },
+  {
+   "key": "1440x1080 drawImage canvas smoothoff multiply a<1 clip1:rect id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.066
+  },
+  {
+   "key": "1440x1080 drawImage canvas scaled smoothhigh source-over a1 noclip id  ",
+   "n": 6,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.067
+  },
+  {
+   "key": "300x150 drawImage canvas scaled smoothlow copy a1 noclip id  ",
+   "n": 6,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.068
+  },
+  {
+   "key": "300x150 drawImage canvas scaled smoothlow lighten a<1 noclip id  ",
+   "n": 7,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.068
+  },
+  {
+   "key": "300x150 drawImage canvas scaled smoothlow color a<1 noclip id  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.068
+  },
+  {
+   "key": "75x38 drawImage canvas scaled smoothlow copy a1 noclip id  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.068
+  },
+  {
+   "key": "300x150 drawImage canvas scaled smoothlow screen a<1 noclip id  ",
+   "n": 5,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.068
+  },
+  {
+   "key": "300x150 fillRect  pattern source-over a1 noclip id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.069
+  },
+  {
+   "key": "300x150 drawImage canvas scaled smoothlow soft-light a<1 noclip id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.069
+  },
+  {
+   "key": "1440x1080 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+   "n": 11,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.069
+  },
+  {
+   "key": "1x600 fillRect  colour-a source-over a1 noclip id  ",
+   "n": 900,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.069
+  },
+  {
+   "key": "105x53 drawImage canvas scaled smoothlow copy a1 noclip id  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.071
+  },
+  {
+   "key": "60x30 drawImage canvas scaled smoothlow copy a1 noclip id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.072
+  },
+  {
+   "key": "1x750 fillRect  colour-a source-over a1 noclip id  ",
+   "n": 300,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.072
+  },
+  {
+   "key": "150x75 drawImage canvas scaled smoothlow copy a1 noclip id  ",
+   "n": 2,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.073
+  },
+  {
+   "key": "PAGE drawImage canvas smoothlow source-over a1 noclip id  ",
+   "n": 1,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.074
+  },
+  {
+   "key": "200x120 drawImage canvas scaled smoothoff source-over a1 noclip id  ",
+   "n": 968,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.074
+  },
+  {
+   "key": "PAGE drawImage canvas scaled smoothoff source-over a1 noclip id  ",
+   "n": 1831,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.074
+  },
+  {
+   "key": "200x120 drawImage canvas scaled smoothoff copy a1 noclip id  ",
+   "n": 968,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.074
+  },
+  {
+   "key": "50x30 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+   "n": 968,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.074
+  },
+  {
+   "key": "200x120 drawImage canvas scaled smoothlow lighter a<1 noclip id  ",
+   "n": 968,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.074
+  },
+  {
+   "key": "PAGE drawImage canvas scaled smoothoff source-over a1 clip1:rect id  ",
+   "n": 1399,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.074
+  },
+  {
+   "key": "PAGE drawImage canvas smoothoff multiply a1 clip1:rect id  ",
+   "n": 1399,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 1.075
+  },
+  {
+   "key": "800x600 fillRect  colour source-over a1 noclip id  shadow",
+   "n": 39453,
+   "phase": "load",
+   "raw": null,
+   "era": null,
+   "t": 2.872
+  },
+  {
+   "key": "800x600 fillRect  colour lighter a1 noclip id  ",
+   "n": 1,
+   "phase": "play",
+   "raw": null,
+   "era": 0,
+   "t": 6.262
+  },
+  {
+   "key": "800x600 drawImage HTMLImageElement scaled smoothoff source-over a1 noclip scale2  ",
+   "n": 586,
+   "phase": "ring",
+   "raw": 0,
+   "era": 1,
+   "t": 6.268
+  },
+  {
+   "key": "160x192 drawImage canvas scaled smoothoff source-over a1 noclip id  ",
+   "n": 431,
+   "phase": "ring",
+   "raw": 0.43,
+   "era": 1,
+   "t": 6.982
+  },
+  {
+   "key": "160x192 drawImage canvas scaled smoothoff copy a1 noclip id  ",
+   "n": 431,
+   "phase": "ring",
+   "raw": 0.43,
+   "era": 1,
+   "t": 6.982
+  },
+  {
+   "key": "160x192 drawImage canvas smoothoff source-over a1 noclip id  ",
+   "n": 862,
+   "phase": "ring",
+   "raw": 0.43,
+   "era": 1,
+   "t": 6.982
+  },
+  {
+   "key": "160x192 fillRect  colour multiply a1 noclip id  ",
+   "n": 862,
+   "phase": "ring",
+   "raw": 0.43,
+   "era": 1,
+   "t": 6.982
+  },
+  {
+   "key": "160x192 drawImage canvas scaled smoothlow lighter a<1 noclip id  ",
+   "n": 1293,
+   "phase": "ring",
+   "raw": 0.43,
+   "era": 1,
+   "t": 6.982
+  },
+  {
+   "key": "40x48 drawImage canvas scaled smoothlow source-over a1 noclip id  ",
+   "n": 431,
+   "phase": "ring",
+   "raw": 0.43,
+   "era": 1,
+   "t": 6.982
+  },
+  {
+   "key": "PAGE fillRect  lin lighter a<1 clip1:rect id  ",
+   "n": 431,
+   "phase": "ring",
+   "raw": 0.43,
+   "era": 1,
+   "t": 6.982
+  },
+  {
+   "key": "PAGE fillRect  pattern lighter a<1 clip1:rect id  ",
+   "n": 431,
+   "phase": "ring",
+   "raw": 0.43,
+   "era": 1,
+   "t": 6.982
+  }
+ ]
+}
