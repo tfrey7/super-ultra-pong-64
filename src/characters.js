@@ -164,18 +164,22 @@
           sheets: { left: 'era4-pilot-red', right: 'era4-pilot-blue' },
           frame: { w: 12, h: 42 }, hand: { x: 12, y: 17 }, scale: 3.125, fps: 12,
           frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
-    // PlayStation (item 1228): a STAND-IN only. Tim ruled flat sprites out of
-    // the 3D eras; the real players are polygon models from item 1248's
-    // renderer, and era 5's model card swaps these two sheets out. They are
-    // pixflux's two raw fighter sheets packed into the rig's 3 x 6 order by
-    // assets/pixellab/era5-fighters-cut.mjs: the red-gi fighter on the left,
-    // the blue-top fighter on the right, 23-pixel figures in a 20 x 30 frame,
-    // drawn about 83 table units tall with the hand on the paddle box's top.
+    // PlayStation (item 1253, docs/ART.md era 5 PLAYERS): two built figures, no
+    // sheets. tools/blender/era5-players.py makes them in Blender from
+    // primitives at the machine's own budget -- 248 and 236 flat-shaded
+    // triangles, no textures: `red`, the karateka in a gi with flared sleeves,
+    // a heavy belt and a headband, and `blue`, the taller kickboxer in a
+    // sleeveless top, wide trousers and a top-knot, so the two silhouettes read
+    // apart at 320 x 240. Each name loads twice over: assets/models/<name>.glb
+    // (the rigged glTF the real 3D layer stands, lights and animates, item
+    // 1274's contract) and <name>.json beside it (the same parts posed six
+    // times, for a page with no WebGL). The `ink` slot is the gi and the top,
+    // repainted each frame in that paddle's colour, so a fighter always wears
+    // its own side.
     5:  { skin: '#c8906a', body: '#1a1a1f', res: 2, round: true,
-          sheets: { left: 'era5-left', right: 'era5-right' },
-          frame: { w: 20, h: 30 }, hand: { x: 19, y: 18 }, scale: 3.6,
+          models: { left: 'era5-fighter-red', right: 'era5-fighter-blue' },
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
-          shading: 'flat' },   // item 1283: no model until era 5's own lands (1253-1258)
+          shading: 'flat' },
     // Nintendo 64 (item 1230, docs/ART.md Era 6): the penguin holds the player's paddle and the
     // frog the computer's, chunky toy mascots drawn smoothed and fogged at their paddle's depth
     // (capped at 0.35, as the era caps its paddles). Sheets derived by
