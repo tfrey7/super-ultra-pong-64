@@ -1,0 +1,38 @@
+[
+  {
+    "file": "era7-before.png",
+    "width": 1440,
+    "height": 900,
+    "brightest": {
+      "x": 1148,
+      "y": 445,
+      "rgb": [
+        249,
+        238,
+        233
+      ]
+    },
+    "brightestIsWhite": false,
+    "whitePixels": 0,
+    "fieldColours": 7500,
+    "fieldMeanBrightness": 72.4
+  },
+  {
+    "file": "era7-after.png",
+    "width": 1440,
+    "height": 900,
+    "brightest": {
+      "x": 965,
+      "y": 630,
+      "rgb": [
+        253,
+        254,
+        254
+      ]
+    },
+    "brightestIsWhite": false,
+    "whitePixels": 0,
+    "fieldColours": 19564,
+    "fieldMeanBrightness": 121.2
+  }
+]
