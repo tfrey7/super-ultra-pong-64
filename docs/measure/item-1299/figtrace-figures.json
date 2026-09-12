@@ -1,0 +1,533 @@
+{
+ "label": "figures",
+ "query": "&figure=player-proof-hi",
+ "events": 325353,
+ "longest": [
+  {
+   "ms": 1300.58,
+   "name": "ThreadPool_RunTask",
+   "cat": "toplevel",
+   "proc": "Browser",
+   "ts": 176703299086
+  },
+  {
+   "ms": 1156.34,
+   "name": "RunTask",
+   "cat": "disabled-by-default-devtools.timeline",
+   "proc": "Renderer",
+   "ts": 176701241092
+  },
+  {
+   "ms": 1147.84,
+   "name": "ThreadControllerImpl::RunTask",
+   "cat": "toplevel",
+   "proc": "Renderer",
+   "ts": 176701241092
+  },
+  {
+   "ms": 1147.84,
+   "name": "ScriptRunner::ExecutePendingScript",
+   "cat": "blink",
+   "proc": "Renderer",
+   "ts": 176701241092
+  },
+  {
+   "ms": 1147.83,
+   "name": "PendingScript::ExecuteScriptBlock",
+   "cat": "blink",
+   "proc": "Renderer",
+   "ts": 176701241093
+  },
+  {
+   "ms": 1147.83,
+   "name": "AsyncTask Run",
+   "cat": "blink",
+   "proc": "Renderer",
+   "ts": 176701241093
+  },
+  {
+   "ms": 1147.82,
+   "name": "EvaluateScript",
+   "cat": "devtools.timeline",
+   "proc": "Renderer",
+   "ts": 176701241095
+  },
+  {
+   "ms": 1147.81,
+   "name": "v8.run",
+   "cat": "v8",
+   "proc": "Renderer",
+   "ts": 176701241104
+  },
+  {
+   "ms": 310.68,
+   "name": "ThreadPool_RunTask",
+   "cat": "toplevel",
+   "proc": "Browser",
+   "ts": 176703016592
+  },
+  {
+   "ms": 309.96,
+   "name": "ThreadPool_RunTask",
+   "cat": "toplevel",
+   "proc": "Browser",
+   "ts": 176703016327
+  },
+  {
+   "ms": 155.13,
+   "name": "ThreadPool_RunTask",
+   "cat": "toplevel",
+   "proc": "Browser",
+   "ts": 176703047806
+  },
+  {
+   "ms": 138.65,
+   "name": "ThreadPool_RunTask",
+   "cat": "toplevel",
+   "proc": "Browser",
+   "ts": 176703036453
+  },
+  {
+   "ms": 131.44,
+   "name": "RunTask",
+   "cat": "disabled-by-default-devtools.timeline",
+   "proc": "Renderer",
+   "ts": 176702508516
+  },
+  {
+   "ms": 131.39,
+   "name": "ThreadControllerImpl::RunTask",
+   "cat": "toplevel",
+   "proc": "Renderer",
+   "ts": 176702508517
+  },
+  {
+   "ms": 131.39,
+   "name": "ProxyMain::BeginMainFrame",
+   "cat": "cc,benchmark",
+   "proc": "Renderer",
+   "ts": 176702508518
+  },
+  {
+   "ms": 122.49,
+   "name": "WebFrameWidgetImpl::BeginMainFrame",
+   "cat": "blink",
+   "proc": "Renderer",
+   "ts": 176702508528
+  },
+  {
+   "ms": 122.48,
+   "name": "Blink.Animate.UpdateTime",
+   "cat": "blink",
+   "proc": "Renderer",
+   "ts": 176702508533
+  },
+  {
+   "ms": 122.48,
+   "name": "PageAnimator::serviceScriptedAnimations",
+   "cat": "blink,rail",
+   "proc": "Renderer",
+   "ts": 176702508535
+  },
+  {
+   "ms": 122.46,
+   "name": "FrameRequestCallbackCollection::ExecuteFrameCallbacks",
+   "cat": "blink",
+   "proc": "Renderer",
+   "ts": 176702508546
+  },
+  {
+   "ms": 122.43,
+   "name": "FireAnimationFrame",
+   "cat": "devtools.timeline",
+   "proc": "Renderer",
+   "ts": 176702508547
+  },
+  {
+   "ms": 122.43,
+   "name": "AsyncTask Run",
+   "cat": "blink",
+   "proc": "Renderer",
+   "ts": 176702508549
+  },
+  {
+   "ms": 122.41,
+   "name": "v8.callFunction",
+   "cat": "v8",
+   "proc": "Renderer",
+   "ts": 176702508560
+  },
+  {
+   "ms": 122.4,
+   "name": "FunctionCall",
+   "cat": "devtools.timeline",
+   "proc": "Renderer",
+   "ts": 176702508561
+  },
+  {
+   "ms": 114.63,
+   "name": "ThreadPool_RunTask",
+   "cat": "toplevel",
+   "proc": "Browser",
+   "ts": 176703247746
+  },
+  {
+   "ms": 106.35,
+   "name": "ThreadPool_RunTask",
+   "cat": "toplevel",
+   "proc": "Browser",
+   "ts": 176703037629
+  },
+  {
+   "ms": 94.13,
+   "name": "GLES2::ReadPixels",
+   "cat": "gpu",
+   "proc": "Renderer",
+   "ts": 176702532208
+  },
+  {
+   "ms": 93.63,
+   "name": "ImplementationBase::WaitForCmd",
+   "cat": "gpu",
+   "proc": "Renderer",
+   "ts": 176702532213
+  },
+  {
+   "ms": 93.63,
+   "name": "CommandBufferHelper::Finish",
+   "cat": "gpu",
+   "proc": "Renderer",
+   "ts": 176702532214
+  },
+  {
+   "ms": 93.61,
+   "name": "CommandBufferProxyImpl::WaitForGetOffset",
+   "cat": "gpu",
+   "proc": "Renderer",
+   "ts": 176702532231
+  },
+  {
+   "ms": 81.75,
+   "name": "RunTask",
+   "cat": "disabled-by-default-devtools.timeline",
+   "proc": "GPU Process",
+   "ts": 176702544006
+  }
+ ],
+ "totals": [
+  {
+   "key": "Renderer | RunTask",
+   "count": 211,
+   "ms": 4892.759999999999,
+   "longest": 1156.34
+  },
+  {
+   "key": "Renderer | ThreadControllerImpl::RunTask",
+   "count": 211,
+   "ms": 4877.400000000002,
+   "longest": 1147.84
+  },
+  {
+   "key": "Renderer | ProxyMain::BeginMainFrame",
+   "count": 202,
+   "ms": 3701.969999999999,
+   "longest": 131.39
+  },
+  {
+   "key": "Browser | ThreadPool_RunTask",
+   "count": 184,
+   "ms": 3603.480000000001,
+   "longest": 1300.58
+  },
+  {
+   "key": "Renderer | AsyncTask Run",
+   "count": 207,
+   "ms": 3333.7899999999995,
+   "longest": 1147.83
+  },
+  {
+   "key": "Renderer | WebFrameWidgetImpl::BeginMainFrame",
+   "count": 203,
+   "ms": 2184.009999999999,
+   "longest": 122.49
+  },
+  {
+   "key": "Renderer | Blink.Animate.UpdateTime",
+   "count": 203,
+   "ms": 2182.96,
+   "longest": 122.48
+  },
+  {
+   "key": "Renderer | PageAnimator::serviceScriptedAnimations",
+   "count": 203,
+   "ms": 2182.12,
+   "longest": 122.48
+  },
+  {
+   "key": "Renderer | FrameRequestCallbackCollection::ExecuteFrameCallbacks",
+   "count": 203,
+   "ms": 2179.449999999999,
+   "longest": 122.46
+  },
+  {
+   "key": "Renderer | FireAnimationFrame",
+   "count": 203,
+   "ms": 2172.38,
+   "longest": 122.43
+  },
+  {
+   "key": "Renderer | v8.callFunction",
+   "count": 203,
+   "ms": 2167.6300000000006,
+   "longest": 122.41
+  },
+  {
+   "key": "Renderer | FunctionCall",
+   "count": 203,
+   "ms": 2156.9700000000003,
+   "longest": 122.4
+  },
+  {
+   "key": "Renderer | Commit",
+   "count": 202,
+   "ms": 1503.2500000000005,
+   "longest": 28.94
+  },
+  {
+   "key": "Renderer | LayerTreeHost::DoUpdateLayers",
+   "count": 202,
+   "ms": 1488.8799999999985,
+   "longest": 28.88
+  },
+  {
+   "key": "Renderer | PendingScript::ExecuteScriptBlock",
+   "count": 4,
+   "ms": 1162.1899999999998,
+   "longest": 1147.83
+  },
+  {
+   "key": "Renderer | EvaluateScript",
+   "count": 4,
+   "ms": 1162.0399999999997,
+   "longest": 1147.82
+  },
+  {
+   "key": "Renderer | v8.run",
+   "count": 4,
+   "ms": 1161.6299999999999,
+   "longest": 1147.81
+  },
+  {
+   "key": "Renderer | ScriptRunner::ExecutePendingScript",
+   "count": 3,
+   "ms": 1156.5599999999997,
+   "longest": 1147.84
+  },
+  {
+   "key": "Renderer | GLES2::ReadPixels",
+   "count": 248,
+   "ms": 1149.6999999999994,
+   "longest": 94.13
+  },
+  {
+   "key": "GPU Process | RunTask",
+   "count": 352,
+   "ms": 1134.7199999999996,
+   "longest": 81.75
+  },
+  {
+   "key": "GPU Process | ThreadControllerImpl::RunTask",
+   "count": 352,
+   "ms": 1133.8199999999993,
+   "longest": 81.74
+  },
+  {
+   "key": "Renderer | ImplementationBase::WaitForCmd",
+   "count": 252,
+   "ms": 1060.5800000000006,
+   "longest": 93.63
+  },
+  {
+   "key": "Renderer | CommandBufferHelper::Finish",
+   "count": 252,
+   "ms": 1060.2500000000007,
+   "longest": 93.63
+  },
+  {
+   "key": "Renderer | CommandBufferProxyImpl::WaitForGetOffset",
+   "count": 252,
+   "ms": 1057.0200000000007,
+   "longest": 93.61
+  },
+  {
+   "key": "GPU Process | Scheduler::RunTask",
+   "count": 254,
+   "ms": 998.7000000000002,
+   "longest": 81.74
+  }
+ ],
+ "shaders": [
+  {
+   "key": "Renderer | Blink.Animate.UpdateTime",
+   "count": 204,
+   "ms": 2183,
+   "longest": 122.48
+  },
+  {
+   "key": "GPU Process | ProgramExecutableVk::warmUpGraphicsPipelineCache",
+   "count": 4,
+   "ms": 42.39,
+   "longest": 16.34
+  },
+  {
+   "key": "Renderer | GLES2Implementation::GetProgramiv",
+   "count": 71,
+   "ms": 29.78,
+   "longest": 7.76
+  },
+  {
+   "key": "GPU Process | Compile/Link (unlocked)",
+   "count": 12,
+   "ms": 17.189999999999998,
+   "longest": 4.25
+  },
+  {
+   "key": "GPU Process | ShaderTranslateTask::run",
+   "count": 7,
+   "ms": 16.18,
+   "longest": 4.21
+  },
+  {
+   "key": "Renderer | Blink.PrePaint.UpdateTime",
+   "count": 204,
+   "ms": 8.040000000000008,
+   "longest": 0.14
+  },
+  {
+   "key": "Renderer | Blink.Paint.UpdateTime",
+   "count": 204,
+   "ms": 2.7399999999999882,
+   "longest": 0.21
+  },
+  {
+   "key": "Renderer | BlinkScheduler_OnTaskCompleted",
+   "count": 2033,
+   "ms": 2.3799999999999932,
+   "longest": 0.06
+  },
+  {
+   "key": "Renderer | GLES2Implementation::GetShaderiv",
+   "count": 8,
+   "ms": 1.69,
+   "longest": 0.45
+  },
+  {
+   "key": "Renderer | Blink.ForcedStyleAndLayout.UpdateTime",
+   "count": 208,
+   "ms": 1.600000000000001,
+   "longest": 0.23
+  },
+  {
+   "key": "GPU Process | GLES2DecoderPassthroughImpl::DoLinkProgram",
+   "count": 4,
+   "ms": 1,
+   "longest": 0.29
+  },
+  {
+   "key": "Renderer | v8.compile",
+   "count": 47,
+   "ms": 0.8500000000000004,
+   "longest": 0.29
+  },
+  {
+   "key": "Renderer | Blink.Style.UpdateTime",
+   "count": 3,
+   "ms": 0.61,
+   "longest": 0.43
+  },
+  {
+   "key": "GPU Process | LinkTaskVk::linkImpl",
+   "count": 4,
+   "ms": 0.45,
+   "longest": 0.13
+  },
+  {
+   "key": "Renderer | Blink.Layout.UpdateTime",
+   "count": 2,
+   "ms": 0.23,
+   "longest": 0.14
+  },
+  {
+   "key": "Renderer | Blink.CompositingCommit.UpdateTime",
+   "count": 204,
+   "ms": 0.17,
+   "longest": 0.09
+  },
+  {
+   "key": "Renderer | BlinkScheduler_PerformMicrotaskCheckpoint",
+   "count": 2033,
+   "ms": 0.07,
+   "longest": 0.01
+  },
+  {
+   "key": "Renderer | Blink.ParseStyleSheet.UpdateTime",
+   "count": 1,
+   "ms": 0.07,
+   "longest": 0.07
+  },
+  {
+   "key": "Renderer | Blink.CompositingInputs.UpdateTime",
+   "count": 204,
+   "ms": 0.060000000000000005,
+   "longest": 0.02
+  },
+  {
+   "key": "Renderer | Blink.IntersectionObservation.UpdateTime",
+   "count": 203,
+   "ms": 0.060000000000000005,
+   "longest": 0.01
+  },
+  {
+   "key": "GPU Process | Program::MainLinkLoadEvent::wait",
+   "count": 4,
+   "ms": 0.06,
+   "longest": 0.04
+  },
+  {
+   "key": "Renderer | Blink.Accessibility.UpdateTime",
+   "count": 204,
+   "ms": 0.01,
+   "longest": 0.01
+  },
+  {
+   "key": "Renderer | Blink.UpdateViewportIntersection.UpdateTime",
+   "count": 22,
+   "ms": 0,
+   "longest": 0
+  },
+  {
+   "key": "GPU Process | CompileEvent::wait",
+   "count": 16,
+   "ms": 0,
+   "longest": 0
+  },
+  {
+   "key": "Renderer | HTMLDocumentParser::DispatchLinkHeaderPreloads",
+   "count": 3,
+   "ms": 0,
+   "longest": 0
+  },
+  {
+   "key": "Renderer | GLES2::GetShaderPrecisionFormat",
+   "count": 2,
+   "ms": 0,
+   "longest": 0
+  },
+  {
+   "key": "pid 0 | ImageFilter Shader Tiling",
+   "count": 1,
+   "ms": 0,
+   "longest": 0
+  }
+ ]
+}

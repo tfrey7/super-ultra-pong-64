@@ -176,3 +176,66 @@ on master, run minutes apart on the same busy machine. That is the software-canv
    MATCH POINT over 100G - FINISH IT as a held toast with the vignette tightened from 250 to 220.
 3. For anything moving on its own behind the play (ash, the banner, the sun's bloom breathing
    plus and minus 5 % every 6 s), use a few dozen seeded fills a frame. Never loop over pixels.
+
+## LESSONS: HD under the whole post chain (item 1298)
+
+*The reference is still Gears of War (Tim's ruling, 2026-09-11), with Project Gotham Racing 3's
+720p HDR beside it. What this pass changed is not the palette but the picture: the field is drawn
+by the real 3D layer now, so the ball and the bats sit INSIDE the composite the post passes work
+on, and the readability laws had to be won back one at a time. One frozen rally frame, before and
+after: [era10-before.png](../shots/item-1298/era10-before.png) and
+[era10-after.png](../shots/item-1298/era10-after.png) (`?era=10`).*
+
+**What the reference changed.** The Xenos had 10 MB of eDRAM so a 2005 game could anti-alias at
+720p while the post chain ran on top. The canvas equivalent is the layer's own `render` knobs:
+era 10 is the first era to set any -- `{ resolution: 1.2, filter: true, lighting: 'standard' }`,
+which draws the field 1.2 times over the picture's own 960 x 720 and samples it back down smoothly.
+The bats' edges come out of the composite already resolved, which is what lets bloom, depth of
+field, grain and the grade run over them and still leave them sharp.
+
+**The add is the one the ladder had already earned.** Achievements (items 1156 and 1234) stay, on
+the one rung where a point does not leave the era; no earlier era has one.
+
+**The change, measured.** `node docs/measure/item1298/hdcheck.mjs --label after --port 9355` (and
+`--root` at the main checkout for the before) freezes one rally frame -- the far bat up in the
+depth-of-field strip, the near bat down, the ball mid-flight -- and reads the native 960 x 720
+picture back out of the page. Headless Chrome with the GPU off, so these are the slowest numbers
+the game ever shows:
+
+| | before | after |
+| --- | --- | --- |
+| pixels brighter than the ball's core (R1) | 224 | **0** |
+| the ball's core, of 255 | 250 | **255** |
+| far bat's outer edge, in pixels (R4) | 3 | **2** |
+| near bat's outer edge | 1 | 1 |
+| the ruins' detail, far band | 2.68 | 2.69 |
+| mean frame, one second of play | 33.5 ms | 38.4 ms |
+
+- **A law written for a painter's order stops holding the moment somebody else paints.** R1 and R4
+  were free while the era drew its own paddles and ball after the post chain. With the layer
+  drawing them into the same buffer as the table, the grade drained the bats' earned ink and the
+  bloom put 224 pixels of sky above the ball. Each law needed its own move back: the ball's white
+  core repainted after every pass, and the bats' rectangles knocked out of the depth-of-field
+  strip with an even-odd clip before the soft copy goes down.
+- **Restore an ink with the `color` blend, not a fill.** Refilling the bat's faces with its ink
+  throws the 3D lighting away and gives you a flat lozenge. Painting the ink through
+  `globalCompositeOperation = 'color'` puts the hue and the full saturation back and keeps the
+  lit surface's own brightness -- one line, and the shading survives. It restores at 100 %; if a
+  later pass wants the ink calmer against the brown grade, that is an alpha on this one call.
+- **One light, tagged, and put out again the same frame.** The 3D scene is shared by eras 5 to 10,
+  so a light added for one era lights all of them -- including the finale's rewind down the ladder
+  and the frames either side of a ring. Era 10's `fieldSetup(I, state)` adds its warm rim light
+  once, poses it every frame, and hands it back so `draw` can set its intensity to 0 the moment
+  the field is drawn. Intensity 0, never `visible = false`: three.js keys its shader programs on
+  how many lights are in the scene, so toggling visibility swaps programs every frame.
+- **A carry-forward has to be guarded, because the era below may not have landed yet.** This is
+  the first `fieldSetup` on the ladder. It calls `R.eraLook(9).fieldSetup` first *when there is
+  one* -- which is how era 9's moving light and shadows, era 8's mirrored slab and era 6's blob
+  shadows will arrive here once those cards land -- and works exactly as well while there is not.
+- **1.2 is not free: it cost 4.9 ms a frame** on the software-drawn Chrome, inside the 5 ms this
+  card allowed but not by much. If a later card needs that back, `resolution: 1` renders at the
+  picture's own 960 x 720 and gives up only the anti-aliasing; nothing else on this page depends
+  on it.
+- **The far ruins did not move** (2.68 to 2.69): knocking the bats out of the depth-of-field strip
+  takes nothing away from the distance, which is the point of masking rather than of taking the
+  soft copy earlier.

@@ -67,13 +67,21 @@ test('with no WebGL the layer declines and field() paints the canvas table', () 
   assert.ok(tableCalls > 0 && tableCalls === calls.length, `field() fallback made ${tableCalls} calls, table() ${calls.length}`);
 });
 
-test('every era file can carry render knobs, and none sets any yet', () => {
+// An era may leave them all at their defaults; whatever it does set has to be
+// one of the four knobs the layer reads. Era 10 sets its own (item 1298: HD).
+test('every era file draws its field through the layer, and any render knobs it sets are known ones', () => {
   const fs = require('node:fs');
   const path = require('node:path');
   const dir = path.join(__dirname, '..', 'src', 'eras');
+  const KNOBS = ['resolution', 'filter', 'fog', 'lighting'];
+  const { R } = require('../tools/eralooks.js').loadRenderer(path.join(__dirname, '..'));
   for (const f of fs.readdirSync(dir).filter((n) => /^era([5-9]|10)-/.test(n))) {
     const src = fs.readFileSync(path.join(dir, f), 'utf8');
     assert.ok(/T\.field\(/.test(src), `${f} draws its field through T.field`);
-    assert.ok(!/\brender:\s*\{/.test(src), `${f} sets no render knobs yet`);
+    const era = Number(f.match(/^era(\d+)/)[1]);
+    const knobs = (R.eraLook(era) || {}).render;
+    if (era === 10) assert.ok(knobs && typeof knobs === 'object', `${f} sets its render knobs`);
+    else assert.ok(knobs === undefined || typeof knobs === 'object', `${f} sets knobs or none`);
+    for (const k of Object.keys(knobs || {})) assert.ok(KNOBS.includes(k), `${f} render knob ${k} is a known one`);
   }
 });
