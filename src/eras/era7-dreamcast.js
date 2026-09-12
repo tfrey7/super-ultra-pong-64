@@ -49,6 +49,38 @@
 
   var PADDLE = { z: 24, edge: 0.4 };
 
+  // ------------------------------------------- strict 1999 (item 1293)
+  // Tim ruled this card's own decision on 2026-09-11: era 7's reference is not
+  // Jet Set Radio's ink (a 2000 game) but 1999's own launch showcases,
+  // Soulcalibur and Sonic Adventure -- smooth, bright, VGA-sharp 3D at
+  // 640 x 480, no haze, a polished stage with a fighter's ring painted on it,
+  // in the manner of: no Sega or Namco character or mark is drawn.
+  // It is the FIELD that changes, and only the field. Without WebGL (?gl=off,
+  // node --test) this era paints exactly the cel table it always did, so the
+  // rooftop, the graffiti score and the ink are untouched there.
+  var RENDER = { resolution: 0.8, filter: true, fog: null, lighting: 'phong' };
+
+  // What fieldSetup puts on the shared parts. `lift` is an EMISSIVE colour, not
+  // a fill: PongField3D.pose() writes every part's .color from the era's table
+  // style on every frame, so emissive is the one seat an era can hold -- and it
+  // is also what makes a 1999 showcase read bright and evenly lit rather than
+  // shadowed. `specular` and `shininess` are the polish those two games are
+  // remembered for. See docs/lessons/era7-dreamcast.md.
+  var STAGE = {
+    slab: { lift: '#10407e', specular: '#9ad7ff', shininess: 90 },
+    net: { colour: '#eaf6ff', lift: '#2b5f92', specular: '#ffffff', shininess: 60 },
+    bat: { lift: '#3a2810', specular: '#ffffff', shininess: 120 },
+    ball: { lift: '#78889a', specular: '#ffffff', shininess: 200 },
+    // The ring: a bright band lying on the table top, inside its edges, the one
+    // shape a 1999 fighter's stage is known by. Circular geometry stretched
+    // across the field's 800 x 600, 0.4 above the top like the painted lines.
+    ring: { radius: 292, tube: 4.5, segments: 10, sides: 64, colour: '#ffd400', lift: '#ffd400', lift3: 0.4 },
+    // The ball's third tone, drawn only over the 3D field: two hard cel bands
+    // become white, shade and deep shade, so it reads as a round lit sphere
+    // rather than a sticker. Flat fills still -- no gradients anywhere here.
+    sheen: { at: 0.55, colour: '#a7d3ea' }
+  };
+
   // The graffiti score. The bible's cell 13 at y 14 hangs to about screen y 100
   // with its extrusion and drips, past R8's limit of the far edge (82.1) less 6.
   // Cell 10 from y 4, with drips of 8 to 14, keeps the whole tag above y 76.
@@ -347,6 +379,86 @@
     ball: { name: 'ball', alpha: 0.3, blend: 'soft-light', period: 12, smooth: true }
   };
 
+  // ------------------------------------------------ the field, in 1999 (item 1293)
+  /** The 3D layer's internals, or null: no WebGL, ?gl=off, node --test. */
+  function layer() {
+    var F = root.PongField3D;
+    return F && typeof F.internals === 'function' ? F.internals() : null;
+  }
+
+  /** Set one material's 1999 polish, skipping anything this material has not got. */
+  function dress(mat, spec) {
+    if (!mat || !spec) return false;
+    if (spec.colour && mat.color && mat.color.set) mat.color.set(spec.colour);
+    if (mat.emissive && mat.emissive.set) mat.emissive.set(spec.lift);
+    if (mat.specular && mat.specular.set) mat.specular.set(spec.specular);
+    if (spec.shininess !== undefined) mat.shininess = spec.shininess;
+    mat.flatShading = false;              // smooth, not faceted: no cel banding
+    if (mat.needsUpdate !== undefined) mat.needsUpdate = true;
+    return true;
+  }
+
+  /** The ring on the table top: built once per set of parts, added to the layer's own group. */
+  function addRing(I) {
+    var THREE = I.THREE, G = STAGE.ring;
+    if (!THREE || !THREE.Mesh || !THREE.TorusGeometry || !I.parts.group) return null;
+    var mat = THREE.MeshPhongMaterial ? new THREE.MeshPhongMaterial({ color: G.colour })
+      : new THREE.MeshBasicMaterial({ color: G.colour });
+    dress(mat, { colour: G.colour, lift: G.lift, specular: '#ffffff', shininess: 100 });
+    var mesh = new THREE.Mesh(new THREE.TorusGeometry(G.radius, G.tube, G.segments, G.sides), mat);
+    mesh.rotation.x = -Math.PI / 2;                 // flat on the table top
+    mesh.scale.set(390 / G.radius, 1, 1);           // a circle stretched across 800 x 600
+    mesh.position.set(0, G.lift3, 0);
+    mesh.name = 'era7-ring';
+    I.parts.group.add(mesh);
+    return mesh;
+  }
+
+  /**
+   * Hide or show the layer's own ball. It is hidden for exactly as long as the
+   * layer takes to render this era's frame -- draw() shows it again the moment
+   * T.field returns -- so no other era ever meets it hidden.
+   * `parts.ball.visible` is NOT the knob: PongField3D.pose() writes it on every
+   * frame from the serve delay, so an era cannot hold it false. The ball's
+   * material opacity is the one seat that survives (a finding on item 1293).
+   */
+  function hideBall(parts, hide) {
+    if (!parts || !parts.ballMat) return false;
+    parts.ballMat.opacity = hide ? 0 : 1;
+    return true;
+  }
+
+  var stage = { mats: null, ring: null };
+
+  /**
+   * This era's work inside the shared 3D scene, called from draw() before
+   * T.field. Answers what it did, which is also what its test reads:
+   *   null     there is no 3D layer this frame (the canvas fallback draws)
+   *   'fresh'  the parts were not ours -- another era drew, or the render knobs
+   *            rebuilt them -- so the stage materials went on and the ring was
+   *            added; happens once per set of parts, not once a frame
+   *   'kept'   the stage was already ours: only the ball was hidden
+   */
+  function fieldSetup(I, state) {
+    if (!I || !I.parts) return null;
+    var six = R && typeof R.eraLook === 'function' ? R.eraLook(6) : null;
+    if (six && typeof six.fieldSetup === 'function') {
+      try { six.fieldSetup(I, state); } catch (e) { /* era 6 owns its own errors */ }
+    }
+    var p = I.parts;
+    var fresh = stage.mats !== p.surfaceMat;
+    if (fresh) {
+      dress(p.surfaceMat, STAGE.slab);
+      dress(p.netMat, STAGE.net);
+      if (p.bats) ['left', 'right'].forEach(function (s) { if (p.bats[s]) dress(p.bats[s].mat, STAGE.bat); });
+      dress(p.ballMat, STAGE.ball);
+      stage.ring = addRing(I);
+      stage.mats = p.surfaceMat;
+    }
+    hideBall(p, true);
+    return fresh ? 'fresh' : 'kept';
+  }
+
   // --------------------------------------------------------------- 2. table
   function tableStyle(T) {
     return {
@@ -465,25 +577,39 @@
   }
 
   // ------------------------------------------------------------- 7. the ball
-  function drawBall(ctx, T, cam, state) {
+  /**
+   * One shade band on the ball: the same circle offset (+off r, +off r), down
+   * and to the right, drawn as the lens where the two circles overlap -- two
+   * arcs, no clip and no gradient. Pure drawing.
+   */
+  function shadeLens(ctx, s, off, colour) {
+    var d = off * Math.SQRT2;                  // centre offset, in radii
+    var half = Math.acos(d / 2);               // half the lens's angle on each circle
+    var dir = Math.PI / 4;                     // down and to the right
+    var bx = s.x + off * s.r, by = s.y + off * s.r;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, dir - half, dir + half);
+    ctx.arc(bx, by, s.r, dir + Math.PI - half, dir + Math.PI + half);
+    ctx.closePath();
+    ctx.fillStyle = colour;
+    ctx.fill();
+  }
+
+  /**
+   * The ball. `smooth` is the 1999 field's ball (item 1293): the same white
+   * core and ink edge with a third, deeper tone, so it turns rather than
+   * flicks. Without it this is exactly the two-band cel ball the canvas
+   * fallback has always drawn.
+   */
+  function drawBall(ctx, T, cam, state, smooth) {
     var s = T.ball(ctx, cam, state.ball, {
       fill: PALETTE.ballCore,
       shadow: T.rgba(PALETTE.ink, 0.35),
       outline: { width: 2, colour: PALETTE.ink },
       texture: TEXTURE.ball
     });
-    // The shade band: the same circle offset (+0.35r, +0.35r), inside the ball.
-    // Drawn as the lens where the two circles overlap -- two arcs, no clip.
-    var d = 0.35 * Math.SQRT2;                 // centre offset, in radii
-    var half = Math.acos(d / 2);               // half the lens's angle on each circle
-    var dir = Math.PI / 4;                     // down and to the right
-    var bx = s.x + 0.35 * s.r, by = s.y + 0.35 * s.r;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, dir - half, dir + half);
-    ctx.arc(bx, by, s.r, dir + Math.PI - half, dir + Math.PI + half);
-    ctx.closePath();
-    ctx.fillStyle = PALETTE.ballShade;
-    ctx.fill();
+    shadeLens(ctx, s, 0.35, PALETTE.ballShade);
+    if (smooth) shadeLens(ctx, s, STAGE.sheen.at, STAGE.sheen.colour);
     return s;
   }
 
@@ -754,7 +880,14 @@
       ? state.score.left + '-' + state.score.right : null;
 
     backdrop(ctx, T, cam, state, P, flash);                       // 1
-    var gl = T.field(ctx, cam, tableStyle(T), state, P);         // 2, through the 3D layer when it can (item 1273)
+    var I = layer();                                              // 2, the 1999 stage in the shared scene (item 1293)
+    if (I) fieldSetup(I, state);
+    var gl = T.field(ctx, cam, tableStyle(T), state, P);         // through the 3D layer when it can (item 1273)
+    if (I) hideBall(I.parts, false);                              // the layer's ball is its own again at once
+    // The ball is this era's to draw again whenever the layer did not draw one:
+    // without the 3D field, as ever, and with it, because we hid the layer's so
+    // the impact burst and the speed lines can go UNDER it (item 1293).
+    var ownBall = !gl || !!I;
 
     var sides = ['left', 'right'];                                // 4, the far paddle first
     if (state.right.y + state.right.h < state.left.y + state.left.h) sides.reverse();
@@ -774,7 +907,7 @@
         ctx.stroke();
       }
       drawBurst(ctx, state);
-      if (!gl) drawBall(ctx, T, cam, state);                      // 7, last on the table (the 3D layer drew its own)
+      if (ownBall) drawBall(ctx, T, cam, state, gl);              // 7, last on the table, over its own contact effects
     }
 
     var mid = state.width / 2;                                    // 8, above the far edge
@@ -1035,6 +1168,8 @@
     name: '1999 Sega Dreamcast',
     like: 1,              // paddle colours: the ones the session earned on its first point
     camera: CAMERA,
+    render: RENDER,       // strict 1999: 640 x 480, smooth, no haze (item 1293)
+    fieldSetup: fieldSetup,
     card: { flash: '#ffffff', wipe: ['#ee5a24', '#ffffff', '#111111'], box: '#ffffff', border: '#111111',
             inner: null, year: '#ee5a24', name: '#111111', label: '#1e73d8', dots: null },
     // Punchy synth-funk: slap bass, claps, stabs and a short echo (bible chapter 8).
@@ -1096,6 +1231,13 @@
     splatShape: splatShape,
     tagsShown: tagsShown,
     tagCells: tagCells,
-    tagCentre: tagCentre
+    tagCentre: tagCentre,
+    // The 1999 field (item 1293), for its own test.
+    RENDER: RENDER,
+    STAGE: STAGE,
+    dress: dress,
+    hideBall: hideBall,
+    addRing: addRing,
+    shadeLens: shadeLens
   });
 })(typeof globalThis !== 'undefined' ? globalThis : this);
