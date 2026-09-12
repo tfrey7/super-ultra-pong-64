@@ -162,3 +162,85 @@ arcade table. Rally frame: [rally-era7.png](../shots/item-1231/rally-era7.png).
    for them.
 
 - **The opponent's name is not drawn in this era (item 1261)**: the placard already says CPU beside the right score, so DREAM CPU beside it said the same thing twice.
+
+## LESSONS: strict 1999, the field only (item 1293)
+
+Before and after, the same serve: [era7-before.png](../shots/item-1293/era7-before.png) and
+[era7-after.png](../shots/item-1293/era7-after.png), with the readings beside them
+([era7-readings.py](../shots/item-1293/era7-readings.py), nothing to install).
+
+**Which 1999 this is.** The card was written for *Jet Set Radio* -- cel shading and ink outlines --
+and Tim answered its decision with **strict 1999: Soulcalibur and Sonic Adventure** instead. A 2000
+game was one rung early, and 1999's own launch showcases are smooth, bright and VGA-sharp, not
+inked. THE MACHINE's *Reference games* bullet above still quotes the art bible's row, written
+before that ruling; `docs/ART.md`'s era 7 row is the place that has to change, and it belongs to
+whoever owns the bible rather than to this card.
+
+**It is the FIELD that changed, and only the field.** The rooftop, the sky bands, the skyline, the
+blimp, the graffiti score, the tags, the cans, the splat, the arrival flourish and the voice are
+all as they were -- and so is the whole era without WebGL: `?gl=off` and `node --test` paint
+exactly the cel table they painted before. That is the card's own rule, and it is also what made a
+30-minute job possible: the canvas era and the 3D field are two pictures of one rung.
+
+**The four numbers.** `render: { resolution: 0.8, filter: true, fog: null, lighting: 'phong' }`.
+0.8 of the 800 x 600 picture the field lands in is exactly **640 x 480**, VGA. `filter: true` is
+the whole argument in one flag: 1999's showcases were smooth, so the picture is scaled up smoothed
+rather than blocky. `fog: null`: era 6's haze does not carry forward, because a bright stage has no
+distance to hide. `'phong'` buys the specular highlight those two games are remembered for -- and
+is also, today, the only thing that cleans up after this era (below).
+
+**What an era can and cannot hold in the shared 3D scene.** The scene is one, shared by eras 5 to
+10, so `fieldSetup(I, state)` writes on parts every other era draws with.
+
+- **`.color` is not yours.** `PongField3D.pose()` writes the slab's, lines', rails', bats' and
+  ball's colour from the era's table style on *every* frame, after `fieldSetup` has run. What
+  survives is `emissive`, `specular`, `shininess` and `flatShading` -- so era 7's stage colour is
+  carried as an emissive lift over the layer's own fill, which is also why it reads evenly lit.
+- **`parts.ball.visible` is not yours either**, for the same reason. The era hides the layer's ball
+  with `parts.ballMat.opacity = 0` and hands it straight back the moment `T.field` returns, so no
+  other era can ever meet it hidden. "Restore it when another era draws" cannot be implemented by
+  the era that hid it: it is not running then.
+- **There is no teardown, and the chain relies on that.** Changing `lighting` makes the layer
+  rebuild every material and empty its group, disposing of anything an era added -- which is the
+  only cleanup there is. Coming up from era 6 (`'lambert'`) that rebuild happens, so era 7 starts
+  from clean parts. Going on to era 8 it does **not**: era 8 asks for `'phong'` too, and it calls
+  era 7's own `fieldSetup` on purpose, to carry this field forward. So era 7's ring and its lift
+  are still there on the PS2, by the chain's design rather than by accident. The one thing that
+  must not carry is the hidden ball: era 8 draws no ball of its own, so era 7 hides the layer's
+  ball **only on frames whose era is 7**, and a test pins it.
+- **Dress the material the mesh is wearing now.** Era 6's `fieldSetup` runs first (era 7 calls it)
+  and hands the slab mesh a textured material of its own, so `parts.surfaceMat` is no longer what
+  the table is painted with. Era 7 dresses `parts.slab.material` when the two differ, and takes the
+  Nintendo 64's grain off every frame, because era 6 puts it back every frame. Two readings from
+  getting this wrong: with era 6's material left alone the table stayed a dark N64 checker (field
+  mean 81.6), and with era 7's emissive lift stacked on top of era 6's own the table blew out to
+  near-white (**203** of 255). Setting that material's *colour* is what works -- safe, because
+  `pose()` writes only `surfaceMat.color`.
+
+**What the change is worth, measured** -- same frame, the field band only (the table, under the sky
+and above the near lip):
+
+| | distinct colours | mean brightness | brightest pixel in the frame |
+| --- | --- | --- | --- |
+| before (cel) | 7,500 | 72.4 | 249, 238, 233 -- **not** on the ball |
+| after (1999) | 19,564 | 121.2 | 253, 254, 254 -- **on the ball itself** |
+
+The colour count is the reading that separates the two looks: flat poster fills against real smooth
+shading. Nothing reaches a pure 255 because the display's tube overlay tints the whole page, so R1
+reads as "the brightest pixel in the frame lands on the ball", which it now does and did not
+before. Frame time in the playtest's software Chrome: **29.9 ms mean**, between era 6's 27.5 and
+era 8's 32.3 in the same run -- the six "holds full frame rate" FAILs on eras 5 to 10 are card
+1216's, and are there on master too.
+
+**The ring.** A 1999 fighter's stage is known by its edge, so the table wears one: a painted
+boundary lying on the top, one circle stretched across 800 x 600. Two things were wrong on the
+first pass, both worth inheriting: a lift as bright as the fill makes a **neon hoop that owns the
+frame**, and the same white specular the slab wears **washes the near bat out to pale**, which
+costs R4 (each paddle's near face wears its earned colour). Lit rather than glowing, and a grey
+gleam on the bats, fixed both.
+
+**LESSONS:** the reference changed the *field* and nothing else -- era 7 stopped being a poster and
+became a lit stage (640 x 480 smoothed, no haze, polished surfaces, a painted ring) while every
+canvas thing drawn round it stayed as it was, which is how a whole-look change fits in one small
+card. Its build-up in the ladder: **added** the contact effects back over the ball (no earlier era
+draws an effect at the contact), **changed** cel shading for smooth, bright, VGA-sharp shading.
