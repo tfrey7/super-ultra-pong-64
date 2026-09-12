@@ -61,9 +61,13 @@ const POSE = `(() => {
   return { gl: !!(window.PongField3D && window.PongField3D.available()), why: window.PongField3D ? window.PongField3D.why() : 'no layer' };
 })()`;
 
-// Read the native picture: under each bat's foot (the mirrored near face,
-// 7 units deep) against the plain slab 90 units further along x, and the
-// letterbox against the table and the paddles' projected extents.
+// Read the native picture. A mirrored blade hangs straight down from its
+// original, so on screen it lies just BELOW the bat's foot -- but how far below
+// depends on where up the table the bat stands, so a single probe point misses
+// one of the two. Instead walk down the screen from each foot, a native row at
+// a time, and keep the row that is most the bat's own colour against the plain
+// slab the same distance below, 90 units further along x. Also: the letterbox
+// against the table's and the paddles' projected extents.
 const PROBE = `(() => {
   const g = window.__pong, R = window.PongRender, T = R.table3d, L = R.eraLook(8);
   const cam = T.camera(L.drift(g.time));
@@ -73,14 +77,28 @@ const PROBE = `(() => {
   function px(p) { const d = x.getImageData(Math.round(p.x * sx), Math.round(p.y * sy), 1, 1).data; return [d[0], d[1], d[2]]; }
   const out = { native: [nat.width, nat.height], gl: (window.PongField3D.internals() || {}).renderer ?
     [window.PongField3D.internals().renderer.domElement.width, window.PongField3D.internals().renderer.domElement.height] : null };
+  const hexRgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
   out.bats = ['left', 'right'].map((side) => {
+    // The NEAR edge of the bat's footprint: the blade's standing face covers
+    // everything up-screen of it, and the mirrored copy hangs down-screen of it.
     const r = g[side], cx = r.x + r.w / 2, near = r.y + r.h;
-    const under = T.project(cam, cx, near + 2, -7);
     const foot = T.project(cam, cx, near, 0);
     const plainX = side === 'left' ? cx + 90 : cx - 90;
-    const plain = T.project(cam, plainX, near + 2, -7);
-    return { side, foot: [+foot.x.toFixed(1), +foot.y.toFixed(1)], under: [+under.x.toFixed(1), +under.y.toFixed(1)],
-      underRgb: px(under), plainRgb: px(plain), ink: R.paddleInk(g, side) };
+    const plainFoot = T.project(cam, plainX, near, 0);
+    const ink = R.paddleInk(g, side), want = hexRgb(ink);
+    // Which of the bat's three channels its ink leans on, against the slate slab.
+    const lean = want.indexOf(Math.max(...want));
+    const rows = [];
+    for (let d = 1; d <= 16; d++) {
+      const u = px({ x: foot.x, y: foot.y + d / sy });
+      const p = px({ x: plainFoot.x, y: plainFoot.y + d / sy });
+      // How much more of the bat's own leading colour is here than on plain slab.
+      rows.push({ d, u, p, tint: +(u[lean] - p[lean] - (u[(lean + 1) % 3] - p[(lean + 1) % 3])).toFixed(1) });
+    }
+    const best = rows.reduce((a, b) => (b.tint > a.tint ? b : a));
+    return { side, ink, leanChannel: 'rgb'[lean], foot: [+foot.x.toFixed(1), +foot.y.toFixed(1)],
+      bestRowsBelowFoot: best.d, underRgb: best.u, plainRgb: best.p, tint: best.tint,
+      visible: best.tint >= 3, rows };
   });
   const ys = [];
   [[0, 0, 0], [800, 0, 0], [0, 600, 0], [800, 600, 0], [0, 600, -14], [800, 600, -14]].forEach((p) => ys.push(T.project(cam, p[0], p[1], p[2]).y));
@@ -134,6 +152,8 @@ try {
 }
 const out = path.join(HERE, LABEL + '.json');
 writeFileSync(out, JSON.stringify(result, null, 1) + '\n');
-console.log(JSON.stringify({ timing: result.timing, posed: result.posed, bats: result.probe.bats, letterbox: result.probe.letterbox,
+const brief = result.probe.bats.map((b) => ({ side: b.side, ink: b.ink, lean: b.leanChannel,
+  rowsBelowFoot: b.bestRowsBelowFoot, underRgb: b.underRgb, plainRgb: b.plainRgb, tint: b.tint, visible: b.visible }));
+console.log(JSON.stringify({ timing: result.timing, posed: result.posed, bats: brief, letterbox: result.probe.letterbox,
   native: result.probe.native, gl: result.probe.gl }, null, 1));
 console.log('wrote ' + out + ' and ' + result.png);
