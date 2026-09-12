@@ -6,9 +6,9 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "era 6 takes Super Mario 64's look -- blob shadows under the players and the N64's smeared filtering",
-    "item": "1295",
-    "sha": "a9b730d",
+    "feature": "the 3D figures are warmed before their era arrives, so the first frame no longer hitches",
+    "item": "1298",
+    "sha": "d7ce07d",
     "date": "2026-09-12"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
