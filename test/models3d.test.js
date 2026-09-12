@@ -230,10 +230,14 @@ test('eras 5 to 10 name a shading of their own and no model by default; eras 1 t
   for (let e = 1; e <= 10; e++) {
     const c = C.configFor(e);
     if (e < 5) { assert.ok(!c.model, 'era ' + e + ' stays a sprite'); continue; }
-    // Item 1283: no era wears the proof figure until its own model card lands.
+    // Item 1283: no era wears the proof figure. Once an era's own figure card
+    // lands (1253-1258; era 6 is item 1254) it names its own file, whose name
+    // begins with that era -- never the proof figure, and never another era's.
     for (const side of ['left', 'right']) {
       const s = C.configFor(e, side);
-      assert.ok(!s.model && !s.figure, 'era ' + e + ' ' + side + ' names no model: ' + (s.model || s.figure));
+      assert.ok(!s.model, 'era ' + e + ' ' + side + ' names no polygon model: ' + s.model);
+      assert.ok(!s.figure || s.figure.indexOf('era' + e + '-') === 0,
+        'era ' + e + ' ' + side + ' wears its own figure, not ' + s.figure);
     }
     assert.ok(M.MODES.includes(c.shading), 'era ' + e + ' shading ' + c.shading);
     modes.add(c.shading);
@@ -241,14 +245,17 @@ test('eras 5 to 10 name a shading of their own and no model by default; eras 1 t
   assert.strictEqual(modes.size, 6, 'one mode an era');
 });
 
-test('item 1283: each 3D era wears its own pair, twelve different sheets across the six', () => {
-  const sheets = new Set();
+// Item 1254 made era 6's pair real, so an era's two players are its own built
+// figures once its card has landed, and its own two stand-in sheets until then.
+test('item 1283: each 3D era wears its own pair, twelve different players across the six', () => {
+  const players = new Set();
   for (let e = 5; e <= 10; e++) {
-    const l = C.configFor(e, 'left').sheet, r = C.configFor(e, 'right').sheet;
-    assert.ok(l && r && l !== r, 'era ' + e + ' has two different figures: ' + l + ' / ' + r);
-    sheets.add(l); sheets.add(r);
+    const l = C.configFor(e, 'left'), r = C.configFor(e, 'right');
+    const a = l.figure || l.sheet, b = r.figure || r.sheet;
+    assert.ok(a && b && a !== b, 'era ' + e + ' has two different figures: ' + a + ' / ' + b);
+    players.add(a); players.add(b);
   }
-  assert.strictEqual(sheets.size, 12);
+  assert.strictEqual(players.size, 12);
 });
 
 test('item 1283: with the proof models loaded but not asked for, every 3D era draws its stand-ins', () => {
