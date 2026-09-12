@@ -216,3 +216,31 @@ diffs the two frames inside the page, so the pair is the same frame with one thi
    which runs after the layer has posed and relit.
 4. **Check what the era below you actually does before claiming to differ from it.** Half of this
    card's "change" was already true of era 5.
+
+## The players: a penguin and a frog at the machine's budget (item 1254)
+
+The two figures at the ends of this era's table are built in Blender by
+`tools/blender/era6-players.py`, run headless, and shipped as ordinary glTF files
+(`assets/models/era6-penguin.glb`, `era6-frog.glb`) with the six moves in them. The script takes
+`--who penguin|frog`, so one file makes both characters and the pair cannot drift apart.
+
+- **LESSONS: model to the machine's budget by spending segments, not by deleting parts.** The N64
+  drew about 100,000 polygons a second, which is about 350 triangles for a player once the table,
+  the park and the ball are paid for. The first build came out at 468 and 500 triangles with every
+  feature these two need -- a beak, a scarf, eyes on stalks, a cap with a brim. Nothing was
+  removed to make the budget: the round parts were given fewer sides (the body 8 sides to 6, the
+  head 8 x 5 to 7 x 4, the limbs 4 to 3, the frog's pupils a flat two-ring sphere), which cost 362
+  and 388 triangles and kept both silhouettes whole. A silhouette is what a player recognises at
+  this size; a facet count is not. The budget lives in one table at the top of the script
+  (`DETAIL`), so a later machine's figure is the same body at a higher number.
+- **The detail a mascot needs is in the outline, not the surface.** At this era's camera each
+  figure is about forty pixels tall under the fog, so the frog reads as a frog because its eyes
+  stand on top of its head and its cap has a brim -- shapes that change the outline. The belly
+  patch and the pupils cost triangles and are nearly invisible; they were kept small for that
+  reason.
+- **The material named `ink` is where the era's colour goes.** The game repaints it in that
+  paddle's colour every frame, so the penguin's scarf and the frog's cap always match the score.
+  Everything else is the character's own palette, off this era's page in `docs/ART.md`.
+- **Both figures ride one rig, and the rig is the proof figure's.** The six clips are keyed from
+  the same joint poses every era's figure uses (`tools/blender/player-proof.py`'s `skeleton`), so
+  the stroke and the step read the same on every rung of the ladder while the bodies differ.
