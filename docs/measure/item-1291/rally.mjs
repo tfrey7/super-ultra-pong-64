@@ -60,18 +60,31 @@ const page = (q) => 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/
 // random, so two runs photograph two differently coloured bats. Pinned here, on
 // the measurement page only, so the before and after pictures are the same frame
 // and the edge check knows exactly which ink it is hunting for.
+//
+// The ink must be one NOTHING ELSE IN THE ERA WEARS: the edge scan claims a pixel
+// whose channel ratios match the ink, and the left player's red gi is accent red
+// (#e03a3e), so pinning the bat to it made the scan trace the FIGURE -- 5 of 9
+// edges on the chunk grid instead of 3 of 3, identically on both trees. A purple
+// and a teal nothing else on this table uses keep the scan on the bat.
 const PLACE = `(() => {
   const g = window.__pong;
   const look = window.PongRender.eraLook(5);
-  look.paddleInk = (s, side) => (side === 'left' ? '#e03a3e' : '#2e6db4');
+  look.paddleInk = (s, side) => (side === 'left' ? '#a459d0' : '#40b898');
   g.serveDelay = 0; g.time = 12.5;
   g.ball.x = 520; g.ball.y = 250; g.ball.vx = 260; g.ball.vy = 60;
   g.left.y = 200; g.right.y = 190;
   return g.era;
 })()`;
 
+// --gpu lets Chrome use the real graphics card. Without it the playtest's own
+// flags apply and WebGL is rasterised on the CPU by SwiftShader, where a texture
+// fetch costs what a texture fetch costs -- which is the machine this card's
+// table got 4 ms a draw slower on, and not the machine anybody plays on.
+const GPU = process.argv.includes('--gpu');
+
 async function open(url) {
-  const chrome = await launchChrome(CHROME, ['--headless=new', '--disable-gpu', '--enable-unsafe-swiftshader',
+  const chrome = await launchChrome(CHROME, ['--headless=new',
+    ...(GPU ? [] : ['--disable-gpu', '--enable-unsafe-swiftshader']),
     '--hide-scrollbars', '--mute-audio', '--allow-file-access-from-files', '--window-size=1000,760',
     '--remote-debugging-port=' + PORT, '--no-first-run', '--no-default-browser-check', url],
   { name: 'item1291' }).catch(refusePortTaken);
@@ -150,14 +163,16 @@ async function main() {
       console.log(`warm-up thrown away: ${WARM} s, ${w.n} frames, mean ${w.mean.toFixed(2)} ms, p95 ${w.p95.toFixed(2)} ms; ` +
         `3D layer ${w.glDraws} draws at ${w.glMs.toFixed(2)} ms each`);
     }
-    const f = await frames(s);
+    const f = WINDOWS > 0 ? await frames(s) : [];   // --windows 0: just the picture and the slab
     f.forEach((r, i) => console.log(`frame window ${i + 1}: ${r.n} frames, mean ${r.mean.toFixed(2)} ms, p95 ${r.p95.toFixed(2)} ms; ` +
       `3D layer ${r.glDraws} draws at ${r.glMs.toFixed(2)} ms each`));
-    const mid = (xs) => { const a = xs.slice().sort((p, q) => p - q); return a.length % 2 ? a[(a.length - 1) / 2] : (a[a.length / 2 - 1] + a[a.length / 2]) / 2; };
-    const mean = f.reduce((a, r) => a + r.mean, 0) / f.length, gl = f.reduce((a, r) => a + r.glMs, 0) / f.length;
-    console.log(`frame mean of the ${f.length} windows: ${mean.toFixed(2)} ms a frame, ${gl.toFixed(2)} ms a 3D draw`);
-    console.log(`frame MEDIAN of the ${f.length} windows: ${mid(f.map((r) => r.mean)).toFixed(2)} ms a frame, ` +
-      `${mid(f.map((r) => r.glMs)).toFixed(2)} ms a 3D draw`);
+    if (f.length) {
+      const mid = (xs) => { const a = xs.slice().sort((p, q) => p - q); return a.length % 2 ? a[(a.length - 1) / 2] : (a[a.length / 2 - 1] + a[a.length / 2]) / 2; };
+      const mean = f.reduce((a, r) => a + r.mean, 0) / f.length, gl = f.reduce((a, r) => a + r.glMs, 0) / f.length;
+      console.log(`frame mean of the ${f.length} windows: ${mean.toFixed(2)} ms a frame, ${gl.toFixed(2)} ms a 3D draw`);
+      console.log(`frame MEDIAN of the ${f.length} windows: ${mid(f.map((r) => r.mean)).toFixed(2)} ms a frame, ` +
+        `${mid(f.map((r) => r.glMs)).toFixed(2)} ms a 3D draw`);
+    }
   } finally { ws.close(); await chrome.close(); }
   }
 
