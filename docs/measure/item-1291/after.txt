@@ -87,3 +87,13 @@ slab {"gl":true,"material":"MeshLambertMaterial","flat":true,"map":"64 x 64","af
 edge: the left bat's box [129,314,159,384] (ink #a459d0) on the 800 x 600 page, ?display=off
 edge: the bat's left edge over 58 rows, as [x, from row, rows]: [[140,320,8],[138,328,22],[135,350,28]]
 edge: 3 of 3 edge positions sit on a 2.5-pixel chunk boundary (x = 0, 3, 5, 8, 10, 13 ...); 1 of 1 inner runs are whole chunks tall (2 or 3 rows, or a multiple of 2.5 rounded)
+
+=== attempt 2, the same check on the MERGED tree (master 434133c merged in, 25 commits, clean) ===
+item 1291 after-merged: . (G:/Claude Stuff/super-ultra-pong-64-item-1291)
+era 5; shot -> docs/shots/item-1291/after-merged-era5-rally.png
+slab {"gl":true,"material":"MeshLambertMaterial","flat":true,"map":"64 x 64","affine":true,"rail":"MeshLambertMaterial + vertex colours"}
+edge: the left bat's box [129,314,159,384] (ink #a459d0) on the 800 x 600 page, ?display=off
+edge: the bat's left edge over 58 rows, as [x, from row, rows]: [[140,320,8],[138,328,22],[135,350,28]]
+edge: 3 of 3 edge positions sit on a 2.5-pixel chunk boundary (x = 0, 3, 5, 8, 10, 13 ...); 1 of 1 inner runs are whole chunks tall (2 or 3 rows, or a multiple of 2.5 rounded)
+note: the before/after PAIR was taken before the merge, both sides off base 95ae4b9, so the only
+difference between those two pictures is this card. This run confirms the merged tree draws the same.
