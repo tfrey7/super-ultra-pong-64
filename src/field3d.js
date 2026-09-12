@@ -344,6 +344,10 @@
   var figKept = {};             // side + ':' + name -> one posed instance
   var figuresTaken = false;     // this draw stood the figures; src/models3d.js asks once (takeFigures)
   var figuresOff = !!(root.location && /[?&](models|characters|figures)=off\b/.test(String(root.location.search || '')));
+  // Item 1299: what the first frame that draws a figure pays, in ms, and what
+  // the warm-up paid instead. figureTimings() answers it; a measurement reads it.
+  var figTimes = { parseMs: 0, buildMs: 0, compileMs: 0, warmMs: 0, warms: 0, warmed: [] };
+  function nowMs() { return root.performance && root.performance.now ? root.performance.now() : 0; }
 
   /** The clip a src/characters.js beat plays. */
   function clipFor(beat) { return CLIP_OF[beat] || 'idle'; }
@@ -373,6 +377,7 @@
     var files = root.PongFigureFiles;
     if (files && typeof files[name] === 'string') {
       f = figFiles[name] = { state: 'loading', gltf: null, pong: null, why: '' };
+      var t0 = nowMs();
       try {
         new state3.three.GLTFLoader().parse(base64Buffer(files[name]), '', function (gltf) {
           f.gltf = gltf;
@@ -380,6 +385,7 @@
           f.state = 'ready';
         }, function (e) { f.state = 'failed'; f.why = String((e && e.message) || e); });
       } catch (e) { f.state = 'failed'; f.why = String((e && e.message) || e); }
+      figTimes.parseMs += nowMs() - t0;
       return null;
     }
     if (!figAsked[name] && root.document && root.document.body) {
@@ -397,6 +403,7 @@
   function kept(side, name, f) {
     var key = side + ':' + name;
     if (figKept[key]) return figKept[key];
+    var tBuild = nowMs();
     var THREE = state3.three;
     var body = THREE.SkeletonUtils.clone(f.gltf.scene);
     var ink = [];
@@ -423,6 +430,7 @@
     state3.scene.add(shadow);
     figKept[key] = { side: side, name: name, body: body, mixer: mixer, actions: actions, ink: ink, shadow: shadow,
       pong: f.pong, clip: null, since: 0, prev: null, prevAt: 0 };
+    figTimes.buildMs += nowMs() - tBuild;
     return figKept[key];
   }
 
@@ -566,6 +574,12 @@
     clipFor: clipFor,
     clipTime: clipTime,
     figureState: function (name) { var f = figFiles[name]; return f ? { state: f.state, why: f.why || '' } : null; },
+    /** Item 1299: what unpacking, building and compiling the figures has cost this page, in ms. */
+    figureTimings: function () {
+      return { parseMs: +figTimes.parseMs.toFixed(2), buildMs: +figTimes.buildMs.toFixed(2),
+        compileMs: +figTimes.compileMs.toFixed(2), warmMs: +figTimes.warmMs.toFixed(2),
+        warms: figTimes.warms, warmed: figTimes.warmed.slice() };
+    },
     /**
      * Whether the last draw stood the glTF figures, answered ONCE: src/models3d.js
      * asks as it is about to draw the polygon figures over the same frame, and
