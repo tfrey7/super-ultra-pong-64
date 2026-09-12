@@ -810,10 +810,9 @@
 
   var stripe = { tiles: null, ctx: null, patterns: null };
   function stripeTiles() {
-    if (stripe.tiles !== null) return stripe.tiles;
-    stripe.tiles = false;
+    if (stripe.tiles) return stripe.tiles;
     var doc = root.document;
-    if (!doc || typeof doc.createElement !== 'function') return false;
+    if (!doc || typeof doc.createElement !== 'function') return false;   // headless: nothing to build on, ask again next frame
     stripe.tiles = [0, 1].map(function (parity) {
       var c = doc.createElement('canvas');
       c.width = 1;
@@ -1157,6 +1156,7 @@
     fieldSetup: fieldSetup,       // the mirror in the slab, carried forward by eras 9 and 10
     mirrorTransforms: mirrorTransforms,
     interlacePlan: interlacePlan,
+    interlace: interlace,         // the one pattern fill, for the era's own test
     MIRROR: MIRROR,
     INTERLACE: INTERLACE,
     card: { flash: '#9fc4ff', wipe: ['#000000', '#141c33', '#2d3e50'], box: '#0b1020', border: '#2d3e50',
