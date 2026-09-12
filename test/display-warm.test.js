@@ -47,12 +47,34 @@ test('every row with a screen is drawn once on a layer, the layer copied once, t
     assert.strictEqual(D.warmOverlays(page), true);
     const withScreens = D.ROWS.filter((r) => r.overlay && r.overlay !== 'none');
     assert.strictEqual(withScreens.length, 11, 'every rung from the arcade to the 360 has a screen');
-    assert.deepStrictEqual(seen.map((s) => s.row), withScreens, 'each row once, with its own settings (strength and all)');
-    assert.deepStrictEqual(seen.map((s) => s.kind), withScreens.map((r) => r.overlay));
+    // Item 1313: from the top of the ladder DOWN, so the work canvases the
+    // tubes share are left at era 0's size -- the era the first frame draws.
+    const topDown = withScreens.slice().reverse();
+    assert.deepStrictEqual(seen.map((s) => s.row), topDown, 'each row once, top of the ladder down, with its own settings (strength and all)');
+    assert.deepStrictEqual(seen.map((s) => s.kind), topDown.map((r) => r.overlay));
     const layer = seen[0].ctx.canvas;
     assert.ok(seen.every((s) => s.ctx.canvas === layer), 'all on one layer, never on the page');
     assert.deepStrictEqual([layer.width, layer.height], [1600, 1200], 'the page\'s size, so each tube\'s shade is built at the size it is used');
-    assert.ok(seen.every((s) => s.info.native === D.canvas() && s.info.era === -1), 'over the native picture, as no real era');
+    assert.ok(seen.every((s) => s.info.era === -1), 'as no real era');
+    // Item 1313: a stand-in native picture at each row's OWN size, not the
+    // live one -- a tube's work canvases are made at the size it is handed,
+    // and warming them all at the title's size only had them rebuilt at the
+    // switch.
+    assert.deepStrictEqual(seen.map((s) => [s.info.native.width, s.info.native.height]),
+      topDown.map((r) => [r.w, r.h]), 'each row warmed with a native picture of its own size');
+    assert.ok(seen.every((s) => s.info.native !== D.canvas()), 'a stand-in, never the live native picture');
+    // Item 1313: at a clock reading that puts era 1's rolling band of
+    // brightness inside its tube. At time 0 it sits wholly above the picture,
+    // the clip culls it, and the warm-up builds nothing for it -- which left
+    // the first era change a 45.8-104.2 ms frame. The two numbers are the
+    // band's speed and its height in src/display-crt.js.
+    const atari = seen.find((s) => s.row.era === 1);
+    const rect = atari.rect, t = atari.info.time;
+    assert.ok(t > 0, 'the warm-up does not run at time 0');
+    const band = rect.h * 0.22;
+    const y = rect.y - band + ((t * 0.09) % 1) * (rect.h + band * 2);
+    assert.ok(y - band >= rect.y && y + band <= rect.y + rect.h,
+      'era 1\'s rolling band falls wholly inside the tube at the warm-up\'s time');
     assert.deepStrictEqual(calls.map((c) => c[0]), ['drawImage', 'clearRect'], 'the layer copied once, then the page cleared');
     assert.strictEqual(calls[0][1], layer);
     assert.deepStrictEqual(calls[1].slice(1), [0, 0, 1600, 1200]);

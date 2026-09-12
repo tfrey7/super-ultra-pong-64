@@ -268,28 +268,22 @@
    *    those are made at whatever size the native picture it is handed has.
    *    The rows are warmed from the top of the ladder DOWN, so the shared work
    *    canvases are left at era 0's size, the era the first real frame draws.
-   * 2. The rows are warmed a SECOND time straight onto the page, and the page is
-   *    then read back one pixel before it is cleared. The layer pass above does
-   *    not cover an overlay's draws onto the page itself: era 1's RF tube ends
-   *    with a rolling band of brightness (a linear gradient filled 'lighter'
-   *    through a rectangular clip) and its snow (a repeating pattern, 'lighter'),
-   *    and both were still being drawn onto the page for the first time the frame
-   *    the first ring passed the centre. That frame was 45.8, 54.1 and 104.2 ms
-   *    on 3 of 3 fresh climbs at 1920 x 1080 with the GPU on; with just those two
-   *    switched off and every other part of the tube left on, 4.4 ms (2 of 2),
-   *    and with the tube's fringes and glow off instead and the band and snow
-   *    left on, 49.9 and 50.1 ms -- so the band and the snow are the whole cost.
-   *    The one-pixel read is what forces Chrome to execute those draws before the
-   *    clear discards them (item 1218's rule, which the layer was standing in
-   *    for): without it the second pass changes nothing.
-   *    Readings: docs/measure/item1285/pace-1313-*.json.
-   * 3. Both passes warm at WARM_TIME, not at time 0. An overlay that moves with
-   *    the clock can put its draw entirely outside the picture at one moment,
-   *    and a draw that falls outside the clip is culled -- it builds nothing.
-   *    era 1's band is at `rect.y - band` at time 0, which is wholly above the
-   *    tube and clipped away, so the first pass onto the page (which had the
-   *    read-back and everything else) still left 45.9, 70.9 and 75.0 ms on 3 of
-   *    3 climbs. WARM_TIME puts the band across the middle of the picture.
+   * 2. The warm-up runs at WARM_TIME, not at time 0. An overlay that moves with
+   *    the clock can put a draw entirely outside the picture at one moment, and
+   *    a draw that falls outside the clip is culled: it builds nothing, and the
+   *    warm-up silently misses it. era 1's RF tube ends with a band of
+   *    brightness rolling down the tube (a linear gradient filled 'lighter'
+   *    through a rectangular clip) and its snow (a repeating pattern,
+   *    'lighter'), and at time 0 the band is at `rect.y - band`, wholly above
+   *    the tube. So it was still drawn for the first time the frame the first
+   *    ring passed the centre: 45.8, 54.1 and 104.2 ms on 3 of 3 fresh climbs at
+   *    1920 x 1080 with the GPU on, a trace of which names a 63.6 ms GPU task
+   *    that is two FillRRectOp of 31.0 ms each. The A/B: era 1's row with no
+   *    overlay at all, 8.3 ms; the band and snow switched off and every other
+   *    part of the tube left on, 4.4 ms; the tube's fringes and glow off instead
+   *    and the band and snow on, 49.9 and 50.1 ms.
+   *    Readings: docs/measure/item1285/pace-1313-*.json, and
+   *    1313-trace-rung0.trace.json.gz beside them.
    */
   // The band rolling down era 1's tube sits at ((t * 0.09) % 1) of its travel;
   // 5.56 s puts it at half way, wholly inside the picture, which is the only
@@ -329,15 +323,12 @@
       layer.height = page.height;
       var x = layer.getContext('2d');
       if (!x) return false;
-      var stands = [];
       for (var e = ROWS.length - 1; e >= 0; e--) {
         var r = ROWS[e];
         var fn = OVERLAYS[r.overlay];
         if (!fn || fn === OVERLAYS.none) continue;
         var rect = fitRect(page.width, page.height, r.aspect);
-        var stand = nativeLike(r) || native;
-        stands.push({ r: r, rect: rect, stand: stand });
-        warmRow(x, r, stand, rect);
+        warmRow(x, r, nativeLike(r) || native, rect);
       }
       if (drew) {
         pageCtx.save();
@@ -345,21 +336,6 @@
         pageCtx.drawImage(layer, 0, 0);
         pageCtx.restore();
       }
-      // The same rows again, this time onto the page, where an overlay's own
-      // page draws land in play.
-      for (var i = 0; i < stands.length; i++) warmRow(pageCtx, stands[i].r, stands[i].stand, stands[i].rect);
-      // Make Chrome execute them before the clear below throws them away: one
-      // pixel of the page read into a scratch canvas and then out of it. Taking
-      // the page as a drawing SOURCE is what forces its pending draws through,
-      // and, unlike reading the page itself, it is allowed on a page whose
-      // canvas an image has tainted (off disk, every era 3 picture does).
-      try {
-        var peek = document.createElement('canvas');
-        peek.width = 1; peek.height = 1;
-        var px = peek.getContext('2d');
-        px.drawImage(page, 0, 0, 1, 1, 0, 0, 1, 1);
-        try { px.getImageData(0, 0, 1, 1); } catch (taintErr) { /* the draw above already flushed */ }
-      } catch (readErr) { /* an optimisation only */ }
     } catch (err) {
       // An optimisation only.
     } finally {
