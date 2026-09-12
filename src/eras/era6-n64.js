@@ -892,7 +892,9 @@
     var F3 = root.PongField3D;
     var I3 = F3 && typeof F3.available === 'function' && F3.available() && typeof F3.internals === 'function'
       ? F3.internals() : null;
-    if (I3) fieldSetup(I3, state);
+    // through the look, not the local function, so a measurement can take it off for an A/B
+    var mine = P && typeof P.eraLook === 'function' ? P.eraLook(6) : null;
+    if (I3 && mine && typeof mine.fieldSetup === 'function') mine.fieldSetup(I3, state);
 
     // 1-3. the world, at half resolution, copied up smoothed: the blur
     var buf = T.offscreen(BUFFER.key, BUFFER.w, BUFFER.h);
