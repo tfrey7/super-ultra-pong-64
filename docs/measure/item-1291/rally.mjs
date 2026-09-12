@@ -31,6 +31,14 @@ const ROOT = path.resolve(arg('root', OWN));
 const OUT = path.join(OWN, 'docs', 'shots', 'item-1291');
 const PORT = Number(arg('port', 9491));
 const LABEL = arg('label', 'after');
+// The first seconds of a fresh page are not the game's speed: SwiftShader compiles
+// each material's program the first time it is drawn, and this era's slab carries a
+// custom one. WARM seconds of play are thrown away before the first window, and the
+// windows' MEDIAN is the number to compare -- one long compile frame moves a mean
+// by 4 ms and a median not at all.
+const WINDOWS = Number(arg('windows', 3));
+const WARM = Number(arg('warm', 0));
+const ONLY = arg('only', 'both');          // frames | edge | both
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -48,8 +56,14 @@ const page = (q) => 'file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/
 // The rally frame: the ball two thirds of the way to the computer, heading there,
 // each paddle a little off its line, the clock pinned so the camera's wobble is
 // the same pose on both runs.
+// Era 5 wears era 1's paddle colours (look.like = 1), which the session draws at
+// random, so two runs photograph two differently coloured bats. Pinned here, on
+// the measurement page only, so the before and after pictures are the same frame
+// and the edge check knows exactly which ink it is hunting for.
 const PLACE = `(() => {
   const g = window.__pong;
+  const look = window.PongRender.eraLook(5);
+  look.paddleInk = (s, side) => (side === 'left' ? '#e03a3e' : '#2e6db4');
   g.serveDelay = 0; g.time = 12.5;
   g.ball.x = 520; g.ball.y = 250; g.ball.vx = 260; g.ball.vy = 60;
   g.left.y = 200; g.right.y = 190;
@@ -78,16 +92,16 @@ async function open(url) {
   return { chrome, ws, s };
 }
 
-async function frames(s) {
+async function frames(s, seconds) {
   const out = [];
-  for (let w = 0; w < 3; w++) {
+  for (let w = 0; w < (seconds ? 1 : WINDOWS); w++) {
     out.push(await s.eval(`new Promise((done) => {
       const F = window.PongField3D, g = window.__pong;
       const s0 = F.stats(), t = [];
       function tick(now) {
         t.push(now);
         g.right.y = g.ball.y - g.right.h / 2;          // the computer on the ball: no point mid-reading
-        if (now - t[0] < 3000) requestAnimationFrame(tick);
+        if (now - t[0] < ${seconds ? seconds * 1000 : 3000}) requestAnimationFrame(tick);
         else {
           const s1 = F.stats(), d = [];
           for (let i = 1; i < t.length; i++) d.push(t[i] - t[i - 1]);
@@ -108,7 +122,9 @@ async function main() {
   console.log(`item 1291 ${LABEL}: ${rel} (${ROOT})`);
 
   // 1. the ordinary page: the rally frame and the frame clock
-  let { chrome, ws, s } = await open(page());
+  let chrome, ws, s;
+  if (ONLY !== 'edge') {
+  ({ chrome, ws, s } = await open(page()));
   try {
     await sleep(2500);
     const era = await s.eval(PLACE);
@@ -129,14 +145,24 @@ async function main() {
     })()`);
     console.log(`era ${era}; shot -> ${path.relative(OWN, file)}`);
     console.log('slab ' + JSON.stringify(slab));
+    if (WARM > 0) {
+      const w = (await frames(s, WARM))[0];
+      console.log(`warm-up thrown away: ${WARM} s, ${w.n} frames, mean ${w.mean.toFixed(2)} ms, p95 ${w.p95.toFixed(2)} ms; ` +
+        `3D layer ${w.glDraws} draws at ${w.glMs.toFixed(2)} ms each`);
+    }
     const f = await frames(s);
     f.forEach((r, i) => console.log(`frame window ${i + 1}: ${r.n} frames, mean ${r.mean.toFixed(2)} ms, p95 ${r.p95.toFixed(2)} ms; ` +
       `3D layer ${r.glDraws} draws at ${r.glMs.toFixed(2)} ms each`));
+    const mid = (xs) => { const a = xs.slice().sort((p, q) => p - q); return a.length % 2 ? a[(a.length - 1) / 2] : (a[a.length / 2 - 1] + a[a.length / 2]) / 2; };
     const mean = f.reduce((a, r) => a + r.mean, 0) / f.length, gl = f.reduce((a, r) => a + r.glMs, 0) / f.length;
-    console.log(`frame mean of the three windows: ${mean.toFixed(2)} ms a frame, ${gl.toFixed(2)} ms a 3D draw`);
+    console.log(`frame mean of the ${f.length} windows: ${mean.toFixed(2)} ms a frame, ${gl.toFixed(2)} ms a 3D draw`);
+    console.log(`frame MEDIAN of the ${f.length} windows: ${mid(f.map((r) => r.mean)).toFixed(2)} ms a frame, ` +
+      `${mid(f.map((r) => r.glMs)).toFixed(2)} ms a 3D draw`);
   } finally { ws.close(); await chrome.close(); }
+  }
 
   // 2. ?display=off: era 5 straight onto the 800 x 600 page; the left bat's edges
+  if (ONLY === 'frames') return;
   ({ chrome, ws, s } = await open(page('&display=off')));
   try {
     await sleep(2500);
