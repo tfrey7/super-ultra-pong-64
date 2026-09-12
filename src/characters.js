@@ -196,15 +196,24 @@
           sheets: { left: 'era7-skater-left-sheet', right: 'era7-skater-right-sheet' },
           frame: { w: 44, h: 84 }, hand: { x: 44, y: 66 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 10,
           shading: 'cel' },
-    // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
-    // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
-    // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
-    // fps 3, not the bible's 8: the rig has one rate for idle, move and win,
-    // and at 8 a two-frame breath reads as a flicker. The players are clipped
-    // to the picture between the era's 52-pixel letterbox bars (item 1249).
+    // PlayStation 2 (item 1256): the two OPERATIVES, Blender-built figures --
+    // tools/blender/era8-players.py, assets/models/era8-operative-{left,right}.
+    // The left one is the midnight operative (navy suit, amber visor, a comms
+    // pack and a raised collar), the right the slate one (slate suit, flare-blue
+    // visor, thigh pouches and shoulder pads): two silhouettes, never one figure
+    // twice (Tim, 2026-09-11: "can't reuse that primitive character like that").
+    // Each is 820 and 796 triangles, the PlayStation 2's budget, smooth-shaded
+    // for the era's phong lighting, and each file carries the six clips the 3D
+    // layer plays. The glTF layer (src/field3d.js) reads these names as figures
+    // and loads <name>.glb.js; with no WebGL src/models3d.js draws the same two
+    // operatives from <name>.js, so this era names no sprite sheet at all and
+    // item 1232's stand-in cut-outs no longer draw here.
+    // modelScale 1: the files are already the realism ladder's 250 table units
+    // tall (docs/ART.md section 8), not the proof figure's 90. The players stay
+    // clipped to the picture between the era's 52-pixel letterbox bars (item 1249).
     8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
-          sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
-          frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
+          models: { left: 'era8-operative-left', right: 'era8-operative-right' },
+          modelScale: 1, frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3, clip: { y0: 52, y1: 548 },
           shading: 'specular' },
     // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
