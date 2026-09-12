@@ -27,8 +27,15 @@ import { CdpConnection } from '../../../tools/cdp.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..', '..');
 const arg = (name, d) => { const i = process.argv.indexOf(name); return i !== -1 ? Number(process.argv[i + 1]) : d; };
+const str = (name, d) => { const i = process.argv.indexOf(name); return i !== -1 ? process.argv[i + 1] : d; };
 const PORT = arg('--port', 9481);
 const ROUNDS = arg('--rounds', 2);
+// Item 1299's copy: since item 1283 NO era block names a figure, so the reading
+// asks for one the way a test does (?figure=<name>), and it can be taken over
+// one era rather than all six.
+const ERAS = str('--eras', '5,6,7,8,9,10').split(',').map(Number);
+const FIGURE = str('--figure', 'player-proof-hi');
+const LABEL = str('--label', 'run');
 const CHROME = ['C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'].find((p) => existsSync(p));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -49,7 +56,7 @@ function stats(d) {
 }
 
 async function one(s, era, setup) {
-  await s.send('Page.navigate', { url: `${base}?era=${era}${setup === 'polygon' ? '&figures=off' : ''}` });
+  await s.send('Page.navigate', { url: `${base}?era=${era}&figure=${FIGURE}${setup === 'polygon' ? '&figures=off' : ''}` });
   for (let t = 0; t < 100; t++) {
     if (await s.eval('!!(window.__pong && document.getElementById("field"))').catch(() => false)) break;
     await sleep(100);
@@ -112,11 +119,11 @@ try {
   await s.send('Page.enable');
   await s.send('Runtime.enable');
   for (let round = 0; round < ROUNDS; round++) {
-    for (let era = 5; era <= 10; era++) {
+    for (const era of ERAS) {
       for (const setup of round % 2 ? ['polygon', 'figures'] : ['figures', 'polygon']) {
         const r = await one(s, era, setup);
         rows.push({ round, ...r });
-        console.log(`${setup.padEnd(8)} era ${String(era).padStart(2)} ${r.name.padEnd(17)} file ${(r.file && r.file.state) || '-'} ` +
+        console.log(`${setup.padEnd(8)} era ${String(era).padStart(2)} ${String(r.name).padEnd(17)} file ${(r.file && r.file.state) || '-'} ` +
           `figures drawn ${r.drawn}/${r.asked}: mean ${r.mean} ms, p95 ${r.p95} ms over ${r.frames} frames`);
       }
     }
@@ -125,5 +132,6 @@ try {
   try { ws && ws.close(); } catch { /* gone */ }
   await chrome.close();
 }
-writeFileSync(path.join(HERE, 'figspeed.json'), JSON.stringify({ taken: new Date().toISOString(), rows }, null, 1) + '\n');
-console.log('wrote ' + path.join(HERE, 'figspeed.json'));
+const out = path.join(HERE, `figspeed-${LABEL}.json`);
+writeFileSync(out, JSON.stringify({ taken: new Date().toISOString(), figure: FIGURE, eras: ERAS, rows }, null, 1) + '\n');
+console.log('wrote ' + out);

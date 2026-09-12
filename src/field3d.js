@@ -543,21 +543,37 @@
   }
 
   /**
+   * The figures to have ready while era N is on screen: its own two, and the
+   * two the NEXT era wants -- one era ahead and no further, so a match never
+   * loads figures for eras it has not nearly reached. Pure: node --test reads it.
+   */
+  function figuresWanted(era) {
+    era = Math.floor(era) || 0;
+    var out = [], seen = {};
+    [era, era + 1].forEach(function (e) {
+      figureNamesFor(e).forEach(function (job) {
+        var key = job.side + ':' + job.name;
+        if (seen[key]) return;
+        seen[key] = true;
+        out.push(job);
+      });
+    });
+    return out;
+  }
+
+  /**
    * Line up the figures this era and the next one want, and ask for their files
    * now. Asking is a script tag and costs the frame nothing; it is the waiting
    * that a mid-match arrival cannot afford.
    */
   function warmFigures(era) {
-    era = Math.floor(era) || 0;
-    for (var e = era; e <= era + 1; e++) {
-      figureNamesFor(e).forEach(function (job) {
-        var key = job.side + ':' + job.name;
-        if (warmDone[key] || figKept[key]) return;
-        for (var i = 0; i < warmWanted.length; i++) if (warmWanted[i].side + ':' + warmWanted[i].name === key) return;
-        warmWanted.push(job);
-        if (!warmAsked[job.name]) { warmAsked[job.name] = true; figure(job.name); }
-      });
-    }
+    figuresWanted(era).forEach(function (job) {
+      var key = job.side + ':' + job.name;
+      if (warmDone[key] || figKept[key]) return;
+      for (var i = 0; i < warmWanted.length; i++) if (warmWanted[i].side + ':' + warmWanted[i].name === key) return;
+      warmWanted.push(job);
+      if (!warmAsked[job.name]) { warmAsked[job.name] = true; figure(job.name); }
+    });
     return warmWanted.length;
   }
 
@@ -679,6 +695,8 @@
     warmFigures: function (era) { return ensure() ? warmFigures(era) : 0; },
     /** The { side, name } figures an era wants, none when that era has no 3D figures. */
     figureNamesFor: figureNamesFor,
+    /** The { side, name } figures to have ready while era N is on screen: its own, and the next era's. */
+    figuresWanted: figuresWanted,
     /** Item 1299: what unpacking, building and compiling the figures has cost this page, in ms. */
     figureTimings: function () {
       return { parseMs: +figTimes.parseMs.toFixed(2), buildMs: +figTimes.buildMs.toFixed(2),
