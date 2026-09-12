@@ -178,13 +178,16 @@
           shading: 'flat' },   // item 1283: no model until era 5's own lands (1253-1258)
     // Nintendo 64 (item 1230, docs/ART.md Era 6): the penguin holds the player's paddle and the
     // frog the computer's, chunky toy mascots drawn smoothed and fogged at their paddle's depth
-    // (capped at 0.35, as the era caps its paddles). Sheets derived by
-    // assets/pixellab/era6-n64-sheets.py, embedded in src/textures3d.js and handed to the sprite
-    // loader by src/eras/era6-n64.js. A STAND-IN: Tim ruled sprite players out for the 3D eras
-    // ("that is not gonna look AAA here dude"); polygon models of these two replace this block.
+    // (capped at 0.35, as the era caps its paddles). Item 1254 made them REAL: two Blender-built
+    // glTF figures, tools/blender/era6-players.py -- a round penguin in a scarf (362 triangles)
+    // and a round frog in a cap (388), the machine's own budget of about 350 each -- loaded,
+    // lit and animated by src/field3d.js, their scarf and cap the paddle's ink. The sprite
+    // stand-ins are gone from this era (Tim: "that is not gonna look AAA here dude"); the sheets
+    // era 6's own file still primes are now unused, and until a figure's file has loaded the
+    // rig's placeholder draws in its place.
     6:  { skin: '#e8b890', body: '#283080', scale: 2.6, res: 3, round: true,
-          sheets: { left: 'era6-penguin', right: 'era6-frog' },
-          frame: { w: 32, h: 44 }, hand: { x: 29, y: 28 }, anchor: { dx: 0, dy: 0, dz: 24 },
+          figures: { left: 'era6-penguin', right: 'era6-frog' },
+          anchor: { dx: 0, dy: 0, dz: 24 },
           fps: 6, smooth: true, fogCap: 0.35,
           shading: 'gouraud' },
     // Dreamcast (item 1231): two Jet Set Radio-manner skaters, cut from pixflux by
@@ -246,6 +249,12 @@
     return per || own.model || null;
   }
 
+  /** The glTF figure one side of an era block wears: its own of `figures`, else `figure` (item 1254). */
+  function figureOf(own, side) {
+    var per = own.figures && own.figures[side === 'right' ? 'right' : 'left'];
+    return per || own.figure || null;
+  }
+
   /** The pixellab name one side of an era block wears: its own of `sheets`, else `sheet`. */
   function sheetOf(own, side) {
     var per = own.sheets && own.sheets[side === 'right' ? 'right' : 'left'];
@@ -262,9 +271,11 @@
     var c = Object.assign({}, DEFAULTS, own);
     delete c.sheets;
     delete c.models;
+    delete c.figures;
     c.side = side === 'right' ? 'right' : 'left';
     c.sheet = sheetOf(own, c.side);
     c.model = modelOf(own, c.side);
+    c.figure = figureOf(own, c.side);
     c.frames = Object.assign({}, DEFAULTS.frames, own.frames || {});
     c.anchor = Object.assign({}, DEFAULTS.anchor, own.anchor || {});
     if (!c.sheet) {

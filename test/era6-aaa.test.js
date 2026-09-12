@@ -26,11 +26,12 @@ function pngSize(file) {
 }
 
 // ------------------------------------------------------------ the players
+// Item 1254 turned the pair into built figures, so the block names glTF files
+// rather than sheets; test/era6-figures.test.js pins the figures themselves.
 test('the penguin holds the player\'s paddle and the frog the computer\'s, drawn smoothed and fogged like the paddles', () => {
   const left = C.configFor(6, 'left'), right = C.configFor(6, 'right');
-  assert.strictEqual(left.sheet, 'era6-penguin');
-  assert.strictEqual(right.sheet, 'era6-frog');
-  assert.deepStrictEqual(left.frame, { w: 32, h: 44 });
+  assert.strictEqual(left.figure, 'era6-penguin');
+  assert.strictEqual(right.figure, 'era6-frog');
   assert.strictEqual(left.smooth, true, 'the N64 smoothed every texel');
   assert.strictEqual(left.fogCap, 0.35, 'fogged no more than the era fogs its paddles');
   assert.strictEqual(left.anchor.dz, 24, 'the hand at the paddle box\'s top');
@@ -38,13 +39,19 @@ test('the penguin holds the player\'s paddle and the frog the computer\'s, drawn
   for (const b of C.BEATS) assert.ok(left.frames[b] > 0, 'the sheet has ' + b);
 });
 
-test('each sheet is the rig\'s six rows at the block\'s frame size, embedded as a data: URI, with its manifest entry', () => {
+// The sheets this era generated are no longer what draws its players (item
+// 1254), but they are still shipped and primed, so their size and their cost
+// stay pinned -- at the frame this era made them at, 32 x 44, which was the
+// block's `frame` until the figures replaced it.
+const SHEET_FRAME = { w: 32, h: 44 };
+
+test('each sheet is the rig\'s six rows at the frame size it was made at, embedded as a data: URI, with its manifest entry', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(ART, 'manifest.json'), 'utf8'));
   const cfg = C.configFor(6, 'left');
   const cols = Math.max(...C.BEATS.map((b) => cfg.frames[b]));
   for (const name of D.SHEETS) {
     const file = path.join(ART, 'tex3d-' + name + '.png');
-    assert.deepStrictEqual(pngSize(file), { w: cols * cfg.frame.w, h: C.BEATS.length * cfg.frame.h }, name);
+    assert.deepStrictEqual(pngSize(file), { w: cols * SHEET_FRAME.w, h: C.BEATS.length * SHEET_FRAME.h }, name);
     assert.ok(EMBED.TILES[name] && EMBED.TILES[name].startsWith('data:image/png;base64,'), name + ' is embedded');
     const entry = manifest.images.find((e) => e.file === 'tex3d-' + name + '.png');
     assert.ok(entry && entry.derivedFrom && entry.cost.generations === 0, name + ' is derived, and costs nothing');
@@ -62,11 +69,9 @@ test('era 6 spent at most 12 pixellab generations', () => {
   assert.ok(spent > 0 && spent <= 12, 'spent ' + spent);
 });
 
-test('no part of a figure reaches past its paddle\'s inner face: the hand is on the outer edge', () => {
-  const cfg = C.configFor(6, 'left');
-  const reach = (cfg.frame.w - cfg.hand.x) * cfg.scale;   // table units past the outer edge, toward the ball
-  assert.ok(reach <= 14, 'reaches ' + reach + ' units, the paddle is 14 wide');
-});
+// The sheet's version of this check moved to test/era6-figures.test.js with the
+// figures themselves (item 1254): it now measures the built figure's own box
+// against the hand the file records, not a sprite frame's width.
 
 // ------------------------------------------------------------ the park
 test('the flagpoles stand just beyond the end rails, where the bible puts them', () => {
