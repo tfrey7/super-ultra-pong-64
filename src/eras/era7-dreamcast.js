@@ -69,12 +69,19 @@
   var STAGE = {
     slab: { lift: '#10407e', specular: '#9ad7ff', shininess: 90 },
     net: { colour: '#eaf6ff', lift: '#2b5f92', specular: '#ffffff', shininess: 60 },
-    bat: { lift: '#3a2810', specular: '#ffffff', shininess: 120 },
+    // The bats keep the colour the session earned (R4), so their lift is only a
+    // little off black and their gleam is grey: a white specular at the
+    // shininess the slab wears washed the near face out to pale (measured on
+    // the first pass of this card's after-frame).
+    bat: { lift: '#1a1a22', specular: '#777777', shininess: 45 },
     ball: { lift: '#78889a', specular: '#ffffff', shininess: 200 },
-    // The ring: a bright band lying on the table top, inside its edges, the one
-    // shape a 1999 fighter's stage is known by. Circular geometry stretched
-    // across the field's 800 x 600, 0.4 above the top like the painted lines.
-    ring: { radius: 292, tube: 4.5, segments: 10, sides: 64, colour: '#ffd400', lift: '#ffd400', lift3: 0.4 },
+    // The ring: the painted boundary a 1999 fighter's stage is known by, lying
+    // on the table top inside its edges. Circular geometry stretched across the
+    // field's 800 x 600, 0.4 above the top like the other painted lines, and
+    // LIT rather than glowing -- a lift as bright as the fill made a neon hoop
+    // that owned the frame (first pass, same measurement).
+    ring: { radius: 262, tube: 2.6, segments: 10, sides: 72, colour: '#ffe9a8', lift: '#33290d', lift3: 0.4,
+      across: 352 },
     // The ball's third tone, drawn only over the 3D field: two hard cel bands
     // become white, shade and deep shade, so it reads as a round lit sphere
     // rather than a sticker. Flat fills still -- no gradients anywhere here.
@@ -404,10 +411,10 @@
     if (!THREE || !THREE.Mesh || !THREE.TorusGeometry || !I.parts.group) return null;
     var mat = THREE.MeshPhongMaterial ? new THREE.MeshPhongMaterial({ color: G.colour })
       : new THREE.MeshBasicMaterial({ color: G.colour });
-    dress(mat, { colour: G.colour, lift: G.lift, specular: '#ffffff', shininess: 100 });
+    dress(mat, { colour: G.colour, lift: G.lift, specular: '#cccccc', shininess: 60 });
     var mesh = new THREE.Mesh(new THREE.TorusGeometry(G.radius, G.tube, G.segments, G.sides), mat);
     mesh.rotation.x = -Math.PI / 2;                 // flat on the table top
-    mesh.scale.set(390 / G.radius, 1, 1);           // a circle stretched across 800 x 600
+    mesh.scale.set(G.across / G.radius, 1, 1);      // a circle stretched across 800 x 600
     mesh.position.set(0, G.lift3, 0);
     mesh.name = 'era7-ring';
     I.parts.group.add(mesh);
