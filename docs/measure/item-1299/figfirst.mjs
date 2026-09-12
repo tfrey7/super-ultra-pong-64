@@ -70,7 +70,16 @@ const RECORDER = `(function () {
         kids = io ? io.scene.children.length : -1;
       }
     } catch (e) { /* the page is still coming up */ }
-    if (last !== null) window.__rec.rows.push({ t: +now.toFixed(1), d: +(now - last).toFixed(1), st: st, kids: kids });
+    // How long the page thread stays busy this frame: this callback is the
+    // first rAF the page registers, so it runs before the game's, and a
+    // timeout posted here runs after the whole frame's work is done.
+    var row = null;
+    if (last !== null) {
+      row = { t: +now.toFixed(1), d: +(now - last).toFixed(1), st: st, kids: kids, busy: 0 };
+      window.__rec.rows.push(row);
+    }
+    var began = performance.now();
+    if (row) setTimeout(function () { row.busy = +(performance.now() - began).toFixed(1); }, 0);
     last = now;
     requestAnimationFrame(tick);
   }
@@ -103,7 +112,7 @@ async function one(s, era) {
   const firstFig = rows.findIndex((r) => r.kids > baseKids);
   const after = firstFig === -1 ? [] : rows.slice(firstFig);
   const longest = (list) => list.reduce((a, b) => (b.d > a.d ? b : a), { d: 0, t: 0, st: '-', kids: -1 });
-  const over = (list, ms) => list.filter((r) => r.d > ms).map((r) => ({ t: r.t, d: r.d, st: r.st, kids: r.kids }));
+  const over = (list, ms) => list.filter((r) => r.d > ms).map((r) => ({ t: r.t, d: r.d, busy: r.busy, st: r.st, kids: r.kids }));
   return { era, ...info, frames: rows.length, baseKids,
     firstFigureFrame: firstFig === -1 ? null : rows[firstFig],
     longestOverall: longest(rows), longestAfterFigures: longest(after),
@@ -138,7 +147,7 @@ try {
       runs.push({ run: r, ...row });
       const f = row.firstFigureFrame, T = row.timings || {};
       console.log(`run ${r} era ${era} ${row.name}: first figure frame ` +
-        (f ? `${f.d} ms at ${f.t} ms` : 'never') +
+        (f ? `${f.d} ms (page busy ${f.busy} ms) at ${f.t} ms` : 'never') +
         `, longest after ${row.longestAfterFigures.d} ms, longest overall ${row.longestOverall.d} ms` +
         `, over 50 ms: ${row.over50.length}` +
         ` | unpack ${T.parseMs} ms, build ${T.buildMs} ms, compile ${T.compileMs} ms, warm ${T.warmMs} ms`);
