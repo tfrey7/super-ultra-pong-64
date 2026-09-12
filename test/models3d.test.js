@@ -272,7 +272,9 @@ test('item 1283: an era block that names its own model file draws it, and only t
   own.model = 'player-proof-mid';
   try {
     assert.strictEqual(C.configFor(7, 'right').model, 'player-proof-mid');
-    assert.ok(!C.configFor(8).model, 'its neighbour is untouched');
+    // its neighbour is untouched -- era 8 wears its own operatives (item 1256),
+    // never the file era 7 was just handed
+    assert.notStrictEqual(C.configFor(8).model, 'player-proof-mid', 'its neighbour is untouched');
     const ctx = recorder();
     C.drawPlayers(ctx, playing(7), null, R);
     assert.ok(ctx.calls.filter(([k]) => k === 'fill').length > 200, 'era 7 draws its named model');

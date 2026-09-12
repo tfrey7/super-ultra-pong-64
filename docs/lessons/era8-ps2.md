@@ -112,8 +112,9 @@ art bible's era 8 page, [docs/ART.md](../ART.md)).
 
 - **pixflux does not draw sprite sheets.** Asked for "3 columns by 6 rows of equal cells" at
   72 x 324, it drew a 2 x 4 grid of eight figures for one player and a single column of three for
-  the other, at two different heights. [era8-sheets.mjs](../../assets/pixellab/era8-sheets.mjs)
-  finds each figure by its alpha, scales every figure to 80 pixels and stands them on one baseline.
+  the other, at two different heights. `assets/pixellab/era8-sheets.mjs` (deleted by item 1256
+  with the sheets it cut; `git log -- assets/pixellab/era8-sheets.mjs` still has it)
+  found each figure by its alpha, scaled every figure to 80 pixels and stood them on one baseline.
   It derives the missing beats: a lean for move, a mirrored figure turning to watch the ball for a
   miss, and a pixel's bob for idle. That script costs 0 generations. **Ask pixflux for figures,
   never for a grid, and cut the grid yourself.**
