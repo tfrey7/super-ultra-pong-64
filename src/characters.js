@@ -216,16 +216,27 @@
           sheets: { left: 'era9-armour-left', right: 'era9-armour-right' },
           frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6,
           shading: 'vertex' },
-    // Xbox 360 (item 1234, docs/ART.md era 10): two heavy soldiers, pixellab
-    // sheets reposed, graded, rimmed and grained offline by
-    // assets/pixellab/era10-derive.mjs at twice the bible's 32 x 66 (a 96 x 132
-    // frame holding a 48 x 66 figure cell), so the rig's unsmoothed draw of a
-    // pre-smoothed sheet reads HD. 0.68 table units a sheet pixel is the
-    // bible's 1.36 at that doubling: about 90 units tall on the table.
+    // Xbox 360 (item 1258, docs/ART.md era 10 and its Reference games section):
+    // two soldiers built in Blender by tools/blender/era10-players.py, one per
+    // side and deliberately unalike -- era10-vanguard on the player's end is
+    // WIDE (a domed helmet with a lit visor band, a slab chest plate over the
+    // undersuit, huge round pauldrons, a back tank, heavy greaves), and
+    // era10-ranger on the computer's is TALLER and angular (a flat crested
+    // helmet, one square pauldron on its bat arm, a shoulder tank, belt
+    // pouches), in olive gunmetal against cold blue steel, a cold visor
+    // against an amber one. 1016 and 764 triangles: the 360's budget (about
+    // 1200 each), the highest rung of the ladder. In the manner of the era's
+    // reference -- Gears of War's bulk and brown-grey armour read through the
+    // era's bloom, depth of field and grade (item 1298) -- never a copy of it.
+    // Named as `models`, which resolves per side, and the glTF layer reads the
+    // same name (src/field3d.js: `cfg.figure || cfg.model`), so each end of
+    // the table is its own character in WebGL and in the canvas fallback
+    // alike. The `ink` material is repainted in that paddle's colour every
+    // frame. Item 1234's sprite stand-ins are no longer named here: Tim ruled
+    // flat sprites out of the 3D eras ("that is not gonna look AAA here dude").
     10: { skin: '#e2b294', body: '#2a2e36', res: 4, round: true,
-          sheets: { left: 'era10-soldier-left', right: 'era10-soldier-right' },
-          frame: { w: 96, h: 132 }, hand: { x: 84, y: 84 }, scale: 0.68,
-          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
+          models: { left: 'era10-vanguard', right: 'era10-ranger' },
+          modelScale: 1.8, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
           shading: 'hd' }
   };
 
