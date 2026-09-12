@@ -1,0 +1,63 @@
+{
+ "taken": "2026-09-12T13:45:51.638Z",
+ "label": "1313-after2-1",
+ "gpu": true,
+ "size": "1920,1080",
+ "seconds": 1,
+ "query": "",
+ "pre": "",
+ "stopAfter": 1,
+ "fresh": [],
+ "climb": [
+  {
+   "era": 0,
+   "wallS": 1,
+   "clock": 1,
+   "ballTablePerS": 0.425,
+   "ballScreenPerS": 0.425,
+   "rulesSpeedTablePerGameS": 0.425,
+   "hitStopShare": 0,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 0,
+   "frameMs": 4.17,
+   "maxFrameMs": 4.3,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 0,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1
+  },
+  {
+   "era": 1,
+   "wallS": 1,
+   "clock": 1,
+   "ballTablePerS": 0.425,
+   "ballScreenPerS": 0.425,
+   "rulesSpeedTablePerGameS": 0.425,
+   "hitStopShare": 0,
+   "slowShare": 0,
+   "pauseShare": 0,
+   "hits": 0,
+   "frameMs": 4.17,
+   "maxFrameMs": 4.3,
+   "framesOver50ms": 0,
+   "longFrames": [],
+   "score": 1,
+   "matchPoint": false,
+   "canvasW": 1440,
+   "dpr": 1,
+   "pauseS": 1.804,
+   "ringMaxFrameMs": 20.8,
+   "ringLongFrames": []
+  }
+ ],
+ "climbConvolverSets": [
+  {
+   "ms": 3,
+   "len": 13440,
+   "era": 1
+  }
+ ]
+}
