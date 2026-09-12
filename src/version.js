@@ -6,9 +6,9 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "era 7 takes 1999's own look: Soulcalibur and Sonic Adventure, smooth and bright, with the contact effects back over the ball",
-    "item": "1293",
-    "sha": "ad5e880",
+    "feature": "the display switch warms mid-ring, so the first era change draws no long frame",
+    "item": "1313",
+    "sha": "2347997",
     "date": "2026-09-12"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;

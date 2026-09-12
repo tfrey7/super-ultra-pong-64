@@ -1,0 +1,7 @@
+﻿item 1253 without: G:\Claude Stuff\super-ultra-pong-64-item-1253 (page ?era=5&characters=off), gpu true
+era 5; shot -> docs\shots\item-1253\without-era5-rally.png
+figures {"gl":true,"names":["era5-fighter-red","era5-fighter-blue"],"state":[null,null],"stood":false}
+frame window 1: 591 frames, mean 5.08 ms, p95 8.40 ms; 3D layer 592 draws at 0.39 ms each
+frame window 2: 383 frames, mean 7.84 ms, p95 41.60 ms; 3D layer 422 draws at 3.84 ms each
+frame window 3: 536 frames, mean 5.68 ms, p95 4.30 ms; 3D layer 555 draws at 2.05 ms each
+frame MEDIAN of the 3 windows: 5.68 ms a frame, 2.05 ms a 3D draw

@@ -1,0 +1,40 @@
+{
+  "label": "after-gpu",
+  "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1258",
+  "W": 960,
+  "H": 720,
+  "frame": {
+    "frames": 60,
+    "mean": 4.236666666467984,
+    "p95": 4.9000000059604645,
+    "max": 8.399999976158142
+  },
+  "webgl": true,
+  "sides": {
+    "left": {
+      "name": "era10-vanguard",
+      "state": {
+        "state": "ready",
+        "why": ""
+      },
+      "sheet": null,
+      "modelScale": 1.8,
+      "shading": "hd"
+    },
+    "right": {
+      "name": "era10-ranger",
+      "state": {
+        "state": "ready",
+        "why": ""
+      },
+      "sheet": null,
+      "modelScale": 1.8,
+      "shading": "hd"
+    }
+  },
+  "stoodGltf": false,
+  "ink": {
+    "left": "#84c8fc",
+    "right": "#b55328"
+  }
+}

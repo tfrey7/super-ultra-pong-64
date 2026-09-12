@@ -48,7 +48,7 @@ test('era 6 names its own two figures, one a side, and no sprite stand-in', () =
   assert.strictEqual(right.figure, PAIR.right, 'the frog holds the computer\'s');
   assert.strictEqual(left.sheet, null, 'the sprite stand-ins have left this era');
   assert.strictEqual(right.sheet, null);
-  assert.strictEqual(left.model, null, 'and no polygon model, the proof figure least of all');
+  assert.strictEqual(left.model, PAIR.left, 'the canvas fallback wears the same name, never the proof figure');
   assert.strictEqual(left.is3d, true);
   assert.notStrictEqual(left.figure, right.figure, 'two silhouettes, not one mirrored');
 });

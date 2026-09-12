@@ -54,10 +54,13 @@
  *            letterboxed era's picture between its bars, so a figure never
  *            pokes into a bar. null (the default) clips nothing
  *   skin, body   the placeholder's colours; its shirt wears the paddle's ink
- *   model    3D eras only (item 1248): an assets/models/ name, drawn by
- *            src/models3d.js as a polygon figure instead of any sheet, the
- *            paddle drawn as a slab under its hand; `models: { left, right }`
- *            like `sheets`. Until the file has loaded the sheet path draws.
+ *   figure   3D eras only (items 1248, 1274): an assets/models/ name, the ONE
+ *            key a block names a built player by; `figures: { left, right }`
+ *            like `sheets` (item 1336). The glTF layer (src/field3d.js) loads
+ *            <name>.glb.js; with no WebGL src/models3d.js draws <name>.js as
+ *            a polygon figure, the paddle a slab under its hand. A config's
+ *            `model` is that same name, derived, never written in a block.
+ *            Until a file has loaded the sheet path draws.
  *   shading  the model's look: flat, gouraud, cel, specular, vertex or hd
  *   modelScale, slabZ, ballInk   the figure's size, the slab's height, and
  *            the colour the ball is redrawn in where it passes in front
@@ -128,9 +131,9 @@
     // assets/pixellab/ where the loader looks. Same frame, hand and scale as
     // item 1225's sheets, so the figure holds the paddle where it did.
     2:  { sheets: { left: 'era2-boy', right: 'era2-rival' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' },
-    // Eras 5 to 10 (item 1248): a block may name a model from assets/models/
-    // (`model`, or `models: { left, right }`; `figure` for item 1274's glTF
-    // layer) and a shading, drawn in place of the sheets once it has loaded.
+    // Eras 5 to 10 (item 1248): a block may name a built figure from
+    // assets/models/ (`figure`, or `figures: { left, right }` -- the one key,
+    // item 1336) and a shading, drawn in place of the sheets once it has loaded.
     // Item 1283 (Tim, 2026-09-11: "can't reuse that primitive character like
     // that"): NO block names the proof figure, so every 3D era draws its own
     // stand-in pair until its own model card (1253-1258) names its own file.
@@ -164,18 +167,22 @@
           sheets: { left: 'era4-pilot-red', right: 'era4-pilot-blue' },
           frame: { w: 12, h: 42 }, hand: { x: 12, y: 17 }, scale: 3.125, fps: 12,
           frames: { idle: 2, up: 2, down: 2, swing: 3, miss: 2, win: 2 } },
-    // PlayStation (item 1228): a STAND-IN only. Tim ruled flat sprites out of
-    // the 3D eras; the real players are polygon models from item 1248's
-    // renderer, and era 5's model card swaps these two sheets out. They are
-    // pixflux's two raw fighter sheets packed into the rig's 3 x 6 order by
-    // assets/pixellab/era5-fighters-cut.mjs: the red-gi fighter on the left,
-    // the blue-top fighter on the right, 23-pixel figures in a 20 x 30 frame,
-    // drawn about 83 table units tall with the hand on the paddle box's top.
+    // PlayStation (item 1253, docs/ART.md era 5 PLAYERS): two built figures, no
+    // sheets. tools/blender/era5-players.py makes them in Blender from
+    // primitives at the machine's own budget -- 248 and 236 flat-shaded
+    // triangles, no textures: `red`, the karateka in a gi with flared sleeves,
+    // a heavy belt and a headband, and `blue`, the taller kickboxer in a
+    // sleeveless top, wide trousers and a top-knot, so the two silhouettes read
+    // apart at 320 x 240. Each name loads twice over: assets/models/<name>.glb
+    // (the rigged glTF the real 3D layer stands, lights and animates, item
+    // 1274's contract) and <name>.json beside it (the same parts posed six
+    // times, for a page with no WebGL). The `ink` slot is the gi and the top,
+    // repainted each frame in that paddle's colour, so a fighter always wears
+    // its own side.
     5:  { skin: '#c8906a', body: '#1a1a1f', res: 2, round: true,
-          sheets: { left: 'era5-left', right: 'era5-right' },
-          frame: { w: 20, h: 30 }, hand: { x: 19, y: 18 }, scale: 3.6,
+          figures: { left: 'era5-fighter-red', right: 'era5-fighter-blue' },
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
-          shading: 'flat' },   // item 1283: no model until era 5's own lands (1253-1258)
+          shading: 'flat' },
     // Nintendo 64 (item 1230, docs/ART.md Era 6): the penguin holds the player's paddle and the
     // frog the computer's, chunky toy mascots drawn smoothed and fogged at their paddle's depth
     // (capped at 0.35, as the era caps its paddles). Item 1254 made them REAL: two Blender-built
@@ -199,15 +206,24 @@
           sheets: { left: 'era7-skater-left-sheet', right: 'era7-skater-right-sheet' },
           frame: { w: 44, h: 84 }, hand: { x: 44, y: 66 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 10,
           shading: 'cel' },
-    // PlayStation 2 (item 1232): two operatives, re-cut from pixflux by
-    // assets/pixellab/era8-sheets.mjs; 80-pixel figures in a 40 x 84 frame,
-    // drawn 90 table units tall, the hand on the paddle box's top (dz 24).
-    // fps 3, not the bible's 8: the rig has one rate for idle, move and win,
-    // and at 8 a two-frame breath reads as a flicker. The players are clipped
-    // to the picture between the era's 52-pixel letterbox bars (item 1249).
+    // PlayStation 2 (item 1256): the two OPERATIVES, Blender-built figures --
+    // tools/blender/era8-players.py, assets/models/era8-operative-{left,right}.
+    // The left one is the midnight operative (navy suit, amber visor, a comms
+    // pack and a raised collar), the right the slate one (slate suit, flare-blue
+    // visor, thigh pouches and shoulder pads): two silhouettes, never one figure
+    // twice (Tim, 2026-09-11: "can't reuse that primitive character like that").
+    // Each is 820 and 796 triangles, the PlayStation 2's budget, smooth-shaded
+    // for the era's phong lighting, and each file carries the six clips the 3D
+    // layer plays. The glTF layer (src/field3d.js) reads these names as figures
+    // and loads <name>.glb.js; with no WebGL src/models3d.js draws the same two
+    // operatives from <name>.js, so this era names no sprite sheet at all and
+    // item 1232's stand-in cut-outs no longer draw here.
+    // modelScale 1: the files are already the realism ladder's 250 table units
+    // tall (docs/ART.md section 8), not the proof figure's 90. The players stay
+    // clipped to the picture between the era's 52-pixel letterbox bars (item 1249).
     8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
-          sheets: { left: 'era8-sheet-left', right: 'era8-sheet-right' },
-          frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
+          figures: { left: 'era8-operative-left', right: 'era8-operative-right' },
+          modelScale: 1, frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3, clip: { y0: 52, y1: 548 },
           shading: 'specular' },
     // Xbox (item 1233, docs/ART.md era 9): the space marine and the steel
@@ -219,16 +235,27 @@
           sheets: { left: 'era9-armour-left', right: 'era9-armour-right' },
           frame: { w: 28, h: 54 }, hand: { x: 28, y: 40 }, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 6,
           shading: 'vertex' },
-    // Xbox 360 (item 1234, docs/ART.md era 10): two heavy soldiers, pixellab
-    // sheets reposed, graded, rimmed and grained offline by
-    // assets/pixellab/era10-derive.mjs at twice the bible's 32 x 66 (a 96 x 132
-    // frame holding a 48 x 66 figure cell), so the rig's unsmoothed draw of a
-    // pre-smoothed sheet reads HD. 0.68 table units a sheet pixel is the
-    // bible's 1.36 at that doubling: about 90 units tall on the table.
+    // Xbox 360 (item 1258, docs/ART.md era 10 and its Reference games section):
+    // two soldiers built in Blender by tools/blender/era10-players.py, one per
+    // side and deliberately unalike -- era10-vanguard on the player's end is
+    // WIDE (a domed helmet with a lit visor band, a slab chest plate over the
+    // undersuit, huge round pauldrons, a back tank, heavy greaves), and
+    // era10-ranger on the computer's is TALLER and angular (a flat crested
+    // helmet, one square pauldron on its bat arm, a shoulder tank, belt
+    // pouches), in olive gunmetal against cold blue steel, a cold visor
+    // against an amber one. 1016 and 764 triangles: the 360's budget (about
+    // 1200 each), the highest rung of the ladder. In the manner of the era's
+    // reference -- Gears of War's bulk and brown-grey armour read through the
+    // era's bloom, depth of field and grade (item 1298) -- never a copy of it.
+    // Named as `figures`, which resolves per side, and the canvas fallback draws
+    // the same name (a config's `model` is its `figure`), so each end of
+    // the table is its own character in WebGL and in the canvas fallback
+    // alike. The `ink` material is repainted in that paddle's colour every
+    // frame. Item 1234's sprite stand-ins are no longer named here: Tim ruled
+    // flat sprites out of the 3D eras ("that is not gonna look AAA here dude").
     10: { skin: '#e2b294', body: '#2a2e36', res: 4, round: true,
-          sheets: { left: 'era10-soldier-left', right: 'era10-soldier-right' },
-          frame: { w: 96, h: 132 }, hand: { x: 84, y: 84 }, scale: 0.68,
-          anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
+          figures: { left: 'era10-vanguard', right: 'era10-ranger' },
+          modelScale: 1.8, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
           shading: 'hd' }
   };
 
@@ -242,12 +269,6 @@
   var modelsOn = !/[?&]models=off\b/.test(search);
   var forcedModel = (/[?&]model=([a-z0-9][a-z0-9_-]*)/.exec(search) || [])[1] || null;
   var forcedFigure = (/[?&]figure=([a-z0-9][a-z0-9_-]*)/.exec(search) || [])[1] || null;
-
-  /** The model name one side of an era block wears: its own of `models`, else `model`. */
-  function modelOf(own, side) {
-    var per = own.models && own.models[side === 'right' ? 'right' : 'left'];
-    return per || own.model || null;
-  }
 
   /** The glTF figure one side of an era block wears: its own of `figures`, else `figure` (item 1254). */
   function figureOf(own, side) {
@@ -270,12 +291,12 @@
     if (!own) return null;
     var c = Object.assign({}, DEFAULTS, own);
     delete c.sheets;
-    delete c.models;
     delete c.figures;
     c.side = side === 'right' ? 'right' : 'left';
     c.sheet = sheetOf(own, c.side);
-    c.model = modelOf(own, c.side);
     c.figure = figureOf(own, c.side);
+    // The canvas fallback wears the figure's own name (item 1336: one key).
+    c.model = c.figure;
     c.frames = Object.assign({}, DEFAULTS.frames, own.frames || {});
     c.anchor = Object.assign({}, DEFAULTS.anchor, own.anchor || {});
     if (!c.sheet) {
@@ -287,7 +308,8 @@
     c.era = era;
     c.is3d = era >= FIRST_3D;
     // The opt-in (item 1283): one model, or one glTF figure, on every 3D era.
-    if (c.is3d && modelsOn && forcedModel) c.model = forcedModel;
+    // ?model= puts one file on both layers, ?figure= on the glTF layer only.
+    if (c.is3d && modelsOn && forcedModel) c.model = c.figure = forcedModel;
     if (c.is3d && modelsOn && forcedFigure) c.figure = forcedFigure;
     return c;
   }
@@ -776,7 +798,7 @@
     var n = 0;
     if (forcedModel && modelsOn) { M.get(forcedModel); n++; }
     Object.keys(ERAS).forEach(function (e) {
-      [ERAS[e].model, ERAS[e].models && ERAS[e].models.left, ERAS[e].models && ERAS[e].models.right]
+      [ERAS[e].figure, ERAS[e].figures && ERAS[e].figures.left, ERAS[e].figures && ERAS[e].figures.right]
         .forEach(function (name) { if (name) { M.get(name); n++; } });
     });
     return n;

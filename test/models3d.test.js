@@ -225,17 +225,19 @@ test('fillFor: fog pulls a colour toward the fog, and the PlayStation dithers be
 });
 
 // --------------------------------------------------------- through the rig
-test('eras 5 to 10 name a shading of their own and no model by default; eras 1 to 4 keep their sprites', () => {
+test('eras 5 to 10 name a shading of their own and never the proof figure; eras 1 to 4 keep their sprites', () => {
   const modes = new Set();
   for (let e = 1; e <= 10; e++) {
     const c = C.configFor(e);
     if (e < 5) { assert.ok(!c.model, 'era ' + e + ' stays a sprite'); continue; }
     // Item 1283: no era wears the proof figure. Once an era's own figure card
-    // lands (1253-1258; era 6 is item 1254) it names its own file, whose name
-    // begins with that era -- never the proof figure, and never another era's.
+    // lands (1253-1258) it names its own file, whose name begins with that era
+    // -- never the proof figure, and never another era's. The canvas fallback
+    // wears the same name (item 1336: `figure` is the one key).
+    assert.ok(!('model' in C.ERAS[e]) && !('models' in C.ERAS[e]), 'era ' + e + ' names its players by figure/figures only');
     for (const side of ['left', 'right']) {
       const s = C.configFor(e, side);
-      assert.ok(!s.model, 'era ' + e + ' ' + side + ' names no polygon model: ' + s.model);
+      assert.strictEqual(s.model, s.figure, 'era ' + e + ' ' + side + ': the fallback wears the figure: ' + s.model);
       assert.ok(!s.figure || s.figure.indexOf('era' + e + '-') === 0,
         'era ' + e + ' ' + side + ' wears its own figure, not ' + s.figure);
     }
@@ -268,17 +270,19 @@ test('item 1283: with the proof models loaded but not asked for, every 3D era dr
   }
 });
 
-test('item 1283: an era block that names its own model file draws it, and only that era', () => {
+test('item 1283: an era block that names its own figure file draws it, and only that era', () => {
   M.loadFile(path.join(MODELS, 'player-proof-mid.json'));
   const own = C.ERAS[7];
-  own.model = 'player-proof-mid';
+  own.figure = 'player-proof-mid';   // the one key (item 1336); the fallback draws it
   try {
     assert.strictEqual(C.configFor(7, 'right').model, 'player-proof-mid');
-    assert.ok(!C.configFor(8).model, 'its neighbour is untouched');
+    // its neighbour is untouched -- era 8 wears its own operatives (item 1256),
+    // never the file era 7 was just handed
+    assert.notStrictEqual(C.configFor(8).model, 'player-proof-mid', 'its neighbour is untouched');
     const ctx = recorder();
     C.drawPlayers(ctx, playing(7), null, R);
     assert.ok(ctx.calls.filter(([k]) => k === 'fill').length > 200, 'era 7 draws its named model');
-  } finally { delete own.model; }
+  } finally { delete own.figure; }
 });
 
 test('with the proof model asked for (the ?model= switch), every 3D era draws both players as models and writes no state', () => {

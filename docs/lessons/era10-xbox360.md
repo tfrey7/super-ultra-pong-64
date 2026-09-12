@@ -239,3 +239,29 @@ the game ever shows:
 - **The far ruins did not move** (2.68 to 2.69): knocking the bats out of the depth-of-field strip
   takes nothing away from the distance, which is the point of masking rather than of taking the
   soft copy earlier.
+
+## LESSONS: modelling to the machine's budget (item 1258)
+
+- **The budget is about silhouette, not about detail.** The Xbox 360's rung allows about 1200
+  triangles a figure, and the two soldiers came out at **1016** (the wide vanguard) and **764**
+  (the tall ranger). Almost all of that is curvature: one smooth helmet dome is 168 triangles and
+  a round pauldron 80, while a slab of armour, a visor band, a boot or a belt pouch is **12**. So
+  the gear that makes the two players tell apart at a glance -- crest, tank, pouches, greaves --
+  is nearly free, and the budget is really a cap on how many round things a figure may have. The
+  ranger reads as the more elaborate soldier of the two on a quarter fewer triangles than the
+  vanguard, because its helmet is flat.
+- **The triangles are not what costs the frame.** With a graphics card, a second of ordinary play
+  at this era is 4.2 ms a frame with the two figures standing and 4.2 ms without them: they cost
+  nothing measurable. On the harness's GPU-less Chrome the same pair costs 7 to 8 ms a frame
+  (46.0 -> 54.3 and 38.2 -> 45.0 over two pairs of readings). That is fill and per-pixel shading in
+  a software rasteriser, not the mesh, so trimming triangles to buy that back would buy almost
+  nothing; the knob that would is the era's `resolution`, above.
+- **Two characters, not one mirrored.** The contract's default is one file mirrored in x for the
+  other end of the table. Naming the pair as `models: { left, right }` in the era's block gets a
+  different figure a side at no cost at all -- the layer already resolves the name per side
+  (`cfg.figure || cfg.model`) -- and it is what lets the player's soldier be heavy and the
+  computer's tall.
+- **Export the canvas fallback in the same run.** Writing the old `pong-model-1` JSON beside the
+  glTF costs one function in the build script and is what lets the sprite stand-ins leave this era
+  entirely: with no WebGL the page draws the same two soldiers as polygons instead of falling back
+  to art the era is no longer meant to wear.
