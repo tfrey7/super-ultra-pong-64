@@ -1,0 +1,168 @@
+{
+  "era6": {
+    "era": 6,
+    "before": {
+      "shot": "rally-era6-before.png",
+      "edge": {
+        "column": 336,
+        "canvas": [
+          883,
+          662
+        ],
+        "band": [
+          132,
+          331
+        ],
+        "row": 229,
+        "step": 64.036,
+        "width": 1,
+        "table": {
+          "box": [
+            194,
+            185,
+            689,
+            477
+          ],
+          "meanEdge": 12.03450890756503,
+          "hardEdges": 94009,
+          "pairs": 287508
+        }
+      },
+      "layer": {
+        "webgl": true,
+        "why": "",
+        "stats": {
+          "frames": 248,
+          "ms": 2156.8000000715256
+        },
+        "renders": [
+          400,
+          300
+        ],
+        "discs": 0
+      }
+    },
+    "after": {
+      "shot": "rally-era6-after.png",
+      "edge": {
+        "column": 336,
+        "canvas": [
+          883,
+          662
+        ],
+        "band": [
+          132,
+          331
+        ],
+        "row": 276,
+        "step": 64.406,
+        "width": 1,
+        "table": {
+          "box": [
+            194,
+            185,
+            689,
+            477
+          ],
+          "meanEdge": 15.056577069153064,
+          "hardEdges": 110154,
+          "pairs": 287508
+        }
+      },
+      "layer": {
+        "webgl": true,
+        "why": "",
+        "stats": {
+          "frames": 293,
+          "ms": 2343.200000166893
+        },
+        "renders": [
+          320,
+          240
+        ],
+        "discs": 3
+      }
+    },
+    "diff": {
+      "darker": 5646,
+      "meanDrop": 25.331492915338252,
+      "clusters": [
+        {
+          "n": 514,
+          "x": 774,
+          "y": 458
+        },
+        {
+          "n": 411,
+          "x": 747,
+          "y": 459
+        },
+        {
+          "n": 404,
+          "x": 141,
+          "y": 338
+        }
+      ],
+      "canvas": [
+        883,
+        662
+      ]
+    },
+    "frames": {
+      "n": 110,
+      "mean": 16.666363636363638,
+      "p95": 16.799999999999727,
+      "max": 16.800000000000182
+    }
+  },
+  "era5": {
+    "era": 5,
+    "after": {
+      "shot": "rally-era5-playstation.png",
+      "edge": {
+        "column": 336,
+        "canvas": [
+          883,
+          662
+        ],
+        "band": [
+          132,
+          331
+        ],
+        "row": 218,
+        "step": 57.744,
+        "width": 3,
+        "table": {
+          "box": [
+            194,
+            185,
+            689,
+            477
+          ],
+          "meanEdge": 6.344615895898774,
+          "hardEdges": 27241,
+          "pairs": 287508
+        }
+      },
+      "layer": {
+        "webgl": true,
+        "why": "",
+        "stats": {
+          "frames": 216,
+          "ms": 1859.9999998807907
+        },
+        "renders": [
+          320,
+          240
+        ],
+        "discs": 0
+      }
+    },
+    "frames": {
+      "n": 110,
+      "mean": 16.818181818181817,
+      "p95": 16.799999999999727,
+      "max": 33.29999999999927
+    }
+  }
+}
