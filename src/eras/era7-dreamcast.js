@@ -417,6 +417,7 @@
     mesh.scale.set(G.across / G.radius, 1, 1);      // a circle stretched across 800 x 600
     mesh.position.set(0, G.lift3, 0);
     mesh.name = 'era7-ring';
+    mesh.userData = { era: 7, ring: true };         // tagged, so a later era can find it (era 8 carries this field forward)
     I.parts.group.add(mesh);
     return mesh;
   }
@@ -462,7 +463,10 @@
       stage.ring = addRing(I);
       stage.mats = p.surfaceMat;
     }
-    hideBall(p, true);
+    // The ball is hidden only when era 7 is the era being drawn. Era 8 calls
+    // this function to carry era 7's field forward (item 1295), and era 8 draws
+    // no ball of its own -- hiding it there would take the ball off the table.
+    if (state && state.era === 7) hideBall(p, true);
     return fresh ? 'fresh' : 'kept';
   }
 

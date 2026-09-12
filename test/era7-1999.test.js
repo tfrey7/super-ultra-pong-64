@@ -214,6 +214,18 @@ test('a new set of parts -- another era drew, or the knobs rebuilt them -- is dr
   assert.strictEqual(second.group.children.filter((m) => m.name === 'era7-ring').length, 1);
 });
 
+test('era 8 carrying this field forward does not lose the ball', () => {
+  // Era 8 (item 1295) calls era 7's fieldSetup to inherit the field, and draws
+  // no ball of its own. Only era 7's own frames hide the layer's ball.
+  const parts = fakeParts();
+  const I = fakeLayer(parts).internals();
+  const era8 = Object.assign(rally(), { era: 8 });
+  look.fieldSetup(I, era8);
+  assert.strictEqual(parts.ballMat.opacity, 1, 'the ball is still there on era 8');
+  look.fieldSetup(I, rally());
+  assert.strictEqual(parts.ballMat.opacity, 0, 'and hidden on era 7, which draws its own');
+});
+
 test('fieldSetup does nothing at all when there is no 3D layer', () => {
   assert.strictEqual(look.fieldSetup(null, rally()), null);
   assert.strictEqual(look.fieldSetup(undefined, rally()), null);
