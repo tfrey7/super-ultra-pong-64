@@ -69,6 +69,13 @@ in which the layer really stood the figures. The raw readings are in
   the bootstrap's section 8a. I did not prove it. The next step is to trace one era 9 page from load
   with `docs/measure/item-1203/trace.mjs`, and if that is the cause, compile the figures during
   load (`renderer.compile`) or ask for their files at page start instead of on first sight.
+- **Item 1299 measured that 333 ms frame and it was not the shader.** A figure's first frame costs
+  about 20-30 ms all told — 3 ms to unpack the file, 3 ms to build both posed copies, 5-11 ms in the
+  draw call that builds the program — and every shader the GPU process builds over a whole page
+  comes to 76 ms, the longest single build 16.3 ms. The rest of that 333 ms was the machine: the
+  same round's `?figures=off` readings ran at 43.75 and 95.45 ms. The layer warms one era ahead all
+  the same, so an arrival never pays even those 20-30 ms mid-match; the readings and the recorders
+  are in [docs/measure/item-1299](../measure/item-1299/README.md).
 - The frame-rate lines the playtest fails on eras 5 to 10 in this Chrome are still card 1216's.
   They fail with the polygon figures as well. The ladder walk on the merged tree with the figures on
   passed 36 of 42 checks, the same count as item 1273's, and all six misses were those lines. Every
