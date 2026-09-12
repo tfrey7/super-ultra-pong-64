@@ -6,9 +6,9 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "the 3D figures are warmed before their era arrives, so the first frame no longer hitches",
-    "item": "1298",
-    "sha": "d7ce07d",
+    "feature": "era 7 puts its contact effects back over a cel-shaded field, the Jet Set Radio look",
+    "item": "1293",
+    "sha": "ad5e880",
     "date": "2026-09-12"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
