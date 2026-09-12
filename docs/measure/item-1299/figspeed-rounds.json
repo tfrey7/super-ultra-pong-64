@@ -1,0 +1,102 @@
+{
+ "taken": "2026-09-12T13:29:12.600Z",
+ "figure": "player-proof-hi",
+ "eras": [
+  9
+ ],
+ "rows": [
+  {
+   "round": 0,
+   "setup": "figures",
+   "era": 9,
+   "name": "player-proof-hi",
+   "file": {
+    "state": "ready",
+    "why": ""
+   },
+   "gl": true,
+   "drawn": 0,
+   "asked": 0,
+   "frames": 60,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8
+  },
+  {
+   "round": 0,
+   "setup": "polygon",
+   "era": 9,
+   "name": "player-proof-hi",
+   "file": null,
+   "gl": true,
+   "drawn": 0,
+   "asked": 0,
+   "frames": 61,
+   "mean": 16.67,
+   "p95": 16.7,
+   "max": 16.8
+  },
+  {
+   "round": 1,
+   "setup": "polygon",
+   "era": 9,
+   "name": "player-proof-hi",
+   "file": null,
+   "gl": true,
+   "drawn": 0,
+   "asked": 0,
+   "frames": 59,
+   "mean": 16.95,
+   "p95": 16.8,
+   "max": 33.4
+  },
+  {
+   "round": 1,
+   "setup": "figures",
+   "era": 9,
+   "name": "player-proof-hi",
+   "file": {
+    "state": "ready",
+    "why": ""
+   },
+   "gl": true,
+   "drawn": 0,
+   "asked": 0,
+   "frames": 32,
+   "mean": 32.29,
+   "p95": 33.4,
+   "max": 50
+  },
+  {
+   "round": 2,
+   "setup": "figures",
+   "era": 9,
+   "name": "player-proof-hi",
+   "file": {
+    "state": "ready",
+    "why": ""
+   },
+   "gl": true,
+   "drawn": 0,
+   "asked": 0,
+   "frames": 30,
+   "mean": 33.34,
+   "p95": 33.4,
+   "max": 50
+  },
+  {
+   "round": 2,
+   "setup": "polygon",
+   "era": 9,
+   "name": "player-proof-hi",
+   "file": null,
+   "gl": true,
+   "drawn": 0,
+   "asked": 0,
+   "frames": 32,
+   "mean": 31.77,
+   "p95": 33.4,
+   "max": 49.9
+  }
+ ]
+}
