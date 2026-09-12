@@ -471,7 +471,10 @@ test('a block with only `sheet` still serves both sides, as before sheets existe
     // for every era whose own block still brings no art (the era cards fill theirs in).
     for (let e = 1; e <= 10; e++) {
       if (e === 2) continue;
-      if (C.ERAS[e].sheet || C.ERAS[e].sheets) continue;   // an era card's own art (item 1232 on)
+      const own = C.ERAS[e];
+      // an era card's own art (item 1232 on), or its own figure files (the
+      // figure cards, 1253-1258): both give the two sides different configs
+      if (own.sheet || own.sheets || own.model || own.models || own.figure) continue;
       assert.strictEqual(C.configFor(e, 'left').sheet, null, 'era ' + e + ' left is the placeholder');
       assert.deepStrictEqual(C.configFor(e, 'right'), Object.assign(C.configFor(e, 'left'), { side: 'right' }),
         'era ' + e + ': the two sides are the same config');

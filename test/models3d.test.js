@@ -230,10 +230,16 @@ test('eras 5 to 10 name a shading of their own and no model by default; eras 1 t
   for (let e = 1; e <= 10; e++) {
     const c = C.configFor(e);
     if (e < 5) { assert.ok(!c.model, 'era ' + e + ' stays a sprite'); continue; }
-    // Item 1283: no era wears the proof figure until its own model card lands.
+    // Item 1283: no era wears the PROOF figure. Until its own figure card lands
+    // (1253-1258) an era names no model at all; once it has, it names its own
+    // file on each side -- never the proof one, and never one file twice.
+    const own = C.ERAS[e];
+    const mine = !!(own.model || own.models || own.figure);
     for (const side of ['left', 'right']) {
       const s = C.configFor(e, side);
-      assert.ok(!s.model && !s.figure, 'era ' + e + ' ' + side + ' names no model: ' + (s.model || s.figure));
+      const name = s.model || s.figure;
+      if (mine) assert.ok(name && !/player-proof/.test(name), 'era ' + e + ' ' + side + ' names its own figure: ' + name);
+      else assert.ok(!name, 'era ' + e + ' ' + side + ' names no model: ' + (s.model || s.figure));
     }
     assert.ok(M.MODES.includes(c.shading), 'era ' + e + ' shading ' + c.shading);
     modes.add(c.shading);
@@ -241,14 +247,17 @@ test('eras 5 to 10 name a shading of their own and no model by default; eras 1 t
   assert.strictEqual(modes.size, 6, 'one mode an era');
 });
 
-test('item 1283: each 3D era wears its own pair, twelve different sheets across the six', () => {
-  const sheets = new Set();
+test('item 1283: each 3D era wears its own pair, twelve different players across the six', () => {
+  // A pair is two sheets while the era is still standing in, and two figure
+  // files once its own figure card has landed -- never one player twice.
+  const players = new Set();
   for (let e = 5; e <= 10; e++) {
-    const l = C.configFor(e, 'left').sheet, r = C.configFor(e, 'right').sheet;
-    assert.ok(l && r && l !== r, 'era ' + e + ' has two different figures: ' + l + ' / ' + r);
-    sheets.add(l); sheets.add(r);
+    const l = C.configFor(e, 'left'), r = C.configFor(e, 'right');
+    const ln = l.model || l.figure || l.sheet, rn = r.model || r.figure || r.sheet;
+    assert.ok(ln && rn && ln !== rn, 'era ' + e + ' has two different figures: ' + ln + ' / ' + rn);
+    players.add(ln); players.add(rn);
   }
-  assert.strictEqual(sheets.size, 12);
+  assert.strictEqual(players.size, 12);
 });
 
 test('item 1283: with the proof models loaded but not asked for, every 3D era draws its stand-ins', () => {
@@ -267,7 +276,7 @@ test('item 1283: an era block that names its own model file draws it, and only t
   own.model = 'player-proof-mid';
   try {
     assert.strictEqual(C.configFor(7, 'right').model, 'player-proof-mid');
-    assert.ok(!C.configFor(8).model, 'its neighbour is untouched');
+    assert.notStrictEqual(C.configFor(8).model, 'player-proof-mid', 'its neighbour is untouched');
     const ctx = recorder();
     C.drawPlayers(ctx, playing(7), null, R);
     assert.ok(ctx.calls.filter(([k]) => k === 'fill').length > 200, 'era 7 draws its named model');
