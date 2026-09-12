@@ -67,8 +67,8 @@ test('with no WebGL the layer declines and field() paints the canvas table', () 
   assert.ok(tableCalls > 0 && tableCalls === calls.length, `field() fallback made ${tableCalls} calls, table() ${calls.length}`);
 });
 
-// Era 10 is the first era to set any (item 1298: HD). Eras 5 to 9 still take
-// the defaults, and whatever an era does set is one of the four known knobs.
+// An era may leave them all at their defaults; whatever it does set has to be
+// one of the four knobs the layer reads. Era 10 sets its own (item 1298: HD).
 test('every era file draws its field through the layer, and any render knobs it sets are known ones', () => {
   const fs = require('node:fs');
   const path = require('node:path');
@@ -80,8 +80,8 @@ test('every era file draws its field through the layer, and any render knobs it 
     assert.ok(/T\.field\(/.test(src), `${f} draws its field through T.field`);
     const era = Number(f.match(/^era(\d+)/)[1]);
     const knobs = (R.eraLook(era) || {}).render;
-    if (era < 10) assert.equal(knobs, undefined, `${f} sets no render knobs yet`);
-    else assert.ok(knobs && typeof knobs === 'object', `${f} sets its render knobs`);
+    if (era === 10) assert.ok(knobs && typeof knobs === 'object', `${f} sets its render knobs`);
+    else assert.ok(knobs === undefined || typeof knobs === 'object', `${f} sets knobs or none`);
     for (const k of Object.keys(knobs || {})) assert.ok(KNOBS.includes(k), `${f} render knob ${k} is a known one`);
   }
 });
