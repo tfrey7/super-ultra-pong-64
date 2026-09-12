@@ -78,6 +78,22 @@
   var BLOOM = { main: 0.55, wide: 0.35, fallback: 0.35 };
   var DOF = { farY: 90, alpha: 0.6 };  // d 0.85 to 1 is field y 0 to 90
   var PADDLE = { z: 24, light: { top: 0.3, near: -0.05, side: -0.45 } };
+  // HD (item 1298). The 3D layer draws the field at 1.2 GL pixels per pixel of
+  // the picture it lands in and is sampled back into it: the Xenos's 10 MB of
+  // eDRAM is what bought anti-aliasing at 720p, and this is the canvas
+  // equivalent -- the bats' edges come out of the composite already resolved,
+  // which is what lets the post chain run over them and still leave them sharp.
+  var RENDER = { resolution: 1.2, filter: true, lighting: 'standard' };
+  // The warm rim light: a SECOND, low directional light from behind the far
+  // wall on the HDR sun's side (the sun is painted at RUIN.sunX), so the bats
+  // and the ball carry a warm edge into the composite the post passes touch.
+  // It breathes with the sun's bloom, and it burns only on era 10's own frame.
+  var RIM = { tag: 'era10-rim', colour: '#ffd9a0', intensity: 1.15, height: 150, behind: 900 };
+  // Era 10's materials on the shared scene: the bats and the ball a little
+  // glossier than the ladder's default, so the rim light reads as an edge.
+  var HD = { roughness: 0.34, metalness: 0.08 };
+  var CORE = { radius: 0.62 };         // the ball's white core, as a share of its screen radius
+  var MASK = { pad: 2 };               // how far past a bat's rectangle the depth-of-field hole goes
   // The plaza (docs/ART.md era 10, item 1234). The ruin plate is the pixellab
   // columns, 400 x 120, drawn once at 800 x 120 so its own sun sits under the
   // HDR sun at x 560 (tiled, it showed two suns); the banner hangs off the second column and
@@ -440,8 +456,34 @@
     }
   }
 
-  /** 3: depth of field -- the far strip again, from a half-scale copy of the frame so far. */
-  function farStripSoft(ctx, T, cam) {
+  /**
+   * A bat's screen rectangle: the bounding box of its box, padded, clipped to
+   * the strip it has to be knocked out of. Null when the two do not meet.
+   */
+  function batRect(T, cam, p, z, edge) {
+    var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    var xs = [p.x, p.x + p.w], ys = [p.y, p.y + p.h], zs = [0, z];
+    for (var i = 0; i < 2; i++) for (var j = 0; j < 2; j++) for (var k = 0; k < 2; k++) {
+      var s = T.project(cam, xs[i], ys[j], zs[k]);
+      if (s.x < x0) x0 = s.x;
+      if (s.x > x1) x1 = s.x;
+      if (s.y < y0) y0 = s.y;
+      if (s.y > y1) y1 = s.y;
+    }
+    x0 -= MASK.pad; y0 -= MASK.pad; x1 += MASK.pad; y1 += MASK.pad;
+    if (y0 >= edge) return null;             // wholly below the strip: nothing to knock out
+    if (y1 > edge) y1 = edge;
+    return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+  }
+
+  /**
+   * 3: depth of field -- the far strip again, from a half-scale copy of the
+   * frame so far. Since the 3D layer draws the bats INSIDE that copy (item
+   * 1273), their rectangles are knocked out of the strip, so no bat is ever
+   * softened by it (R4); when the layer did not draw, the bats come after this
+   * pass and there is nothing to knock out.
+   */
+  function farStripSoft(ctx, T, cam, bats) {
     var half = T.offscreen('dof-half', 400, 300);
     if (!half || !('canvas' in ctx) || !ctx.canvas) return false;
     var h = half.ctx;
@@ -453,7 +495,11 @@
     ctx.save();
     ctx.beginPath();
     ctx.rect(0, 0, 800, edge);
-    ctx.clip();
+    for (var i = 0; bats && i < bats.length; i++) {
+      var m = batRect(T, cam, bats[i].rect, bats[i].z, edge);
+      if (m) ctx.rect(m.x, m.y, m.w, m.h);
+    }
+    ctx.clip('evenodd');
     ctx.globalAlpha = DOF.alpha;
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(half.canvas, 0, 0, 800, 600);
@@ -645,6 +691,130 @@
     ctx.restore();
   }
 
+  /**
+   * 6e, with the 3D layer: the bats' earned ink back over the lit faces. The
+   * layer drew them inside the composite, so the grade drained their colour
+   * with everything else; painting the ink through 'color' puts the hue and
+   * the full saturation back and leaves the lighting's own brightness alone
+   * (R4). Its faces are the layer's own blade -- the projection table3d and
+   * the layer share -- so nothing but the bat is repainted.
+   */
+  function restoreInks3d(ctx, T, cam, state, P, I) {
+    var sides = ['left', 'right'];
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'color';
+    for (var i = 0; i < sides.length; i++) {
+      var p = state[sides[i]], z = bladeHeight(I, sides[i]);
+      ctx.fillStyle = P.paddleInk(state, sides[i]);
+      trace(ctx, [T.project(cam, p.x, p.y, z), T.project(cam, p.x + p.w, p.y, z),
+                  T.project(cam, p.x + p.w, p.y + p.h, z), T.project(cam, p.x, p.y + p.h, z)]);
+      ctx.fill();
+      trace(ctx, [T.project(cam, p.x, p.y + p.h, 0), T.project(cam, p.x + p.w, p.y + p.h, 0),
+                  T.project(cam, p.x + p.w, p.y + p.h, z), T.project(cam, p.x, p.y + p.h, z)]);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  /** 7, with the 3D layer: the ball's white core, after every post pass (R1, R2). */
+  function ballCore(ctx, ball) {
+    var r = ball.r * CORE.radius;
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    var g = ctx.createRadialGradient(ball.x - r * 0.2, ball.y - r * 0.2, 0, ball.x, ball.y, r);
+    g.addColorStop(0, C.core);
+    g.addColorStop(0.7, C.core);
+    g.addColorStop(1, rgba(C.core, 0));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ------------------------------------------------- inside the 3D layer
+  /**
+   * The scene work era 10 does inside the real 3D layer (item 1273), called
+   * from draw just before the field. The scene is ONE, shared by eras 5 to 10,
+   * so this runs era 9's own setup first when it exists -- which is how era
+   * 9's moving light and shadows, era 8's mirrored slab and era 6's blob
+   * shadows arrive here -- then adds era 10's own one thing on top: a warm rim
+   * light from behind the far wall, added once and tagged, posed every frame.
+   *
+   * It answers the light, so draw can put it out the moment the field is
+   * drawn: a frame of any other era -- inside a ring, or on the way down the
+   * finale's rewind -- is lit exactly as it was before. Answers null when the
+   * page has no 3D layer at all (node --test, ?gl=off), and then era 10 draws
+   * precisely what it drew before this card.
+   */
+  var field3 = { frames: -1 };
+
+  /** True when the frame before this one was not era 10's: the layer counts every frame it draws. */
+  function anotherEraDrew() {
+    var F = root.PongField3D;
+    var n = F && typeof F.stats === 'function' ? F.stats().frames : -1;
+    var mine = n === field3.frames;
+    field3.frames = n + 1;              // this frame is about to be drawn
+    return !mine;
+  }
+
+  function rimLight(I) {
+    var p = I.parts || {};
+    if (p[RIM.tag]) return p[RIM.tag];
+    var light = new I.THREE.DirectionalLight(RIM.colour, 0);
+    light.name = RIM.tag;
+    light.position.set(RUIN.sunX - 400, RIM.height, -RIM.behind);
+    I.scene.add(light);
+    if (light.target) I.scene.add(light.target);     // aimed at the middle of the table
+    p[RIM.tag] = light;
+    return light;
+  }
+
+  /** How tall the layer is standing this side's blade (a figure holding it makes it taller). */
+  function bladeHeight(I, side) {
+    var bats = I && I.parts && I.parts.bats;
+    var bat = bats && bats[side];
+    if (bat && bat.blade && bat.blade.scale && bat.blade.scale.y > 0) return bat.blade.scale.y;
+    var F = root.PongField3D;
+    return (F && F.SIZES && F.SIZES.bat && F.SIZES.bat.z) || PADDLE.z;
+  }
+
+  function hdMaterials(I) {
+    var p = I.parts || {}, mats = [p.ballMat];
+    ['left', 'right'].forEach(function (side) {
+      var bat = p.bats && p.bats[side];
+      if (bat && bat.mat) mats.push(bat.mat);
+    });
+    mats.forEach(function (m) {
+      if (!m) return;
+      if ('roughness' in m) m.roughness = HD.roughness;
+      if ('metalness' in m) m.metalness = HD.metalness;
+    });
+  }
+
+  function fieldSetup(I, state) {
+    if (!I || !I.THREE || !I.scene) return null;
+    var prev = R && typeof R.eraLook === 'function' ? R.eraLook(9) : null;
+    if (prev && typeof prev.fieldSetup === 'function' && prev.fieldSetup !== fieldSetup) {
+      prev.fieldSetup(I, state);
+    }
+    var light = rimLight(I);
+    if (anotherEraDrew()) hdMaterials(I);
+    var t = (state && state.time) || 0;
+    if (light.color && light.color.set) light.color.set(RIM.colour);
+    light.intensity = RIM.intensity * (1 + BREATHE.amount * Math.sin(2 * Math.PI * t / BREATHE.period));
+    return light;
+  }
+
+  /** The layer's scene, when this page has one and it is switched on. */
+  function layerInternals() {
+    var F = root.PongField3D;
+    if (!F || typeof F.available !== 'function' || typeof F.internals !== 'function') return null;
+    return F.available() ? F.internals() : null;
+  }
+
   // ---------------------------------------------------------------- HUD
   /**
    * How far right of its place blade i sits this frame: on an arrival by a
@@ -808,9 +978,15 @@
 
     backdrop(ctx, T, farY, state.time || 0);                   // 1
     if (bloom) sun(bloom.ctx, farY, true, breathe);
+    var I = layerInternals();                                  // the shared 3D scene, when the page has one
+    var rim = fieldSetup(I, state);                            // era 9's setup, then era 10's rim light
     var gl = T.field(ctx, cam, tableStyle(T), state, P);      // 2, through the 3D layer when it can (item 1273)
+    if (rim) rim.intensity = 0;                                // it lit era 10's frame and nobody else's
     railDetail(ctx, T, cam, bloom);
-    farStripSoft(ctx, T, cam);                                 // 3
+    farStripSoft(ctx, T, cam, gl ? [                           // 3 (R4: no bat is softened)
+      { rect: state.left, z: bladeHeight(I, 'left') },
+      { rect: state.right, z: bladeHeight(I, 'right') }
+    ] : null);
     var drawn = gl ? [] : paddles(ctx, T, cam, state, P, bloom);   // 4 (the 3D layer drew the bats)
     if (ball) motionBlur(ctx, T, cam, state, ball);            // 5
     if (bloom) {
@@ -823,6 +999,8 @@
     grainPass(ctx, T, state);
     ashPass(ctx, state);
     restoreInks(ctx, drawn);
+    if (gl) restoreInks3d(ctx, T, cam, state, P, I);            // 6e, over the layer's own bats (R4)
+    if (ball && gl) ballCore(ctx, ball);                        // 7, the core after every pass (R1)
     if (ball && !gl) T.ball(ctx, cam, state.ball, { fill: ballFill(ctx), texture: TEXTURE.ball });   // 7
     hud(ctx, state, P, farY - 6);                              // 8
     if (toast) drawToast(ctx, P, toast);
@@ -986,6 +1164,8 @@
     name: '2005 Xbox 360',
     like: 1,              // paddle colours: the ones the session earned on its first point
     camera: CAMERA,
+    render: RENDER,       // HD: the layer's own knobs (item 1298)
+    fieldSetup: fieldSetup,
     palette360: C,
     hudLayout: { toast: TOAST, toastText: TOAST_TEXT, blades: BLADES, font: '600 20px ' + FONT_FAMILY },
     toast: toastFor,
