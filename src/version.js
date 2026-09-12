@@ -6,9 +6,9 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "era 10 gets its own Blender-built players, standing at the Xbox 360 table",
-    "item": "1258",
-    "sha": "ab459e0",
+    "feature": "era 8 gets its own Blender-built players, standing at the PlayStation 2 table",
+    "item": "1256",
+    "sha": "4587a36",
     "date": "2026-09-12"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
