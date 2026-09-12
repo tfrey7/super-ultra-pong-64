@@ -1,0 +1,287 @@
+{
+ "taken": "2026-09-12T13:43:32.460Z",
+ "label": "rally",
+ "root": "G:\\Claude Stuff\\super-ultra-pong-64-item-1256",
+ "timing": {
+  "frames": 90,
+  "meanMs": 34.1,
+  "p95Ms": 50,
+  "maxMs": 50.1,
+  "era": 8
+ },
+ "posed": {
+  "gl": true,
+  "why": ""
+ },
+ "probe": {
+  "names": {
+   "left": "era8-operative-left",
+   "right": "era8-operative-right"
+  },
+  "sheets": {
+   "left": null,
+   "right": null
+  },
+  "files": {
+   "left": {
+    "state": "ready",
+    "why": ""
+   },
+   "right": {
+    "state": "ready",
+    "why": ""
+   }
+  },
+  "beats": {
+   "left": "swing",
+   "right": "down"
+  },
+  "renderSize": [
+   512,
+   384
+  ],
+  "figures": [
+   {
+    "name": "Scene",
+    "worldX": -428.5,
+    "scale": 1,
+    "heightUnits": 235.9,
+    "screen": {
+     "x0": 34.4,
+     "x1": 85.8,
+     "top": 108.6,
+     "bottom": 189.9
+    },
+    "materials": [
+     {
+      "name": "suit",
+      "colour": "#141a2c"
+     }
+    ],
+    "triangles": 464
+   },
+   {
+    "name": "Scene",
+    "worldX": -428.5,
+    "scale": 1,
+    "heightUnits": 101.6,
+    "screen": {
+     "x0": 37.3,
+     "x1": 93.6,
+     "top": 118.6,
+     "bottom": 170
+    },
+    "materials": [
+     {
+      "name": "gear",
+      "colour": "#2a3342"
+     }
+    ],
+    "triangles": 172
+   },
+   {
+    "name": "Scene",
+    "worldX": -428.5,
+    "scale": 1,
+    "heightUnits": 17.1,
+    "screen": {
+     "x0": 51.9,
+     "x1": 62.4,
+     "top": 125.1,
+     "bottom": 136.6
+    },
+    "materials": [
+     {
+      "name": "skin",
+      "colour": "#c99a74"
+     }
+    ],
+    "triangles": 80
+   },
+   {
+    "name": "Scene",
+    "worldX": -428.5,
+    "scale": 1,
+    "heightUnits": 72.2,
+    "screen": {
+     "x0": 56.9,
+     "x1": 91.9,
+     "top": 122.9,
+     "bottom": 168.8
+    },
+    "materials": [
+     {
+      "name": "ink",
+      "colour": "#5cba5c"
+     }
+    ],
+    "triangles": 68
+   },
+   {
+    "name": "Scene",
+    "worldX": -428.5,
+    "scale": 1,
+    "heightUnits": 9,
+    "screen": {
+     "x0": 57.4,
+     "x1": 62.1,
+     "top": 122.9,
+     "bottom": 135
+    },
+    "materials": [
+     {
+      "name": "visor",
+      "colour": "#ffb020"
+     }
+    ],
+    "triangles": 12
+   },
+   {
+    "name": "Scene",
+    "worldX": -428.5,
+    "scale": 1,
+    "heightUnits": 11,
+    "screen": {
+     "x0": 66.9,
+     "x1": 82.7,
+     "top": 168.6,
+     "bottom": 185.8
+    },
+    "materials": [
+     {
+      "name": "boots",
+      "colour": "#0e1118"
+     }
+    ],
+    "triangles": 24
+   },
+   {
+    "name": "Scene",
+    "worldX": 428.5,
+    "scale": 1,
+    "heightUnits": 47.2,
+    "screen": {
+     "x0": 423.4,
+     "x1": 465.9,
+     "top": 191.6,
+     "bottom": 226.9
+    },
+    "materials": [
+     {
+      "name": "gear",
+      "colour": "#222a36"
+     }
+    ],
+    "triangles": 148
+   },
+   {
+    "name": "Scene",
+    "worldX": 428.5,
+    "scale": 1,
+    "heightUnits": 72.2,
+    "screen": {
+     "x0": 426.2,
+     "x1": 462.5,
+     "top": 181,
+     "bottom": 227.1
+    },
+    "materials": [
+     {
+      "name": "ink",
+      "colour": "#e46f6f"
+     }
+    ],
+    "triangles": 68
+   },
+   {
+    "name": "Scene",
+    "worldX": 428.5,
+    "scale": 1,
+    "heightUnits": 235.9,
+    "screen": {
+     "x0": 432.1,
+     "x1": 486,
+     "top": 167.9,
+     "bottom": 246.2
+    },
+    "materials": [
+     {
+      "name": "suit",
+      "colour": "#3c4654"
+     }
+    ],
+    "triangles": 464
+   },
+   {
+    "name": "Scene",
+    "worldX": 428.5,
+    "scale": 1,
+    "heightUnits": 11,
+    "screen": {
+     "x0": 435.3,
+     "x1": 451.6,
+     "top": 223.7,
+     "bottom": 241.5
+    },
+    "materials": [
+     {
+      "name": "boots",
+      "colour": "#14181e"
+     }
+    ],
+    "triangles": 24
+   },
+   {
+    "name": "Scene",
+    "worldX": 428.5,
+    "scale": 1,
+    "heightUnits": 17.1,
+    "screen": {
+     "x0": 456.8,
+     "x1": 467.8,
+     "top": 184.8,
+     "bottom": 196.5
+    },
+    "materials": [
+     {
+      "name": "skin",
+      "colour": "#b98a66"
+     }
+    ],
+    "triangles": 80
+   },
+   {
+    "name": "Scene",
+    "worldX": 428.5,
+    "scale": 1,
+    "heightUnits": 9,
+    "screen": {
+     "x0": 457.2,
+     "x1": 462.1,
+     "top": 182.7,
+     "bottom": 195.2
+    },
+    "materials": [
+     {
+      "name": "visor",
+      "colour": "#5aa8ff"
+     }
+    ],
+    "triangles": 12
+   }
+  ],
+  "letterbox": {
+   "barFieldUnits": 52,
+   "barPx": 33.3,
+   "heightPx": 384
+  },
+  "figuresInsideLetterbox": true,
+  "rect": {
+   "x": 47.671875,
+   "y": 0,
+   "w": 882.65625,
+   "h": 662
+  }
+ },
+ "png": "G:\\Claude Stuff\\super-ultra-pong-64-item-1256\\docs\\shots\\item-1256\\rally.png"
+}
