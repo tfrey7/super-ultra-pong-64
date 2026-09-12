@@ -13,9 +13,9 @@ Look file: [src/eras/era1-atari2600.js](../../src/eras/era1-atari2600.js).
   later era keeps them (`like: 1`).
 - **Native resolution here:** 160 x 192, hard pixel edges: the 2600's 160-wide playfield and its
   192 lines, so the pixels come out wide.
-- **Palette:** a dozen colours picked by eye to sit in the range a 2600 could show. They are warm
-  and slightly muddy, with no pure `#ff` channel anywhere. **It is not the real 128-entry NTSC
-  palette**, and the file says so. Every entry is deliberately bright, because a paddle that
+- **Palette:** a dozen colours, each a real entry of the 2600's 128-colour NTSC palette (16 hues x
+  8 luminances), named in the file by hue and luminance, with Stella's NTSC table as the source
+  (item 1287; until then they were picked by eye). Every entry is deliberately bright, because a paddle that
   vanishes into the black field is a broken game. `PongRender.isLegible()` checks that, and the
   palette's length must match `RULES.paletteSize` in `src/game.js` (a test pins the join).
 - **Sound chip:** the TIA. Two channels, with coarse pitch dividers that land every note off true.
@@ -93,8 +93,8 @@ Look file: [src/eras/era1-atari2600.js](../../src/eras/era1-atari2600.js).
    remove `advanceEra`'s call.
 4. Delete the other era files, the 3D files, `src/display-tv.js`, `src/erachange.js` (the flourish
    only plays on a ring), `src/signboards.js` and `src/match.js`.
-5. For a real 2600 palette, replace the dozen colours with the NTSC table. That was never done
-   here, so `isLegible()` is your first check.
+5. The dozen colours are already real NTSC entries (item 1287), and `test/era1-atari2600.test.js`
+   carries the whole 128-entry table. A new ink must come off it and pass `isLegible()`.
 
 ## LESSONS
 
@@ -176,3 +176,15 @@ art bible's era 1 page, [docs/ART.md](../ART.md)). A rally at this era:
   after: [contact.png](../shots/item-1278/contact.png) (grey bar the old frames, ink bar the new;
   the player then the computer; game scale 5 above, 4x below). A rally with them:
   [rally-era1.png](../shots/item-1278/rally-era1.png).
+- LESSONS (item 1287, the reference Combat changed): the twelve inks are real NTSC entries now,
+  and each scanline holds the TIA's four colour registers: the black field, one playfield grey
+  (hue 0, luminance 3) for the wall, the crowd, the net and the ball, and the two players' inks,
+  which the scores also wear (score mode). The ball goes up into every line from the top wall to
+  the bottom, so the crowd cannot sit on lines it never visits. The crowd shares the playfield
+  colour instead, and that has a cost you can see: over a lit crowd block the ball disappears,
+  just as it would on the real chip. The ball is also a dimmer grey than the old phosphor white.
+  The net is a one-pixel column, which the 40-block playfield cannot draw, so the playfield check
+  covers the wall and the crowd only. The same frame before and after:
+  [before-court.png](../shots/item-1287/before-court.png) /
+  [after-court.png](../shots/item-1287/after-court.png), and with the ball up in the crowd,
+  [before.png](../shots/item-1287/before.png) / [after.png](../shots/item-1287/after.png).
