@@ -215,6 +215,29 @@
   }
 
   /**
+   * A stand-in native picture at a row's own size, holding this frame, made
+   * the way that row's real native picture is made: the field-sized picture
+   * sampled down with the row's own smoothing, which for a 2D row is exactly
+   * what finish() does. Item 1313: an overlay warmed with one of these builds
+   * its work canvases -- and the GPU programs for the blends onto them -- at
+   * the size the era will really hand it.
+   */
+  function nativeLike(r) {
+    if (typeof document === 'undefined' || !document.createElement) return null;
+    var src = live.field || live.native;
+    if (!src || !src.width || !src.height) return null;
+    var c = document.createElement('canvas');
+    c.width = r.w;
+    c.height = r.h;
+    var x = c.getContext('2d');
+    if (!x) return null;
+    x.setTransform(1, 0, 0, 1, 0, 0);
+    x.imageSmoothingEnabled = !!r.smooth;
+    x.drawImage(src, 0, 0, src.width, src.height, 0, 0, r.w, r.h);
+    return c;
+  }
+
+  /**
    * Every row's screen overlay drawn once, at page load, so none of them is
    * drawn for the first time in the middle of an era change (item 1239).
    *
@@ -236,39 +259,73 @@
    * page's size, which the first frame of that era would otherwise pay for.
    * The main loop calls it once, on the first frame, before present(). A warm-up
    * is only ever an optimisation: nothing it does may stop the page.
+   *
+   * Two things item 1313 had to add, and each was measured:
+   *
+   * 1. Each row is warmed with a native picture of ITS OWN size, not with the
+   *    title's. A tube does every blend on native-sized work canvases of its own
+   *    -- the RF tube's copy, its two tinted frames, its shrunken glow -- and
+   *    those are made at whatever size the native picture it is handed has.
+   *    The rows are warmed from the top of the ladder DOWN, so the shared work
+   *    canvases are left at era 0's size, the era the first real frame draws.
+   * 2. The rows are warmed a SECOND time straight onto the page, and the page is
+   *    then read back one pixel before it is cleared. The layer pass above does
+   *    not cover an overlay's draws onto the page itself: era 1's RF tube ends
+   *    with a rolling band of brightness (a linear gradient filled 'lighter'
+   *    through a rectangular clip) and its snow (a repeating pattern, 'lighter'),
+   *    and both were still being drawn onto the page for the first time the frame
+   *    the first ring passed the centre. That frame was 45.8, 54.1 and 104.2 ms
+   *    on 3 of 3 fresh climbs at 1920 x 1080 with the GPU on; with just those two
+   *    switched off and every other part of the tube left on, 4.4 ms (2 of 2),
+   *    and with the tube's fringes and glow off instead and the band and snow
+   *    left on, 49.9 and 50.1 ms -- so the band and the snow are the whole cost.
+   *    The one-pixel read is what forces Chrome to execute those draws before the
+   *    clear discards them (item 1218's rule, which the layer was standing in
+   *    for): without it the second pass changes nothing.
+   *    Readings: docs/measure/item1285/pace-1313-*.json.
    */
   function warmOverlays(pageCtx) {
     var page = pageCtx && pageCtx.canvas;
     var native = live.native;
     if (typeof document === 'undefined' || !document.createElement || !page || !native) return false;
     var drew = 0;
+
+    /** One row's overlay, over its own picture, on whichever context. */
+    function warmRow(x, r, stand, rect) {
+      x.save();
+      try {
+        x.setTransform(1, 0, 0, 1, 0, 0);
+        x.globalAlpha = 1;
+        x.globalCompositeOperation = 'source-over';
+        x.imageSmoothingEnabled = !!r.smooth;
+        if (r.smooth) x.imageSmoothingQuality = 'high';
+        x.drawImage(stand, 0, 0, stand.width, stand.height, rect.x, rect.y, rect.w, rect.h);
+        // era -1: no real era, so an overlay that keeps a previous frame (the
+        // 720p panel's smear) never blends this one into a real frame.
+        OVERLAYS[r.overlay](x, rect, r, { era: -1, time: 0, native: stand });
+        drew++;
+      } catch (rowErr) {
+        // this row stays cold; the rest still warm
+      } finally {
+        x.restore();
+      }
+    }
+
     try {
       var layer = document.createElement('canvas');
       layer.width = page.width;
       layer.height = page.height;
       var x = layer.getContext('2d');
       if (!x) return false;
-      for (var e = 0; e < ROWS.length; e++) {
+      var stands = [];
+      for (var e = ROWS.length - 1; e >= 0; e--) {
         var r = ROWS[e];
         var fn = OVERLAYS[r.overlay];
         if (!fn || fn === OVERLAYS.none) continue;
         var rect = fitRect(page.width, page.height, r.aspect);
-        // One row's failure never stops the others from warming.
-        x.save();
-        try {
-          x.setTransform(1, 0, 0, 1, 0, 0);
-          x.imageSmoothingEnabled = !!r.smooth;
-          if (r.smooth) x.imageSmoothingQuality = 'high';
-          x.drawImage(native, 0, 0, native.width, native.height, rect.x, rect.y, rect.w, rect.h);
-          // era -1: no real era, so an overlay that keeps a previous frame (the
-          // 720p panel's smear) never blends this one into a real frame.
-          fn(x, rect, r, { era: -1, time: 0, native: native });
-          drew++;
-        } catch (rowErr) {
-          // this row stays cold; the rest still warm
-        } finally {
-          x.restore();
-        }
+        var stand = nativeLike(r) || native;
+        stands.push({ r: r, rect: rect, stand: stand });
+        warmRow(x, r, stand, rect);
       }
       if (drew) {
         pageCtx.save();
@@ -276,12 +333,29 @@
         pageCtx.drawImage(layer, 0, 0);
         pageCtx.restore();
       }
+      // The same rows again, this time onto the page, where an overlay's own
+      // page draws land in play.
+      for (var i = 0; i < stands.length; i++) warmRow(pageCtx, stands[i].r, stands[i].stand, stands[i].rect);
+      // Make Chrome execute them before the clear below throws them away: one
+      // pixel of the page read into a scratch canvas and then out of it. Taking
+      // the page as a drawing SOURCE is what forces its pending draws through,
+      // and, unlike reading the page itself, it is allowed on a page whose
+      // canvas an image has tainted (off disk, every era 3 picture does).
+      try {
+        var peek = document.createElement('canvas');
+        peek.width = 1; peek.height = 1;
+        var px = peek.getContext('2d');
+        px.drawImage(page, 0, 0, 1, 1, 0, 0, 1, 1);
+        try { px.getImageData(0, 0, 1, 1); } catch (taintErr) { /* the draw above already flushed */ }
+      } catch (readErr) { /* an optimisation only */ }
     } catch (err) {
       // An optimisation only.
     } finally {
       if (drew) {
         pageCtx.save();
         pageCtx.setTransform(1, 0, 0, 1, 0, 0);
+        pageCtx.globalAlpha = 1;
+        pageCtx.globalCompositeOperation = 'source-over';
         pageCtx.clearRect(0, 0, page.width, page.height);
         pageCtx.restore();
       }
