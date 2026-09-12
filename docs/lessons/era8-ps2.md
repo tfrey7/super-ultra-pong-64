@@ -112,8 +112,9 @@ art bible's era 8 page, [docs/ART.md](../ART.md)).
 
 - **pixflux does not draw sprite sheets.** Asked for "3 columns by 6 rows of equal cells" at
   72 x 324, it drew a 2 x 4 grid of eight figures for one player and a single column of three for
-  the other, at two different heights. [era8-sheets.mjs](../../assets/pixellab/era8-sheets.mjs)
-  finds each figure by its alpha, scales every figure to 80 pixels and stands them on one baseline.
+  the other, at two different heights. `assets/pixellab/era8-sheets.mjs` (deleted by item 1256
+  with the sheets it cut; `git log -- assets/pixellab/era8-sheets.mjs` still has it)
+  found each figure by its alpha, scaled every figure to 80 pixels and stood them on one baseline.
   It derives the missing beats: a lean for move, a mirrored figure turning to watch the ball for a
   miss, and a pixel's bob for idle. That script costs 0 generations. **Ask pixflux for figures,
   never for a grid, and cut the grid yourself.**
@@ -211,3 +212,56 @@ Before and after, the same posed rally frame:
 2. The arm-per-frame pattern above, for any effect that must own a shared scene for its own
    frames only.
 3. The stripe-tile interlace, which suits any machine that drew two fields to a frame.
+
+---
+
+## LESSONS: the two operatives, modelled to the machine's budget (item 1256)
+
+Era 8's players stopped being flat cut-outs here. They are two Blender-built figures --
+`assets/models/era8-operative-left` and `-right`, made by `tools/blender/era8-players.py`,
+exported as glTF to `tools/blender/README.md`'s contract and stood, lit and animated by the real
+3D layer. Tim's ruling is the reason: "if you are trying to do sprites in the 3d eras uh...that
+is not gonna look AAA here dude", and "can't reuse that primitive character like that".
+
+- **Model to the machine's number, and let the SILHOUETTE spend it.** The Graphics Synthesizer
+  pushed 2.352 gigapixels a second through 4 MB of eDRAM and had **no pixel shaders**, so a
+  PlayStation 2 character could not buy its look back in shading the way era 9 and era 10 can:
+  what read as detail in 2000 was the outline and the flat gear hung on it. The budget here is
+  about 800 triangles a player, and the two land at **820 and 796**. They are spent on shape --
+  a lean 250-unit body, a visor box across the head's front, a tactical belt, a comms pack and a
+  raised collar on the left operative, thigh pouches and shoulder pads on the right -- not on
+  rounder limbs. Cones of 7 sides and a 14 x 8 head sphere are plenty at this camera; going to
+  9 and 16 x 10 (the proof figure's `hi`) would have bought nothing anybody can see and put both
+  players over the machine's number.
+- **One script, two people.** `era8-players.py` takes `--side left|right` and builds a different
+  body from the same skeleton: different palette, different gear, different triangle count. That
+  is what stops an era looking like one figure mirrored, and a test pins it (`test/era8-figures.test.js`:
+  the two palettes differ, the visors are amber against flare blue, the bodies are not the same size).
+- **The file is the ladder's 250 table units tall, so the era's `modelScale` is 1.** The proof
+  figure is about 90 and every 3D era multiplied it by 1.8. Building at the realism ladder's own
+  height instead (docs/ART.md section 8) means the number in `src/characters.js` says nothing and
+  hides nothing. A test pins the height in the file's own extras.
+- **Write the no-WebGL fallback from the same script.** `--json` also writes the compact
+  `pong-model-1` the canvas renderer draws, from the same parts and the same six poses, so
+  `?gl=off` shows these two operatives rather than a placeholder silhouette -- which is what let
+  this era's block drop its sprite sheets outright instead of keeping them as a hidden fallback.
+- **A shape hung off a bone lands where the bone STARTS, not where you pictured it.** The head,
+  its face and its visor all ride the neck-to-head bone (so a lost point can turn the head), and
+  a part written `'tail'` in the parts table hangs off that bone's far end. Without that the head
+  is built at the neck and the figure has no face.
+- **Ask the page what it drew; do not read it off a picture.** `docs/measure/item1256/shoot.mjs`
+  poses one rally frame and then asks the layer itself: both files `ready`, this era naming no
+  sheet, twelve skinned pieces in the scene totalling **1616 triangles** (820 + 796, the two files
+  exactly), the left player mid-`swing` while the right one steps `down`, and every piece inside
+  the letterbox bars. The screenshot is what a person looks at; those readings are what a test
+  could not fake.
+- **The figures cost this era nothing measurable.** 1.5 s of ordinary play at era 8 in the
+  playtest's software-drawn Chrome: **34.1 ms** a frame with the two operatives standing, against
+  **33.9 ms** measured on the same rung by item 1295 before they existed. The 3D eras are all far
+  over 16.7 ms there for reasons card 1216 owns, not for reasons a player model owns.
+
+**What a one-era game would copy**
+
+4. `tools/blender/era8-players.py`: one script that builds a CAST, not a character -- the side
+   flag picking palette and gear off one skeleton, the budget as a `--detail` row, and the glTF
+   and the canvas fallback written from the same parts in one run.
