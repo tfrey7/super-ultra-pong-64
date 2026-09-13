@@ -6,10 +6,10 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "the display switch warms mid-ring, so the first era change draws no long frame",
-    "item": "1313",
-    "sha": "2347997",
-    "date": "2026-09-12"
+    "feature": "Polygon players, era 6: the Nintendo 64 penguin and frog",
+    "item": "1254",
+    "sha": "1127fff",
+    "date": "2026-09-13"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
