@@ -8,7 +8,7 @@
   root.PongVersion = {
     "feature": "Polygon players, era 6: the Nintendo 64 penguin and frog",
     "item": "1254",
-    "sha": "1127fff",
+    "sha": "73a1d56",
     "date": "2026-09-13"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
