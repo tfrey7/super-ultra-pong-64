@@ -471,15 +471,11 @@ test('a block with only `sheet` still serves both sides, as before sheets existe
     // for every era whose own block still brings no art (the era cards fill theirs in).
     for (let e = 1; e <= 10; e++) {
       if (e === 2) continue;
-      if (C.ERAS[e].sheet || C.ERAS[e].sheets) continue;   // an era card's own art (item 1232 on)
-      const left = C.configFor(e, 'left'), right = C.configFor(e, 'right');
-      assert.strictEqual(left.sheet, null, 'era ' + e + ' left is the placeholder');
-      // An era whose block names one figure a side (item 1253 on) differs in
-      // `model` and in nothing else; every other era is the same on both sides.
-      const own = C.ERAS[e].models || {};
-      assert.strictEqual(right.model, own.right || C.ERAS[e].model || null, 'era ' + e + ": the right side's own model");
-      assert.deepStrictEqual(right, Object.assign(left, { side: 'right', model: right.model }),
-        'era ' + e + ': the two sides are the same config but for the figure each wears');
+      // an era card's own art (item 1232 on), or its own two built figures (item 1254 on)
+      if (C.ERAS[e].sheet || C.ERAS[e].sheets || C.ERAS[e].figure || C.ERAS[e].figures) continue;
+      assert.strictEqual(C.configFor(e, 'left').sheet, null, 'era ' + e + ' left is the placeholder');
+      assert.deepStrictEqual(C.configFor(e, 'right'), Object.assign(C.configFor(e, 'left'), { side: 'right' }),
+        'era ' + e + ': the two sides are the same config');
     }
   } finally {
     fake.restore();

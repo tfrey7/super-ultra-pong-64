@@ -54,10 +54,13 @@
  *            letterboxed era's picture between its bars, so a figure never
  *            pokes into a bar. null (the default) clips nothing
  *   skin, body   the placeholder's colours; its shirt wears the paddle's ink
- *   model    3D eras only (item 1248): an assets/models/ name, drawn by
- *            src/models3d.js as a polygon figure instead of any sheet, the
- *            paddle drawn as a slab under its hand; `models: { left, right }`
- *            like `sheets`. Until the file has loaded the sheet path draws.
+ *   figure   3D eras only (items 1248, 1274): an assets/models/ name, the ONE
+ *            key a block names a built player by; `figures: { left, right }`
+ *            like `sheets` (item 1336). The glTF layer (src/field3d.js) loads
+ *            <name>.glb.js; with no WebGL src/models3d.js draws <name>.js as
+ *            a polygon figure, the paddle a slab under its hand. A config's
+ *            `model` is that same name, derived, never written in a block.
+ *            Until a file has loaded the sheet path draws.
  *   shading  the model's look: flat, gouraud, cel, specular, vertex or hd
  *   modelScale, slabZ, ballInk   the figure's size, the slab's height, and
  *            the colour the ball is redrawn in where it passes in front
@@ -128,9 +131,9 @@
     // assets/pixellab/ where the loader looks. Same frame, hand and scale as
     // item 1225's sheets, so the figure holds the paddle where it did.
     2:  { sheets: { left: 'era2-boy', right: 'era2-rival' }, frame: { w: 10, h: 44 }, hand: { x: 10, y: 22 }, scale: 3.125, fps: 7.5, skin: '#fca044', body: '#0000bc' },
-    // Eras 5 to 10 (item 1248): a block may name a model from assets/models/
-    // (`model`, or `models: { left, right }`; `figure` for item 1274's glTF
-    // layer) and a shading, drawn in place of the sheets once it has loaded.
+    // Eras 5 to 10 (item 1248): a block may name a built figure from
+    // assets/models/ (`figure`, or `figures: { left, right }` -- the one key,
+    // item 1336) and a shading, drawn in place of the sheets once it has loaded.
     // Item 1283 (Tim, 2026-09-11: "can't reuse that primitive character like
     // that"): NO block names the proof figure, so every 3D era draws its own
     // stand-in pair until its own model card (1253-1258) names its own file.
@@ -177,18 +180,21 @@
     // repainted each frame in that paddle's colour, so a fighter always wears
     // its own side.
     5:  { skin: '#c8906a', body: '#1a1a1f', res: 2, round: true,
-          models: { left: 'era5-fighter-red', right: 'era5-fighter-blue' },
+          figures: { left: 'era5-fighter-red', right: 'era5-fighter-blue' },
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
           shading: 'flat' },
     // Nintendo 64 (item 1230, docs/ART.md Era 6): the penguin holds the player's paddle and the
     // frog the computer's, chunky toy mascots drawn smoothed and fogged at their paddle's depth
-    // (capped at 0.35, as the era caps its paddles). Sheets derived by
-    // assets/pixellab/era6-n64-sheets.py, embedded in src/textures3d.js and handed to the sprite
-    // loader by src/eras/era6-n64.js. A STAND-IN: Tim ruled sprite players out for the 3D eras
-    // ("that is not gonna look AAA here dude"); polygon models of these two replace this block.
+    // (capped at 0.35, as the era caps its paddles). Item 1254 made them REAL: two Blender-built
+    // glTF figures, tools/blender/era6-players.py -- a round penguin in a scarf (362 triangles)
+    // and a round frog in a cap (388), the machine's own budget of about 350 each -- loaded,
+    // lit and animated by src/field3d.js, their scarf and cap the paddle's ink. The sprite
+    // stand-ins are gone from this era (Tim: "that is not gonna look AAA here dude"); the sheets
+    // era 6's own file still primes are now unused, and until a figure's file has loaded the
+    // rig's placeholder draws in its place.
     6:  { skin: '#e8b890', body: '#283080', scale: 2.6, res: 3, round: true,
-          sheets: { left: 'era6-penguin', right: 'era6-frog' },
-          frame: { w: 32, h: 44 }, hand: { x: 29, y: 28 }, anchor: { dx: 0, dy: 0, dz: 24 },
+          figures: { left: 'era6-penguin', right: 'era6-frog' },
+          anchor: { dx: 0, dy: 0, dz: 24 },
           fps: 6, smooth: true, fogCap: 0.35,
           shading: 'gouraud' },
     // Dreamcast (item 1231): two Jet Set Radio-manner skaters, cut from pixflux by
@@ -216,7 +222,7 @@
     // tall (docs/ART.md section 8), not the proof figure's 90. The players stay
     // clipped to the picture between the era's 52-pixel letterbox bars (item 1249).
     8:  { skin: '#dcae8c', body: '#20242c', res: 4, round: true,
-          models: { left: 'era8-operative-left', right: 'era8-operative-right' },
+          figures: { left: 'era8-operative-left', right: 'era8-operative-right' },
           modelScale: 1, frame: { w: 40, h: 84 }, hand: { x: 32, y: 47 }, scale: 1.125,
           anchor: { dx: 0, dy: 0, dz: 24 }, fps: 3, clip: { y0: 52, y1: 548 },
           shading: 'specular' },
@@ -241,14 +247,14 @@
     // 1200 each), the highest rung of the ladder. In the manner of the era's
     // reference -- Gears of War's bulk and brown-grey armour read through the
     // era's bloom, depth of field and grade (item 1298) -- never a copy of it.
-    // Named as `models`, which resolves per side, and the glTF layer reads the
-    // same name (src/field3d.js: `cfg.figure || cfg.model`), so each end of
+    // Named as `figures`, which resolves per side, and the canvas fallback draws
+    // the same name (a config's `model` is its `figure`), so each end of
     // the table is its own character in WebGL and in the canvas fallback
     // alike. The `ink` material is repainted in that paddle's colour every
     // frame. Item 1234's sprite stand-ins are no longer named here: Tim ruled
     // flat sprites out of the 3D eras ("that is not gonna look AAA here dude").
     10: { skin: '#e2b294', body: '#2a2e36', res: 4, round: true,
-          models: { left: 'era10-vanguard', right: 'era10-ranger' },
+          figures: { left: 'era10-vanguard', right: 'era10-ranger' },
           modelScale: 1.8, anchor: { dx: 0, dy: 0, dz: 24 }, fps: 8,
           shading: 'hd' }
   };
@@ -264,10 +270,10 @@
   var forcedModel = (/[?&]model=([a-z0-9][a-z0-9_-]*)/.exec(search) || [])[1] || null;
   var forcedFigure = (/[?&]figure=([a-z0-9][a-z0-9_-]*)/.exec(search) || [])[1] || null;
 
-  /** The model name one side of an era block wears: its own of `models`, else `model`. */
-  function modelOf(own, side) {
-    var per = own.models && own.models[side === 'right' ? 'right' : 'left'];
-    return per || own.model || null;
+  /** The glTF figure one side of an era block wears: its own of `figures`, else `figure` (item 1254). */
+  function figureOf(own, side) {
+    var per = own.figures && own.figures[side === 'right' ? 'right' : 'left'];
+    return per || own.figure || null;
   }
 
   /** The pixellab name one side of an era block wears: its own of `sheets`, else `sheet`. */
@@ -285,10 +291,12 @@
     if (!own) return null;
     var c = Object.assign({}, DEFAULTS, own);
     delete c.sheets;
-    delete c.models;
+    delete c.figures;
     c.side = side === 'right' ? 'right' : 'left';
     c.sheet = sheetOf(own, c.side);
-    c.model = modelOf(own, c.side);
+    c.figure = figureOf(own, c.side);
+    // The canvas fallback wears the figure's own name (item 1336: one key).
+    c.model = c.figure;
     c.frames = Object.assign({}, DEFAULTS.frames, own.frames || {});
     c.anchor = Object.assign({}, DEFAULTS.anchor, own.anchor || {});
     if (!c.sheet) {
@@ -300,7 +308,8 @@
     c.era = era;
     c.is3d = era >= FIRST_3D;
     // The opt-in (item 1283): one model, or one glTF figure, on every 3D era.
-    if (c.is3d && modelsOn && forcedModel) c.model = forcedModel;
+    // ?model= puts one file on both layers, ?figure= on the glTF layer only.
+    if (c.is3d && modelsOn && forcedModel) c.model = c.figure = forcedModel;
     if (c.is3d && modelsOn && forcedFigure) c.figure = forcedFigure;
     return c;
   }
@@ -789,7 +798,7 @@
     var n = 0;
     if (forcedModel && modelsOn) { M.get(forcedModel); n++; }
     Object.keys(ERAS).forEach(function (e) {
-      [ERAS[e].model, ERAS[e].models && ERAS[e].models.left, ERAS[e].models && ERAS[e].models.right]
+      [ERAS[e].figure, ERAS[e].figures && ERAS[e].figures.left, ERAS[e].figures && ERAS[e].figures.right]
         .forEach(function (name) { if (name) { M.get(name); n++; } });
     });
     return n;

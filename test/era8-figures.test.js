@@ -132,13 +132,15 @@ test('the two operatives are a pair, not one figure twice', () => {
 
 test('era 8 names its own operatives and no sprite stand-in', () => {
   const own = C.ERAS[8];
-  assert.deepStrictEqual(own.models, SIDES);
+  assert.deepStrictEqual(own.figures, SIDES);
+  assert.ok(!own.models && !own.model, 'figures is the one key (item 1336)');
   assert.ok(!own.sheet && !own.sheets, 'the stand-in sheets have left this era');
   assert.strictEqual(own.modelScale, 1, 'the files are already 250 table units tall');
   assert.strictEqual(own.shading, 'specular', "the era's own render settings, kept");
   for (const side of ['left', 'right']) {
     const cfg = C.configFor(8, side);
-    assert.strictEqual(cfg.model, SIDES[side], `the ${side} player wears its own operative`);
+    assert.strictEqual(cfg.figure, SIDES[side], `the ${side} player wears its own operative`);
+    assert.strictEqual(cfg.model, cfg.figure, 'and the canvas fallback the same one');
     assert.strictEqual(cfg.sheet, null);
     assert.ok(cfg.is3d);
     assert.deepStrictEqual(cfg.clip, { y0: 52, y1: 548 }, 'still clipped inside the letterbox');

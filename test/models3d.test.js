@@ -230,12 +230,16 @@ test('eras 5 to 10 name a shading of their own and never the proof figure; eras 
   for (let e = 1; e <= 10; e++) {
     const c = C.configFor(e);
     if (e < 5) { assert.ok(!c.model, 'era ' + e + ' stays a sprite'); continue; }
-    // Item 1283: no era wears the PROOF figure -- an era whose own model card has
-    // landed (1253 on) names its own files, one a side, and any other names none.
+    // Item 1283: no era wears the proof figure. Once an era's own figure card
+    // lands (1253-1258) it names its own file, whose name begins with that era
+    // -- never the proof figure, and never another era's. The canvas fallback
+    // wears the same name (item 1336: `figure` is the one key).
+    assert.ok(!('model' in C.ERAS[e]) && !('models' in C.ERAS[e]), 'era ' + e + ' names its players by figure/figures only');
     for (const side of ['left', 'right']) {
       const s = C.configFor(e, side);
-      const own = s.figure || s.model;
-      assert.ok(!/^player-proof/.test(own || ''), 'era ' + e + ' ' + side + ' does not reuse the proof figure: ' + own);
+      assert.strictEqual(s.model, s.figure, 'era ' + e + ' ' + side + ': the fallback wears the figure: ' + s.model);
+      assert.ok(!s.figure || s.figure.indexOf('era' + e + '-') === 0,
+        'era ' + e + ' ' + side + ' wears its own figure, not ' + s.figure);
     }
     assert.ok(M.MODES.includes(c.shading), 'era ' + e + ' shading ' + c.shading);
     modes.add(c.shading);
@@ -243,17 +247,17 @@ test('eras 5 to 10 name a shading of their own and never the proof figure; eras 
   assert.strictEqual(modes.size, 6, 'one mode an era');
 });
 
-test('item 1283: each 3D era wears its own pair, twelve different figures across the six', () => {
-  const names = new Set();
+// Item 1254 made era 6's pair real, so an era's two players are its own built
+// figures once its card has landed, and its own two stand-in sheets until then.
+test('item 1283: each 3D era wears its own pair, twelve different players across the six', () => {
+  const players = new Set();
   for (let e = 5; e <= 10; e++) {
-    // An era's pair is its own models once its model card has landed (item 1253
-    // on), and its stand-in sheets until then; either way the two sides differ.
-    const of = (side) => { const c = C.configFor(e, side); return c.figure || c.model || c.sheet; };
-    const l = of('left'), r = of('right');
-    assert.ok(l && r && l !== r, 'era ' + e + ' has two different figures: ' + l + ' / ' + r);
-    names.add(l); names.add(r);
+    const l = C.configFor(e, 'left'), r = C.configFor(e, 'right');
+    const a = l.figure || l.sheet, b = r.figure || r.sheet;
+    assert.ok(a && b && a !== b, 'era ' + e + ' has two different figures: ' + a + ' / ' + b);
+    players.add(a); players.add(b);
   }
-  assert.strictEqual(names.size, 12);
+  assert.strictEqual(players.size, 12);
 });
 
 test('item 1283: with the proof models loaded but not asked for, every 3D era draws its stand-ins', () => {
@@ -266,10 +270,10 @@ test('item 1283: with the proof models loaded but not asked for, every 3D era dr
   }
 });
 
-test('item 1283: an era block that names its own model file draws it, and only that era', () => {
+test('item 1283: an era block that names its own figure file draws it, and only that era', () => {
   M.loadFile(path.join(MODELS, 'player-proof-mid.json'));
   const own = C.ERAS[7];
-  own.model = 'player-proof-mid';
+  own.figure = 'player-proof-mid';   // the one key (item 1336); the fallback draws it
   try {
     assert.strictEqual(C.configFor(7, 'right').model, 'player-proof-mid');
     // its neighbour is untouched -- era 8 wears its own operatives (item 1256),
@@ -278,7 +282,7 @@ test('item 1283: an era block that names its own model file draws it, and only t
     const ctx = recorder();
     C.drawPlayers(ctx, playing(7), null, R);
     assert.ok(ctx.calls.filter(([k]) => k === 'fill').length > 200, 'era 7 draws its named model');
-  } finally { delete own.model; }
+  } finally { delete own.figure; }
 });
 
 test('with the proof model asked for (the ?model= switch), every 3D era draws both players as models and writes no state', () => {

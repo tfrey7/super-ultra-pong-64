@@ -114,7 +114,8 @@ keys must match.
   The layer adds that script tag itself the first time an era asks for the name. Nothing goes in
   `index.html`.
 - **Naming it for an era**: the era's block in `src/characters.js` names the figure as `figure:
-  '<name>'`, or, until it does, as its `model:`. The layer loads `<name>.glb.js`. A name with no
+  '<name>'`, or one a side as `figures: { left, right }` -- the only key (item 1336; a block never
+  writes `model` or `models`). The layer loads `<name>.glb.js`. A name with no
   glTF file keeps drawing item 1248's polygon figure of that name, the fallback. A figure card that
   wants a fallback too also writes `<name>.json` in the old format below.
 - **Budgets**: the proof figure is 244, 548 and 1128 triangles (`--detail lo`, `mid`, `hi`) at

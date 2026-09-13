@@ -476,7 +476,7 @@
     for (var i = 0; i < 2; i++) {
       var cfg = C.configFor(era, sides[i]);
       if (!cfg || !cfg.is3d) return null;
-      var name = cfg.figure || cfg.model;
+      var name = cfg.figure;
       var f = figure(name);
       if (!f || !state[sides[i]]) return null;
       pick.push({ side: sides[i], cfg: cfg, f: f, name: name });
@@ -536,7 +536,7 @@
     ['left', 'right'].forEach(function (side) {
       var cfg = C.configFor(era, side);
       if (!cfg || !cfg.is3d) return;
-      var name = cfg.figure || cfg.model;
+      var name = cfg.figure;
       if (typeof name === 'string' && FIG_NAME.test(name)) out.push({ side: side, name: name });
     });
     return out;

@@ -36,7 +36,8 @@ function triangles(j) {
 test('era 10 names its own two figures, one a side, and no sprite stand-in', () => {
   for (const side of ['left', 'right']) {
     const cfg = C.configFor(10, side);
-    assert.strictEqual(cfg.model, PAIR[side], side + ' wears its own figure');
+    assert.strictEqual(cfg.figure, PAIR[side], side + ' wears its own figure');
+    assert.strictEqual(cfg.model, cfg.figure, side + ': the canvas fallback wears the same name');
     assert.strictEqual(cfg.sheet, null, side + ' names no sprite sheet any more');
   }
   assert.notStrictEqual(PAIR.left, PAIR.right, 'the two ends are two characters');
