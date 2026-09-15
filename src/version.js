@@ -6,10 +6,10 @@
 (function (root) {
   'use strict';
   root.PongVersion = {
-    "feature": "Polygon players, era 6: the Nintendo 64 penguin and frog",
-    "item": "1254",
-    "sha": "73a1d56",
-    "date": "2026-09-13"
+    "feature": "console lands this repo's ready cards",
+    "item": "1688",
+    "sha": "008abe3",
+    "date": "2026-09-15"
   };
   if (typeof module === 'object' && module.exports) module.exports = root.PongVersion;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
